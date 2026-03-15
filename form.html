@@ -131,7 +131,7 @@ var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
 
 var params = new URLSearchParams(location.search);
 var caseId  = params.get('case') || '';
-var type    = params.get('type') || '';   // tokutei_nintei / tokutei_koushin / gijinkoku_nintei / gijinkoku_koushin / company
+var type    = params.get('type') || '';   // tokutei_nintei / tokutei_koushin / tokutei_henkou / gijinkoku_nintei / gijinkoku_koushin / gijinkoku_henkou / company
 var caseName = params.get('name') ? decodeURIComponent(params.get('name')) : '';
 var currentLang = params.get('lang') || '';
 
@@ -326,10 +326,12 @@ function buildForm(t) {
     case 'tokutei_nintei':
       return blockBasic() + blockMarried() + blockTokuteiNintei() + blockContact(false);
     case 'tokutei_koushin':
+    case 'tokutei_henkou':
       return blockBasic() + blockMarried() + blockTokuteiKoushin() + blockContact(false);
     case 'gijinkoku_nintei':
       return blockBasic() + blockMarried() + blockTokuteiNintei() + blockEducation() + blockContact(false);
     case 'gijinkoku_koushin':
+    case 'gijinkoku_henkou':
       return blockBasic() + blockMarried() + blockTokuteiKoushin() + blockEducation() + blockContact(false);
     case 'company':
       return buildCompanyForm();
@@ -344,11 +346,16 @@ function field(id, label, inputType, required, placeholder, transKey, options) {
   h += '<label>' + label + (required ? '<span class="req">*</span>' : '') + '</label>';
   if (transKey) h += '<div class="trans" data-key="' + transKey + '"></div>';
   if (inputType === 'select') {
-    h += '<select id="' + id + '">';
+    var _onchange = (id === 'f-nationality') ? ' onchange="toggleNationalityOther(this.value)"' : '';
+    h += '<select id="' + id + '"' + _onchange + '>';
     (options||[]).forEach(function(o) {
       h += '<option value="' + o + '">' + (o === '' ? '---' : o) + '</option>';
     });
     h += '</select>';
+    // 国籍「その他」の場合に入力フィールドを追加
+    if (id === 'f-nationality') {
+      h += '<input type="text" id="f-nationalityOther" placeholder="国籍を入力 / Enter nationality" style="display:none;margin-top:8px;width:100%;padding:13px 14px;border:1.5px solid #e5e7eb;border-radius:10px;font-size:16px;outline:none;background:white;-webkit-appearance:none;min-height:50px;" oninput="this.value=this.value">';
+    }
   } else if (inputType === 'textarea') {
     h += '<textarea id="' + id + '" rows="2" placeholder="' + placeholder + '"></textarea>';
   } else {
@@ -503,6 +510,13 @@ function finRow(label, prefix) {
   '</tr>';
 }
 
+function toggleNationalityOther(val) {
+  var el = document.getElementById('f-nationalityOther');
+  if (!el) return;
+  el.style.display = val === 'その他' ? 'block' : 'none';
+  if (val !== 'その他') el.value = '';
+}
+
 var _officerCount = 3;
 function addOfficer() {
   _officerCount++;
@@ -550,7 +564,7 @@ function collectData() {
 
   // 人材系共通
   var d = {
-    applicantNameEn: val('f-name'), birthdate: val('f-birth'), nationality: val('f-nationality'),
+    applicantNameEn: val('f-name'), birthdate: val('f-birth'), nationality: (val('f-nationality') === 'その他' ? (val('f-nationalityOther') || 'その他') : val('f-nationality')),
     passport: val('f-passport'), passportExpiry: val('f-passExpiry'),
     married: val('f-married'), email: val('f-email'), phone: val('f-phone'),
     residenceCard: val('f-residenceCard'), address: val('f-address')
@@ -563,11 +577,11 @@ function collectData() {
     d.lastEntryFrom = val('f-lastEntryFrom');
     d.lastEntryTo   = val('f-lastEntryTo');
   }
-  if (t === 'tokutei_koushin' || t === 'gijinkoku_koushin') {
+  if (t === 'tokutei_koushin' || t === 'tokutei_henkou' || t === 'gijinkoku_koushin' || t === 'gijinkoku_henkou') {
     var y = val('f-firstEntryY'), m = val('f-firstEntryM'), dd = val('f-firstEntryD');
     if (y || m || dd) d.firstEntry = y + '年' + m + '月' + dd + '日';
   }
-  if (t === 'gijinkoku_nintei' || t === 'gijinkoku_koushin') {
+  if (t === 'gijinkoku_nintei' || t === 'gijinkoku_koushin' || t === 'gijinkoku_henkou') {
     d.eduCountry = val('f-eduCountry'); d.education = val('f-education');
     d.schoolName = val('f-schoolName'); d.completionDate = val('f-completionDate');
     d.major = val('f-major');
@@ -647,9 +661,11 @@ function setLang(l) {
 // ===== バッジ =====
 var TYPE_LABELS = {
   tokutei_nintei:   { cat:'特定技能', kind:'認定', catClass:'badge-tokutei', kindClass:'badge-nintei' },
-  tokutei_koushin:  { cat:'特定技能', kind:'変更・更新', catClass:'badge-tokutei', kindClass:'badge-koushin' },
+  tokutei_koushin:  { cat:'特定技能', kind:'更新', catClass:'badge-tokutei', kindClass:'badge-koushin' },
+  tokutei_henkou:   { cat:'特定技能', kind:'変更', catClass:'badge-tokutei', kindClass:'badge-koushin' },
   gijinkoku_nintei: { cat:'技人国', kind:'認定', catClass:'badge-gijinkoku', kindClass:'badge-nintei' },
-  gijinkoku_koushin:{ cat:'技人国', kind:'変更・更新', catClass:'badge-gijinkoku', kindClass:'badge-koushin' },
+  gijinkoku_koushin:{ cat:'技人国', kind:'更新', catClass:'badge-gijinkoku', kindClass:'badge-koushin' },
+  gijinkoku_henkou: { cat:'技人国', kind:'変更', catClass:'badge-gijinkoku', kindClass:'badge-koushin' },
   company:          { cat:'企業情報', kind:'', catClass:'badge-company', kindClass:'' }
 };
 
