@@ -279,9 +279,9 @@ function blockContact(showResCard) {
   if (showResCard) h += field('f-residenceCard', '在留カード番号', 'text', false, '例: AB12345678CD', 'residenceCard');
   h += field('f-address', '現住所（日本）', 'text', false, '例: 東京都新宿区西新宿2-1-1', 'address');
   h += '<div class="field">';
-  h += '<label>一時帰国予定<div class="trans show" data-key="tempReturn" style="font-size:11px;color:#6366f1;font-weight:500;"></div></label>';
-  h += '<select id="f-tempReturnStatus" onchange="toggleTempReturnDate(this.value)">';
-  h += '<option value="">---</option>';
+  h += '<label>一時帰国予定<span style="color:#dc2626;margin-left:2px;">*</span><div class="trans show" data-key="tempReturn" style="font-size:11px;color:#6366f1;font-weight:500;"></div></label>';
+  h += '<select id="f-tempReturnStatus" required onchange="toggleTempReturnDate(this.value)">';
+  h += '<option value="">--- 選択してください / Please select ---</option>';
   h += '<option value="予定あり">予定あり / Yes, I have a plan</option>';
   h += '<option value="予定なし">予定なし / No plan</option>';
   h += '<option value="未定">未定 / Undecided</option>';
@@ -869,6 +869,7 @@ contractRenewalPeriod: val('f-contractRenewalPeriod'),
     passport: val('f-passport'), passportExpiry: val('f-passExpiry'),
     married: val('f-married'), email: val('f-email'),
     residenceCard: val('f-residenceCard'), address: val('f-address'),
+    tempReturnFlag: val('f-tempReturnStatus'),
     tempReturn: val('f-tempReturn'),
 
   };
@@ -908,6 +909,8 @@ function validate() {
   if (!val('f-nationality')) return '国籍は必須です。';
   if (!val('f-email')) return 'メールアドレスは必須です。';
   if (!val('f-married')) return '結婚しているかどうかを選択してください。';
+  if (!val('f-tempReturnStatus')) return '一時帰国予定を選択してください。';
+  if (val('f-tempReturnStatus') === '予定あり' && !val('f-tempReturn')) return '帰国予定日を入力してください。';
   if ((type==='tokutei_nintei'||type==='gijinkoku_nintei') && !val('f-entryCount')) return '来日回数を入力してください。';
   if ((type==='tokutei_nintei'||type==='gijinkoku_nintei') && !val('f-coeCount')) return 'COE申請回数を入力してください。';
   return null;
@@ -1035,6 +1038,7 @@ function prefillForm(resp) {
     married: 'f-married', email: 'f-email',
     residenceCard: 'f-residenceCard', address: 'f-address',
     residenceStatus: 'f-residenceStatus', completionDate: 'f-completionDate',
+    tempReturnFlag: 'f-tempReturnStatus',
     tempReturn: 'f-tempReturn',
     // 在留歴（認定）
     entryCount: 'f-entryCount', coeCount: 'f-coeCount', coeDenied: 'f-coeDenied',
