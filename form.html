@@ -367,7 +367,9 @@ function field(id, label, inputType, required, placeholder, transKey, options) {
 
 // ===== 企業フォーム =====
 function buildCompanyForm() {
-  return '<div class="card"><div class="section-title">企業基本情報</div>' +
+  return (
+  // ① 企業基本情報
+  '<div class="card"><div class="section-title">企業基本情報</div>' +
     field('f-coName','会社名','text',true,'例: 株式会社〇〇食品') +
     field('f-coNameKana','会社名（ひらがな）','text',false,'例: かぶしきかいしゃ〇〇しょくひん') +
     field('f-coNameEn','会社名（英語）','text',false,'例: OO Foods Co., Ltd.') +
@@ -378,10 +380,16 @@ function buildCompanyForm() {
     field('f-coLaborInsNo','労働保険番号','text',false,'例: 12-3456-789012-000') +
     '<div class="grid2">' +
       field('f-coEmployees','常勤職員数','number',false,'例: 25') +
+      field('f-coForeignEmployees','うち外国人職員数','number',false,'例: 3') +
+    '</div>' +
+    '<div class="grid2">' +
+      field('f-coTrainees','技能実習生数','number',false,'例: 2') +
       field('f-coCapital','資本金（円）','number',false,'例: 10000000') +
     '</div>' +
     field('f-coAnnualSales','年間売上金額（円）','number',false,'例: 500000000') +
   '</div>' +
+
+  // ② 所在地
   '<div class="card"><div class="section-title">所在地</div>' +
     '<div class="grid2">' +
       field('f-coZip','郵便番号','text',false,'例: 160-0022') +
@@ -392,20 +400,51 @@ function buildCompanyForm() {
     field('f-coAddressEn','住所（英語）','text',false,'例: 3F OO Bldg., 2-1-1 Shinjuku, Shinjuku-ku, Tokyo') +
     field('f-coTel','電話番号','text',false,'例: 03-1234-5678') +
   '</div>' +
+
+  // ③ 就業場所
+  '<div class="card"><div class="section-title">就業場所（事業所）</div>' +
+    field('f-officeName','事業所名','text',false,'例: 株式会社〇〇 板橋工場') +
+    field('f-officeNameEn','事業所名（英語）','text',false,'例: OO Co., Ltd. Itabashi Factory') +
+    '<div class="grid2">' +
+      field('f-officePref','都道府県','text',false,'例: 東京都') +
+      field('f-officeCity','市区町村','text',false,'例: 板橋区') +
+    '</div>' +
+    field('f-officeAddress','事業所住所（詳細）','text',false,'例: 板橋区板橋1丁目2番3号') +
+    field('f-officeAddressEn','事業所住所（英語）','text',false,'例: 1-2-3 Itabashi, Itabashi-ku, Tokyo') +
+    field('f-officeTel','事業所電話番号','text',false,'例: 03-9876-5432') +
+    field('f-jobCategory','業務内容（特定技能分野・区分）','text',false,'例: 飲食料品製造業 / 飲食料品製造') +
+    field('f-jobDescription','受け入れる外国人の職務内容','textarea',false,'例: 食品製造ラインにおいて加工品の仕上げ・品質判別等に従事') +
+  '</div>' +
+
+  // ④ 代表者・作成責任者
   '<div class="card"><div class="section-title">代表者・作成責任者</div>' +
     '<div class="grid2">' +
       field('f-coRepName','代表者氏名','text',false,'例: 山田 太郎') +
       field('f-coRepTitle','代表者役職','text',false,'例: 代表取締役') +
     '</div>' +
     '<div class="grid2">' +
+      field('f-coRepNameEn','代表者氏名（英語）','text',false,'例: YAMADA TARO') +
+      field('f-coRepTitleEn','代表者役職（英語）','text',false,'例: President') +
+    '</div>' +
+    '<div class="grid2">' +
       field('f-coAuthorName','作成責任者氏名','text',false,'例: 佐藤 花子') +
       field('f-coAuthorTitle','作成責任者役職','text',false,'例: 人事部長') +
     '</div>' +
-    '<div class="grid2">' +
-      field('f-coRepNameEn','代表者氏名（英語）','text',false,'例: YAMADA TARO') +
-      field('f-coAuthorNameEn','作成責任者氏名（英語）','text',false,'例: SATO HANAKO') +
-    '</div>' +
+    field('f-coAuthorNameEn','作成責任者氏名（英語）','text',false,'例: SATO HANAKO') +
   '</div>' +
+
+  // ⑤ 相談窓口
+  '<div class="card"><div class="section-title">雇用管理相談窓口</div>' +
+    '<div style="font-size:11px;color:#9ca3af;margin-bottom:10px;">申請人の雇用条件の相談等に対応する窓口</div>' +
+    field('f-consultDept','部署名','text',false,'例: 人事部') +
+    '<div class="grid2">' +
+      field('f-consultName','担当者名','text',false,'例: 田中 一郎') +
+      field('f-consultNameEn','担当者名（英語）','text',false,'例: TANAKA ICHIRO') +
+    '</div>' +
+    field('f-consultTel','電話番号','text',false,'例: 03-1234-5678') +
+  '</div>' +
+
+  // ⑥ 役員情報
   '<div class="card"><div class="section-title">役員情報</div>' +
     '<div style="font-size:11px;color:#9ca3af;margin-bottom:10px;">代表者を含む全役員を記入してください</div>' +
     '<div id="officers-container">' +
@@ -413,50 +452,113 @@ function buildCompanyForm() {
     '</div>' +
     '<button type="button" onclick="addOfficer()" style="font-size:11px;padding:5px 14px;background:white;border:1.5px dashed #c7d2fe;border-radius:6px;color:#6366f1;cursor:pointer;font-weight:700;">＋ 役員を追加</button>' +
   '</div>' +
-  '<div class="card"><div class="section-title">決算情報（3期分）</div>' +
-    '<div style="font-size:11px;color:#9ca3af;margin-bottom:10px;">直近3期分（単位：円）</div>' +
-    '<table class="fin-table"><thead><tr><th></th><th>前年度</th><th>前々年度</th><th>前々々年度</th></tr></thead><tbody>' +
-    finRow('売上高','prevSales') + finRow('経常損益','prevOrdinary') + finRow('純損益','prevNet') + finRow('純資産','prevAsset') +
-    '</tbody></table>' +
-  '</div>' +
-  '<div class="card"><div class="section-title">比較対象日本人</div>' +
-    '<div style="font-size:11px;color:#9ca3af;margin-bottom:10px;">外国人と同等業務に従事する日本人の情報</div>' +
-    '<div class="grid2">' +
-      field('f-jpCompAge','年齢','number',false,'例: 35') +
-      field('f-jpCompGender','性別','select',false,'',null,['','男','女']) +
-    '</div>' +
-    field('f-jpCompExp','経験年数','text',false,'例: 5年') +
-    field('f-jpCompJobDesc','職務内容','text',false,'例: 食品製造ライン作業') +
-    field('f-jpCompSalary','月額賃金（円）','number',false,'例: 210000') +
-    field('f-jpCompReason','同等以上の理由','textarea',false,'同一ラインで同等業務に従事しており…') +
-  '</div>' +
-  '<div class="card"><div class="section-title">行方不明者数（特定技能外国人）</div>' +
-    '<div class="grid3">' +
-      field('f-missing1y','直近1年','number',false,'0') +
-      field('f-missing2y','直近2年','number',false,'0') +
-      field('f-missing3y','直近3年','number',false,'0') +
-    '</div>' +
-  '</div>' +
+
+  // ⑦ 雇用条件：給与
   '<div class="card"><div class="section-title">雇用条件</div>' +
     '<div class="sub-label">【給与】</div>' +
     '<div class="grid2">' +
       field('f-salaryType','給与形態','select',false,'',null,['','月給','時給','日給']) +
-      field('f-salaryAmt','金額（円）','number',false,'例: 200000') +
+      field('f-salaryAmt','基本給（円）','number',false,'例: 200000') +
     '</div>' +
-    '<div class="sub-label">【契約期間】</div>' +
+
+    // 手当①〜④
+    '<div class="sub-label">【手当】</div>' +
     '<div class="grid2">' +
-      field('f-contractStart','開始日','date',false,'') +
-      field('f-contractEnd','終了日','date',false,'') +
+      field('f-allowance1Name','手当①名称','text',false,'例: 通勤手当') +
+      field('f-allowance1Amt','手当①金額（円）','number',false,'例: 10000') +
     '</div>' +
-    '<div class="sub-label">【勤務地・事業所】</div>' +
-    field('f-officeName','事業所名','text',false,'例: 株式会社〇〇 板橋工場') +
+    field('f-allowance1Cond','手当①計算方法・条件','text',false,'例: 実費支給') +
     '<div class="grid2">' +
-      field('f-officePref','都道府県','text',false,'例: 東京都') +
-      field('f-officeCity','市区町村','text',false,'例: 板橋区') +
+      field('f-allowance2Name','手当②名称','text',false,'例: 住宅手当') +
+      field('f-allowance2Amt','手当②金額（円）','number',false,'例: 20000') +
     '</div>' +
-    field('f-officeAddress','事業所住所（詳細）','text',false,'例: 板橋区板橋1丁目2番3号') +
-    field('f-officeTel','事業所電話番号','text',false,'例: 03-9876-5432') +
-    '<div class="sub-label">【労働時間・休日】</div>' +
+    field('f-allowance2Cond','手当②計算方法・条件','text',false,'') +
+    '<div class="grid2">' +
+      field('f-allowance3Name','手当③名称','text',false,'例: 皆勤手当') +
+      field('f-allowance3Amt','手当③金額（円）','number',false,'例: 5000') +
+    '</div>' +
+    field('f-allowance3Cond','手当③計算方法・条件','text',false,'') +
+    '<div class="grid2">' +
+      field('f-allowance4Name','手当④名称','text',false,'例: 職務手当') +
+      field('f-allowance4Amt','手当④金額（円）','number',false,'例: 10000') +
+    '</div>' +
+    field('f-allowance4Cond','手当④計算方法・条件','text',false,'') +
+
+    // 固定残業代
+    '<div class="sub-label">【固定残業代】</div>' +
+    field('f-fixedOtName','固定残業代 名称','text',false,'例: 固定残業手当') +
+    '<div class="grid2">' +
+      field('f-fixedOtAmt','固定残業代 金額（円）','number',false,'例: 30000') +
+      field('f-fixedOtHours','何時間分','number',false,'例: 20') +
+    '</div>' +
+
+    // 控除
+    '<div class="sub-label">【控除】</div>' +
+    '<div class="grid2">' +
+      field('f-deductTax','税金 概算額（円）','number',false,'例: 15000') +
+      field('f-deductSocialIns','社会保険料 概算額（円）','number',false,'例: 30000') +
+    '</div>' +
+    field('f-deductEmpIns','雇用保険料 概算額（円）','number',false,'例: 1000') +
+
+    // 居住費
+    '<div class="sub-label">【居住費】</div>' +
+    field('f-housingProvided','居住費徴収の有無','select',false,'',null,['','有','無']) +
+    field('f-deductHousing','居住費控除 月額（円）','number',false,'なければ 0') +
+    field('f-housingDetail','居住費 適正額の説明','textarea',false,'例: 月額13万円で借上の物件。居住人数10名のため1万3千円は適正。') +
+
+    // 食費
+    '<div class="sub-label">【食費】</div>' +
+    field('f-foodProvided','食費徴収の有無','select',false,'',null,['','有','無']) +
+    field('f-deductFood','食費控除 月額（円）','number',false,'なければ 0') +
+    field('f-foodDetail','食費 適正額の説明・食事内容','textarea',false,'例: 社員食堂で昼食1食500円。月20日×500円=10,000円は適正。') +
+
+    // 水道光熱費・その他控除
+    '<div class="sub-label">【水道光熱費・その他控除】</div>' +
+    '<div class="grid2">' +
+      field('f-deductUtility','水道光熱費 月額（円）','number',false,'なければ 0') +
+      field('f-deductOther1Name','その他控除① 名目','text',false,'例: 〇〇費') +
+    '</div>' +
+    field('f-deductOther1Amt','その他控除① 金額（円）','number',false,'なければ 0') +
+
+    // 社会保険
+    '<div class="sub-label">【社会保険・雇用保険】</div>' +
+    '<div class="grid2">' +
+      field('f-insKenpo','健康保険 加入','select',false,'',null,['','加入','未加入']) +
+      field('f-insPension','厚生年金 加入','select',false,'',null,['','加入','未加入']) +
+    '</div>' +
+    '<div class="grid2">' +
+      field('f-insEmp','雇用保険 加入','select',false,'',null,['','加入','未加入']) +
+      field('f-insLabor','労災保険 加入','select',false,'',null,['','加入','未加入']) +
+    '</div>' +
+    field('f-healthCheck','定期健康診断','select',false,'',null,['','毎年実施','その他']) +
+
+    // 昇給・賞与・退職金
+    '<div class="sub-label">【昇給・賞与・退職金】</div>' +
+    '<div class="grid2">' +
+      field('f-salaryRaise','昇給','select',false,'',null,['','有','無']) +
+      field('f-salaryRaiseCond','昇給 条件・時期','text',false,'例: 毎年4月（査定による）') +
+    '</div>' +
+    '<div class="grid2">' +
+      field('f-bonus','賞与','select',false,'',null,['','有','無']) +
+      field('f-bonusCond','賞与 条件・時期','text',false,'例: 年2回（6月・12月）') +
+    '</div>' +
+    '<div class="grid2">' +
+      field('f-retirement','退職金','select',false,'',null,['','有','無']) +
+      field('f-retirementDetail','退職金 制度内容','text',false,'例: 勤続3年以上') +
+    '</div>' +
+
+    // 支払方法・締め日
+    '<div class="sub-label">【支払方法・締め日】</div>' +
+    field('f-payMethod','支払方法','select',false,'',null,['','口座振込','現金','その他']) +
+    '<div class="grid2">' +
+      field('f-payCutoff','締め日','text',false,'例: 毎月末日') +
+      field('f-payDay','支払日','text',false,'例: 翌月25日') +
+    '</div>' +
+  '</div>' +
+
+  // ⑧ 労働時間
+  '<div class="card"><div class="section-title">労働時間・休日</div>' +
+    '<div class="sub-label">【所定労働時間】</div>' +
     '<div class="grid2">' +
       field('f-startTime','始業時刻','time',false,'') +
       field('f-endTime','終業時刻','time',false,'') +
@@ -465,29 +567,109 @@ function buildCompanyForm() {
       field('f-breakTime','休憩時間（分）','number',false,'例: 60') +
       field('f-dailyHours','1日所定労働時間（時間）','number',false,'例: 8') +
     '</div>' +
-    field('f-fixedDay1','定休日','text',false,'例: 土曜日、日曜日、祝日') +
+    '<div class="grid2">' +
+      field('f-weeklyDays','週所定労働日数','number',false,'例: 5') +
+      field('f-weeklyHours','週所定労働時間','number',false,'例: 40') +
+    '</div>' +
+    '<div class="grid2">' +
+      field('f-monthlyDays','月所定労働日数','number',false,'例: 21') +
+      field('f-monthlyHours','月所定労働時間','number',false,'例: 170') +
+    '</div>' +
+    '<div class="grid2">' +
+      field('f-yearlyDays','年所定労働日数','number',false,'例: 261') +
+      field('f-yearlyHours','年所定労働時間','number',false,'例: 2080') +
+    '</div>' +
+    field('f-overtimeFlg','所定労働時間外労働の有無','select',false,'',null,['','有','無']) +
+
+    // 交代制
+    '<div class="sub-label">【交代制（シフト制）】</div>' +
+    field('f-shiftFlg','交代制（シフト制）の採用','select',false,'',null,['','あり','なし']) +
+    field('f-shiftDetail','シフトパターン詳細','textarea',false,'例: 早番 7:00-16:00 / 遅番 13:00-22:00（週ごとに交代）') +
+
+    // 変形労働
+    field('f-flexFlg','変形時間労働制の適用','select',false,'',null,['','適用あり','適用なし']) +
+    field('f-flexDetail','変形労働時間制の詳細','text',false,'例: 1年単位の変形労働時間制（単位：月、最大週平均40時間）') +
+
+    // 休日
+    '<div class="sub-label">【休日】</div>' +
+    field('f-holidayType','休日の種類','select',false,'',null,['','定例日','非定例日','定例日＋非定例日']) +
+    '<div class="grid2">' +
+      field('f-fixedHolidayMon','月曜日','select',false,'',null,['','休み','出勤']) +
+      field('f-fixedHolidayTue','火曜日','select',false,'',null,['','休み','出勤']) +
+    '</div>' +
+    '<div class="grid2">' +
+      field('f-fixedHolidayWed','水曜日','select',false,'',null,['','休み','出勤']) +
+      field('f-fixedHolidayThu','木曜日','select',false,'',null,['','休み','出勤']) +
+    '</div>' +
+    '<div class="grid2">' +
+      field('f-fixedHolidayFri','金曜日','select',false,'',null,['','休み','出勤']) +
+      field('f-fixedHolidaySat','土曜日','select',false,'',null,['','休み','出勤']) +
+    '</div>' +
+    '<div class="grid2">' +
+      field('f-fixedHolidaySun','日曜日','select',false,'',null,['','休み','出勤']) +
+      field('f-fixedHolidayHol','祝日','select',false,'',null,['','休み','出勤']) +
+    '</div>' +
+    field('f-otherHoliday','その他休日（非定例日等）','text',false,'例: GW・夏季・年末年始') +
     field('f-annualHolidays','年間休日数','number',false,'例: 120') +
-    '<div class="sub-label">【手当・控除】</div>' +
+  '</div>' +
+
+  // ⑨ 契約期間
+  '<div class="card"><div class="section-title">契約期間</div>' +
     '<div class="grid2">' +
-      field('f-allowance1Name','手当①名称','text',false,'例: 通勤手当') +
-      field('f-allowance1Amt','手当①金額（円）','number',false,'例: 10000') +
+      field('f-contractStart','契約開始日','date',false,'') +
+      field('f-contractEnd','契約終了日','date',false,'') +
+    '</div>' +
+    field('f-contractRenewal','契約更新の有無','select',false,'',null,['','更新する場合があり得る','更新しない','自動更新']) +
+    field('f-contractRenewalCond','更新の判断基準','text',false,'例: 契約期間満了時の業務量・勤務成績・会社の経営状況による') +
+    '<div class="grid2">' +
+      field('f-contractRenewalMax','更新上限（回数）','text',false,'例: 4回まで / 上限なし') +
+      field('f-contractRenewalPeriod','通算契約期間の上限','text',false,'例: 5年まで / 制限なし') +
+    '</div>' +
+  '</div>' +
+
+  // ⑩ 離職・行方不明
+  '<div class="card"><div class="section-title">離職者・行方不明者情報</div>' +
+    '<div class="sub-label">【自己都合離職者（直近1年以内）】</div>' +
+    '<div class="grid2">' +
+      field('f-resignJp','日本人 人数','number',false,'例: 1') +
+      field('f-resignForeign','外国人 人数','number',false,'例: 0') +
+    '</div>' +
+    '<div class="sub-label">【会社都合離職者（直近1年以内）】</div>' +
+    '<div class="grid2">' +
+      field('f-dismissJp','日本人 人数','number',false,'例: 0') +
+      field('f-dismissForeign','外国人 人数','number',false,'例: 0') +
+    '</div>' +
+    '<div class="sub-label">【行方不明者数（特定技能）前1年間】</div>' +
+    field('f-missing1y','行方不明者数','number',false,'0') +
+  '</div>' +
+
+  // ⑪ 比較対象日本人
+  '<div class="card"><div class="section-title">比較対象日本人</div>' +
+    '<div style="font-size:11px;color:#9ca3af;margin-bottom:10px;">外国人と同等業務に従事する日本人の情報</div>' +
+    '<div class="grid2">' +
+      field('f-jpCompAge','年齢','number',false,'例: 35') +
+      field('f-jpCompGender','性別','select',false,'',null,['','男','女']) +
+    '</div>' +
+    field('f-jpCompExp','経験年数','text',false,'例: 5年') +
+    field('f-jpCompJobDesc','職務内容','text',false,'例: 食品製造ライン作業（盛付・包装）') +
+    field('f-jpCompSalary','月額報酬（円）','number',false,'例: 210000') +
+    '<div class="grid2">' +
+      field('f-jpCompAllow1Name','手当①名称','text',false,'例: 通勤手当') +
+      field('f-jpCompAllow1Amt','手当①金額（円）','number',false,'例: 10000') +
     '</div>' +
     '<div class="grid2">' +
-      field('f-allowance2Name','手当②名称','text',false,'例: 住宅手当') +
-      field('f-allowance2Amt','手当②金額（円）','number',false,'例: 20000') +
+      field('f-jpCompAllow2Name','手当②名称','text',false,'例: 住宅手当') +
+      field('f-jpCompAllow2Amt','手当②金額（円）','number',false,'例: 20000') +
     '</div>' +
     '<div class="grid2">' +
-      field('f-deductHousing','居住費控除（月額・円）','number',false,'なければ 0') +
-      field('f-deductFood','食費控除（月額・円）','number',false,'なければ 0') +
+      field('f-jpCompAllow3Name','手当③名称','text',false,'') +
+      field('f-jpCompAllow3Amt','手当③金額（円）','number',false,'') +
     '</div>' +
-    '<div class="sub-label">【社会保険・雇用保険】</div>' +
-    field('f-insurance','加入保険（該当するもの全て）','text',false,'例: 健康保険、厚生年金保険、雇用保険、労災保険') +
-    '<div class="sub-label">【締め日・支払日】</div>' +
-    '<div class="grid2">' +
-      field('f-payCutoff','締め日','text',false,'例: 毎月末日') +
-      field('f-payDay','支払日','text',false,'例: 翌月25日') +
-    '</div>' +
-  '</div>';
+    field('f-salaryRuleFlg','賃金規定の有無','select',false,'',null,['','有','無']) +
+    field('f-salaryRuleApply','賃金規定に基づき同等の日本人労働者に支払う賃金額（円）','number',false,'例: 210000') +
+    field('f-jpCompReason','同等以上の理由','textarea',false,'例: 同一ラインで同等業務に従事しており、経験年数・職務内容が同等であるため') +
+  '</div>'
+  );
 }
 
 function officerRow(n) {
@@ -532,34 +714,95 @@ function val(id) { var el=document.getElementById(id); return el ? el.value.trim
 function collectData() {
   var t = type;
   if (t === 'company') {
-    return {
+    // 役員情報を動的収集
+    var officers = {};
+    document.querySelectorAll('.officer-row').forEach(function(row) {
+      var idx = row.getAttribute('data-idx');
+      officers['officer'+idx+'Name']  = val('f-officer'+idx+'Name');
+      officers['officer'+idx+'Title'] = val('f-officer'+idx+'Title');
+      officers['officer'+idx+'Kana']  = val('f-officer'+idx+'Kana');
+    });
+    var d = {
+      // 企業基本情報
       name: val('f-coName'), nameKana: val('f-coNameKana'), nameEn: val('f-coNameEn'),
       corpNo: val('f-coCorpNo'), empInsNo: val('f-coEmpInsNo'), laborInsNo: val('f-coLaborInsNo'),
-      employees: val('f-coEmployees'), capital: val('f-coCapital'), annualSales: val('f-coAnnualSales'),
+      employees: val('f-coEmployees'), foreignEmployees: val('f-coForeignEmployees'),
+      trainees: val('f-coTrainees'), capital: val('f-coCapital'), annualSales: val('f-coAnnualSales'),
+      // 所在地
       zip: val('f-coZip'), pref: val('f-coPref'), city: val('f-coCity'),
       address: val('f-coAddress'), addressEn: val('f-coAddressEn'), tel: val('f-coTel'),
-      repName: val('f-coRepName'), repTitle: val('f-coRepTitle'), repNameEn: val('f-coRepNameEn'),
-      authorName: val('f-coAuthorName'), authorTitle: val('f-coAuthorTitle'), authorNameEn: val('f-coAuthorNameEn'),
-      officer1Name: val('f-officer1Name'), officer1Title: val('f-officer1Title'), officer1Kana: val('f-officer1Kana'),
-      officer2Name: val('f-officer2Name'), officer2Title: val('f-officer2Title'), officer2Kana: val('f-officer2Kana'),
-      officer3Name: val('f-officer3Name'), officer3Title: val('f-officer3Title'), officer3Kana: val('f-officer3Kana'),
-      prevSales1: val('f-prevSales1'), prevOrdinary1: val('f-prevOrdinary1'), prevNet1: val('f-prevNet1'), prevAsset1: val('f-prevAsset1'),
-      prevSales2: val('f-prevSales2'), prevOrdinary2: val('f-prevOrdinary2'), prevNet2: val('f-prevNet2'), prevAsset2: val('f-prevAsset2'),
-      prevSales3: val('f-prevSales3'), prevOrdinary3: val('f-prevOrdinary3'), prevNet3: val('f-prevNet3'), prevAsset3: val('f-prevAsset3'),
-      jpCompAge: val('f-jpCompAge'), jpCompGender: val('f-jpCompGender'), jpCompExp: val('f-jpCompExp'),
-      jpCompJobDesc: val('f-jpCompJobDesc'), jpCompSalary: val('f-jpCompSalary'), jpCompReason: val('f-jpCompReason'),
-      missing1y: val('f-missing1y'), missing2y: val('f-missing2y'), missing3y: val('f-missing3y'),
+      // 就業場所
+      officeName: val('f-officeName'), officeNameEn: val('f-officeNameEn'),
+      officePref: val('f-officePref'), officeCity: val('f-officeCity'),
+      officeAddress: val('f-officeAddress'), officeAddressEn: val('f-officeAddressEn'),
+      officeTel: val('f-officeTel'),
+      jobCategory: val('f-jobCategory'), jobDescription: val('f-jobDescription'),
+      // 代表者・作成責任者
+      repName: val('f-coRepName'), repTitle: val('f-coRepTitle'),
+      repNameEn: val('f-coRepNameEn'), repTitleEn: val('f-coRepTitleEn'),
+      authorName: val('f-coAuthorName'), authorTitle: val('f-coAuthorTitle'),
+      authorNameEn: val('f-coAuthorNameEn'),
+      // 相談窓口
+      consultDept: val('f-consultDept'), consultName: val('f-consultName'),
+      consultNameEn: val('f-consultNameEn'), consultTel: val('f-consultTel'),
+      // 給与・手当
       salaryType: val('f-salaryType'), salaryAmt: val('f-salaryAmt'),
+      allowance1Name: val('f-allowance1Name'), allowance1Amt: val('f-allowance1Amt'), allowance1Cond: val('f-allowance1Cond'),
+      allowance2Name: val('f-allowance2Name'), allowance2Amt: val('f-allowance2Amt'), allowance2Cond: val('f-allowance2Cond'),
+      allowance3Name: val('f-allowance3Name'), allowance3Amt: val('f-allowance3Amt'), allowance3Cond: val('f-allowance3Cond'),
+      allowance4Name: val('f-allowance4Name'), allowance4Amt: val('f-allowance4Amt'), allowance4Cond: val('f-allowance4Cond'),
+      fixedOtName: val('f-fixedOtName'), fixedOtAmt: val('f-fixedOtAmt'), fixedOtHours: val('f-fixedOtHours'),
+      // 控除
+      deductTax: val('f-deductTax'), deductSocialIns: val('f-deductSocialIns'), deductEmpIns: val('f-deductEmpIns'),
+      housingProvided: val('f-housingProvided'), deductHousing: val('f-deductHousing'), housingDetail: val('f-housingDetail'),
+      foodProvided: val('f-foodProvided'), deductFood: val('f-deductFood'), foodDetail: val('f-foodDetail'),
+      deductUtility: val('f-deductUtility'),
+      deductOther1Name: val('f-deductOther1Name'), deductOther1Amt: val('f-deductOther1Amt'),
+      // 保険・健診
+      insKenpo: val('f-insKenpo'), insPension: val('f-insPension'),
+      insEmp: val('f-insEmp'), insLabor: val('f-insLabor'), healthCheck: val('f-healthCheck'),
+      // 昇給・賞与・退職金
+      salaryRaise: val('f-salaryRaise'), salaryRaiseCond: val('f-salaryRaiseCond'),
+      bonus: val('f-bonus'), bonusCond: val('f-bonusCond'),
+      retirement: val('f-retirement'), retirementDetail: val('f-retirementDetail'),
+      // 支払・締め日
+      payMethod: val('f-payMethod'), payCutoff: val('f-payCutoff'), payDay: val('f-payDay'),
+      // 労働時間
+      startTime: val('f-startTime'), endTime: val('f-endTime'),
+      breakTime: val('f-breakTime'), dailyHours: val('f-dailyHours'),
+      weeklyDays: val('f-weeklyDays'), weeklyHours: val('f-weeklyHours'),
+      monthlyDays: val('f-monthlyDays'), monthlyHours: val('f-monthlyHours'),
+      yearlyDays: val('f-yearlyDays'), yearlyHours: val('f-yearlyHours'),
+      overtimeFlg: val('f-overtimeFlg'),
+      shiftFlg: val('f-shiftFlg'), shiftDetail: val('f-shiftDetail'),
+      flexFlg: val('f-flexFlg'), flexDetail: val('f-flexDetail'),
+      // 休日
+      holidayType: val('f-holidayType'),
+      fixedHolidayMon: val('f-fixedHolidayMon'), fixedHolidayTue: val('f-fixedHolidayTue'),
+      fixedHolidayWed: val('f-fixedHolidayWed'), fixedHolidayThu: val('f-fixedHolidayThu'),
+      fixedHolidayFri: val('f-fixedHolidayFri'), fixedHolidaySat: val('f-fixedHolidaySat'),
+      fixedHolidaySun: val('f-fixedHolidaySun'), fixedHolidayHol: val('f-fixedHolidayHol'),
+      otherHoliday: val('f-otherHoliday'), annualHolidays: val('f-annualHolidays'),
+      // 契約期間
       contractStart: val('f-contractStart'), contractEnd: val('f-contractEnd'),
-      officeName: val('f-officeName'), officePref: val('f-officePref'), officeCity: val('f-officeCity'),
-      officeAddress: val('f-officeAddress'), officeTel: val('f-officeTel'),
-      startTime: val('f-startTime'), endTime: val('f-endTime'), breakTime: val('f-breakTime'),
-      dailyHours: val('f-dailyHours'), fixedDay1: val('f-fixedDay1'), annualHolidays: val('f-annualHolidays'),
-      allowance1Name: val('f-allowance1Name'), allowance1Amt: val('f-allowance1Amt'),
-      allowance2Name: val('f-allowance2Name'), allowance2Amt: val('f-allowance2Amt'),
-      deductHousing: val('f-deductHousing'), deductFood: val('f-deductFood'),
-      insurance: val('f-insurance'), payCutoff: val('f-payCutoff'), payDay: val('f-payDay')
+      contractRenewal: val('f-contractRenewal'), contractRenewalCond: val('f-contractRenewalCond'),
+      contractRenewalMax: val('f-contractRenewalMax'), contractRenewalPeriod: val('f-contractRenewalPeriod'),
+      // 離職・行方不明
+      resignJp: val('f-resignJp'), resignForeign: val('f-resignForeign'),
+      dismissJp: val('f-dismissJp'), dismissForeign: val('f-dismissForeign'),
+      missing1y: val('f-missing1y'),
+      // 比較対象日本人
+      jpCompAge: val('f-jpCompAge'), jpCompGender: val('f-jpCompGender'), jpCompExp: val('f-jpCompExp'),
+      jpCompJobDesc: val('f-jpCompJobDesc'), jpCompSalary: val('f-jpCompSalary'),
+      jpCompAllow1Name: val('f-jpCompAllow1Name'), jpCompAllow1Amt: val('f-jpCompAllow1Amt'),
+      jpCompAllow2Name: val('f-jpCompAllow2Name'), jpCompAllow2Amt: val('f-jpCompAllow2Amt'),
+      jpCompAllow3Name: val('f-jpCompAllow3Name'), jpCompAllow3Amt: val('f-jpCompAllow3Amt'),
+      salaryRuleFlg: val('f-salaryRuleFlg'), salaryRuleApply: val('f-salaryRuleApply'),
+      jpCompReason: val('f-jpCompReason')
     };
+    // 役員情報を合体
+    Object.assign(d, officers);
+    return d;
   }
 
   // 人材系共通
