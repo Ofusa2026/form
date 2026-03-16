@@ -274,7 +274,6 @@ function blockBasic() {
 function blockContact(showResCard) {
   var h = '<div class="card"><div class="section-title">連絡先・住所</div>';
   h += field('f-email', 'メールアドレス', 'text', true, '例: your@email.com', 'email');
-  h += field('f-phone', '電話番号', 'text', false, '例: 090-1234-5678', 'phone');
   if (showResCard) h += field('f-residenceCard', '在留カード番号', 'text', false, '例: AB12345678CD', 'residenceCard');
   h += field('f-address', '現住所（日本）', 'text', false, '例: 東京都新宿区西新宿2-1-1', 'address');
   h += '<div class="field">';
@@ -291,53 +290,6 @@ function blockContact(showResCard) {
   h += '</div>';
   h += '</div>';
 
-  // 在日親族
-  h += '<div class="card"><div class="section-title">在日親族</div>';
-  h += '<div class="field">';
-  h += '<label>日本に住んでいる家族・親族はいますか？<div class="trans show" data-key="hasRelative" style="font-size:11px;color:#6366f1;font-weight:500;"></div></label>';
-  h += '<select id="f-hasRelative" onchange="toggleRelativeFields(this.value)">';
-  h += '<option value="">---</option>';
-  h += '<option value="いる">いる（Yes）</option>';
-  h += '<option value="いない">いない（No）</option>';
-  h += '</select>';
-  h += '</div>';
-  h += '<div id="relativeFieldsWrap" style="display:none;">';
-  h += '<div style="font-size:11px;color:#9ca3af;margin-bottom:10px;">※複数いる場合は最も関係が近い方を記入してください</div>';
-  // 親族①
-  h += '<div style="background:#f9fafb;border-radius:10px;padding:12px;margin-bottom:8px;border:1px solid #e5e7eb;">';
-  h += '<div style="font-size:11px;font-weight:700;color:#6366f1;margin-bottom:8px;">親族①</div>';
-  h += field('f-relative1Name', '氏名', 'text', false, '例: NGUYEN THI B', 'relativeName');
-  h += '<div class="grid2">';
-  h +=   field('f-relative1Relation', '続柄', 'select', false, '', 'relativeRelation', ['','配偶者','子','父','母','兄弟','姉妹','祖父','祖母','その他']);
-  h +=   field('f-relative1Birth', '生年月日', 'date', false, '', 'relativeBirth');
-  h += '</div>';
-  h += '<div class="grid2">';
-  h +=   field('f-relative1Nationality', '国籍', 'text', false, '例: ベトナム / 日本', 'relativeNationality');
-  h +=   field('f-relative1Status', '在留資格', 'text', false, '例: 永住者 / 日本国籍', 'relativeStatus');
-  h += '</div>';
-  h += field('f-relative1Address', '住所（日本）', 'text', false, '例: 東京都新宿区…', 'relativeAddress');
-  h += field('f-relative1WorkSchool', '勤務先・学校名', 'text', false, '例: 〇〇株式会社 / 〇〇小学校', 'relativeWorkSchool');
-  h += '</div>';
-  // 親族②（追加ボタン）
-  h += '<div id="relative2Wrap" style="display:none;">';
-  h += '<div style="background:#f9fafb;border-radius:10px;padding:12px;margin-bottom:8px;border:1px solid #e5e7eb;">';
-  h += '<div style="font-size:11px;font-weight:700;color:#6366f1;margin-bottom:8px;">親族②</div>';
-  h += field('f-relative2Name', '氏名', 'text', false, '', 'relativeName');
-  h += '<div class="grid2">';
-  h +=   field('f-relative2Relation', '続柄', 'select', false, '', 'relativeRelation', ['','配偶者','子','父','母','兄弟','姉妹','祖父','祖母','その他']);
-  h +=   field('f-relative2Birth', '生年月日', 'date', false, '', 'relativeBirth');
-  h += '</div>';
-  h += '<div class="grid2">';
-  h +=   field('f-relative2Nationality', '国籍', 'text', false, '例: ベトナム / 日本', 'relativeNationality');
-  h +=   field('f-relative2Status', '在留資格', 'text', false, '例: 永住者 / 日本国籍', 'relativeStatus');
-  h += '</div>';
-  h += field('f-relative2Address', '住所（日本）', 'text', false, '', 'relativeAddress');
-  h += field('f-relative2WorkSchool', '勤務先・学校名', 'text', false, '', 'relativeWorkSchool');
-  h += '</div>';
-  h += '</div>';
-  h += '<button type="button" id="addRelative2Btn" onclick="document.getElementById(\'relative2Wrap\').style.display=\'block\';this.style.display=\'none\';" style="font-size:11px;padding:5px 14px;background:white;border:1.5px dashed #c7d2fe;border-radius:6px;color:#6366f1;cursor:pointer;font-weight:700;">＋ 親族②を追加</button>';
-  h += '</div>';
-  h += '</div>';
   return h;
 }
 
@@ -781,11 +733,6 @@ function toggleNationalityOther(val) {
   if (val !== 'その他') el.value = '';
 }
 
-function toggleRelativeFields(val) {
-  var el = document.getElementById('relativeFieldsWrap');
-  if (el) el.style.display = val === 'いる' ? 'block' : 'none';
-}
-
 function toggleTempReturnDate(val) {
   var el = document.getElementById('tempReturnDateWrap');
   if (el) el.style.display = val === '予定あり' ? 'block' : 'none';
@@ -907,18 +854,10 @@ function collectData() {
   var d = {
     applicantNameEn: val('f-name'), birthdate: val('f-birth'), nationality: (val('f-nationality') === 'その他' ? (val('f-nationalityOther') || 'その他') : val('f-nationality')),
     passport: val('f-passport'), passportExpiry: val('f-passExpiry'),
-    married: val('f-married'), email: val('f-email'), phone: val('f-phone'),
+    married: val('f-married'), email: val('f-email'),
     residenceCard: val('f-residenceCard'), address: val('f-address'),
     tempReturn: val('f-tempReturn'),
-    hasRelative: val('f-hasRelative'),
-    relative1Name: val('f-relative1Name'), relative1Relation: val('f-relative1Relation'),
-    relative1Birth: val('f-relative1Birth'), relative1Nationality: val('f-relative1Nationality'),
-    relative1Status: val('f-relative1Status'), relative1Address: val('f-relative1Address'),
-    relative1WorkSchool: val('f-relative1WorkSchool'),
-    relative2Name: val('f-relative2Name'), relative2Relation: val('f-relative2Relation'),
-    relative2Birth: val('f-relative2Birth'), relative2Nationality: val('f-relative2Nationality'),
-    relative2Status: val('f-relative2Status'), relative2Address: val('f-relative2Address'),
-    relative2WorkSchool: val('f-relative2WorkSchool')
+
   };
 
   if (t === 'tokutei_nintei' || t === 'gijinkoku_nintei') {
