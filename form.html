@@ -490,28 +490,10 @@ function buildCompanyForm() {
       field('f-salaryMonthly','基本給（円）','number',false,'例: 200000') +
     '</div>' +
 
-    // 手当①〜④
+    // 手当（追加式）
     '<div class="sub-label">【手当】</div>' +
-    '<div class="grid2">' +
-      field('f-allowance1Name','手当①名称','text',false,'例: 通勤手当') +
-      field('f-allowance1Amount','手当①金額（円）','number',false,'例: 10000') +
-    '</div>' +
-    field('f-allowance1Cond','手当①計算方法・条件','text',false,'例: 実費支給') +
-    '<div class="grid2">' +
-      field('f-allowance2Name','手当②名称','text',false,'例: 住宅手当') +
-      field('f-allowance2Amount','手当②金額（円）','number',false,'例: 20000') +
-    '</div>' +
-    field('f-allowance2Cond','手当②計算方法・条件','text',false,'') +
-    '<div class="grid2">' +
-      field('f-allowance3Name','手当③名称','text',false,'例: 皆勤手当') +
-      field('f-allowance3Amount','手当③金額（円）','number',false,'例: 5000') +
-    '</div>' +
-    field('f-allowance3Cond','手当③計算方法・条件','text',false,'') +
-    '<div class="grid2">' +
-      field('f-allowance4Name','手当④名称','text',false,'例: 職務手当') +
-      field('f-allowance4Amount','手当④金額（円）','number',false,'例: 10000') +
-    '</div>' +
-    field('f-allowance4Cond','手当④計算方法・条件','text',false,'') +
+    '<div id="allowanceRows">' + allowanceRow(1) + '</div>' +
+    '<button type="button" id="addAllowanceBtn" onclick="addAllowanceRow()" style="font-size:11px;padding:4px 14px;background:white;border:1.5px dashed #c7d2fe;border-radius:6px;color:#6366f1;cursor:pointer;font-weight:700;margin-bottom:10px;">＋ 手当を追加</button>' +
 
     // 固定残業代
     '<div class="sub-label">【固定残業代】</div>' +
@@ -649,11 +631,6 @@ function buildCompanyForm() {
       field('f-contractEnd','契約終了日','date',false,'') +
     '</div>' +
     field('f-contractRenewal','契約更新の有無','select',false,'',null,['','更新する場合があり得る','更新しない','自動更新']) +
-    field('f-contractRenewalCond','更新の判断基準','text',false,'例: 契約期間満了時の業務量・勤務成績・会社の経営状況による') +
-    '<div class="grid2">' +
-      field('f-contractRenewalMax','更新上限（回数）','text',false,'例: 4回まで / 上限なし') +
-      field('f-contractRenewalPeriod','通算契約期間の上限','text',false,'例: 5年まで / 制限なし') +
-    '</div>' +
   '</div>' +
 
   // ⑩ 離職・行方不明
@@ -719,6 +696,46 @@ function finRow(label, prefix) {
     '<td><input type="number" id="f-' + prefix + '2" placeholder="0"></td>' +
     '<td><input type="number" id="f-' + prefix + '3" placeholder="0"></td>' +
   '</tr>';
+}
+
+var _allowanceCount = 1;
+var _maxAllowance = 4;
+var _nums = ['','①','②','③','④'];
+
+function allowanceRow(n) {
+  return '<div id="allowanceRow'+n+'" style="border:1px solid #e5e7eb;border-radius:8px;padding:10px;margin-bottom:6px;background:#f9fafb;">' +
+    '<div style="font-size:10px;font-weight:700;color:#6366f1;margin-bottom:6px;display:flex;align-items:center;justify-content:space-between;">' +
+    '手当'+_nums[n] +
+    (n > 1 ? '<button type="button" onclick="removeAllowanceRow('+n+')" style="font-size:10px;padding:1px 8px;background:white;color:#dc2626;border:1px solid #fca5a5;border-radius:4px;cursor:pointer;">削除</button>' : '') +
+    '</div>' +
+    '<div class="grid2">' +
+      field('f-allowance'+n+'Name','名称','text',false,'例: 通勤手当') +
+      field('f-allowance'+n+'Amount','金額（円）','number',false,'例: 10000') +
+    '</div>' +
+    field('f-allowance'+n+'Cond','計算方法・条件','text',false,'例: 実費支給') +
+    '</div>';
+}
+
+function addAllowanceRow() {
+  if (_allowanceCount >= _maxAllowance) return;
+  _allowanceCount++;
+  var container = document.getElementById('allowanceRows');
+  if (!container) return;
+  var div = document.createElement('div');
+  div.innerHTML = allowanceRow(_allowanceCount);
+  container.appendChild(div.firstChild);
+  if (_allowanceCount >= _maxAllowance) {
+    var btn = document.getElementById('addAllowanceBtn');
+    if (btn) btn.style.display = 'none';
+  }
+  applyTranslations();
+}
+
+function removeAllowanceRow(n) {
+  var row = document.getElementById('allowanceRow'+n);
+  if (row) { row.remove(); _allowanceCount--; }
+  var btn = document.getElementById('addAllowanceBtn');
+  if (btn) btn.style.display = 'inline-block';
 }
 
 function toggleNationalityOther(val) {
@@ -789,6 +806,7 @@ function collectData() {
       allowance2Name: val('f-allowance2Name'), allowance2Amount: val('f-allowance2Amount'), allowance2Cond: val('f-allowance2Cond'),
       allowance3Name: val('f-allowance3Name'), allowance3Amount: val('f-allowance3Amount'), allowance3Cond: val('f-allowance3Cond'),
       allowance4Name: val('f-allowance4Name'), allowance4Amount: val('f-allowance4Amount'), allowance4Cond: val('f-allowance4Cond'),
+      // ※動的行は上記で統一（最大4件）
       fixedOTName: val('f-fixedOTName'), fixedOTAmount: val('f-fixedOTAmount'), fixedOTHours: val('f-fixedOTHours'),
       // 控除
       deductTax: val('f-deductTax'), deductSocial: val('f-deductSocial'), deductEmployment: val('f-deductEmployment'),
@@ -824,7 +842,7 @@ function collectData() {
       // 契約期間
       contractStart: val('f-contractStart'), contractEnd: val('f-contractEnd'),
       contractRenewal: val('f-contractRenewal'), contractRenewalCond: val('f-contractRenewalCond'),
-      contractRenewalMax: val('f-contractRenewalMax'), contractRenewalPeriod: val('f-contractRenewalPeriod'),
+contractRenewalPeriod: val('f-contractRenewalPeriod'),
       // 離職・行方不明
       resignJp: val('f-resignJp'), resignForeign: val('f-resignForeign'),
       dismissJp: val('f-dismissJp'), dismissForeign: val('f-dismissForeign'),
