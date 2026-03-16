@@ -439,12 +439,7 @@ function buildCompanyForm() {
   '<div class="card"><div class="section-title">就業場所（事業所）</div>' +
     field('f-officeName','事業所名','text',false,'例: 株式会社〇〇 板橋工場') +
     field('f-officeNameEn','事業所名（英語）','text',false,'例: OO Co., Ltd. Itabashi Factory') +
-    '<div class="grid2">' +
-      field('f-officePref','都道府県','text',false,'例: 東京都') +
-      field('f-officeCity','市区町村','text',false,'例: 板橋区') +
-    '</div>' +
-    field('f-officeAddress','事業所住所（詳細）','text',false,'例: 板橋区板橋1丁目2番3号') +
-    field('f-officeAddressEn','事業所住所（英語）','text',false,'例: 1-2-3 Itabashi, Itabashi-ku, Tokyo') +
+    field('f-officeAddress','事業所住所','text',false,'例: 東京都板橋区板橋1丁目2番3号') +
     field('f-officeTel','事業所電話番号','text',false,'例: 03-9876-5432') +
     field('f-jobCategory','業務内容（特定技能分野・区分）','text',false,'例: 飲食料品製造業 / 飲食料品製造') +
     field('f-jobDescription','受け入れる外国人の職務内容','textarea',false,'例: 食品製造ラインにおいて加工品の仕上げ・品質判別等に従事') +
@@ -492,47 +487,47 @@ function buildCompanyForm() {
     '<div class="sub-label">【給与】</div>' +
     '<div class="grid2">' +
       field('f-salaryType','給与形態','select',false,'',null,['','月給','時給','日給']) +
-      field('f-salaryAmt','基本給（円）','number',false,'例: 200000') +
+      field('f-salaryMonthly','基本給（円）','number',false,'例: 200000') +
     '</div>' +
 
     // 手当①〜④
     '<div class="sub-label">【手当】</div>' +
     '<div class="grid2">' +
       field('f-allowance1Name','手当①名称','text',false,'例: 通勤手当') +
-      field('f-allowance1Amt','手当①金額（円）','number',false,'例: 10000') +
+      field('f-allowance1Amount','手当①金額（円）','number',false,'例: 10000') +
     '</div>' +
     field('f-allowance1Cond','手当①計算方法・条件','text',false,'例: 実費支給') +
     '<div class="grid2">' +
       field('f-allowance2Name','手当②名称','text',false,'例: 住宅手当') +
-      field('f-allowance2Amt','手当②金額（円）','number',false,'例: 20000') +
+      field('f-allowance2Amount','手当②金額（円）','number',false,'例: 20000') +
     '</div>' +
     field('f-allowance2Cond','手当②計算方法・条件','text',false,'') +
     '<div class="grid2">' +
       field('f-allowance3Name','手当③名称','text',false,'例: 皆勤手当') +
-      field('f-allowance3Amt','手当③金額（円）','number',false,'例: 5000') +
+      field('f-allowance3Amount','手当③金額（円）','number',false,'例: 5000') +
     '</div>' +
     field('f-allowance3Cond','手当③計算方法・条件','text',false,'') +
     '<div class="grid2">' +
       field('f-allowance4Name','手当④名称','text',false,'例: 職務手当') +
-      field('f-allowance4Amt','手当④金額（円）','number',false,'例: 10000') +
+      field('f-allowance4Amount','手当④金額（円）','number',false,'例: 10000') +
     '</div>' +
     field('f-allowance4Cond','手当④計算方法・条件','text',false,'') +
 
     // 固定残業代
     '<div class="sub-label">【固定残業代】</div>' +
-    field('f-fixedOtName','固定残業代 名称','text',false,'例: 固定残業手当') +
+    field('f-fixedOTName','固定残業代 名称','text',false,'例: 固定残業手当') +
     '<div class="grid2">' +
-      field('f-fixedOtAmt','固定残業代 金額（円）','number',false,'例: 30000') +
-      field('f-fixedOtHours','何時間分','number',false,'例: 20') +
+      field('f-fixedOTAmount','固定残業代 金額（円）','number',false,'例: 30000') +
+      field('f-fixedOTHours','何時間分','number',false,'例: 20') +
     '</div>' +
 
     // 控除
     '<div class="sub-label">【控除】</div>' +
     '<div class="grid2">' +
       field('f-deductTax','税金 概算額（円）','number',false,'例: 15000') +
-      field('f-deductSocialIns','社会保険料 概算額（円）','number',false,'例: 30000') +
+      field('f-deductSocial','社会保険料 概算額（円）','number',false,'例: 30000') +
     '</div>' +
-    field('f-deductEmpIns','雇用保険料 概算額（円）','number',false,'例: 1000') +
+    field('f-deductEmployment','雇用保険料 概算額（円）','number',false,'例: 1000') +
 
     // 居住費
     '<div class="sub-label">【居住費】</div>' +
@@ -552,7 +547,7 @@ function buildCompanyForm() {
       field('f-deductUtility','水道光熱費 月額（円）','number',false,'なければ 0') +
       field('f-deductOther1Name','その他控除① 名目','text',false,'例: 〇〇費') +
     '</div>' +
-    field('f-deductOther1Amt','その他控除① 金額（円）','number',false,'なければ 0') +
+    field('f-deductOther1Amount','その他控除① 金額（円）','number',false,'なければ 0') +
 
     // 社会保険
     '<div class="sub-label">【社会保険・雇用保険】</div>' +
@@ -585,7 +580,7 @@ function buildCompanyForm() {
     '<div class="sub-label">【支払方法・締め日】</div>' +
     field('f-payMethod','支払方法','select',false,'',null,['','口座振込','現金','その他']) +
     '<div class="grid2">' +
-      field('f-payCutoff','締め日','text',false,'例: 毎月末日') +
+      field('f-payCutoffDayDay','締め日','text',false,'例: 毎月末日') +
       field('f-payDay','支払日','text',false,'例: 翌月25日') +
     '</div>' +
   '</div>' +
@@ -603,15 +598,15 @@ function buildCompanyForm() {
     '</div>' +
     '<div class="grid2">' +
       field('f-weeklyDays','週所定労働日数','number',false,'例: 5') +
-      field('f-weeklyHours','週所定労働時間','number',false,'例: 40') +
+      field('f-weeklyH','週所定労働時間','number',false,'例: 40') +
     '</div>' +
     '<div class="grid2">' +
       field('f-monthlyDays','月所定労働日数','number',false,'例: 21') +
-      field('f-monthlyHours','月所定労働時間','number',false,'例: 170') +
+      field('f-monthlyH','月所定労働時間','number',false,'例: 170') +
     '</div>' +
     '<div class="grid2">' +
       field('f-yearlyDays','年所定労働日数','number',false,'例: 261') +
-      field('f-yearlyHours','年所定労働時間','number',false,'例: 2080') +
+      field('f-yearlyH','年所定労働時間','number',false,'例: 2080') +
     '</div>' +
     field('f-overtimeFlg','所定労働時間外労働の有無','select',false,'',null,['','有','無']) +
 
@@ -700,7 +695,7 @@ function buildCompanyForm() {
       field('f-jpCompAllow3Amt','手当③金額（円）','number',false,'') +
     '</div>' +
     field('f-salaryRuleFlg','賃金規定の有無','select',false,'',null,['','有','無']) +
-    field('f-salaryRuleApply','賃金規定に基づき同等の日本人労働者に支払う賃金額（円）','number',false,'例: 210000') +
+
     field('f-jpCompReason','同等以上の理由','textarea',false,'例: 同一ラインで同等業務に従事しており、経験年数・職務内容が同等であるため') +
   '</div>'
   );
@@ -778,9 +773,7 @@ function collectData() {
       address: val('f-coAddress'), addressEn: val('f-coAddressEn'), tel: val('f-coTel'),
       // 就業場所
       officeName: val('f-officeName'), officeNameEn: val('f-officeNameEn'),
-      officePref: val('f-officePref'), officeCity: val('f-officeCity'),
-      officeAddress: val('f-officeAddress'), officeAddressEn: val('f-officeAddressEn'),
-      officeTel: val('f-officeTel'),
+      officeAddress: val('f-officeAddress'), officeTel: val('f-officeTel'),
       jobCategory: val('f-jobCategory'), jobDescription: val('f-jobDescription'),
       // 代表者・作成責任者
       repName: val('f-coRepName'), repTitle: val('f-coRepTitle'),
@@ -791,18 +784,18 @@ function collectData() {
       consultDept: val('f-consultDept'), consultName: val('f-consultName'),
       consultNameEn: val('f-consultNameEn'), consultTel: val('f-consultTel'),
       // 給与・手当
-      salaryType: val('f-salaryType'), salaryAmt: val('f-salaryAmt'),
-      allowance1Name: val('f-allowance1Name'), allowance1Amt: val('f-allowance1Amt'), allowance1Cond: val('f-allowance1Cond'),
-      allowance2Name: val('f-allowance2Name'), allowance2Amt: val('f-allowance2Amt'), allowance2Cond: val('f-allowance2Cond'),
-      allowance3Name: val('f-allowance3Name'), allowance3Amt: val('f-allowance3Amt'), allowance3Cond: val('f-allowance3Cond'),
-      allowance4Name: val('f-allowance4Name'), allowance4Amt: val('f-allowance4Amt'), allowance4Cond: val('f-allowance4Cond'),
-      fixedOtName: val('f-fixedOtName'), fixedOtAmt: val('f-fixedOtAmt'), fixedOtHours: val('f-fixedOtHours'),
+      salaryType: val('f-salaryType'), salaryMonthly: val('f-salaryMonthly'),
+      allowance1Name: val('f-allowance1Name'), allowance1Amount: val('f-allowance1Amount'), allowance1Cond: val('f-allowance1Cond'),
+      allowance2Name: val('f-allowance2Name'), allowance2Amount: val('f-allowance2Amount'), allowance2Cond: val('f-allowance2Cond'),
+      allowance3Name: val('f-allowance3Name'), allowance3Amount: val('f-allowance3Amount'), allowance3Cond: val('f-allowance3Cond'),
+      allowance4Name: val('f-allowance4Name'), allowance4Amount: val('f-allowance4Amount'), allowance4Cond: val('f-allowance4Cond'),
+      fixedOTName: val('f-fixedOTName'), fixedOTAmount: val('f-fixedOTAmount'), fixedOTHours: val('f-fixedOTHours'),
       // 控除
-      deductTax: val('f-deductTax'), deductSocialIns: val('f-deductSocialIns'), deductEmpIns: val('f-deductEmpIns'),
+      deductTax: val('f-deductTax'), deductSocial: val('f-deductSocial'), deductEmployment: val('f-deductEmployment'),
       housingProvided: val('f-housingProvided'), deductHousing: val('f-deductHousing'), housingDetail: val('f-housingDetail'),
       foodProvided: val('f-foodProvided'), deductFood: val('f-deductFood'), foodDetail: val('f-foodDetail'),
       deductUtility: val('f-deductUtility'),
-      deductOther1Name: val('f-deductOther1Name'), deductOther1Amt: val('f-deductOther1Amt'),
+      deductOther1Name: val('f-deductOther1Name'), deductOther1Amount: val('f-deductOther1Amount'),
       // 保険・健診
       insKenpo: val('f-insKenpo'), insPension: val('f-insPension'),
       insEmp: val('f-insEmp'), insLabor: val('f-insLabor'), healthCheck: val('f-healthCheck'),
@@ -811,13 +804,13 @@ function collectData() {
       bonus: val('f-bonus'), bonusCond: val('f-bonusCond'),
       retirement: val('f-retirement'), retirementDetail: val('f-retirementDetail'),
       // 支払・締め日
-      payMethod: val('f-payMethod'), payCutoff: val('f-payCutoff'), payDay: val('f-payDay'),
+      payMethod: val('f-payMethod'), payCutoffDay: val('f-payCutoffDayDay'), payDay: val('f-payDay'),
       // 労働時間
       startTime: val('f-startTime'), endTime: val('f-endTime'),
       breakTime: val('f-breakTime'), dailyHours: val('f-dailyHours'),
-      weeklyDays: val('f-weeklyDays'), weeklyHours: val('f-weeklyHours'),
-      monthlyDays: val('f-monthlyDays'), monthlyHours: val('f-monthlyHours'),
-      yearlyDays: val('f-yearlyDays'), yearlyHours: val('f-yearlyHours'),
+      weeklyDays: val('f-weeklyDays'), weeklyH: val('f-weeklyH'),
+      monthlyDays: val('f-monthlyDays'), monthlyH: val('f-monthlyH'),
+      yearlyDays: val('f-yearlyDays'), yearlyH: val('f-yearlyH'),
       overtimeFlg: val('f-overtimeFlg'),
       shiftFlg: val('f-shiftFlg'), shiftDetail: val('f-shiftDetail'),
       flexFlg: val('f-flexFlg'), flexDetail: val('f-flexDetail'),
@@ -842,7 +835,7 @@ function collectData() {
       jpCompAllow1Name: val('f-jpCompAllow1Name'), jpCompAllow1Amt: val('f-jpCompAllow1Amt'),
       jpCompAllow2Name: val('f-jpCompAllow2Name'), jpCompAllow2Amt: val('f-jpCompAllow2Amt'),
       jpCompAllow3Name: val('f-jpCompAllow3Name'), jpCompAllow3Amt: val('f-jpCompAllow3Amt'),
-      salaryRuleFlg: val('f-salaryRuleFlg'), salaryRuleApply: val('f-salaryRuleApply'),
+      salaryRuleFlg: val('f-salaryRuleFlg'),
       jpCompReason: val('f-jpCompReason')
     };
     // 役員情報を合体
