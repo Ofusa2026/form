@@ -151,6 +151,7 @@ var TRANS = {
     address:'Address in Japan',
     phone:'Phone Number',
     homeAddress:'Home Country Address',
+    tempReturn:'Do you plan to return home temporarily?', tempReturnDate:'Planned return date',
     eduCountry:'Country', education:'Education Level', schoolName:'School Name',
     completionDate:'Graduation Date', major:'Major'
   },
@@ -166,6 +167,7 @@ var TRANS = {
     lastEntryTo:'Ngày bạn về nước',
     residenceCard:'Số thẻ cư trú', address:'Địa chỉ tại Nhật', phone:'Điện thoại',
     homeAddress:'Địa chỉ quê nhà',
+    tempReturn:'Bạn có kế hoạch về nước tạm thời không?', tempReturnDate:'Ngày dự kiến về nước',
     eduCountry:'Quốc gia', education:'Học vấn', schoolName:'Tên trường',
     completionDate:'Tốt nghiệp', major:'Chuyên ngành'
   },
@@ -180,6 +182,7 @@ var TRANS = {
     lastEntryFrom:'Tanggal terakhir masuk Jepang', lastEntryTo:'Tanggal pulang ke negara asal',
     residenceCard:'No. Kartu Izin Tinggal', address:'Alamat di Jepang', phone:'Telepon',
     homeAddress:'Alamat Negara Asal',
+    tempReturn:'Apakah Anda berencana pulang sementara?', tempReturnDate:'Tanggal rencana pulang',
     eduCountry:'Negara', education:'Pendidikan', schoolName:'Nama Sekolah',
     completionDate:'Lulus', major:'Jurusan'
   },
@@ -194,6 +197,7 @@ var TRANS = {
     lastEntryFrom:'နောက်ဆုံး ဂျပန်ဝင်ရောက်ခဲ့သည့်ရက်', lastEntryTo:'ပြည်သို့ပြန်သည့်ရက်',
     residenceCard:'နေထိုင်ခွင့်ကတ်', address:'ဂျပန်လိပ်စာ', phone:'ဖုန်း',
     homeAddress:'မိခင်နိုင်ငံ လိပ်စာ',
+    tempReturn:'ယာယီပြန်ရန် စီစဉ်ထားပါသလား？', tempReturnDate:'ပြန်မည့်ရက်',
     eduCountry:'နိုင်ငံ', education:'ပညာ', schoolName:'ကျောင်း', completionDate:'ဘွဲ့ရ', major:'ဘာသာ'
   },
   km: {
@@ -207,6 +211,7 @@ var TRANS = {
     lastEntryFrom:'ថ្ងៃចូលប្រទេសជប៉ុនចុងក្រោយ', lastEntryTo:'ថ្ងៃត្រឡប់ទៅប្រទេស',
     residenceCard:'លេខកាតស្នាក់នៅ', address:'អាសយដ្ឋានជប៉ុន', phone:'ទូរស័ព្ទ',
     homeAddress:'អាសយដ្ឋានប្រទេសដើម',
+    tempReturn:'តើអ្នកមានគម្រោងត្រឡប់ទៅប្រទេសដើមបណ្តោះអាសន្នទេ？', tempReturnDate:'ថ្ងៃគ្រោងត្រឡប់',
     eduCountry:'ប្រទេស', education:'ការអប់រំ', schoolName:'ឈ្មោះសាលា', completionDate:'បញ្ចប់', major:'ជំនាញ'
   },
   ne: {
@@ -220,6 +225,7 @@ var TRANS = {
     lastEntryFrom:'अन्तिम पटक जापान प्रवेश गरेको मिति', lastEntryTo:'स्वदेश फर्किएको मिति',
     residenceCard:'बसोबास कार्ड नम्बर', address:'जापानमा ठेगाना', phone:'फोन',
     homeAddress:'गृह देशको ठेगाना',
+    tempReturn:'के तपाईं अस्थायी रूपमा स्वदेश फर्कने योजना गर्नुहुन्छ？', tempReturnDate:'फर्कने मिति',
     eduCountry:'देश', education:'शिक्षा', schoolName:'विद्यालय', completionDate:'स्नातक', major:'विषय'
   },
   zh: {
@@ -233,6 +239,7 @@ var TRANS = {
     lastEntryFrom:'最后一次入境日本的日期', lastEntryTo:'回国的日期',
     residenceCard:'居留卡号码', address:'在日本的地址', phone:'电话',
     homeAddress:'本国地址',
+    tempReturn:'是否有临时回国计划？', tempReturnDate:'预计回国日期',
     eduCountry:'国家', education:'学历', schoolName:'学校名称', completionDate:'毕业', major:'专业'
   }
 };
@@ -263,7 +270,18 @@ function blockContact(showResCard) {
   h += field('f-phone', '電話番号', 'text', false, '例: 090-1234-5678', 'phone');
   if (showResCard) h += field('f-residenceCard', '在留カード番号', 'text', false, '例: AB12345678CD', 'residenceCard');
   h += field('f-address', '現住所（日本）', 'text', false, '例: 東京都新宿区西新宿2-1-1', 'address');
-
+  h += '<div class="field">';
+  h += '<label>一時帰国予定<div class="trans show" data-key="tempReturn" style="font-size:11px;color:#6366f1;font-weight:500;"></div></label>';
+  h += '<select id="f-tempReturn" onchange="toggleTempReturnDate(this.value)">';
+  h += '<option value="">---</option>';
+  h += '<option value="予定あり">予定あり / Yes, I have a plan</option>';
+  h += '<option value="予定なし">予定なし / No plan</option>';
+  h += '<option value="未定">未定 / Undecided</option>';
+  h += '</select>';
+  h += '</div>';
+  h += '<div id="tempReturnDateWrap" style="display:none;">';
+  h += field('f-tempReturnDate', '帰国予定日', 'date', false, '', 'tempReturnDate');
+  h += '</div>';
   h += '</div>';
   return h;
 }
@@ -312,10 +330,19 @@ function blockTokuteiKoushin() {
   return '<div class="card"><div class="section-title">在留歴</div>' +
     '<div style="font-size:13px;font-weight:700;color:#1f2937;margin-bottom:6px;">特定技能で初めて日本に来たのはいつですか？</div>' +
     '<div class="trans" data-key="firstEntry"></div>' +
-    '<div class="grid3">' +
-      '<div class="field"><label>年</label><input type="number" id="f-firstEntryY" placeholder="例: 2023" min="2019" max="2030"></div>' +
-      '<div class="field"><label>月</label><input type="number" id="f-firstEntryM" placeholder="例: 4" min="1" max="12"></div>' +
-      '<div class="field"><label>日</label><input type="number" id="f-firstEntryD" placeholder="例: 1" min="1" max="31"></div>' +
+    '<div class="field" style="margin-bottom:10px;">' +
+      '<select id="f-firstEntryStatus" onchange="toggleFirstEntryDate(this.value)" style="width:100%;padding:13px 14px;border:1.5px solid #e5e7eb;border-radius:10px;font-size:16px;background:white;-webkit-appearance:none;min-height:50px;">' +
+        '<option value="">---</option>' +
+        '<option value="date">日付を入力する</option>' +
+        '<option value="future">これから特定技能になる（まだ来日していない）</option>' +
+      '</select>' +
+    '</div>' +
+    '<div id="firstEntryDateWrap" style="display:none;">' +
+      '<div class="grid3">' +
+        '<div class="field"><label>年</label><input type="number" id="f-firstEntryY" placeholder="例: 2023" min="2019" max="2030"></div>' +
+        '<div class="field"><label>月</label><input type="number" id="f-firstEntryM" placeholder="例: 4" min="1" max="12"></div>' +
+        '<div class="field"><label>日</label><input type="number" id="f-firstEntryD" placeholder="例: 1" min="1" max="31"></div>' +
+      '</div>' +
     '</div>' +
   '</div>';
 }
@@ -699,6 +726,16 @@ function toggleNationalityOther(val) {
   if (val !== 'その他') el.value = '';
 }
 
+function toggleTempReturnDate(val) {
+  var el = document.getElementById('tempReturnDateWrap');
+  if (el) el.style.display = val === '予定あり' ? 'block' : 'none';
+}
+
+function toggleFirstEntryDate(val) {
+  var el = document.getElementById('firstEntryDateWrap');
+  if (el) el.style.display = val === 'date' ? 'block' : 'none';
+}
+
 var _officerCount = 3;
 function addOfficer() {
   _officerCount++;
@@ -810,7 +847,8 @@ function collectData() {
     applicantNameEn: val('f-name'), birthdate: val('f-birth'), nationality: (val('f-nationality') === 'その他' ? (val('f-nationalityOther') || 'その他') : val('f-nationality')),
     passport: val('f-passport'), passportExpiry: val('f-passExpiry'),
     married: val('f-married'), email: val('f-email'), phone: val('f-phone'),
-    residenceCard: val('f-residenceCard'), address: val('f-address')
+    residenceCard: val('f-residenceCard'), address: val('f-address'),
+    tempReturn: val('f-tempReturn'), tempReturnDate: val('f-tempReturnDate')
   };
 
   if (t === 'tokutei_nintei' || t === 'gijinkoku_nintei') {
@@ -821,8 +859,13 @@ function collectData() {
     d.lastEntryTo   = val('f-lastEntryTo');
   }
   if (t === 'tokutei_koushin' || t === 'tokutei_henkou' || t === 'gijinkoku_koushin' || t === 'gijinkoku_henkou') {
-    var y = val('f-firstEntryY'), m = val('f-firstEntryM'), dd = val('f-firstEntryD');
-    if (y || m || dd) d.firstEntry = y + '年' + m + '月' + dd + '日';
+    var fStatus = val('f-firstEntryStatus');
+    if (fStatus === 'future') {
+      d.firstEntry = 'これから特定技能になる';
+    } else if (fStatus === 'date') {
+      var y = val('f-firstEntryY'), m = val('f-firstEntryM'), dd = val('f-firstEntryD');
+      if (y || m || dd) d.firstEntry = y + '年' + m + '月' + dd + '日';
+    }
   }
   if (t === 'gijinkoku_nintei' || t === 'gijinkoku_koushin' || t === 'gijinkoku_henkou') {
     d.eduCountry = val('f-eduCountry'); d.education = val('f-education');
