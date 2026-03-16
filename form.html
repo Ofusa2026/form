@@ -134,6 +134,8 @@ var caseId  = params.get('case') || '';
 var type    = params.get('type') || '';   // tokutei_nintei / tokutei_koushin / tokutei_henkou / gijinkoku_nintei / gijinkoku_koushin / gijinkoku_henkou / company
 var caseName = params.get('name') ? decodeURIComponent(params.get('name')) : '';
 var currentLang = params.get('lang') || '';
+var responseId = params.get('response_id') || '';  // 編集モード: 既存回答のID
+var editMode = !!responseId;
 
 // ===== 翻訳辞書 =====
 var TRANS = {
@@ -928,15 +930,25 @@ async function submitForm() {
   btn.disabled = true; btn.textContent = '送信中...';
 
   try {
-    var res = await fetch(SUPABASE_URL + '/rest/v1/form_responses', {
-      method: 'POST',
-      headers: { 'Content-Type':'application/json','apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY,'Prefer':'return=minimal' },
-      body: JSON.stringify({ case_id: caseId, form_type: type, response: response })
-    });
+    var res;
+    if (editMode && responseId) {
+      // 編集モード：既存レコードを更新
+      res = await fetch(SUPABASE_URL + '/rest/v1/form_responses?id=eq.' + encodeURIComponent(responseId), {
+        method: 'PATCH',
+        headers: { 'Content-Type':'application/json','apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY,'Prefer':'return=minimal' },
+        body: JSON.stringify({ response: response, imported_at: null }) // imported_atをリセット
+      });
+    } else {
+      res = await fetch(SUPABASE_URL + '/rest/v1/form_responses', {
+        method: 'POST',
+        headers: { 'Content-Type':'application/json','apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY,'Prefer':'return=minimal' },
+        body: JSON.stringify({ case_id: caseId, form_type: type, response: response })
+      });
+    }
     if (!res.ok) throw new Error('HTTP ' + res.status);
     document.getElementById('mainContent').innerHTML =
       '<div class="success"><div class="icon">✅</div><h2>送信完了</h2>' +
-      '<p>ご回答ありがとうございました。<br>担当者が内容を確認いたします。</p></div>';
+      '<p>'+(editMode?'修正内容を送信しました。<br>担当者が確認いたします。':'ご回答ありがとうございました。<br>担当者が内容を確認いたします。')+'</p></div>';
     document.getElementById('btnWrap').style.display = 'none';
   } catch(e) {
     btn.disabled = false; btn.textContent = '送信する';
@@ -988,7 +1000,112 @@ var TYPE_LABELS = {
   }
   document.getElementById('formBody').innerHTML = buildForm(type);
   setLang(currentLang);
+
+  // 編集モード：既存回答をSupabaseから取得してフィールドに流し込む
+  if (editMode && responseId) {
+    // ヘッダーを編集モード表示に
+    var infoEl = document.getElementById('infoBox');
+    if (infoEl) {
+      infoEl.style.background = '#fef3c7';
+      infoEl.style.borderColor = '#fcd34d';
+      infoEl.style.color = '#92400e';
+      infoEl.textContent = '✏️ 回答を編集中です。修正後、送信ボタンを押してください。';
+    }
+    // 送信ボタンのラベル変更
+    var btnEl = document.getElementById('btn-submit');
+    if (btnEl) btnEl.textContent = '✏️ 修正を送信する';
+
+    fetch(SUPABASE_URL + '/rest/v1/form_responses?id=eq.' + encodeURIComponent(responseId) + '&select=response', {
+      headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }
+    }).then(function(r){ return r.json(); })
+    .then(function(data) {
+      if (!data || !data.length || !data[0].response) return;
+      var resp = data[0].response;
+      prefillForm(resp);
+    }).catch(function(e){ console.error('prefill fetch error:', e); });
+  }
 })();
+
+// ===== プリフィル =====
+function prefillForm(resp) {
+  // キー→input IDのマッピング
+  var keyToId = {
+    applicantNameEn: 'f-name', birthdate: 'f-birth',
+    nationality: 'f-nationality', passport: 'f-passport', passportExpiry: 'f-passExpiry',
+    married: 'f-married', email: 'f-email',
+    residenceCard: 'f-residenceCard', address: 'f-address',
+    residenceStatus: 'f-residenceStatus', completionDate: 'f-completionDate',
+    tempReturn: 'f-tempReturn',
+    // 在留歴（認定）
+    entryCount: 'f-entryCount', coeCount: 'f-coeCount', coeDenied: 'f-coeDenied',
+    lastEntryFrom: 'f-lastEntryFrom', lastEntryTo: 'f-lastEntryTo',
+    // 在留歴（更新/変更）
+    firstEntry: 'f-firstEntryStatus',
+    // 学歴
+    eduCountry: 'f-eduCountry', education: 'f-education',
+    schoolName: 'f-schoolName', major: 'f-major',
+    // 企業
+    name: 'f-coName', nameKana: 'f-coNameKana', nameEn: 'f-coNameEn',
+    corpNo: 'f-coCorpNo', empInsNo: 'f-coEmpInsNo', laborInsNo: 'f-coLaborInsNo',
+    employees: 'f-coEmployees', foreignEmployees: 'f-coForeignEmployees',
+    trainees: 'f-coTrainees', capital: 'f-coCapital', annualSales: 'f-coAnnualSales',
+    zip: 'f-coZip', pref: 'f-coPref', city: 'f-coCity',
+    address_co: 'f-coAddress', addressEn: 'f-coAddressEn', tel: 'f-coTel',
+    repName: 'f-coRepName', repTitle: 'f-coRepTitle',
+    repNameEn: 'f-coRepNameEn', repTitleEn: 'f-coRepTitleEn',
+    authorName: 'f-coAuthorName', authorTitle: 'f-coAuthorTitle',
+    consultDept: 'f-consultDept', consultName: 'f-consultName', consultTel: 'f-consultTel',
+    salaryMonthly: 'f-salaryMonthly',
+    fixedOTName: 'f-fixedOTName', fixedOTAmount: 'f-fixedOTAmount', fixedOTHours: 'f-fixedOTHours',
+    deductTax: 'f-deductTax', deductSocial: 'f-deductSocial', deductEmployment: 'f-deductEmployment',
+    deductHousing: 'f-deductHousing', deductFood: 'f-deductFood', deductUtility: 'f-deductUtility',
+    payCutoffDay: 'f-payCutoffDay', payDay: 'f-payDay',
+    startTime: 'f-startTime', endTime: 'f-endTime', breakTime: 'f-breakTime',
+    dailyHours: 'f-dailyHours', weeklyDays: 'f-weeklyDays', weeklyH: 'f-weeklyH',
+    annualHolidays: 'f-annualHolidays',
+    jpCompAge: 'f-jpCompAge', jpCompExp: 'f-jpCompExp',
+    jpCompJobDesc: 'f-jpCompJobDesc', jpCompSalary: 'f-jpCompSalary', jpCompReason: 'f-jpCompReason'
+  };
+
+  Object.keys(resp).forEach(function(k) {
+    var v = resp[k];
+    if (!v && v !== 0) return;
+    var elId = keyToId[k] || ('f-' + k);
+    var el = document.getElementById(elId);
+    if (!el) return;
+    if (el.tagName === 'SELECT') {
+      // セレクトの場合は一致するoptionを選択
+      for (var i = 0; i < el.options.length; i++) {
+        if (el.options[i].value === String(v) || el.options[i].text === String(v)) {
+          el.selectedIndex = i; break;
+        }
+      }
+      // トグル処理
+      if (el.onchange) el.onchange();
+      else { var ev = new Event('change'); el.dispatchEvent(ev); }
+    } else {
+      el.value = v;
+    }
+  });
+
+  // 手当①〜④のプリフィル（動的行）
+  var maxAllow = 1;
+  for (var ai = 2; ai <= 4; ai++) {
+    if (resp['allowance'+ai+'Name'] || resp['allowance'+ai+'Amount']) maxAllow = ai;
+  }
+  for (var ai = 2; ai <= maxAllow; ai++) {
+    addAllowanceRow && addAllowanceRow();
+  }
+  for (var ai = 1; ai <= maxAllow; ai++) {
+    ['Name','Amount','Cond'].forEach(function(f) {
+      var k = 'allowance'+ai+f;
+      if (resp[k]) {
+        var el = document.getElementById('f-'+k);
+        if (el) el.value = resp[k];
+      }
+    });
+  }
+}
 </script>
 </body>
 </html>
