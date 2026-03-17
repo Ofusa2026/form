@@ -587,6 +587,9 @@ function buildCompanyForm() {
       field('f-dailyHours','1日所定労働時間（時間）','number',false,'例: 8') +
     '</div>' +
     '<div class="grid2">' +
+      field('f-dailyMins','1日所定労働時間（分）','number',false,'例: 0') +
+    '</div>' +
+    '<div class="grid2">' +
       field('f-weeklyDays','週所定労働日数','number',false,'例: 5') +
       field('f-weeklyH','週所定労働時間','number',false,'例: 40') +
     '</div>' +
@@ -833,7 +836,7 @@ function collectData() {
       payMethod: val('f-payMethod'), payCutoffDay: val('f-payCutoffDayDay'), payDay: val('f-payDay'),
       // 労働時間
       startTime: val('f-startTime'), endTime: val('f-endTime'),
-      breakTime: val('f-breakTime'), dailyHours: val('f-dailyHours'),
+      breakTime: val('f-breakTime'), dailyHours: val('f-dailyHours'), dailyMins: val('f-dailyMins'),
       weeklyDays: val('f-weeklyDays'), weeklyH: val('f-weeklyH'),
       monthlyDays: val('f-monthlyDays'), monthlyH: val('f-monthlyH'),
       yearlyDays: val('f-yearlyDays'), yearlyH: val('f-yearlyH'),
