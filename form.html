@@ -65,6 +65,10 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 .btn-submit { width: 100%; padding: 16px; background: #2563eb; color: white; border: none; border-radius: 12px; font-size: 16px; font-weight: 800; cursor: pointer; }
 .btn-submit:active { background: #1d4ed8; transform: scale(.98); }
 .btn-submit:disabled { background: #9ca3af; cursor: not-allowed; transform: none; }
+.btn-draft { width: 100%; padding: 14px; background: white; color: #2563eb; border: 2px solid #2563eb; border-radius: 12px; font-size: 15px; font-weight: 800; cursor: pointer; margin-bottom: 8px; }
+.btn-draft:active { background: #eff6ff; transform: scale(.98); }
+.btn-draft:disabled { color: #9ca3af; border-color: #9ca3af; cursor: not-allowed; transform: none; }
+.draft-saved-msg { text-align: center; font-size: 11px; color: #16a34a; margin-top: 6px; display: none; font-weight: 600; }
 
 /* エラー */
 .error-msg { background: #fef2f2; color: #dc2626; border-radius: 10px; padding: 12px 14px; font-size: 13px; margin-bottom: 12px; display: none; border: 1px solid #fca5a5; }
@@ -122,7 +126,9 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <div class="btn-wrap" id="btnWrap">
+  <button class="btn-draft" onclick="saveDraft()" id="btn-draft">💾 途中保存する</button>
   <button class="btn-submit" onclick="submitForm()" id="btn-submit">送信する</button>
+  <div class="draft-saved-msg" id="draftSavedMsg">✅ 途中保存しました</div>
 </div>
 
 <script>
@@ -279,9 +285,9 @@ function blockContact(showResCard) {
   if (showResCard) h += field('f-residenceCard', '在留カード番号', 'text', false, '例: AB12345678CD', 'residenceCard');
   h += field('f-address', '現住所（日本）', 'text', false, '例: 東京都新宿区西新宿2-1-1', 'address');
   h += '<div class="field">';
-  h += '<label>一時帰国予定<span style="color:#dc2626;margin-left:2px;">*</span><div class="trans show" data-key="tempReturn" style="font-size:11px;color:#6366f1;font-weight:500;"></div></label>';
-  h += '<select id="f-tempReturnStatus" required onchange="toggleTempReturnDate(this.value)">';
-  h += '<option value="">--- 選択してください / Please select ---</option>';
+  h += '<label>一時帰国予定<div class="trans show" data-key="tempReturn" style="font-size:11px;color:#6366f1;font-weight:500;"></div></label>';
+  h += '<select id="f-tempReturnStatus" onchange="toggleTempReturnDate(this.value)">';
+  h += '<option value="">---</option>';
   h += '<option value="予定あり">予定あり / Yes, I have a plan</option>';
   h += '<option value="予定なし">予定なし / No plan</option>';
   h += '<option value="未定">未定 / Undecided</option>';
@@ -869,7 +875,6 @@ contractRenewalPeriod: val('f-contractRenewalPeriod'),
     passport: val('f-passport'), passportExpiry: val('f-passExpiry'),
     married: val('f-married'), email: val('f-email'),
     residenceCard: val('f-residenceCard'), address: val('f-address'),
-    tempReturnFlag: val('f-tempReturnStatus'),
     tempReturn: val('f-tempReturn'),
 
   };
@@ -909,8 +914,6 @@ function validate() {
   if (!val('f-nationality')) return '国籍は必須です。';
   if (!val('f-email')) return 'メールアドレスは必須です。';
   if (!val('f-married')) return '結婚しているかどうかを選択してください。';
-  if (!val('f-tempReturnStatus')) return '一時帰国予定を選択してください。';
-  if (val('f-tempReturnStatus') === '予定あり' && !val('f-tempReturn')) return '帰国予定日を入力してください。';
   if ((type==='tokutei_nintei'||type==='gijinkoku_nintei') && !val('f-entryCount')) return '来日回数を入力してください。';
   if ((type==='tokutei_nintei'||type==='gijinkoku_nintei') && !val('f-coeCount')) return 'COE申請回数を入力してください。';
   return null;
@@ -960,6 +963,82 @@ async function submitForm() {
     el.style.display = 'block';
   }
 }
+
+// ===== 途中保存 =====
+var _draftResponseId = responseId || '';  // 保存済みのresponse_idを保持
+var _autoSaveTimer = null;
+
+async function saveDraft(auto) {
+  var btn = document.getElementById('btn-draft');
+  var msg = document.getElementById('draftSavedMsg');
+  if (btn) { btn.disabled = true; btn.textContent = auto ? '⏳ 自動保存中...' : '⏳ 保存中...'; }
+  if (msg) msg.style.display = 'none';
+
+  try {
+    var response = collectData();
+    // 空値は除去
+    Object.keys(response).forEach(function(k){ if(response[k]===''||response[k]==null) delete response[k]; });
+
+    var res;
+    if (_draftResponseId) {
+      // 既存レコードを更新（draft_saved_at を記録）
+      res = await fetch(SUPABASE_URL + '/rest/v1/form_responses?id=eq.' + encodeURIComponent(_draftResponseId), {
+        method: 'PATCH',
+        headers: { 'Content-Type':'application/json','apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY,'Prefer':'return=minimal' },
+        body: JSON.stringify({ response: response, imported_at: null })
+      });
+    } else {
+      // 新規レコード作成
+      res = await fetch(SUPABASE_URL + '/rest/v1/form_responses?select=id', {
+        method: 'POST',
+        headers: { 'Content-Type':'application/json','apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY,'Prefer':'return=representation' },
+        body: JSON.stringify({ case_id: caseId, form_type: type, response: response })
+      });
+      if (res.ok) {
+        var data = await res.json();
+        if (data && data[0] && data[0].id) {
+          _draftResponseId = data[0].id;
+          // URLにresponse_idを付与（ページリロード後も復元できる）
+          var newUrl = location.pathname + '?case=' + encodeURIComponent(caseId)
+            + '&type=' + encodeURIComponent(type)
+            + (caseName ? '&name=' + encodeURIComponent(caseName) : '')
+            + '&response_id=' + encodeURIComponent(_draftResponseId)
+            + (currentLang ? '&lang=' + encodeURIComponent(currentLang) : '');
+          history.replaceState(null, '', newUrl);
+        }
+      }
+    }
+
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    if (msg) { msg.style.display = 'block'; setTimeout(function(){ msg.style.display = 'none'; }, 3000); }
+    if (!auto) showAlert('✅ 途中保存しました。同じURLから続きを入力できます。', 'success');
+  } catch(e) {
+    if (!auto) showAlert('❌ 保存に失敗しました: ' + e.message, 'error');
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = '💾 途中保存する'; }
+  }
+}
+
+function showAlert(msg, type) {
+  var el = document.getElementById('errorMsg');
+  if (!el) return;
+  el.textContent = msg;
+  el.style.display = 'block';
+  el.style.background = type === 'success' ? '#f0fdf4' : '#fef2f2';
+  el.style.color = type === 'success' ? '#15803d' : '#dc2626';
+  el.style.borderColor = type === 'success' ? '#86efac' : '#fca5a5';
+  setTimeout(function(){ el.style.display = 'none'; }, 4000);
+}
+
+// 60秒ごとに自動保存（入力中のみ）
+var _hasInput = false;
+document.addEventListener('input', function(){ _hasInput = true; });
+setInterval(function(){
+  if (_hasInput && caseId) {
+    _hasInput = false;
+    saveDraft(true);
+  }
+}, 60000);
 
 // ===== 翻訳 =====
 function setLang(l) {
@@ -1017,6 +1096,9 @@ var TYPE_LABELS = {
     // 送信ボタンのラベル変更
     var btnEl = document.getElementById('btn-submit');
     if (btnEl) btnEl.textContent = '✏️ 修正を送信する';
+    // 編集モードでは途中保存ボタンを非表示
+    var draftBtn = document.getElementById('btn-draft');
+    if (draftBtn) draftBtn.style.display = 'none';
 
     fetch(SUPABASE_URL + '/rest/v1/form_responses?id=eq.' + encodeURIComponent(responseId) + '&select=response', {
       headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }
@@ -1038,7 +1120,6 @@ function prefillForm(resp) {
     married: 'f-married', email: 'f-email',
     residenceCard: 'f-residenceCard', address: 'f-address',
     residenceStatus: 'f-residenceStatus', completionDate: 'f-completionDate',
-    tempReturnFlag: 'f-tempReturnStatus',
     tempReturn: 'f-tempReturn',
     // 在留歴（認定）
     entryCount: 'f-entryCount', coeCount: 'f-coeCount', coeDenied: 'f-coeDenied',
