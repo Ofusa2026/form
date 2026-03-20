@@ -569,10 +569,7 @@ function buildCompanyForm() {
     // 支払方法・締め日
     '<div class="sub-label">【支払方法・締め日】</div>' +
     field('f-payMethod','支払方法','select',false,'',null,['','口座振込','現金','その他']) +
-    '<div class="grid2">' +
-      field('f-payCutoffDayDay','締め日','text',false,'例: 毎月末日') +
-      field('f-payDay','支払日','text',false,'例: 翌月25日') +
-    '</div>' +
+    buildPayDateFields() +
   '</div>' +
 
   // ⑧ 労働時間
@@ -585,9 +582,6 @@ function buildCompanyForm() {
     '<div class="grid2">' +
       field('f-breakTime','休憩時間（分）','number',false,'例: 60') +
       field('f-dailyHours','1日所定労働時間（時間）','number',false,'例: 8') +
-    '</div>' +
-    '<div class="grid2">' +
-      field('f-dailyMins','1日所定労働時間（分）','number',false,'例: 0') +
     '</div>' +
     '<div class="grid2">' +
       field('f-weeklyDays','週所定労働日数','number',false,'例: 5') +
@@ -660,7 +654,15 @@ function buildCompanyForm() {
     field('f-missing1y','行方不明者数','number',false,'0') +
   '</div>' +
 
-  // ⑪ 比較対象日本人
+  // ⑪ 住居（支援計画書用）
+  '<div class="card"><div class="section-title">住居（支援計画書用）</div>' +
+    '<div style="font-size:11px;color:#9ca3af;margin-bottom:10px;">支援計画書に記載する住居情報</div>' +
+    field('f-housingOwnership','住居形態（自己所有/借上）','select',false,'',null,['','自己所有','借上']) +
+    field('f-cohabitants','同居人数','number',false,'例: 3') +
+    field('f-actualCostDesc','実費相当の説明','textarea',false,'例: 月額13万円で借上の物件。居住人数10名のため1人当たり1万3千円は適正。') +
+  '</div>' +
+
+  // ⑫ 比較対象日本人
   '<div class="card"><div class="section-title">比較対象日本人</div>' +
     '<div style="font-size:11px;color:#9ca3af;margin-bottom:10px;">外国人と同等業務に従事する日本人の情報</div>' +
     '<div class="grid2">' +
@@ -687,6 +689,58 @@ function buildCompanyForm() {
     field('f-jpCompReason','同等以上の理由','textarea',false,'例: 同一ラインで同等業務に従事しており、経験年数・職務内容が同等であるため') +
   '</div>'
   );
+}
+
+// ===== 支払日・締め日 選択式フィールド =====
+function _dayOptions(includeEnd) {
+  var opts = includeEnd ? '<option value="末">末</option>' : '';
+  for (var i = 1; i <= 31; i++) {
+    opts += '<option value="' + i + '">' + i + '日</option>';
+  }
+  return opts;
+}
+
+function buildPayDateFields() {
+  var sel = function(id, opts) {
+    return '<select id="' + id + '" style="padding:10px 8px;border:1.5px solid #e5e7eb;border-radius:10px;font-size:15px;background:white;-webkit-appearance:none;min-height:50px;flex:1;">' +
+      '<option value="">---</option>' + opts + '</select>';
+  };
+  var row = function(label, monthId, dayId) {
+    return '<div class="field">' +
+      '<label>' + label + '</label>' +
+      '<div style="display:flex;align-items:center;gap:6px;">' +
+        sel(monthId, '<option value="毎月">毎月</option><option value="翌月">翌月</option>') +
+        '<span style="color:#6b7280;font-size:13px;white-space:nowrap;">⇨</span>' +
+        sel(dayId, _dayOptions(true)) +
+        '<span style="color:#6b7280;font-size:13px;white-space:nowrap;">⇦</span>' +
+      '</div>' +
+    '</div>';
+  };
+  return '<div class="grid2">' +
+    row('締め日', 'f-payCutoffMonth', 'f-payCutoffDay') +
+    row('支払日', 'f-payDayMonth', 'f-payDayDay') +
+  '</div>';
+}
+
+function collectPayDate() {
+  var cm = val('f-payCutoffMonth'), cd = val('f-payCutoffDay');
+  var pm = val('f-payDayMonth'),    pd = val('f-payDayDay');
+  var cutoff = (cm && cd) ? cm + cd : (cm || cd || '');
+  var payday = (pm && pd) ? pm + pd : (pm || pd || '');
+  return { payCutoffDay: cutoff, payDay: payday };
+}
+
+function prefillPayDate(resp) {
+  // 例: "毎月末" "翌月25日" を分解してセット
+  function _split(str, monthEl, dayEl) {
+    if (!str) return;
+    var m = str.match(/^(毎月|翌月)/);
+    var d = str.replace(/^(毎月|翌月)/, '').replace('日','');
+    if (m && monthEl) { for(var i=0;i<monthEl.options.length;i++) if(monthEl.options[i].value===m[0]){monthEl.selectedIndex=i;break;} }
+    if (d && dayEl)   { for(var i=0;i<dayEl.options.length;i++)   if(dayEl.options[i].value===d){dayEl.selectedIndex=i;break;} }
+  }
+  _split(resp.payCutoffDay, document.getElementById('f-payCutoffMonth'), document.getElementById('f-payCutoffDay'));
+  _split(resp.payDay,       document.getElementById('f-payDayMonth'),    document.getElementById('f-payDayDay'));
 }
 
 function officerRow(n) {
@@ -811,6 +865,8 @@ function collectData() {
       // 相談窓口
       consultDept: val('f-consultDept'), consultName: val('f-consultName'),
       consultNameEn: val('f-consultNameEn'), consultTel: val('f-consultTel'),
+      // 住居（支援計画書用）
+      housingOwnership: val('f-housingOwnership'), cohabitants: val('f-cohabitants'), actualCostDesc: val('f-actualCostDesc'),
       // 給与・手当
       salaryType: val('f-salaryType'), salaryMonthly: val('f-salaryMonthly'),
       allowance1Name: val('f-allowance1Name'), allowance1Amount: val('f-allowance1Amount'), allowance1Cond: val('f-allowance1Cond'),
@@ -833,10 +889,11 @@ function collectData() {
       bonus: val('f-bonus'), bonusCond: val('f-bonusCond'),
       retirement: val('f-retirement'), retirementDetail: val('f-retirementDetail'),
       // 支払・締め日
-      payMethod: val('f-payMethod'), payCutoffDay: val('f-payCutoffDayDay'), payDay: val('f-payDay'),
+      payMethod: val('f-payMethod'),
+      ...collectPayDate(),
       // 労働時間
       startTime: val('f-startTime'), endTime: val('f-endTime'),
-      breakTime: val('f-breakTime'), dailyHours: val('f-dailyHours'), dailyMins: val('f-dailyMins'),
+      breakTime: val('f-breakTime'), dailyHours: val('f-dailyHours'),
       weeklyDays: val('f-weeklyDays'), weeklyH: val('f-weeklyH'),
       monthlyDays: val('f-monthlyDays'), monthlyH: val('f-monthlyH'),
       yearlyDays: val('f-yearlyDays'), yearlyH: val('f-yearlyH'),
@@ -1143,11 +1200,12 @@ function prefillForm(resp) {
     repNameEn: 'f-coRepNameEn', repTitleEn: 'f-coRepTitleEn',
     authorName: 'f-coAuthorName', authorTitle: 'f-coAuthorTitle',
     consultDept: 'f-consultDept', consultName: 'f-consultName', consultTel: 'f-consultTel',
+    housingOwnership: 'f-housingOwnership', cohabitants: 'f-cohabitants', actualCostDesc: 'f-actualCostDesc',
     salaryMonthly: 'f-salaryMonthly',
     fixedOTName: 'f-fixedOTName', fixedOTAmount: 'f-fixedOTAmount', fixedOTHours: 'f-fixedOTHours',
     deductTax: 'f-deductTax', deductSocial: 'f-deductSocial', deductEmployment: 'f-deductEmployment',
     deductHousing: 'f-deductHousing', deductFood: 'f-deductFood', deductUtility: 'f-deductUtility',
-    payCutoffDay: 'f-payCutoffDay', payDay: 'f-payDay',
+    // payCutoffDay・payDayはprefillPayDate()で処理
     startTime: 'f-startTime', endTime: 'f-endTime', breakTime: 'f-breakTime',
     dailyHours: 'f-dailyHours', weeklyDays: 'f-weeklyDays', weeklyH: 'f-weeklyH',
     annualHolidays: 'f-annualHolidays',
@@ -1175,6 +1233,9 @@ function prefillForm(resp) {
       el.value = v;
     }
   });
+
+  // 支払日・締め日のプリフィル（選択式）
+  prefillPayDate(resp);
 
   // 手当①〜④のプリフィル（動的行）
   var maxAllow = 1;
