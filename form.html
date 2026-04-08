@@ -388,7 +388,7 @@ function field(id, label, inputType, required, placeholder, transKey, options) {
   h += '<label>' + label + (required ? '<span class="req">*</span>' : '') + '</label>';
   if (transKey) h += '<div class="trans" data-key="' + transKey + '"></div>';
   if (inputType === 'select') {
-    var _onchange = (id === 'f-nationality') ? ' onchange="toggleNationalityOther(this.value)"' : '';
+    var _onchange = (id === 'f-nationality') ? ' onchange="toggleNationalityOther(this.value)"' : (id === 'f-flexFlg') ? ' onchange="toggleFlexType(this.value)"' : '';
     h += '<select id="' + id + '"' + _onchange + '>';
     (options||[]).forEach(function(o) {
       h += '<option value="' + o + '">' + (o === '' ? '---' : o) + '</option>';
@@ -549,7 +549,7 @@ function buildCompanyForm() {
       field('f-insEmp','雇用保険 加入','select',false,'',null,['','加入','未加入']) +
       field('f-insLabor','労災保険 加入','select',false,'',null,['','加入','未加入']) +
     '</div>' +
-    field('f-healthCheck','定期健康診断','select',false,'',null,['','毎年実施','その他']) +
+    field('f-healthCheck','定期健康診断','select',false,'',null,['','年1回（毎年実施）','年2回（半年ごと）','その他']) +
 
     // 昇給・賞与・退職金
     '<div class="sub-label">【昇給・賞与・退職金】</div>' +
@@ -604,6 +604,9 @@ function buildCompanyForm() {
 
     // 変形労働
     field('f-flexFlg','変形時間労働制の適用','select',false,'',null,['','適用あり','適用なし']) +
+    '<div id="flexTypeWrap" style="display:none;">' +
+      field('f-flexType','変形労働時間制の種類','select',false,'',null,['','1年単位','1ヶ月単位']) +
+    '</div>' +
     field('f-flexDetail','変形労働時間制の詳細','text',false,'例: 1年単位の変形労働時間制（単位：月、最大週平均40時間）') +
 
     // 休日
@@ -820,6 +823,10 @@ function toggleFirstEntryDate(val) {
   var el = document.getElementById('firstEntryDateWrap');
   if (el) el.style.display = val === 'date' ? 'block' : 'none';
 }
+function toggleFlexType(val) {
+  var el = document.getElementById('flexTypeWrap');
+  if (el) el.style.display = val === '適用あり' ? 'block' : 'none';
+}
 
 var _officerCount = 3;
 function addOfficer() {
@@ -863,8 +870,7 @@ function collectData() {
       authorName: val('f-coAuthorName'), authorTitle: val('f-coAuthorTitle'),
       authorNameEn: val('f-coAuthorNameEn'),
       // 相談窓口
-      consultDept: val('f-consultDept'), consultName: val('f-consultName'),
-      consultNameEn: val('f-consultNameEn'), consultTel: val('f-consultTel'),
+      consultDept: val('f-consultDept'), consultName: val('f-consultName'), consultNameEn: val('f-consultNameEn'), consultTel: val('f-consultTel'),
       // 住居（支援計画書用）
       housingOwnership: val('f-housingOwnership'), cohabitants: val('f-cohabitants'), actualCostDesc: val('f-actualCostDesc'),
       // 給与・手当
@@ -899,7 +905,7 @@ function collectData() {
       yearlyDays: val('f-yearlyDays'), yearlyH: val('f-yearlyH'),
       overtimeFlg: val('f-overtimeFlg'),
       shiftFlg: val('f-shiftFlg'), shiftDetail: val('f-shiftDetail'),
-      flexFlg: val('f-flexFlg'), flexDetail: val('f-flexDetail'),
+      flexFlg: val('f-flexFlg'), flexType: val('f-flexType'), flexDetail: val('f-flexDetail'),
       // 休日
       holidayType: val('f-holidayType'),
       fixedHolidayMon: val('f-fixedHolidayMon'), fixedHolidayTue: val('f-fixedHolidayTue'),
@@ -997,12 +1003,13 @@ async function submitForm() {
 
   try {
     var res;
-    if (editMode && responseId) {
-      // 編集モード：既存レコードを更新
-      res = await fetch(SUPABASE_URL + '/rest/v1/form_responses?id=eq.' + encodeURIComponent(responseId), {
+    var _submitId = _draftResponseId || responseId;
+    if (_submitId) {
+      // 下書き or 編集モード：既存レコードを更新
+      res = await fetch(SUPABASE_URL + '/rest/v1/form_responses?id=eq.' + encodeURIComponent(_submitId), {
         method: 'PATCH',
         headers: { 'Content-Type':'application/json','apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY,'Prefer':'return=minimal' },
-        body: JSON.stringify({ response: response, imported_at: null }) // imported_atをリセット
+        body: JSON.stringify({ response: response, imported_at: null })
       });
     } else {
       res = await fetch(SUPABASE_URL + '/rest/v1/form_responses', {
@@ -1014,7 +1021,7 @@ async function submitForm() {
     if (!res.ok) throw new Error('HTTP ' + res.status);
     document.getElementById('mainContent').innerHTML =
       '<div class="success"><div class="icon">✅</div><h2>送信完了</h2>' +
-      '<p>'+(editMode?'修正内容を送信しました。<br>担当者が確認いたします。':'ご回答ありがとうございました。<br>担当者が内容を確認いたします。')+'</p></div>';
+      '<p>ご回答ありがとうございました。<br>担当者が内容を確認いたします。</p></div>';
     document.getElementById('btnWrap').style.display = 'none';
   } catch(e) {
     btn.disabled = false; btn.textContent = '送信する';
@@ -1143,30 +1150,42 @@ var TYPE_LABELS = {
   document.getElementById('formBody').innerHTML = buildForm(type);
   setLang(currentLang);
 
-  // 編集モード：既存回答をSupabaseから取得してフィールドに流し込む
-  if (editMode && responseId) {
-    // ヘッダーを編集モード表示に
-    var infoEl = document.getElementById('infoBox');
-    if (infoEl) {
-      infoEl.style.background = '#fef3c7';
-      infoEl.style.borderColor = '#fcd34d';
-      infoEl.style.color = '#92400e';
-      infoEl.textContent = '✏️ 回答を編集中です。修正後、送信ボタンを押してください。';
-    }
-    // 送信ボタンのラベル変更
-    var btnEl = document.getElementById('btn-submit');
-    if (btnEl) btnEl.textContent = '✏️ 修正を送信する';
-    // 編集モードでは途中保存ボタンを非表示
-    var draftBtn = document.getElementById('btn-draft');
-    if (draftBtn) draftBtn.style.display = 'none';
-
-    fetch(SUPABASE_URL + '/rest/v1/form_responses?id=eq.' + encodeURIComponent(responseId) + '&select=response', {
+  // response_id付きURLで開いた場合：DBを確認してモード判定
+  if (responseId) {
+    fetch(SUPABASE_URL + '/rest/v1/form_responses?id=eq.' + encodeURIComponent(responseId) + '&select=response,imported_at', {
       headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }
     }).then(function(r){ return r.json(); })
     .then(function(data) {
-      if (!data || !data.length || !data[0].response) return;
-      var resp = data[0].response;
-      prefillForm(resp);
+      if (!data || !data.length) return;
+      var row = data[0];
+      var resp = row.response;
+      var isSubmitted = !!row.imported_at;
+
+      if (isSubmitted) {
+        // 取込済み＝編集モード
+        var infoEl = document.getElementById('infoBox');
+        if (infoEl) {
+          infoEl.style.background = '#fef3c7';
+          infoEl.style.borderColor = '#fcd34d';
+          infoEl.style.color = '#92400e';
+          infoEl.textContent = '✏️ 回答を編集中です。修正後、送信ボタンを押してください。';
+        }
+        var btnEl = document.getElementById('btn-submit');
+        if (btnEl) btnEl.textContent = '✏️ 修正を送信する';
+        var draftBtn = document.getElementById('btn-draft');
+        if (draftBtn) draftBtn.style.display = 'none';
+      } else {
+        // 未取込＝下書き再開モード
+        var infoEl = document.getElementById('infoBox');
+        if (infoEl) {
+          infoEl.style.background = '#eff6ff';
+          infoEl.style.borderColor = '#93c5fd';
+          infoEl.style.color = '#1d4ed8';
+          infoEl.textContent = '💾 途中保存した内容を復元しました。続きを入力してください。';
+        }
+      }
+
+      if (resp) prefillForm(resp);
     }).catch(function(e){ console.error('prefill fetch error:', e); });
   }
 })();
