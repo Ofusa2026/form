@@ -133,7 +133,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20260413.02';
+var FORM_VERSION = 'ver.20260413.03';
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -302,8 +302,13 @@ function blockContact(showResCard) {
   h += '</div>';
   h += '</div>';
 
-  // 家族情報
-  h += '<div class="card"><div class="section-title">家族情報 / Family in Japan</div>';
+  // 家族情報（結婚＋在日親族を統合）
+  h += '<div class="card"><div class="section-title">家族状況 / Family Information</div>';
+
+  // 結婚
+  h += field('f-married', '結婚していますか？（けっこん）/ Are you married?', 'select', true, '', 'married', ['', 'はい（Yes）', 'いいえ（No）']);
+
+  // 在日親族
   h += '<div class="field">';
   h += '<label>日本に家族はいますか？ / Do you have family in Japan?</label>';
   h += '<select id="f-hasFamily" onchange="toggleFamilyBlock(this.value)">';
@@ -312,22 +317,10 @@ function blockContact(showResCard) {
   h += '<option value="no">いいえ / No</option>';
   h += '</select>';
   h += '</div>';
+
   h += '<div id="familyDetailWrap" style="display:none;">';
-  h += '<div style="font-size:11px;color:#6b7280;margin-bottom:10px;">※ 家族の情報を教えてください / Please provide family information</div>';
-  h += field('f-familyRelation', '続柄 / Relation（例: 配偶者、子、兄弟）', 'text', false, '例: 配偶者 / Spouse');
-  h += field('f-familyWorkplace', '家族が働いている会社 / Family member\'s workplace', 'text', false, '例: 株式会社〇〇');
-  h += field('f-familyResidenceCard', '家族の在留カード番号 / Family member\'s residence card number', 'text', false, '例: AB12345678CD');
-  h += '<div class="field">';
-  h += '<label>一緒に住んでいますか？ / Do you live together?</label>';
-  h += '<select id="f-familyLiveTogether" onchange="toggleFamilyAddress(this.value)">';
-  h += '<option value="">---</option>';
-  h += '<option value="yes">はい / Yes</option>';
-  h += '<option value="no">いいえ / No</option>';
-  h += '</select>';
-  h += '</div>';
-  h += '<div id="familyAddressWrap" style="display:none;">';
-  h += field('f-familyAddress', '家族の住所 / Family member\'s address', 'text', false, '例: 東京都新宿区〇〇1-1-1');
-  h += '</div>';
+  h += '<div id="familyMembersContainer">' + familyMemberRow(1) + '</div>';
+  h += '<button type="button" onclick="addFamilyMember()" style="font-size:11px;padding:5px 14px;background:white;border:1.5px dashed #c7d2fe;border-radius:6px;color:#6366f1;cursor:pointer;font-weight:700;margin-top:4px;">＋ 家族を追加</button>';
   h += '</div>';
   h += '</div>';
 
@@ -360,12 +353,8 @@ function blockContact(showResCard) {
   return h;
 }
 
-// 共通ブロック：結婚
-function blockMarried() {
-  return '<div class="card"><div class="section-title">家族状況</div>' +
-    field('f-married', '結婚していますか？（けっこん）', 'select', true, '', 'married', ['', 'はい（Yes）', 'いいえ（No）']) +
-  '</div>';
-}
+// 共通ブロック：結婚（※家族情報ブロックに統合済み・後方互換のため残す）
+function blockMarried() { return ''; }
 
 // 学歴ブロック
 function blockEducation() {
@@ -1052,9 +1041,45 @@ function toggleFamilyBlock(val) {
   if (el) el.style.display = (val === 'yes') ? 'block' : 'none';
 }
 
-function toggleFamilyAddress(val) {
-  var el = document.getElementById('familyAddressWrap');
+function toggleFamilyAddress(idx, val) {
+  var el = document.getElementById('familyAddressWrap' + idx);
   if (el) el.style.display = (val === 'no') ? 'block' : 'none';
+}
+
+function familyMemberRow(idx) {
+  var h = '<div class="officer-row" id="familyRow' + idx + '" data-fidx="' + idx + '" style="margin-bottom:12px;">';
+  h += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">';
+  h += '<span style="font-size:12px;font-weight:700;color:#374151;">家族 ' + idx + ' 人目</span>';
+  if (idx > 1) h += '<button type="button" onclick="removeFamilyMember(' + idx + ')" style="font-size:11px;padding:2px 8px;background:white;border:1px solid #fca5a5;border-radius:4px;color:#dc2626;cursor:pointer;">削除</button>';
+  h += '</div>';
+  h += '<div class="grid2">';
+  h += '<div class="field"><label>続柄 / Relation</label><input type="text" id="f-family' + idx + 'Relation" placeholder="例: 配偶者 / Spouse"></div>';
+  h += '<div class="field"><label>家族の在留カード番号</label><input type="text" id="f-family' + idx + 'ResidenceCard" placeholder="例: AB12345678CD"></div>';
+  h += '</div>';
+  h += '<div class="field"><label>家族が働いている会社 / Workplace</label><input type="text" id="f-family' + idx + 'Workplace" placeholder="例: 株式会社〇〇"></div>';
+  h += '<div class="field"><label>一緒に住んでいますか？ / Live together?</label>';
+  h += '<select id="f-family' + idx + 'LiveTogether" onchange="toggleFamilyAddress(' + idx + ', this.value)">';
+  h += '<option value="">---</option>';
+  h += '<option value="yes">はい / Yes</option>';
+  h += '<option value="no">いいえ / No</option>';
+  h += '</select></div>';
+  h += '<div id="familyAddressWrap' + idx + '" style="display:none;">';
+  h += '<div class="field"><label>家族の住所 / Family member\'s address</label><input type="text" id="f-family' + idx + 'Address" placeholder="例: 東京都新宿区〇〇1-1-1"></div>';
+  h += '</div>';
+  h += '</div>';
+  return h;
+}
+
+var _familyCount = 1;
+function addFamilyMember() {
+  _familyCount++;
+  var div = document.createElement('div');
+  div.innerHTML = familyMemberRow(_familyCount);
+  document.getElementById('familyMembersContainer').appendChild(div.firstChild);
+}
+function removeFamilyMember(idx) {
+  var el = document.getElementById('familyRow' + idx);
+  if (el) el.remove();
 }
 
 function toggleSkillProof(num, val) {
@@ -1242,15 +1267,25 @@ contractRenewalPeriod: val('f-contractRenewalPeriod'),
     d.jpProof2Task     = val('f-jpProof2Task');
     d.jpProof2Doc      = val('f-jpProof2Doc');
   }
-  // 家族情報
-  d.hasFamily           = val('f-hasFamily');
-  d.familyRelation      = val('f-familyRelation');
-  d.familyWorkplace     = val('f-familyWorkplace');
-  d.familyResidenceCard = val('f-familyResidenceCard');
-  d.familyLiveTogether  = val('f-familyLiveTogether');
-  d.familyAddress       = val('f-familyAddress');
+  // 家族情報（複数名）
+  d.hasFamily = val('f-hasFamily');
+  if (d.hasFamily === 'yes') {
+    var _familyList = [];
+    document.querySelectorAll('#familyMembersContainer [data-fidx]').forEach(function(row) {
+      var i = row.getAttribute('data-fidx');
+      var member = {
+        relation:      val('f-family' + i + 'Relation'),
+        residenceCard: val('f-family' + i + 'ResidenceCard'),
+        workplace:     val('f-family' + i + 'Workplace'),
+        liveTogether:  val('f-family' + i + 'LiveTogether'),
+        address:       val('f-family' + i + 'Address')
+      };
+      _familyList.push(member);
+    });
+    d.familyMembers = _familyList;
+  }
   // 転出届
-  d.tenshutsuDate       = val('f-tenshutsuDate');
+  d.tenshutsuDate = val('f-tenshutsuDate');
   return d;
 }
 function validate() {
