@@ -133,7 +133,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20260413.05';
+var FORM_VERSION = 'ver.20260413.06';
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -179,7 +179,7 @@ var TRANS = {
     familyRelation:'Relationship / Relation', familyResidenceCard:'Family Member\'s Residence Card No.',
     familyWorkplace:'Family Member\'s Workplace', familyLiveTogether:'Do you live together?',
     familyAddress:'Family Member\'s Address',
-    tenshutsuDate:'Date of submitting change of address (if moving)'
+    tenshutsuDate:'Date of submitting change of address notification',tenshutsuTitle:'/ Change of Address',tenshutsuNote:'※ Only if you have a planned move'
   },
   vi: {
     name:'Họ và tên (theo hộ chiếu)', birth:'Ngày sinh', nationality:'Quốc tịch',
@@ -210,7 +210,7 @@ var TRANS = {
     familyRelation:'Quan hệ', familyResidenceCard:'Số thẻ cư trú của người thân',
     familyWorkplace:'Nơi làm việc của người thân', familyLiveTogether:'Bạn có sống chung không?',
     familyAddress:'Địa chỉ của người thân',
-    tenshutsuDate:'Ngày nộp thông báo thay đổi địa chỉ (nếu có chuyển nhà)'
+    tenshutsuDate:'Ngày nộp thông báo thay đổi địa chỉ',tenshutsuTitle:'/ Thay đổi địa chỉ',tenshutsuNote:'※ Chỉ khi có kế hoạch chuyển nhà'
   },
   id: {
     name:'Nama Lengkap (sesuai paspor)', birth:'Tanggal Lahir', nationality:'Kewarganegaraan',
@@ -240,7 +240,7 @@ var TRANS = {
     familyRelation:'Hubungan', familyResidenceCard:'No. Kartu Izin Tinggal anggota keluarga',
     familyWorkplace:'Tempat kerja anggota keluarga', familyLiveTogether:'Apakah tinggal bersama?',
     familyAddress:'Alamat anggota keluarga',
-    tenshutsuDate:'Tanggal pelaporan pindah alamat (jika ada rencana pindah)'
+    tenshutsuDate:'Tanggal pelaporan pindah alamat',tenshutsuTitle:'/ Pindah Alamat',tenshutsuNote:'※ Hanya jika ada rencana pindah'
   },
   my: {
     name:'အမည် (နိုင်ငံကူးလက်မှတ်)', birth:'မွေးသက္ကရာဇ်', nationality:'နိုင်ငံသား',
@@ -269,7 +269,7 @@ var TRANS = {
     familyRelation:'ဆက်ဆံရေး', familyResidenceCard:'မိသားစုဝင် နေထိုင်ခွင့်ကတ်နံပါတ်',
     familyWorkplace:'မိသားစုဝင် အလုပ်ခွင်', familyLiveTogether:'အတူနေထိုင်ပါသလား？',
     familyAddress:'မိသားစုဝင် လိပ်စာ',
-    tenshutsuDate:'နေရပ်ပြောင်းရွှေ့ကြောင်း အကြောင်းကြားစာ တင်သွင်းမည့်ရက်'
+    tenshutsuDate:'နေရပ်ပြောင်းရွှေ့ကြောင်း အကြောင်းကြားစာ တင်သွင်းမည့်ရက်',tenshutsuTitle:'/ နေရာပြောင်းရွှေ့မှု',tenshutsuNote:'※ ပြောင်းရွှေ့ရန် စီစဉ်ထားပါက သာ'
   },
   km: {
     name:'ឈ្មោះ (តាមលិខិតឆ្លងដែន)', birth:'ថ្ងៃខែឆ្នាំកំណើត', nationality:'សញ្ជាតិ',
@@ -298,7 +298,7 @@ var TRANS = {
     familyRelation:'ទំនាក់ទំនង', familyResidenceCard:'លេខកាតស្នាក់នៅរបស់សមាជិកគ្រួសារ',
     familyWorkplace:'កន្លែងធ្វើការរបស់សមាជិកគ្រួសារ', familyLiveTogether:'តើរស់នៅជាមួយគ្នាទេ？',
     familyAddress:'អាសយដ្ឋានរបស់សមាជិកគ្រួសារ',
-    tenshutsuDate:'ថ្ងៃដាក់លិខិតជូនដំណឹងផ្លាស់ប្តូរអាសយដ្ឋាន (ក្នុងករណីមានផែនការ引越し)'
+    tenshutsuDate:'ថ្ងៃដាក់លិខិតជូនដំណឹងផ្លាស់ប្តូរអាសយដ្ឋាន',tenshutsuTitle:'/ ផ្លាស់ប្តូរអាសយដ្ឋាន',tenshutsuNote:'※ តែក្នុងករណីមានផែនការ引越しប៉ុណ្ណោះ'
   },
   ne: {
     name:'पूरा नाम (राहदानी अनुसार)', birth:'जन्म मिति', nationality:'राष्ट्रियता',
@@ -327,7 +327,7 @@ var TRANS = {
     familyRelation:'नाता', familyResidenceCard:'परिवारको बसोबास कार्ड नम्बर',
     familyWorkplace:'परिवारको कार्यस्थल', familyLiveTogether:'के सँगै बस्नुहुन्छ？',
     familyAddress:'परिवारको ठेगाना',
-    tenshutsuDate:'ठेगाना परिवर्तन सूचना दिने मिति (引越しको योजना भएमा)'
+    tenshutsuDate:'ठेगाना परिवर्तन सूचना दिने मिति',tenshutsuTitle:'/ ठेगाना परिवर्तन',tenshutsuNote:'※ सर्ने योजना भएमा मात्र'
   },
   zh: {
     name:'姓名（护照记载）', birth:'出生日期', nationality:'国籍',
@@ -356,7 +356,7 @@ var TRANS = {
     familyRelation:'关系', familyResidenceCard:'家属居留卡号码',
     familyWorkplace:'家属工作单位', familyLiveTogether:'是否同住？',
     familyAddress:'家属地址',
-    tenshutsuDate:'迁出申报日期（如有搬家计划）'
+    tenshutsuDate:'迁出申报日期',tenshutsuTitle:'/ 迁出申报',tenshutsuNote:'※ 仅在有搬家计划时填写'
   }
 };
 
@@ -423,8 +423,8 @@ function blockContact(showResCard) {
   h += '</div>';
 
   // 転出届
-  h += '<div class="card"><div class="section-title">転出届 / Change of Address</div>';
-  h += '<div style="font-size:11px;color:#9ca3af;margin-bottom:10px;">※ お引越しの予定がある場合のみ / Only if you have a planned move</div>';
+  h += '<div class="card"><div class="section-title">転出届<span class="trans" data-key="tenshutsuTitle" style="font-weight:400;font-size:11px;margin-left:6px;color:#6b7280;border:none;padding:0;"></span></div>';
+  h += '<div style="font-size:11px;color:#9ca3af;margin-bottom:10px;" id="tenshutsuNote">※ お引越しの予定がある場合のみ</div>';
   h += field('f-tenshutsuDate', '転出届を出す日', 'date', false, '', 'tenshutsuDate');
   h += '</div>';
 
@@ -1594,6 +1594,11 @@ function setLang(l) {
   // 注意事項を言語に応じて書き換え
   var cautionEl = document.getElementById('cautionBlock');
   if (cautionEl) cautionEl.innerHTML = buildCautionHTML(l);
+  // 転出届注意書きを書き換え
+  var tenshutsuNoteEl = document.getElementById('tenshutsuNote');
+  if (tenshutsuNoteEl) {
+    tenshutsuNoteEl.textContent = dict.tenshutsuNote || '※ お引越しの予定がある場合のみ';
+  }
 }
 
 // ===== バッジ =====
