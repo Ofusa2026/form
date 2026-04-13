@@ -133,7 +133,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20260413.04';
+var FORM_VERSION = 'ver.20260413.05';
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -431,24 +431,76 @@ function blockContact(showResCard) {
   // 注意事項
   h += '<div class="card" style="border: 2px solid #fbbf24; background: #fffbeb;">';
   h += '<div class="section-title" style="color:#92400e; border-left-color:#f59e0b;">⚠️ 注意事項 / Important Notes</div>';
-  h += '<div style="font-size:13px;color:#78350f;line-height:1.9;">';
-  h += '<div style="margin-bottom:12px;padding:10px 12px;background:white;border-radius:8px;border-left:3px solid #ef4444;">';
-  h += '<span style="font-weight:800;color:#dc2626;">①</span> 申請する前に帰国すると、申請ができません。<strong>必ず申請した後に一時帰国してください。</strong>';
-  h += '</div>';
-  h += '<div style="margin-bottom:12px;padding:10px 12px;background:white;border-radius:8px;border-left:3px solid #f59e0b;">';
-  h += '<span style="font-weight:800;color:#d97706;">②</span> 帰国する日が変更になった場合、帰国前に申請が出来るか<strong>必ず行政書士（やりとりをしているグループ）に連絡をしましょう。</strong>';
-  h += '</div>';
-  h += '<div style="margin-bottom:12px;padding:10px 12px;background:white;border-radius:8px;border-left:3px solid #ef4444;">';
-  h += '<span style="font-weight:800;color:#dc2626;">③</span> 在留期限から<strong>2ヶ月経過した場合、入国できない</strong>のでご注意ください。';
-  h += '</div>';
-  h += '<div style="padding:10px 12px;background:white;border-radius:8px;border-left:3px solid #6366f1;">';
-  h += '<span style="font-weight:800;color:#4f46e5;">④</span> 審査期間中に在留期限が切れてしまうと、<strong>銀行口座からお金が下せなくなる可能性があります。</strong>事前に銀行に確認をとりましょう。';
-  h += '<div style="margin-top:6px;font-size:11px;color:#6b7280;">※ 在留期限が切れていても、審査中であれば２か月在留期限が延長されるのでご安心ください。</div>';
-  h += '</div>';
-  h += '</div>';
+  h += '<div id="cautionBlock">' + buildCautionHTML('') + '</div>';
   h += '</div>';
 
   return h;
+}
+
+function buildCautionHTML(lang) {
+  var notes = {
+    '': [
+      ['#ef4444', '申請する前に帰国すると、申請ができません。<strong>必ず申請した後に一時帰国してください。</strong>'],
+      ['#f59e0b', '帰国する日が変更になった場合、帰国前に申請が出来るか<strong>必ず行政書士（やりとりをしているグループ）に連絡をしましょう。</strong>'],
+      ['#ef4444', '在留期限から<strong>2ヶ月経過した場合、入国できない</strong>のでご注意ください。'],
+      ['#6366f1', '審査期間中に在留期限が切れてしまうと、<strong>銀行口座からお金が下せなくなる可能性があります。</strong>事前に銀行に確認をとりましょう。<div style="margin-top:6px;font-size:11px;color:#6b7280;">※ 在留期限が切れていても、審査中であれば２か月在留期限が延長されるのでご安心ください。</div>']
+    ],
+    en: [
+      ['#ef4444', 'If you return home <strong>before</strong> the application is submitted, you will not be able to apply. <strong>Always return home temporarily after the application has been submitted.</strong>'],
+      ['#f59e0b', 'If your return date changes, <strong>please contact your administrative scrivener (the group you are in contact with) before returning home</strong> to check if the application can still be made in time.'],
+      ['#ef4444', 'If <strong>more than 2 months have passed since your residence period expired, you will not be able to re-enter Japan.</strong> Please be careful.'],
+      ['#6366f1', 'If your residence period expires during the review process, <strong>you may not be able to withdraw money from your bank account.</strong> Please check with your bank in advance.<div style="margin-top:6px;font-size:11px;color:#6b7280;">※ Even if your residence period has expired, if your application is under review, it will be extended by 2 months, so please rest assured.</div>']
+    ],
+    vi: [
+      ['#ef4444', 'Nếu bạn về nước <strong>trước khi nộp đơn</strong>, bạn sẽ không thể nộp đơn. <strong>Hãy chắc chắn về nước tạm thời sau khi đã nộp đơn.</strong>'],
+      ['#f59e0b', 'Nếu ngày về nước thay đổi, <strong>hãy liên hệ với hành chính thư ký (nhóm đang liên lạc) trước khi về nước</strong> để kiểm tra xem có thể nộp đơn kịp không.'],
+      ['#ef4444', 'Nếu <strong>đã qua 2 tháng kể từ khi thời hạn cư trú hết hạn, bạn sẽ không thể nhập cảnh vào Nhật Bản.</strong> Hãy chú ý.'],
+      ['#6366f1', 'Nếu thời hạn cư trú hết trong quá trình xét duyệt, <strong>bạn có thể không rút được tiền từ tài khoản ngân hàng.</strong> Hãy xác nhận trước với ngân hàng.<div style="margin-top:6px;font-size:11px;color:#6b7280;">※ Dù thời hạn cư trú đã hết, nếu đang trong quá trình xét duyệt, thời hạn sẽ được gia hạn thêm 2 tháng, xin yên tâm.</div>']
+    ],
+    id: [
+      ['#ef4444', 'Jika Anda pulang ke negara asal <strong>sebelum pengajuan</strong>, Anda tidak dapat mengajukan permohonan. <strong>Pastikan pulang sementara setelah pengajuan selesai.</strong>'],
+      ['#f59e0b', 'Jika tanggal kepulangan berubah, <strong>hubungi pengacara administrasi (grup yang sedang berkomunikasi) sebelum pulang</strong> untuk memastikan pengajuan masih bisa dilakukan tepat waktu.'],
+      ['#ef4444', 'Jika <strong>lebih dari 2 bulan sejak masa izin tinggal habis, Anda tidak dapat masuk ke Jepang.</strong> Harap berhati-hati.'],
+      ['#6366f1', 'Jika masa izin tinggal habis selama proses peninjauan, <strong>Anda mungkin tidak dapat menarik uang dari rekening bank.</strong> Harap konfirmasi terlebih dahulu ke bank.<div style="margin-top:6px;font-size:11px;color:#6b7280;">※ Meski masa izin tinggal habis, jika sedang dalam proses peninjauan, akan diperpanjang 2 bulan, jadi tenang saja.</div>']
+    ],
+    my: [
+      ['#ef4444', 'လျှောက်ထားမှု မတင်မီ ပြည်သို့ပြန်သွားပါက လျှောက်ထား၍မရပါ။ <strong>လျှောက်ထားပြီးမှသာ ယာယီပြည်သို့ပြန်ပါ။</strong>'],
+      ['#f59e0b', 'ပြည်သို့ပြန်မည့်ရက် ပြောင်းလဲပါက ပြည်သို့မပြန်မီ <strong>လျှောက်ထားနိုင်မနိုင် အုပ်ချုပ်ရေးစာရေး (ဆက်သွယ်နေသောအဖွဲ့) ကိုဆက်သွယ်ပါ။</strong>'],
+      ['#ef4444', 'နေထိုင်ခွင့်ရက်ကုန်ဆုံးပြီး <strong>၂လကျော်ပါက ဂျပန်နိုင်ငံသို့ ဝင်ရောက်၍မရပါ။</strong> သတိပြုပါ။'],
+      ['#6366f1', 'စစ်ဆေးနေစဉ် နေထိုင်ခွင့်ကုန်ဆုံးပါက <strong>ဘဏ်မှ ငွေထုတ်၍မရနိုင်ပါ။</strong> ကြိုတင်ဘဏ်နှင့် စစ်ဆေးပါ။<div style="margin-top:6px;font-size:11px;color:#6b7280;">※ နေထိုင်ခွင့်ကုန်ဆုံးသော်လည်း စစ်ဆေးနေဆဲဆိုပါက ၂လ တိုးမြှင့်ပေးမည်ဖြစ်သောကြောင့် စိတ်ချပါ။</div>']
+    ],
+    km: [
+      ['#ef4444', 'បើអ្នកត្រឡប់ទៅប្រទេស <strong>មុនពេលដាក់ពាក្យ</strong> អ្នកនឹងមិនអាចដាក់ពាក្យបានទេ។ <strong>សូមត្រឡប់ទៅបណ្ដោះអាសន្នបន្ទាប់ពីដាក់ពាក្យរួច។</strong>'],
+      ['#f59e0b', 'ប្រសិនបើថ្ងៃត្រឡប់ប្រែប្រួល <strong>សូមទាក់ទងអ្នកសរសេរឯកសារ (ក្រុមដែលកំពុងទំនាក់ទំនង) មុនពេលត្រឡប់</strong> ដើម្បីពិនិត្យថាតើអាចដាក់ពាក្យទាន់ពេលវេលាឬទេ។'],
+      ['#ef4444', 'ប្រសិនបើ <strong>ហួស ២ ខែ ចាប់ពីពេលលិខិតស្នាក់នៅផុតកំណត់ អ្នកនឹងមិនអាចចូលប្រទេសជប៉ុនបានទេ។</strong> សូមប្រយ័ត្ន។'],
+      ['#6366f1', 'ប្រសិនបើអាណត្តិស្នាក់នៅផុតកំណត់ក្នុងអំឡុងពេលត្រួតពិនិត្យ <strong>អ្នកអាចមិនអាចដកប្រាក់ពីគណនីធនាគារបាន។</strong> សូមពិនិត្យជាមួយធនាគារជាមុន។<div style="margin-top:6px;font-size:11px;color:#6b7280;">※ ទោះបីអាណត្តិស្នាក់នៅផុតកំណត់ ប្រសិនបើកំពុងស្ថិតក្នុងការត្រួតពិនិត្យ វានឹងត្រូវបន្ថែម ២ ខែ ដូច្នេះសូមស្ងប់ចិត្ត។</div>']
+    ],
+    ne: [
+      ['#ef4444', 'आवेदन <strong>गर्नुअघि</strong> स्वदेश फर्किनुभयो भने आवेदन गर्न सकिदैन। <strong>आवेदन गरेपछि मात्र अस्थायी रूपमा स्वदेश फर्कनुहोस्।</strong>'],
+      ['#f59e0b', 'स्वदेश फर्कने मिति परिवर्तन भएमा <strong>फर्कनुअघि प्रशासनिक लेखकलाई (सम्पर्कमा रहेको समूह) सम्पर्क गर्नुहोस्</strong> र समयमै आवेदन दिन सकिन्छ कि भनी जाँच गर्नुहोस्।'],
+      ['#ef4444', 'बसोबास अवधि समाप्त भएको <strong>२ महिनापछि जापान प्रवेश गर्न सकिदैन।</strong> कृपया सावधान रहनुहोस्।'],
+      ['#6366f1', 'समीक्षा अवधिमा बसोबास अवधि समाप्त भएमा <strong>बैंक खाताबाट पैसा निकाल्न नसकिने सम्भावना छ।</strong> पहिले नै बैंकमा सम्पर्क गर्नुहोस्।<div style="margin-top:6px;font-size:11px;color:#6b7280;">※ बसोबास अवधि समाप्त भए पनि समीक्षाधीन भएमा २ महिना थपिने भएकाले चिन्ता नगर्नुहोस्।</div>']
+    ],
+    zh: [
+      ['#ef4444', '如果在<strong>申请之前</strong>回国，将无法进行申请。<strong>请务必在申请之后再临时回国。</strong>'],
+      ['#f59e0b', '如果回国日期发生变更，<strong>请在回国前联系行政书士（正在沟通的群组）</strong>，确认是否能在回国前完成申请。'],
+      ['#ef4444', '如果在留期限届满后<strong>超过2个月，将无法入境日本。</strong>请注意。'],
+      ['#6366f1', '如果在审查期间在留期限届满，<strong>可能无法从银行账户取款。</strong>请提前与银行确认。<div style="margin-top:6px;font-size:11px;color:#6b7280;">※ 即使在留期限届满，如正在审查中，在留期限将延长2个月，请放心。</div>']
+    ]
+  };
+  var colors = ['#ef4444','#f59e0b','#ef4444','#6366f1'];
+  var nums = ['①','②','③','④'];
+  var numColors = ['#dc2626','#d97706','#dc2626','#4f46e5'];
+  var list = notes[lang] || notes[''];
+  var out = '<div style="font-size:13px;color:#78350f;line-height:1.9;">';
+  list.forEach(function(item, i) {
+    var isLast = (i === list.length - 1);
+    out += '<div style="' + (isLast ? '' : 'margin-bottom:12px;') + 'padding:10px 12px;background:white;border-radius:8px;border-left:3px solid ' + item[0] + ';">';
+    out += '<span style="font-weight:800;color:' + numColors[i] + ';">' + nums[i] + '</span> ' + item[1];
+    out += '</div>';
+  });
+  out += '</div>';
+  return out;
 }
 
 // 共通ブロック：結婚（※家族情報ブロックに統合済み・後方互換のため残す）
@@ -1539,6 +1591,9 @@ function setLang(l) {
     el.textContent = txt;
     el.classList.toggle('show', !!txt);
   });
+  // 注意事項を言語に応じて書き換え
+  var cautionEl = document.getElementById('cautionBlock');
+  if (cautionEl) cautionEl.innerHTML = buildCautionHTML(l);
 }
 
 // ===== バッジ =====
