@@ -115,6 +115,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
   <div class="header-inner">
     <h1 id="page-title">📋 ヒアリングフォーム</h1>
     <div id="type-badges"></div>
+    <div style="font-size:9px;color:rgba(255,255,255,.35);margin-top:4px;letter-spacing:.3px;" id="ver-display"></div>
   </div>
 </div>
 
@@ -132,7 +133,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20260411.01';
+var FORM_VERSION = 'ver.20260413.01';
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -1356,6 +1357,8 @@ var TYPE_LABELS = {
     document.getElementById('type-badges').innerHTML = b;
   }
   document.getElementById('formBody').innerHTML = buildForm(type);
+  var verEl = document.getElementById('ver-display');
+  if (verEl) verEl.textContent = FORM_VERSION;
   setLang(currentLang);
 
   // フォーム起動時：同じcase_id+typeの未送信下書きを自動検索して復元
