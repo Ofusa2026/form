@@ -133,7 +133,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20260413.06';
+var FORM_VERSION = 'ver.20260413.07';
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -381,23 +381,25 @@ function blockBasic() {
 }
 
 // 共通ブロック：連絡先
-function blockContact(showResCard) {
+function blockContact(showResCard, showExtra) {
   var h = '<div class="card"><div class="section-title">連絡先・住所</div>';
   h += field('f-email', 'メールアドレス', 'text', true, '例: your@email.com', 'email');
   if (showResCard) h += field('f-residenceCard', '在留カード番号', 'text', false, '例: AB12345678CD', 'residenceCard');
-  h += field('f-address', '現住所（日本）', 'text', false, '例: 東京都新宿区西新宿2-1-1', 'address');
-  h += '<div class="field">';
-  h += '<label>一時帰国予定<div class="trans show" data-key="tempReturn" style="font-size:11px;color:#6366f1;font-weight:500;"></div></label>';
-  h += '<select id="f-tempReturnStatus" onchange="toggleTempReturnDate(this.value)">';
-  h += '<option value="">---</option>';
-  h += '<option value="予定あり">予定あり / Yes, I have a plan</option>';
-  h += '<option value="予定なし">予定なし / No plan</option>';
-  h += '<option value="未定">未定 / Undecided</option>';
-  h += '</select>';
-  h += '</div>';
-  h += '<div id="tempReturnDateWrap" style="display:none;">';
-  h += field('f-tempReturn', '帰国予定日', 'date', false, '', 'tempReturnDate');
-  h += '</div>';
+  if (showExtra) {
+    h += field('f-address', '現住所（日本）', 'text', false, '例: 東京都新宿区西新宿2-1-1', 'address');
+    h += '<div class="field">';
+    h += '<label>一時帰国予定<div class="trans show" data-key="tempReturn" style="font-size:11px;color:#6366f1;font-weight:500;"></div></label>';
+    h += '<select id="f-tempReturnStatus" onchange="toggleTempReturnDate(this.value)">';
+    h += '<option value="">---</option>';
+    h += '<option value="予定あり">予定あり / Yes, I have a plan</option>';
+    h += '<option value="予定なし">予定なし / No plan</option>';
+    h += '<option value="未定">未定 / Undecided</option>';
+    h += '</select>';
+    h += '</div>';
+    h += '<div id="tempReturnDateWrap" style="display:none;">';
+    h += field('f-tempReturn', '帰国予定日', 'date', false, '', 'tempReturnDate');
+    h += '</div>';
+  }
   h += '</div>';
 
   // 家族情報（結婚＋在日親族を統合）
@@ -422,17 +424,19 @@ function blockContact(showResCard) {
   h += '</div>';
   h += '</div>';
 
-  // 転出届
-  h += '<div class="card"><div class="section-title">転出届<span class="trans" data-key="tenshutsuTitle" style="font-weight:400;font-size:11px;margin-left:6px;color:#6b7280;border:none;padding:0;"></span></div>';
-  h += '<div style="font-size:11px;color:#9ca3af;margin-bottom:10px;" id="tenshutsuNote">※ お引越しの予定がある場合のみ</div>';
-  h += field('f-tenshutsuDate', '転出届を出す日', 'date', false, '', 'tenshutsuDate');
-  h += '</div>';
+  if (showExtra) {
+    // 転出届
+    h += '<div class="card"><div class="section-title">転出届<span class="trans" data-key="tenshutsuTitle" style="font-weight:400;font-size:11px;margin-left:6px;color:#6b7280;border:none;padding:0;"></span></div>';
+    h += '<div style="font-size:11px;color:#9ca3af;margin-bottom:10px;" id="tenshutsuNote">※ お引越しの予定がある場合のみ</div>';
+    h += field('f-tenshutsuDate', '転出届を出す日', 'date', false, '', 'tenshutsuDate');
+    h += '</div>';
 
-  // 注意事項
-  h += '<div class="card" style="border: 2px solid #fbbf24; background: #fffbeb;">';
-  h += '<div class="section-title" style="color:#92400e; border-left-color:#f59e0b;">⚠️ 注意事項 / Important Notes</div>';
-  h += '<div id="cautionBlock">' + buildCautionHTML('') + '</div>';
-  h += '</div>';
+    // 注意事項
+    h += '<div class="card" style="border: 2px solid #fbbf24; background: #fffbeb;">';
+    h += '<div class="section-title" style="color:#92400e; border-left-color:#f59e0b;">⚠️ 注意事項 / Important Notes</div>';
+    h += '<div id="cautionBlock">' + buildCautionHTML('') + '</div>';
+    h += '</div>';
+  }
 
   return h;
 }
@@ -724,15 +728,15 @@ function blockJapaneseProof() {
 function buildForm(t) {
   switch(t) {
     case 'tokutei_nintei':
-      return blockBasic() + blockMarried() + blockTokuteiNintei() + blockSkillProof() + blockJapaneseProof() + blockContact(false);
+      return blockBasic() + blockMarried() + blockTokuteiNintei() + blockSkillProof() + blockJapaneseProof() + blockContact(false, false);
     case 'tokutei_koushin':
     case 'tokutei_henkou':
-      return blockBasic() + blockMarried() + blockTokuteiKoushin() + blockSkillProof() + blockJapaneseProof() + blockContact(false);
+      return blockBasic() + blockMarried() + blockTokuteiKoushin() + blockSkillProof() + blockJapaneseProof() + blockContact(false, true);
     case 'gijinkoku_nintei':
-      return blockBasic() + blockMarried() + blockTokuteiNintei() + blockEducation() + blockSkillProof() + blockJapaneseProof() + blockContact(false);
+      return blockBasic() + blockMarried() + blockTokuteiNintei() + blockEducation() + blockSkillProof() + blockJapaneseProof() + blockContact(false, false);
     case 'gijinkoku_koushin':
     case 'gijinkoku_henkou':
-      return blockBasic() + blockMarried() + blockTokuteiKoushin() + blockEducation() + blockSkillProof() + blockJapaneseProof() + blockContact(false);
+      return blockBasic() + blockMarried() + blockTokuteiKoushin() + blockEducation() + blockSkillProof() + blockJapaneseProof() + blockContact(false, true);
     case 'company':
       return buildCompanyForm();
     default:
