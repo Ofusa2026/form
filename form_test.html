@@ -28,7 +28,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 .badge-koushin { background: rgba(255,255,255,.2); color: white; margin-left: 4px; }
 
 /* コンテナ */
-.container { max-width: 680px; margin: 0 auto; padding: 16px 12px 80px; }
+.container { max-width: 680px; margin: 0 auto; padding: 16px 12px 160px; }
 
 /* カード */
 .card { background: white; border-radius: 12px; padding: 16px; margin-bottom: 12px; box-shadow: 0 1px 4px rgba(0,0,0,.08); }
@@ -133,7 +133,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20260413.01';
+var FORM_VERSION = 'ver.20260413.02';
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -299,6 +299,61 @@ function blockContact(showResCard) {
   h += '</div>';
   h += '<div id="tempReturnDateWrap" style="display:none;">';
   h += field('f-tempReturn', '帰国予定日', 'date', false, '', 'tempReturnDate');
+  h += '</div>';
+  h += '</div>';
+
+  // 家族情報
+  h += '<div class="card"><div class="section-title">家族情報 / Family in Japan</div>';
+  h += '<div class="field">';
+  h += '<label>日本に家族はいますか？ / Do you have family in Japan?</label>';
+  h += '<select id="f-hasFamily" onchange="toggleFamilyBlock(this.value)">';
+  h += '<option value="">---</option>';
+  h += '<option value="yes">はい / Yes</option>';
+  h += '<option value="no">いいえ / No</option>';
+  h += '</select>';
+  h += '</div>';
+  h += '<div id="familyDetailWrap" style="display:none;">';
+  h += '<div style="font-size:11px;color:#6b7280;margin-bottom:10px;">※ 家族の情報を教えてください / Please provide family information</div>';
+  h += field('f-familyRelation', '続柄 / Relation（例: 配偶者、子、兄弟）', 'text', false, '例: 配偶者 / Spouse');
+  h += field('f-familyWorkplace', '家族が働いている会社 / Family member\'s workplace', 'text', false, '例: 株式会社〇〇');
+  h += field('f-familyResidenceCard', '家族の在留カード番号 / Family member\'s residence card number', 'text', false, '例: AB12345678CD');
+  h += '<div class="field">';
+  h += '<label>一緒に住んでいますか？ / Do you live together?</label>';
+  h += '<select id="f-familyLiveTogether" onchange="toggleFamilyAddress(this.value)">';
+  h += '<option value="">---</option>';
+  h += '<option value="yes">はい / Yes</option>';
+  h += '<option value="no">いいえ / No</option>';
+  h += '</select>';
+  h += '</div>';
+  h += '<div id="familyAddressWrap" style="display:none;">';
+  h += field('f-familyAddress', '家族の住所 / Family member\'s address', 'text', false, '例: 東京都新宿区〇〇1-1-1');
+  h += '</div>';
+  h += '</div>';
+  h += '</div>';
+
+  // 転出届
+  h += '<div class="card"><div class="section-title">転出届 / Change of Address</div>';
+  h += '<div style="font-size:11px;color:#9ca3af;margin-bottom:10px;">※ お引越しの予定がある場合のみ / Only if you have a planned move</div>';
+  h += field('f-tenshutsuDate', '転出届を出す日 / Date of submitting change of address notification', 'date', false, '');
+  h += '</div>';
+
+  // 注意事項
+  h += '<div class="card" style="border: 2px solid #fbbf24; background: #fffbeb;">';
+  h += '<div class="section-title" style="color:#92400e; border-left-color:#f59e0b;">⚠️ 注意事項 / Important Notes</div>';
+  h += '<div style="font-size:13px;color:#78350f;line-height:1.9;">';
+  h += '<div style="margin-bottom:12px;padding:10px 12px;background:white;border-radius:8px;border-left:3px solid #ef4444;">';
+  h += '<span style="font-weight:800;color:#dc2626;">①</span> 申請する前に帰国すると、申請ができません。<strong>必ず申請した後に一時帰国してください。</strong>';
+  h += '</div>';
+  h += '<div style="margin-bottom:12px;padding:10px 12px;background:white;border-radius:8px;border-left:3px solid #f59e0b;">';
+  h += '<span style="font-weight:800;color:#d97706;">②</span> 帰国する日が変更になった場合、帰国前に申請が出来るか<strong>必ず行政書士（やりとりをしているグループ）に連絡をしましょう。</strong>';
+  h += '</div>';
+  h += '<div style="margin-bottom:12px;padding:10px 12px;background:white;border-radius:8px;border-left:3px solid #ef4444;">';
+  h += '<span style="font-weight:800;color:#dc2626;">③</span> 在留期限から<strong>2ヶ月経過した場合、入国できない</strong>のでご注意ください。';
+  h += '</div>';
+  h += '<div style="padding:10px 12px;background:white;border-radius:8px;border-left:3px solid #6366f1;">';
+  h += '<span style="font-weight:800;color:#4f46e5;">④</span> 審査期間中に在留期限が切れてしまうと、<strong>銀行口座からお金が下せなくなる可能性があります。</strong>事前に銀行に確認をとりましょう。';
+  h += '<div style="margin-top:6px;font-size:11px;color:#6b7280;">※ 在留期限が切れていても、審査中であれば２か月在留期限が延長されるのでご安心ください。</div>';
+  h += '</div>';
   h += '</div>';
   h += '</div>';
 
@@ -992,6 +1047,16 @@ function toggleFlexType(val) {
   if (el) el.style.display = val === '適用あり' ? 'block' : 'none';
 }
 
+function toggleFamilyBlock(val) {
+  var el = document.getElementById('familyDetailWrap');
+  if (el) el.style.display = (val === 'yes') ? 'block' : 'none';
+}
+
+function toggleFamilyAddress(val) {
+  var el = document.getElementById('familyAddressWrap');
+  if (el) el.style.display = (val === 'no') ? 'block' : 'none';
+}
+
 function toggleSkillProof(num, val) {
   var examEl   = document.getElementById('skillProof' + num + 'Exam');
   var jisshuEl = document.getElementById('skillProof' + num + 'Jisshu');
@@ -1177,6 +1242,15 @@ contractRenewalPeriod: val('f-contractRenewalPeriod'),
     d.jpProof2Task     = val('f-jpProof2Task');
     d.jpProof2Doc      = val('f-jpProof2Doc');
   }
+  // 家族情報
+  d.hasFamily           = val('f-hasFamily');
+  d.familyRelation      = val('f-familyRelation');
+  d.familyWorkplace     = val('f-familyWorkplace');
+  d.familyResidenceCard = val('f-familyResidenceCard');
+  d.familyLiveTogether  = val('f-familyLiveTogether');
+  d.familyAddress       = val('f-familyAddress');
+  // 転出届
+  d.tenshutsuDate       = val('f-tenshutsuDate');
   return d;
 }
 function validate() {
