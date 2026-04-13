@@ -133,7 +133,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20260413.03';
+var FORM_VERSION = 'ver.20260413.04';
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -165,7 +165,21 @@ var TRANS = {
     tempReturn:'Do you plan to return home temporarily?', tempReturnDate:'Planned return date',
     hasRelative:'Do you have any family members living in Japan?', relativeName:'Full Name', relativeRelation:'Relationship', relativeBirth:'Date of Birth', relativeNationality:'Nationality', relativeStatus:'Visa Status', relativeAddress:'Address in Japan', relativeWorkSchool:'Workplace / School',
     eduCountry:'Country', education:'Education Level', schoolName:'School Name',
-    completionDate:'Graduation Date', major:'Major'
+    completionDate:'Graduation Date', major:'Major',
+    birthPlace:'Place of Birth',
+    skillProof1Type:'Type of Proof (Skill)', skillProof1Field:'Field of Exam Passed', skillProof1Place:'Exam Location',
+    skillProof1Job:'Occupation', skillProof1Task:'Task', skillProof1Doc:'Type of Certificate',
+    skillProof2Type:'Type of Proof ② (if 2 passed)', skillProof2Field:'Field of Exam Passed', skillProof2Place:'Exam Location',
+    skillProof2Job:'Occupation', skillProof2Task:'Task', skillProof2Doc:'Type of Certificate',
+    jpProof1Type:'Type of Proof (Japanese)', jpProof1ExamType:'Type of Japanese Test', jpProof1Place:'Exam Location',
+    jpProof1Job:'Occupation', jpProof1Task:'Task', jpProof1Doc:'Type of Certificate',
+    jpProof2Type:'Type of Proof ② (if 2 passed)', jpProof2ExamType:'Type of Japanese Test', jpProof2Place:'Exam Location',
+    jpProof2Job:'Occupation', jpProof2Task:'Task', jpProof2Doc:'Type of Certificate',
+    hasFamily:'Do you have family in Japan?',
+    familyRelation:'Relationship / Relation', familyResidenceCard:'Family Member\'s Residence Card No.',
+    familyWorkplace:'Family Member\'s Workplace', familyLiveTogether:'Do you live together?',
+    familyAddress:'Family Member\'s Address',
+    tenshutsuDate:'Date of submitting change of address (if moving)'
   },
   vi: {
     name:'Họ và tên (theo hộ chiếu)', birth:'Ngày sinh', nationality:'Quốc tịch',
@@ -182,7 +196,21 @@ var TRANS = {
     tempReturn:'Bạn có kế hoạch về nước tạm thời không?', tempReturnDate:'Ngày dự kiến về nước',
     hasRelative:'Bạn có người thân sống tại Nhật không?', relativeName:'Họ tên', relativeRelation:'Quan hệ', relativeBirth:'Ngày sinh', relativeNationality:'Quốc tịch', relativeStatus:'Tư cách lưu trú', relativeAddress:'Địa chỉ tại Nhật', relativeWorkSchool:'Nơi làm việc / Trường học',
     eduCountry:'Quốc gia', education:'Học vấn', schoolName:'Tên trường',
-    completionDate:'Tốt nghiệp', major:'Chuyên ngành'
+    completionDate:'Tốt nghiệp', major:'Chuyên ngành',
+    birthPlace:'Nơi sinh',
+    skillProof1Type:'Loại chứng chỉ kỹ năng', skillProof1Field:'Lĩnh vực thi đã đỗ', skillProof1Place:'Địa điểm thi',
+    skillProof1Job:'Nghề', skillProof1Task:'Công việc', skillProof1Doc:'Loại chứng chỉ',
+    skillProof2Type:'Loại chứng chỉ kỹ năng ②', skillProof2Field:'Lĩnh vực thi đã đỗ', skillProof2Place:'Địa điểm thi',
+    skillProof2Job:'Nghề', skillProof2Task:'Công việc', skillProof2Doc:'Loại chứng chỉ',
+    jpProof1Type:'Loại chứng chỉ tiếng Nhật', jpProof1ExamType:'Loại bài thi tiếng Nhật', jpProof1Place:'Địa điểm thi',
+    jpProof1Job:'Nghề', jpProof1Task:'Công việc', jpProof1Doc:'Loại chứng chỉ',
+    jpProof2Type:'Loại chứng chỉ tiếng Nhật ②', jpProof2ExamType:'Loại bài thi tiếng Nhật', jpProof2Place:'Địa điểm thi',
+    jpProof2Job:'Nghề', jpProof2Task:'Công việc', jpProof2Doc:'Loại chứng chỉ',
+    hasFamily:'Bạn có người thân ở Nhật không?',
+    familyRelation:'Quan hệ', familyResidenceCard:'Số thẻ cư trú của người thân',
+    familyWorkplace:'Nơi làm việc của người thân', familyLiveTogether:'Bạn có sống chung không?',
+    familyAddress:'Địa chỉ của người thân',
+    tenshutsuDate:'Ngày nộp thông báo thay đổi địa chỉ (nếu có chuyển nhà)'
   },
   id: {
     name:'Nama Lengkap (sesuai paspor)', birth:'Tanggal Lahir', nationality:'Kewarganegaraan',
@@ -198,7 +226,21 @@ var TRANS = {
     tempReturn:'Apakah Anda berencana pulang sementara?', tempReturnDate:'Tanggal rencana pulang',
     hasRelative:'Apakah Anda memiliki keluarga yang tinggal di Jepang?', relativeName:'Nama Lengkap', relativeRelation:'Hubungan', relativeBirth:'Tanggal Lahir', relativeNationality:'Kewarganegaraan', relativeStatus:'Status Visa', relativeAddress:'Alamat di Jepang', relativeWorkSchool:'Tempat Kerja / Sekolah',
     eduCountry:'Negara', education:'Pendidikan', schoolName:'Nama Sekolah',
-    completionDate:'Lulus', major:'Jurusan'
+    completionDate:'Lulus', major:'Jurusan',
+    birthPlace:'Tempat Lahir',
+    skillProof1Type:'Jenis Bukti Keterampilan', skillProof1Field:'Bidang ujian yang lulus', skillProof1Place:'Lokasi ujian',
+    skillProof1Job:'Jenis pekerjaan', skillProof1Task:'Pekerjaan', skillProof1Doc:'Jenis sertifikat',
+    skillProof2Type:'Jenis Bukti Keterampilan ②', skillProof2Field:'Bidang ujian yang lulus', skillProof2Place:'Lokasi ujian',
+    skillProof2Job:'Jenis pekerjaan', skillProof2Task:'Pekerjaan', skillProof2Doc:'Jenis sertifikat',
+    jpProof1Type:'Jenis Bukti Bahasa Jepang', jpProof1ExamType:'Jenis ujian bahasa Jepang', jpProof1Place:'Lokasi ujian',
+    jpProof1Job:'Jenis pekerjaan', jpProof1Task:'Pekerjaan', jpProof1Doc:'Jenis sertifikat',
+    jpProof2Type:'Jenis Bukti Bahasa Jepang ②', jpProof2ExamType:'Jenis ujian bahasa Jepang', jpProof2Place:'Lokasi ujian',
+    jpProof2Job:'Jenis pekerjaan', jpProof2Task:'Pekerjaan', jpProof2Doc:'Jenis sertifikat',
+    hasFamily:'Apakah Anda memiliki keluarga di Jepang?',
+    familyRelation:'Hubungan', familyResidenceCard:'No. Kartu Izin Tinggal anggota keluarga',
+    familyWorkplace:'Tempat kerja anggota keluarga', familyLiveTogether:'Apakah tinggal bersama?',
+    familyAddress:'Alamat anggota keluarga',
+    tenshutsuDate:'Tanggal pelaporan pindah alamat (jika ada rencana pindah)'
   },
   my: {
     name:'အမည် (နိုင်ငံကူးလက်မှတ်)', birth:'မွေးသက္ကရာဇ်', nationality:'နိုင်ငံသား',
@@ -213,7 +255,21 @@ var TRANS = {
     homeAddress:'မိခင်နိုင်ငံ လိပ်စာ',
     tempReturn:'ယာယီပြန်ရန် စီစဉ်ထားပါသလား？', tempReturnDate:'ပြန်မည့်ရက်',
     hasRelative:'ဂျပန်တွင် မိသားစုရှိပါသလား？', relativeName:'အမည်', relativeRelation:'ဆက်ဆံရေး', relativeBirth:'မွေးသက္ကရာဇ်', relativeNationality:'နိုင်ငံသား', relativeStatus:'Visa', relativeAddress:'လိပ်စာ', relativeWorkSchool:'အလုပ်/ကျောင်း',
-    eduCountry:'နိုင်ငံ', education:'ပညာ', schoolName:'ကျောင်း', completionDate:'ဘွဲ့ရ', major:'ဘာသာ'
+    eduCountry:'နိုင်ငံ', education:'ပညာ', schoolName:'ကျောင်း', completionDate:'ဘွဲ့ရ', major:'ဘာသာ',
+    birthPlace:'မွေးဖွားရာဒေသ',
+    skillProof1Type:'ကျွမ်းကျင်မှု အထောက်အထားအမျိုးအစား', skillProof1Field:'အောင်မြင်သောစာမေးပွဲ နယ်ပယ်', skillProof1Place:'စာမေးပွဲကျင်းပရာ',
+    skillProof1Job:'အလုပ်အကိုင်', skillProof1Task:'တာဝန်', skillProof1Doc:'လက်မှတ်အမျိုးအစား',
+    skillProof2Type:'ကျွမ်းကျင်မှု အထောက်အထား ②', skillProof2Field:'အောင်မြင်သောစာမေးပွဲ နယ်ပယ်', skillProof2Place:'စာမေးပွဲကျင်းပရာ',
+    skillProof2Job:'အလုပ်အကိုင်', skillProof2Task:'တာဝန်', skillProof2Doc:'လက်မှတ်အမျိုးအစား',
+    jpProof1Type:'ဂျပန်စာ အထောက်အထားအမျိုးအစား', jpProof1ExamType:'ဂျပန်စာ စာမေးပွဲအမျိုးအစား', jpProof1Place:'စာမေးပွဲကျင်းပရာ',
+    jpProof1Job:'အလုပ်အကိုင်', jpProof1Task:'တာဝန်', jpProof1Doc:'လက်မှတ်အမျိုးအစား',
+    jpProof2Type:'ဂျပန်စာ အထောက်အထား ②', jpProof2ExamType:'ဂျပန်စာ စာမေးပွဲအမျိုးအစား', jpProof2Place:'စာမေးပွဲကျင်းပရာ',
+    jpProof2Job:'အလုပ်အကိုင်', jpProof2Task:'တာဝန်', jpProof2Doc:'လက်မှတ်အမျိုးအစား',
+    hasFamily:'ဂျပန်တွင် မိသားစုရှိပါသလား？',
+    familyRelation:'ဆက်ဆံရေး', familyResidenceCard:'မိသားစုဝင် နေထိုင်ခွင့်ကတ်နံပါတ်',
+    familyWorkplace:'မိသားစုဝင် အလုပ်ခွင်', familyLiveTogether:'အတူနေထိုင်ပါသလား？',
+    familyAddress:'မိသားစုဝင် လိပ်စာ',
+    tenshutsuDate:'နေရပ်ပြောင်းရွှေ့ကြောင်း အကြောင်းကြားစာ တင်သွင်းမည့်ရက်'
   },
   km: {
     name:'ឈ្មោះ (តាមលិខិតឆ្លងដែន)', birth:'ថ្ងៃខែឆ្នាំកំណើត', nationality:'សញ្ជាតិ',
@@ -228,7 +284,21 @@ var TRANS = {
     homeAddress:'អាសយដ្ឋានប្រទេសដើម',
     tempReturn:'តើអ្នកមានគម្រោងត្រឡប់ទៅប្រទេសដើមបណ្តោះអាសន្នទេ？', tempReturnDate:'ថ្ងៃគ្រោងត្រឡប់',
     hasRelative:'តើអ្នកមានសមាជិកគ្រួសាររស់នៅជប៉ុនទេ？', relativeName:'ឈ្មោះ', relativeRelation:'ទំនាក់ទំនង', relativeBirth:'ថ្ងៃខែឆ្នាំ', relativeNationality:'សញ្ជាតិ', relativeStatus:'Visa', relativeAddress:'អាសយដ្ឋាន', relativeWorkSchool:'កន្លែងធ្វើការ/សាលា',
-    eduCountry:'ប្រទេស', education:'ការអប់រំ', schoolName:'ឈ្មោះសាលា', completionDate:'បញ្ចប់', major:'ជំនាញ'
+    eduCountry:'ប្រទេស', education:'ការអប់រំ', schoolName:'ឈ្មោះសាលា', completionDate:'បញ្ចប់', major:'ជំនាញ',
+    birthPlace:'ទីកន្លែងកំណើត',
+    skillProof1Type:'ប្រភេទភស្តុតាងជំនាញ', skillProof1Field:'ផ្នែកប្រឡងដែលបានជាប់', skillProof1Place:'ទីកន្លែងប្រឡង',
+    skillProof1Job:'វិជ្ជាជីវៈ', skillProof1Task:'ការងារ', skillProof1Doc:'ប្រភេទវិញ្ញាបនប័ត្រ',
+    skillProof2Type:'ភស្តុតាងជំនាញ ②', skillProof2Field:'ផ្នែកប្រឡងដែលបានជាប់', skillProof2Place:'ទីកន្លែងប្រឡង',
+    skillProof2Job:'វិជ្ជាជីវៈ', skillProof2Task:'ការងារ', skillProof2Doc:'ប្រភេទវិញ្ញាបនប័ត្រ',
+    jpProof1Type:'ប្រភេទភស្តុតាងភាសាជប៉ុន', jpProof1ExamType:'ប្រភេទការប្រឡងភាសាជប៉ុន', jpProof1Place:'ទីកន្លែងប្រឡង',
+    jpProof1Job:'វិជ្ជាជីវៈ', jpProof1Task:'ការងារ', jpProof1Doc:'ប្រភេទវិញ្ញាបនប័ត្រ',
+    jpProof2Type:'ភស្តុតាងភាសាជប៉ុន ②', jpProof2ExamType:'ប្រភេទការប្រឡងភាសាជប៉ុន', jpProof2Place:'ទីកន្លែងប្រឡង',
+    jpProof2Job:'វិជ្ជាជីវៈ', jpProof2Task:'ការងារ', jpProof2Doc:'ប្រភេទវិញ្ញាបនប័ត្រ',
+    hasFamily:'តើអ្នកមានក្រុមគ្រួសារនៅជប៉ុនទេ？',
+    familyRelation:'ទំនាក់ទំនង', familyResidenceCard:'លេខកាតស្នាក់នៅរបស់សមាជិកគ្រួសារ',
+    familyWorkplace:'កន្លែងធ្វើការរបស់សមាជិកគ្រួសារ', familyLiveTogether:'តើរស់នៅជាមួយគ្នាទេ？',
+    familyAddress:'អាសយដ្ឋានរបស់សមាជិកគ្រួសារ',
+    tenshutsuDate:'ថ្ងៃដាក់លិខិតជូនដំណឹងផ្លាស់ប្តូរអាសយដ្ឋាន (ក្នុងករណីមានផែនការ引越し)'
   },
   ne: {
     name:'पूरा नाम (राहदानी अनुसार)', birth:'जन्म मिति', nationality:'राष्ट्रियता',
@@ -243,7 +313,21 @@ var TRANS = {
     homeAddress:'गृह देशको ठेगाना',
     tempReturn:'के तपाईं अस्थायी रूपमा स्वदेश फर्कने योजना गर्नुहुन्छ？', tempReturnDate:'फर्कने मिति',
     hasRelative:'के तपाईंका परिवार जापानमा बस्छन्？', relativeName:'पूरा नाम', relativeRelation:'नाता', relativeBirth:'जन्म मिति', relativeNationality:'राष्ट्रियता', relativeStatus:'भिसा', relativeAddress:'जापानमा ठेगाना', relativeWorkSchool:'कार्यस्थल / विद्यालय',
-    eduCountry:'देश', education:'शिक्षा', schoolName:'विद्यालय', completionDate:'स्नातक', major:'विषय'
+    eduCountry:'देश', education:'शिक्षा', schoolName:'विद्यालय', completionDate:'स्नातक', major:'विषय',
+    birthPlace:'जन्म स्थान',
+    skillProof1Type:'सीप प्रमाणको प्रकार', skillProof1Field:'उत्तीर्ण परीक्षाको क्षेत्र', skillProof1Place:'परीक्षा स्थान',
+    skillProof1Job:'पेशा', skillProof1Task:'काम', skillProof1Doc:'प्रमाणपत्रको प्रकार',
+    skillProof2Type:'सीप प्रमाण ②', skillProof2Field:'उत्तीर्ण परीक्षाको क्षेत्र', skillProof2Place:'परीक्षा स्थान',
+    skillProof2Job:'पेशा', skillProof2Task:'काम', skillProof2Doc:'प्रमाणपत्रको प्रकार',
+    jpProof1Type:'जापानी भाषा प्रमाणको प्रकार', jpProof1ExamType:'जापानी परीक्षाको प्रकार', jpProof1Place:'परीक्षा स्थान',
+    jpProof1Job:'पेशा', jpProof1Task:'काम', jpProof1Doc:'प्रमाणपत्रको प्रकार',
+    jpProof2Type:'जापानी भाषा प्रमाण ②', jpProof2ExamType:'जापानी परीक्षाको प्रकार', jpProof2Place:'परीक्षा स्थान',
+    jpProof2Job:'पेशा', jpProof2Task:'काम', jpProof2Doc:'प्रमाणपत्रको प्रकार',
+    hasFamily:'के तपाईंका परिवारजन जापानमा छन्？',
+    familyRelation:'नाता', familyResidenceCard:'परिवारको बसोबास कार्ड नम्बर',
+    familyWorkplace:'परिवारको कार्यस्थल', familyLiveTogether:'के सँगै बस्नुहुन्छ？',
+    familyAddress:'परिवारको ठेगाना',
+    tenshutsuDate:'ठेगाना परिवर्तन सूचना दिने मिति (引越しको योजना भएमा)'
   },
   zh: {
     name:'姓名（护照记载）', birth:'出生日期', nationality:'国籍',
@@ -258,7 +342,21 @@ var TRANS = {
     homeAddress:'本国地址',
     tempReturn:'是否有临时回国计划？', tempReturnDate:'预计回国日期',
     hasRelative:'在日本是否有家属？', relativeName:'姓名', relativeRelation:'关系', relativeBirth:'出生日期', relativeNationality:'国籍', relativeStatus:'在留资格', relativeAddress:'在日地址', relativeWorkSchool:'工作单位/学校',
-    eduCountry:'国家', education:'学历', schoolName:'学校名称', completionDate:'毕业', major:'专业'
+    eduCountry:'国家', education:'学历', schoolName:'学校名称', completionDate:'毕业', major:'专业',
+    birthPlace:'出生地',
+    skillProof1Type:'技能证明类型', skillProof1Field:'通过考试的领域', skillProof1Place:'考试地点',
+    skillProof1Job:'职种', skillProof1Task:'作业', skillProof1Doc:'证明书类型',
+    skillProof2Type:'技能证明② （如有2个）', skillProof2Field:'通过考试的领域', skillProof2Place:'考试地点',
+    skillProof2Job:'职种', skillProof2Task:'作业', skillProof2Doc:'证明书类型',
+    jpProof1Type:'日语能力证明类型', jpProof1ExamType:'日语考试类型', jpProof1Place:'考试地点',
+    jpProof1Job:'职种', jpProof1Task:'作业', jpProof1Doc:'证明书类型',
+    jpProof2Type:'日语能力证明②', jpProof2ExamType:'日语考试类型', jpProof2Place:'考试地点',
+    jpProof2Job:'职种', jpProof2Task:'作业', jpProof2Doc:'证明书类型',
+    hasFamily:'在日本是否有家属？',
+    familyRelation:'关系', familyResidenceCard:'家属居留卡号码',
+    familyWorkplace:'家属工作单位', familyLiveTogether:'是否同住？',
+    familyAddress:'家属地址',
+    tenshutsuDate:'迁出申报日期（如有搬家计划）'
   }
 };
 
@@ -274,7 +372,7 @@ function blockBasic() {
       field('f-nationality', '国籍', 'select', true, '', 'nationality',
         ['','ベトナム','インドネシア','ミャンマー','カンボジア','ネパール','フィリピン','中国','タイ','モンゴル','その他']) +
     '</div>' +
-    field('f-birthPlace', '出生地 / Place of birth', 'text', false, '例: Ho Chi Minh City') +
+    field('f-birthPlace', '出生地 / Place of birth', 'text', false, '例: Ho Chi Minh City', 'birthPlace') +
     '<div class="grid2">' +
       field('f-passport', 'パスポート番号', 'text', false, '例: AB1234567', 'passport') +
       field('f-passExpiry', 'パスポート有効期限', 'date', false, '', 'passExpiry') +
@@ -310,7 +408,7 @@ function blockContact(showResCard) {
 
   // 在日親族
   h += '<div class="field">';
-  h += '<label>日本に家族はいますか？ / Do you have family in Japan?</label>';
+  h += '<label>日本に家族はいますか？<div class="trans" data-key="hasFamily"></div></label>';
   h += '<select id="f-hasFamily" onchange="toggleFamilyBlock(this.value)">';
   h += '<option value="">---</option>';
   h += '<option value="yes">はい / Yes</option>';
@@ -327,7 +425,7 @@ function blockContact(showResCard) {
   // 転出届
   h += '<div class="card"><div class="section-title">転出届 / Change of Address</div>';
   h += '<div style="font-size:11px;color:#9ca3af;margin-bottom:10px;">※ お引越しの予定がある場合のみ / Only if you have a planned move</div>';
-  h += field('f-tenshutsuDate', '転出届を出す日 / Date of submitting change of address notification', 'date', false, '');
+  h += field('f-tenshutsuDate', '転出届を出す日', 'date', false, '', 'tenshutsuDate');
   h += '</div>';
 
   // 注意事項
@@ -417,7 +515,7 @@ function blockSkillProof() {
   // 技能証明①
   h += '<div class="sub-label" style="background:#eff6ff;color:#1d4ed8;border-radius:6px;padding:6px 10px;margin-bottom:8px;font-size:12px;font-weight:700;">【証明① 】</div>';
   h += '<div class="field">';
-  h += '<label>証明の種類<span class="req">*</span></label>';
+  h += '<label>証明の種類<span class="req">*</span><div class="trans" data-key="skillProof1Type"></div></label>';
   h += '<select id="f-skillProof1Type" onchange="toggleSkillProof(1, this.value)">';
   h += '<option value="">---</option>';
   h += '<option value="exam">特定技能評価試験 Specified Skilled Worker evaluation test</option>';
@@ -428,16 +526,16 @@ function blockSkillProof() {
   // 特定技能評価試験①
   h += '<div id="skillProof1Exam" style="display:none;">';
   h += '<div class="grid2">';
-  h += field('f-skillProof1Field', '合格した試験の分野', 'text', false, '例: 飲食料品製造業');
-  h += field('f-skillProof1Place', '受験地', 'text', false, '例: ハノイ');
+  h += field('f-skillProof1Field', '合格した試験の分野', 'text', false, '例: 飲食料品製造業', 'skillProof1Field');
+  h += field('f-skillProof1Place', '受験地', 'text', false, '例: ハノイ', 'skillProof1Place');
   h += '</div>';
   h += '</div>';
 
   // 技能実習①
   h += '<div id="skillProof1Jisshu" style="display:none;">';
   h += '<div class="grid2">';
-  h += field('f-skillProof1Job', '職種', 'text', false, '例: 食品製造');
-  h += field('f-skillProof1Task', '作業', 'text', false, '例: 惣菜製造');
+  h += field('f-skillProof1Job', '職種', 'text', false, '例: 食品製造', 'skillProof1Job');
+  h += field('f-skillProof1Task', '作業', 'text', false, '例: 惣菜製造', 'skillProof1Task');
   h += '</div>';
   h += '<div class="field"><label>証明書の種別</label>';
   h += '<select id="f-skillProof1Doc">';
@@ -451,7 +549,7 @@ function blockSkillProof() {
   // 技能証明②
   h += '<div class="sub-label" style="background:#eff6ff;color:#1d4ed8;border-radius:6px;padding:6px 10px;margin:12px 0 8px;font-size:12px;font-weight:700;">【証明②（2つ合格している場合）】</div>';
   h += '<div class="field">';
-  h += '<label>証明の種類</label>';
+  h += '<label>証明の種類<div class="trans" data-key="skillProof2Type"></div></label>';
   h += '<select id="f-skillProof2Type" onchange="toggleSkillProof(2, this.value)">';
   h += '<option value="">なし / 該当しない</option>';
   h += '<option value="exam">特定技能評価試験 Specified Skilled Worker evaluation test</option>';
@@ -462,16 +560,16 @@ function blockSkillProof() {
   // 特定技能評価試験②
   h += '<div id="skillProof2Exam" style="display:none;">';
   h += '<div class="grid2">';
-  h += field('f-skillProof2Field', '合格した試験の分野', 'text', false, '例: 飲食料品製造業');
-  h += field('f-skillProof2Place', '受験地', 'text', false, '例: ヤンゴン');
+  h += field('f-skillProof2Field', '合格した試験の分野', 'text', false, '例: 飲食料品製造業', 'skillProof2Field');
+  h += field('f-skillProof2Place', '受験地', 'text', false, '例: ヤンゴン', 'skillProof2Place');
   h += '</div>';
   h += '</div>';
 
   // 技能実習②
   h += '<div id="skillProof2Jisshu" style="display:none;">';
   h += '<div class="grid2">';
-  h += field('f-skillProof2Job', '職種', 'text', false, '例: 食品製造');
-  h += field('f-skillProof2Task', '作業', 'text', false, '例: 惣菜製造');
+  h += field('f-skillProof2Job', '職種', 'text', false, '例: 食品製造', 'skillProof2Job');
+  h += field('f-skillProof2Task', '作業', 'text', false, '例: 惣菜製造', 'skillProof2Task');
   h += '</div>';
   h += '<div class="field"><label>証明書の種別</label>';
   h += '<select id="f-skillProof2Doc">';
@@ -493,7 +591,7 @@ function blockJapaneseProof() {
   // 日本語証明①
   h += '<div class="sub-label" style="background:#f0fdf4;color:#15803d;border-radius:6px;padding:6px 10px;margin-bottom:8px;font-size:12px;font-weight:700;">【証明①】</div>';
   h += '<div class="field">';
-  h += '<label>証明の種類<span class="req">*</span></label>';
+  h += '<label>証明の種類<span class="req">*</span><div class="trans" data-key="jpProof1Type"></div></label>';
   h += '<select id="f-jpProof1Type" onchange="toggleJpProof(1, this.value)">';
   h += '<option value="">---</option>';
   h += '<option value="exam">特定技能評価試験（日本語）</option>';
@@ -503,21 +601,21 @@ function blockJapaneseProof() {
 
   // 特定技能（日本語試験）①
   h += '<div id="jpProof1Exam" style="display:none;">';
-  h += '<div class="field"><label>合格した試験の種類</label>';
+  h += '<div class="field"><label>合格した試験の種類<div class="trans" data-key="jpProof1ExamType"></div></label>';
   h += '<select id="f-jpProof1ExamType">';
   h += '<option value="">---</option>';
   h += '<option value="jlpt">日本語能力試験 JLPT</option>';
   h += '<option value="jft">国際交流基金日本語基礎テスト JFT-Basic</option>';
   h += '<option value="kaigo">介護日本語能力試験</option>';
   h += '</select></div>';
-  h += field('f-jpProof1Place', '受験地', 'text', false, '例: ハノイ');
+  h += field('f-jpProof1Place', '受験地', 'text', false, '例: ハノイ', 'jpProof1Place');
   h += '</div>';
 
   // 技能実習①（日本語）
   h += '<div id="jpProof1Jisshu" style="display:none;">';
   h += '<div class="grid2">';
-  h += field('f-jpProof1Job', '職種', 'text', false, '例: 食品製造');
-  h += field('f-jpProof1Task', '作業', 'text', false, '例: 惣菜製造');
+  h += field('f-jpProof1Job', '職種', 'text', false, '例: 食品製造', 'jpProof1Job');
+  h += field('f-jpProof1Task', '作業', 'text', false, '例: 惣菜製造', 'jpProof1Task');
   h += '</div>';
   h += '<div class="field"><label>証明書の種別</label>';
   h += '<select id="f-jpProof1Doc">';
@@ -531,7 +629,7 @@ function blockJapaneseProof() {
   // 日本語証明②
   h += '<div class="sub-label" style="background:#f0fdf4;color:#15803d;border-radius:6px;padding:6px 10px;margin:12px 0 8px;font-size:12px;font-weight:700;">【証明②（2つ合格している場合）】</div>';
   h += '<div class="field">';
-  h += '<label>証明の種類</label>';
+  h += '<label>証明の種類<div class="trans" data-key="jpProof2Type"></div></label>';
   h += '<select id="f-jpProof2Type" onchange="toggleJpProof(2, this.value)">';
   h += '<option value="">なし / 該当しない</option>';
   h += '<option value="exam">特定技能評価試験（日本語）</option>';
@@ -541,21 +639,21 @@ function blockJapaneseProof() {
 
   // 特定技能（日本語試験）②
   h += '<div id="jpProof2Exam" style="display:none;">';
-  h += '<div class="field"><label>合格した試験の種類</label>';
+  h += '<div class="field"><label>合格した試験の種類<div class="trans" data-key="jpProof2ExamType"></div></label>';
   h += '<select id="f-jpProof2ExamType">';
   h += '<option value="">---</option>';
   h += '<option value="jlpt">日本語能力試験 JLPT</option>';
   h += '<option value="jft">国際交流基金日本語基礎テスト JFT-Basic</option>';
   h += '<option value="kaigo">介護日本語能力試験</option>';
   h += '</select></div>';
-  h += field('f-jpProof2Place', '受験地', 'text', false, '例: ヤンゴン');
+  h += field('f-jpProof2Place', '受験地', 'text', false, '例: ヤンゴン', 'jpProof2Place');
   h += '</div>';
 
   // 技能実習②（日本語）
   h += '<div id="jpProof2Jisshu" style="display:none;">';
   h += '<div class="grid2">';
-  h += field('f-jpProof2Job', '職種', 'text', false, '例: 食品製造');
-  h += field('f-jpProof2Task', '作業', 'text', false, '例: 惣菜製造');
+  h += field('f-jpProof2Job', '職種', 'text', false, '例: 食品製造', 'jpProof2Job');
+  h += field('f-jpProof2Task', '作業', 'text', false, '例: 惣菜製造', 'jpProof2Task');
   h += '</div>';
   h += '<div class="field"><label>証明書の種別</label>';
   h += '<select id="f-jpProof2Doc">';
@@ -1053,18 +1151,18 @@ function familyMemberRow(idx) {
   if (idx > 1) h += '<button type="button" onclick="removeFamilyMember(' + idx + ')" style="font-size:11px;padding:2px 8px;background:white;border:1px solid #fca5a5;border-radius:4px;color:#dc2626;cursor:pointer;">削除</button>';
   h += '</div>';
   h += '<div class="grid2">';
-  h += '<div class="field"><label>続柄 / Relation</label><input type="text" id="f-family' + idx + 'Relation" placeholder="例: 配偶者 / Spouse"></div>';
-  h += '<div class="field"><label>家族の在留カード番号</label><input type="text" id="f-family' + idx + 'ResidenceCard" placeholder="例: AB12345678CD"></div>';
+  h += '<div class="field"><label>続柄 / Relation<div class="trans" data-key="familyRelation"></div></label><input type="text" id="f-family' + idx + 'Relation" placeholder="例: 配偶者 / Spouse"></div>';
+  h += '<div class="field"><label>家族の在留カード番号<div class="trans" data-key="familyResidenceCard"></div></label><input type="text" id="f-family' + idx + 'ResidenceCard" placeholder="例: AB12345678CD"></div>';
   h += '</div>';
-  h += '<div class="field"><label>家族が働いている会社 / Workplace</label><input type="text" id="f-family' + idx + 'Workplace" placeholder="例: 株式会社〇〇"></div>';
-  h += '<div class="field"><label>一緒に住んでいますか？ / Live together?</label>';
+  h += '<div class="field"><label>家族が働いている会社<div class="trans" data-key="familyWorkplace"></div></label><input type="text" id="f-family' + idx + 'Workplace" placeholder="例: 株式会社〇〇"></div>';
+  h += '<div class="field"><label>一緒に住んでいますか？<div class="trans" data-key="familyLiveTogether"></div></label>';
   h += '<select id="f-family' + idx + 'LiveTogether" onchange="toggleFamilyAddress(' + idx + ', this.value)">';
   h += '<option value="">---</option>';
   h += '<option value="yes">はい / Yes</option>';
   h += '<option value="no">いいえ / No</option>';
   h += '</select></div>';
   h += '<div id="familyAddressWrap' + idx + '" style="display:none;">';
-  h += '<div class="field"><label>家族の住所 / Family member\'s address</label><input type="text" id="f-family' + idx + 'Address" placeholder="例: 東京都新宿区〇〇1-1-1"></div>';
+  h += '<div class="field"><label>家族の住所<div class="trans" data-key="familyAddress"></div></label><input type="text" id="f-family' + idx + 'Address" placeholder="例: 東京都新宿区〇〇1-1-1"></div>';
   h += '</div>';
   h += '</div>';
   return h;
