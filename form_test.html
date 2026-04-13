@@ -92,70 +92,6 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 .type-unknown { text-align: center; padding: 60px 20px; }
 .type-unknown h2 { font-size: 18px; color: #dc2626; margin-bottom: 8px; }
 .type-unknown p { font-size: 13px; color: #6b7280; }
-
-/* ===== 雇用条件ヒアリング追加スタイル ===== */
-
-  *{box-sizing:border-box;margin:0;padding:0;}
-  :root{
-    --navy:#0f2040;--blue:#2563eb;--blue-light:#eff6ff;
-    --gray-50:#f8fafc;--gray-100:#f1f5f9;--gray-200:#e2e8f0;
-    --gray-400:#94a3b8;--gray-600:#475569;--gray-800:#1e293b;
-    --green:#16a34a;--red:#dc2626;
-  }
-  body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic UI',sans-serif;background:var(--gray-50);min-height:100vh;color:var(--gray-800);}
-  
-  /* ヘッダー */
-  .header{background:var(--navy);padding:20px 20px 24px;position:sticky;top:0;z-index:10;}
-  .header-inner{max-width:680px;margin:0 auto;}
-  .header-logo{font-size:11px;font-weight:800;color:rgba(255,255,255,.5);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;}
-  .header-title{font-size:18px;font-weight:800;color:white;line-height:1.3;}
-  .header-sub{font-size:12px;color:rgba(255,255,255,.6);margin-top:4px;}
-  
-  /* コンテンツ */
-  .content{max-width:680px;margin:0 auto;padding:24px 16px 60px;}
-  
-  /* 説明 */
-  .desc-box{background:var(--blue-light);border:1px solid #bfdbfe;border-radius:10px;padding:14px 16px;margin-bottom:24px;font-size:13px;color:#1e40af;line-height:1.6;}
-  .desc-box strong{display:block;margin-bottom:4px;font-size:14px;}
-  
-  /* セクション */
-  .section{margin-bottom:8px;}
-  .section-title{font-size:11px;font-weight:800;color:var(--gray-400);letter-spacing:1px;text-transform:uppercase;padding:16px 0 8px;border-bottom:1px solid var(--gray-200);margin-bottom:12px;}
-  
-  /* フィールド */
-  .field{background:white;border:1.5px solid var(--gray-200);border-radius:10px;padding:14px 16px;margin-bottom:8px;transition:.2s;}
-  .field:focus-within{border-color:var(--blue);box-shadow:0 0 0 3px rgba(37,99,235,.1);}
-  .field-label{font-size:12px;font-weight:700;color:var(--gray-600);margin-bottom:6px;display:flex;align-items:center;gap:6px;}
-  .field-label .req{background:#fee2e2;color:var(--red);font-size:9px;font-weight:700;padding:1px 5px;border-radius:3px;}
-  .field-ph{font-size:11px;color:var(--gray-400);margin-bottom:6px;}
-  .field input,.field textarea{width:100%;border:none;outline:none;font-size:16px;color:var(--gray-800);font-family:inherit;background:transparent;resize:vertical;min-height:36px;line-height:1.5;}
-  .field textarea{min-height:72px;}
-  
-  /* 送信ボタン */
-  .submit-wrap{position:fixed;bottom:0;left:0;right:0;background:white;border-top:1px solid var(--gray-200);padding:12px 16px;z-index:10;}
-  .submit-inner{max-width:680px;margin:0 auto;}
-  .submit-btn{width:100%;padding:14px;background:var(--blue);color:white;border:none;border-radius:10px;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit;transition:.2s;display:flex;align-items:center;justify-content:center;gap:8px;}
-  .submit-btn:hover{background:#1d4ed8;}
-  .submit-btn:disabled{background:var(--gray-400);cursor:not-allowed;}
-  .submit-note{font-size:11px;color:var(--gray-400);text-align:center;margin-top:6px;}
-  
-  /* 完了画面 */
-  .done{display:none;text-align:center;padding:60px 20px;}
-  .done-icon{font-size:60px;margin-bottom:20px;}
-  .done-title{font-size:22px;font-weight:800;color:var(--green);margin-bottom:10px;}
-  .done-sub{font-size:14px;color:var(--gray-600);line-height:1.6;}
-  
-  /* エラー */
-  .error-box{background:#fee2e2;border:1px solid #fca5a5;border-radius:12px;padding:24px 20px;color:var(--red);font-size:14px;text-align:center;margin-bottom:20px;display:none;line-height:1.8;white-space:pre-line;}
-  
-  /* ローディング */
-  .loading{text-align:center;padding:60px 20px;color:var(--gray-400);font-size:14px;}
-  
-  @media(max-width:480px){
-    .header-title{font-size:16px;}
-    .content{padding:20px 12px 80px;}
-    .field{padding:12px 14px;}
-  }
 </style>
 </head>
 <body>
@@ -196,6 +132,8 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
+var FORM_VERSION = 'ver.20260411.01';
+console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
 
@@ -335,6 +273,7 @@ function blockBasic() {
       field('f-nationality', '国籍', 'select', true, '', 'nationality',
         ['','ベトナム','インドネシア','ミャンマー','カンボジア','ネパール','フィリピン','中国','タイ','モンゴル','その他']) +
     '</div>' +
+    field('f-birthPlace', '出生地 / Place of birth', 'text', false, '例: Ho Chi Minh City') +
     '<div class="grid2">' +
       field('f-passport', 'パスポート番号', 'text', false, '例: AB1234567', 'passport') +
       field('f-passExpiry', 'パスポート有効期限', 'date', false, '', 'passExpiry') +
@@ -426,19 +365,179 @@ function blockTokuteiKoushin() {
   '</div>';
 }
 
+// ===== 技能証明ブロック =====
+function blockSkillProof() {
+  var h = '<div class="card"><div class="section-title">技能水準の証明</div>';
+
+  // 技能証明①
+  h += '<div class="sub-label" style="background:#eff6ff;color:#1d4ed8;border-radius:6px;padding:6px 10px;margin-bottom:8px;font-size:12px;font-weight:700;">【証明① 】</div>';
+  h += '<div class="field">';
+  h += '<label>証明の種類<span class="req">*</span></label>';
+  h += '<select id="f-skillProof1Type" onchange="toggleSkillProof(1, this.value)">';
+  h += '<option value="">---</option>';
+  h += '<option value="exam">特定技能評価試験 Specified Skilled Worker evaluation test</option>';
+  h += '<option value="jisshu">技能実習２号を良好に修了 Successfully completed Technical Intern Training (ii)</option>';
+  h += '</select>';
+  h += '</div>';
+
+  // 特定技能評価試験①
+  h += '<div id="skillProof1Exam" style="display:none;">';
+  h += '<div class="grid2">';
+  h += field('f-skillProof1Field', '合格した試験の分野', 'text', false, '例: 飲食料品製造業');
+  h += field('f-skillProof1Place', '受験地', 'text', false, '例: ハノイ');
+  h += '</div>';
+  h += '</div>';
+
+  // 技能実習①
+  h += '<div id="skillProof1Jisshu" style="display:none;">';
+  h += '<div class="grid2">';
+  h += field('f-skillProof1Job', '職種', 'text', false, '例: 食品製造');
+  h += field('f-skillProof1Task', '作業', 'text', false, '例: 惣菜製造');
+  h += '</div>';
+  h += '<div class="field"><label>証明書の種別</label>';
+  h += '<select id="f-skillProof1Doc">';
+  h += '<option value="">---</option>';
+  h += '<option value="3kyu">3級以上の技能検定合格証</option>';
+  h += '<option value="senmonkyu">専門級の技能検定合格証</option>';
+  h += '<option value="hyoka">評価調書</option>';
+  h += '</select></div>';
+  h += '</div>';
+
+  // 技能証明②
+  h += '<div class="sub-label" style="background:#eff6ff;color:#1d4ed8;border-radius:6px;padding:6px 10px;margin:12px 0 8px;font-size:12px;font-weight:700;">【証明②（2つ合格している場合）】</div>';
+  h += '<div class="field">';
+  h += '<label>証明の種類</label>';
+  h += '<select id="f-skillProof2Type" onchange="toggleSkillProof(2, this.value)">';
+  h += '<option value="">なし / 該当しない</option>';
+  h += '<option value="exam">特定技能評価試験 Specified Skilled Worker evaluation test</option>';
+  h += '<option value="jisshu">技能実習２号を良好に修了 Successfully completed Technical Intern Training (ii)</option>';
+  h += '</select>';
+  h += '</div>';
+
+  // 特定技能評価試験②
+  h += '<div id="skillProof2Exam" style="display:none;">';
+  h += '<div class="grid2">';
+  h += field('f-skillProof2Field', '合格した試験の分野', 'text', false, '例: 飲食料品製造業');
+  h += field('f-skillProof2Place', '受験地', 'text', false, '例: ヤンゴン');
+  h += '</div>';
+  h += '</div>';
+
+  // 技能実習②
+  h += '<div id="skillProof2Jisshu" style="display:none;">';
+  h += '<div class="grid2">';
+  h += field('f-skillProof2Job', '職種', 'text', false, '例: 食品製造');
+  h += field('f-skillProof2Task', '作業', 'text', false, '例: 惣菜製造');
+  h += '</div>';
+  h += '<div class="field"><label>証明書の種別</label>';
+  h += '<select id="f-skillProof2Doc">';
+  h += '<option value="">---</option>';
+  h += '<option value="3kyu">3級以上の技能検定合格証</option>';
+  h += '<option value="senmonkyu">専門級の技能検定合格証</option>';
+  h += '<option value="hyoka">評価調書</option>';
+  h += '</select></div>';
+  h += '</div>';
+
+  h += '</div>'; // card end
+  return h;
+}
+
+// ===== 日本語証明ブロック =====
+function blockJapaneseProof() {
+  var h = '<div class="card"><div class="section-title">日本語能力の証明</div>';
+
+  // 日本語証明①
+  h += '<div class="sub-label" style="background:#f0fdf4;color:#15803d;border-radius:6px;padding:6px 10px;margin-bottom:8px;font-size:12px;font-weight:700;">【証明①】</div>';
+  h += '<div class="field">';
+  h += '<label>証明の種類<span class="req">*</span></label>';
+  h += '<select id="f-jpProof1Type" onchange="toggleJpProof(1, this.value)">';
+  h += '<option value="">---</option>';
+  h += '<option value="exam">特定技能評価試験（日本語）</option>';
+  h += '<option value="jisshu">技能実習２号を良好に修了 Successfully completed Technical Intern Training (ii)</option>';
+  h += '</select>';
+  h += '</div>';
+
+  // 特定技能（日本語試験）①
+  h += '<div id="jpProof1Exam" style="display:none;">';
+  h += '<div class="field"><label>合格した試験の種類</label>';
+  h += '<select id="f-jpProof1ExamType">';
+  h += '<option value="">---</option>';
+  h += '<option value="jlpt">日本語能力試験 JLPT</option>';
+  h += '<option value="jft">国際交流基金日本語基礎テスト JFT-Basic</option>';
+  h += '<option value="kaigo">介護日本語能力試験</option>';
+  h += '</select></div>';
+  h += field('f-jpProof1Place', '受験地', 'text', false, '例: ハノイ');
+  h += '</div>';
+
+  // 技能実習①（日本語）
+  h += '<div id="jpProof1Jisshu" style="display:none;">';
+  h += '<div class="grid2">';
+  h += field('f-jpProof1Job', '職種', 'text', false, '例: 食品製造');
+  h += field('f-jpProof1Task', '作業', 'text', false, '例: 惣菜製造');
+  h += '</div>';
+  h += '<div class="field"><label>証明書の種別</label>';
+  h += '<select id="f-jpProof1Doc">';
+  h += '<option value="">---</option>';
+  h += '<option value="3kyu">3級以上の技能検定合格証</option>';
+  h += '<option value="senmonkyu">専門級の技能検定合格証</option>';
+  h += '<option value="hyoka">評価調書</option>';
+  h += '</select></div>';
+  h += '</div>';
+
+  // 日本語証明②
+  h += '<div class="sub-label" style="background:#f0fdf4;color:#15803d;border-radius:6px;padding:6px 10px;margin:12px 0 8px;font-size:12px;font-weight:700;">【証明②（2つ合格している場合）】</div>';
+  h += '<div class="field">';
+  h += '<label>証明の種類</label>';
+  h += '<select id="f-jpProof2Type" onchange="toggleJpProof(2, this.value)">';
+  h += '<option value="">なし / 該当しない</option>';
+  h += '<option value="exam">特定技能評価試験（日本語）</option>';
+  h += '<option value="jisshu">技能実習２号を良好に修了 Successfully completed Technical Intern Training (ii)</option>';
+  h += '</select>';
+  h += '</div>';
+
+  // 特定技能（日本語試験）②
+  h += '<div id="jpProof2Exam" style="display:none;">';
+  h += '<div class="field"><label>合格した試験の種類</label>';
+  h += '<select id="f-jpProof2ExamType">';
+  h += '<option value="">---</option>';
+  h += '<option value="jlpt">日本語能力試験 JLPT</option>';
+  h += '<option value="jft">国際交流基金日本語基礎テスト JFT-Basic</option>';
+  h += '<option value="kaigo">介護日本語能力試験</option>';
+  h += '</select></div>';
+  h += field('f-jpProof2Place', '受験地', 'text', false, '例: ヤンゴン');
+  h += '</div>';
+
+  // 技能実習②（日本語）
+  h += '<div id="jpProof2Jisshu" style="display:none;">';
+  h += '<div class="grid2">';
+  h += field('f-jpProof2Job', '職種', 'text', false, '例: 食品製造');
+  h += field('f-jpProof2Task', '作業', 'text', false, '例: 惣菜製造');
+  h += '</div>';
+  h += '<div class="field"><label>証明書の種別</label>';
+  h += '<select id="f-jpProof2Doc">';
+  h += '<option value="">---</option>';
+  h += '<option value="3kyu">3級以上の技能検定合格証</option>';
+  h += '<option value="senmonkyu">専門級の技能検定合格証</option>';
+  h += '<option value="hyoka">評価調書</option>';
+  h += '</select></div>';
+  h += '</div>';
+
+  h += '</div>'; // card end
+  return h;
+}
+
 // ===== フォームHTML生成 =====
 function buildForm(t) {
   switch(t) {
     case 'tokutei_nintei':
-      return blockBasic() + blockMarried() + blockTokuteiNintei() + blockContact(false);
+      return blockBasic() + blockMarried() + blockTokuteiNintei() + blockSkillProof() + blockJapaneseProof() + blockContact(false);
     case 'tokutei_koushin':
     case 'tokutei_henkou':
-      return blockBasic() + blockMarried() + blockTokuteiKoushin() + blockContact(false);
+      return blockBasic() + blockMarried() + blockTokuteiKoushin() + blockSkillProof() + blockJapaneseProof() + blockContact(false);
     case 'gijinkoku_nintei':
-      return blockBasic() + blockMarried() + blockTokuteiNintei() + blockEducation() + blockContact(false);
+      return blockBasic() + blockMarried() + blockTokuteiNintei() + blockEducation() + blockSkillProof() + blockJapaneseProof() + blockContact(false);
     case 'gijinkoku_koushin':
     case 'gijinkoku_henkou':
-      return blockBasic() + blockMarried() + blockTokuteiKoushin() + blockEducation() + blockContact(false);
+      return blockBasic() + blockMarried() + blockTokuteiKoushin() + blockEducation() + blockSkillProof() + blockJapaneseProof() + blockContact(false);
     case 'company':
       return buildCompanyForm();
     default:
@@ -892,6 +991,20 @@ function toggleFlexType(val) {
   if (el) el.style.display = val === '適用あり' ? 'block' : 'none';
 }
 
+function toggleSkillProof(num, val) {
+  var examEl   = document.getElementById('skillProof' + num + 'Exam');
+  var jisshuEl = document.getElementById('skillProof' + num + 'Jisshu');
+  if (examEl)   examEl.style.display   = (val === 'exam')   ? 'block' : 'none';
+  if (jisshuEl) jisshuEl.style.display = (val === 'jisshu') ? 'block' : 'none';
+}
+
+function toggleJpProof(num, val) {
+  var examEl   = document.getElementById('jpProof' + num + 'Exam');
+  var jisshuEl = document.getElementById('jpProof' + num + 'Jisshu');
+  if (examEl)   examEl.style.display   = (val === 'exam')   ? 'block' : 'none';
+  if (jisshuEl) jisshuEl.style.display = (val === 'jisshu') ? 'block' : 'none';
+}
+
 var _officerCount = 3;
 function addOfficer() {
   _officerCount++;
@@ -1002,6 +1115,7 @@ contractRenewalPeriod: val('f-contractRenewalPeriod'),
   // 人材系共通
   var d = {
     applicantNameEn: val('f-name'), birthdate: val('f-birth'), nationality: (val('f-nationality') === 'その他' ? (val('f-nationalityOther') || 'その他') : val('f-nationality')),
+    birthPlace: val('f-birthPlace'),
     passport: val('f-passport'), passportExpiry: val('f-passExpiry'),
     married: val('f-married'), email: val('f-email'),
     residenceCard: val('f-residenceCard'), address: val('f-address'),
@@ -1030,10 +1144,40 @@ contractRenewalPeriod: val('f-contractRenewalPeriod'),
     d.schoolName = val('f-schoolName'); d.completionDate = val('f-completionDate');
     d.major = val('f-major');
   }
+
+  // 技能証明（全特定技能・技人国共通）
+  if (t !== 'company') {
+    // 技能証明①
+    d.skillProof1Type  = val('f-skillProof1Type');
+    d.skillProof1Field = val('f-skillProof1Field');
+    d.skillProof1Place = val('f-skillProof1Place');
+    d.skillProof1Job   = val('f-skillProof1Job');
+    d.skillProof1Task  = val('f-skillProof1Task');
+    d.skillProof1Doc   = val('f-skillProof1Doc');
+    // 技能証明②
+    d.skillProof2Type  = val('f-skillProof2Type');
+    d.skillProof2Field = val('f-skillProof2Field');
+    d.skillProof2Place = val('f-skillProof2Place');
+    d.skillProof2Job   = val('f-skillProof2Job');
+    d.skillProof2Task  = val('f-skillProof2Task');
+    d.skillProof2Doc   = val('f-skillProof2Doc');
+    // 日本語証明①
+    d.jpProof1Type     = val('f-jpProof1Type');
+    d.jpProof1ExamType = val('f-jpProof1ExamType');
+    d.jpProof1Place    = val('f-jpProof1Place');
+    d.jpProof1Job      = val('f-jpProof1Job');
+    d.jpProof1Task     = val('f-jpProof1Task');
+    d.jpProof1Doc      = val('f-jpProof1Doc');
+    // 日本語証明②
+    d.jpProof2Type     = val('f-jpProof2Type');
+    d.jpProof2ExamType = val('f-jpProof2ExamType');
+    d.jpProof2Place    = val('f-jpProof2Place');
+    d.jpProof2Job      = val('f-jpProof2Job');
+    d.jpProof2Task     = val('f-jpProof2Task');
+    d.jpProof2Doc      = val('f-jpProof2Doc');
+  }
   return d;
 }
-
-// ===== バリデーション =====
 function validate() {
   if (type === 'company') {
     if (!val('f-coName')) return '会社名は必須です。';
@@ -1067,12 +1211,13 @@ async function submitForm() {
 
   try {
     var res;
-    if (editMode && responseId) {
-      // 編集モード：既存レコードを更新
-      res = await fetch(SUPABASE_URL + '/rest/v1/form_responses?id=eq.' + encodeURIComponent(responseId), {
+    var _submitId = _draftResponseId || responseId;
+    if (_submitId) {
+      // 下書き or 編集モード：既存レコードを更新
+      res = await fetch(SUPABASE_URL + '/rest/v1/form_responses?id=eq.' + encodeURIComponent(_submitId), {
         method: 'PATCH',
         headers: { 'Content-Type':'application/json','apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY,'Prefer':'return=minimal' },
-        body: JSON.stringify({ response: response, imported_at: null }) // imported_atをリセット
+        body: JSON.stringify({ response: response, imported_at: null })
       });
     } else {
       res = await fetch(SUPABASE_URL + '/rest/v1/form_responses', {
@@ -1084,7 +1229,7 @@ async function submitForm() {
     if (!res.ok) throw new Error('HTTP ' + res.status);
     document.getElementById('mainContent').innerHTML =
       '<div class="success"><div class="icon">✅</div><h2>送信完了</h2>' +
-      '<p>'+(editMode?'修正内容を送信しました。<br>担当者が確認いたします。':'ご回答ありがとうございました。<br>担当者が内容を確認いたします。')+'</p></div>';
+      '<p>ご回答ありがとうございました。<br>担当者が内容を確認いたします。</p></div>';
     document.getElementById('btnWrap').style.display = 'none';
   } catch(e) {
     btn.disabled = false; btn.textContent = '送信する';
@@ -1213,30 +1358,54 @@ var TYPE_LABELS = {
   document.getElementById('formBody').innerHTML = buildForm(type);
   setLang(currentLang);
 
-  // 編集モード：既存回答をSupabaseから取得してフィールドに流し込む
-  if (editMode && responseId) {
-    // ヘッダーを編集モード表示に
-    var infoEl = document.getElementById('infoBox');
-    if (infoEl) {
-      infoEl.style.background = '#fef3c7';
-      infoEl.style.borderColor = '#fcd34d';
-      infoEl.style.color = '#92400e';
-      infoEl.textContent = '✏️ 回答を編集中です。修正後、送信ボタンを押してください。';
+  // フォーム起動時：同じcase_id+typeの未送信下書きを自動検索して復元
+  if (caseId) {
+    var _draftUrl = SUPABASE_URL + '/rest/v1/form_responses'
+      + '?case_id=eq.' + encodeURIComponent(caseId)
+      + '&form_type=eq.' + encodeURIComponent(type)
+      + '&imported_at=is.null'
+      + '&order=created_at.desc&limit=1'
+      + '&select=id,response,imported_at';
+    // response_id指定があればそちらを優先
+    if (responseId) {
+      _draftUrl = SUPABASE_URL + '/rest/v1/form_responses?id=eq.' + encodeURIComponent(responseId) + '&select=id,response,imported_at';
     }
-    // 送信ボタンのラベル変更
-    var btnEl = document.getElementById('btn-submit');
-    if (btnEl) btnEl.textContent = '✏️ 修正を送信する';
-    // 編集モードでは途中保存ボタンを非表示
-    var draftBtn = document.getElementById('btn-draft');
-    if (draftBtn) draftBtn.style.display = 'none';
-
-    fetch(SUPABASE_URL + '/rest/v1/form_responses?id=eq.' + encodeURIComponent(responseId) + '&select=response', {
+    fetch(_draftUrl, {
       headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }
     }).then(function(r){ return r.json(); })
     .then(function(data) {
-      if (!data || !data.length || !data[0].response) return;
-      var resp = data[0].response;
-      prefillForm(resp);
+      if (!data || !data.length) return;
+      var row = data[0];
+      var resp = row.response;
+      var isSubmitted = !!row.imported_at;
+
+      if (isSubmitted) {
+        // 取込済み＝編集モード（response_id指定時のみ）
+        if (!responseId) return; // 下書きなしなら何もしない
+        var infoEl = document.getElementById('infoBox');
+        if (infoEl) {
+          infoEl.style.background = '#fef3c7';
+          infoEl.style.borderColor = '#fcd34d';
+          infoEl.style.color = '#92400e';
+          infoEl.textContent = '✏️ 回答を編集中です。修正後、送信ボタンを押してください。';
+        }
+        var btnEl = document.getElementById('btn-submit');
+        if (btnEl) btnEl.textContent = '✏️ 修正を送信する';
+        var draftBtn = document.getElementById('btn-draft');
+        if (draftBtn) draftBtn.style.display = 'none';
+      } else {
+        // 未取込＝下書き再開モード
+        _draftResponseId = row.id;
+        var infoEl = document.getElementById('infoBox');
+        if (infoEl) {
+          infoEl.style.background = '#eff6ff';
+          infoEl.style.borderColor = '#93c5fd';
+          infoEl.style.color = '#1d4ed8';
+          infoEl.textContent = '💾 途中保存した内容を復元しました。続きを入力してください。';
+        }
+      }
+
+      if (resp) prefillForm(resp);
     }).catch(function(e){ console.error('prefill fetch error:', e); });
   }
 })();
@@ -1325,373 +1494,6 @@ function prefillForm(resp) {
     });
   }
 }
-
-// ===== 雇用条件ヒアリング統合 =====
-function sb(path, opts) {
-  return fetch(SUPABASE_URL + '/rest/v1/' + path, Object.assign({
-    headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY, 'Content-Type': 'application/json' }
-  }, opts || {}));
-}
-
-
-
-
-var formItems = [];
-var formCoId = '';
-var formIdx = 0;
-
-function sb(path, opts){
-  return fetch(SUPABASE_URL + '/rest/v1/' + path, Object.assign({
-    headers:{'apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY,'Content-Type':'application/json'}
-  }, opts));
-}
-
-function empGetParam(key){
-  return new URLSearchParams(location.search).get(key)||'';
-}
-
-async function empInit(){
-  var coId = empGetParam('co');
-  var idx = parseInt(empGetParam('idx')||'0');
-  var token = empGetParam('token'); // 斜線フラグのトークン（saveKey）
-  var snapKey = empGetParam('snap'); // スナップショットキー
-  var vParam = parseInt(empGetParam('v')||'0'); // キャッシュバスター兼発行日時
-
-  formCoId = coId;
-  formIdx = idx;
-
-  if(!coId){ empShowError('フォームURLが正しくありません。\n担当者にお問い合わせください。'); return; }
-
-  // 発行から30日を超えたURLは無効
-  if(vParam && Date.now() - vParam > 30 * 24 * 60 * 60 * 1000){
-    empShowError('このフォームの有効期限が切れています（発行から30日経過）。\n\n担当者に再発行をご依頼ください。');
-    return;
-  }
-
-  try {
-    // 所属機関データを取得（フラット構造、emp_setsフィールドに配列）
-    var r = await sb('companies?id=eq.'+encodeURIComponent(coId)+'&select=name,emp_sets');
-    var rows = await r.json();
-    if(!rows||!rows.length){ empShowError('所属機関データが見つかりません'); return; }
-    var row = rows[0];
-    var coName = row.name || '';
-    var empSets = [];
-    try{
-      empSets = typeof row.emp_sets==='string' ? JSON.parse(row.emp_sets) : (row.emp_sets||[]);
-    }catch(e){}
-    var es = empSets[idx];
-    if(!es){ empShowError('このフォームは現在ご利用いただけません。\n\n担当者がフォームを再発行するか、直接担当者にお問い合わせください。'); return; }
-
-    // 斜線フラグを取得
-    var skips = {};
-    if(token){
-      var sr = await sb('settings?key=eq.'+encodeURIComponent(token)+'&select=value');
-      var sd = await sr.json();
-      if(sd&&sd.length){ try{ skips=JSON.parse(sd[0].value); }catch(e){} }
-    }
-
-    // スナップショット（発行時の空フィールド一覧）を取得
-    var snapshotKeys = null;
-    if(snapKey){
-      var snapR = await sb('settings?key=eq.'+encodeURIComponent(snapKey)+'&select=value');
-      var snapD = await snapR.json();
-      if(snapD&&snapD.length){ try{ snapshotKeys=JSON.parse(snapD[0].value); }catch(e){} }
-    }
-
-    // 不足項目を抽出（スナップショットがあればそれを基準に）
-    var items = buildItems(es, skips, snapshotKeys);
-    formItems = items;
-
-    // 項目がない場合
-    if(!items.length){
-      document.getElementById('formTitle').textContent = '✅ 入力完了';
-      document.getElementById('formSub').textContent = coName||'';
-      document.getElementById('loadingView').style.display='none';
-      document.getElementById('doneView').style.display='block';
-      document.getElementById('doneView').querySelector('.done-title').textContent='入力不要な項目はありません';
-      document.getElementById('doneView').querySelector('.done-sub').textContent='全ての雇用条件が入力済みです。\nご不明な点は担当者にご連絡ください。';
-      return;
-    }
-
-    document.getElementById('formTitle').textContent = '📋 雇用条件 追加ヒアリング';
-    document.getElementById('formSub').textContent = coName + (es.setName?' — '+es.setName:'');
-
-    renderFields(items);
-    document.getElementById('loadingView').style.display='none';
-    document.getElementById('formView').style.display='block';
-    document.getElementById('submitWrap').style.display='block';
-
-  } catch(e){
-    empShowError('読み込みエラー: '+e.message);
-  }
-}
-
-// EMP_SET_FIELDSの簡易版（フォーム用）
-// EMP_SET_FIELDSと同期したフィールド定義
-// 不足抽出モーダルと同じロジックで項目を生成する
-function buildItems(es, skips, snapshotKeys){
-  var items = [];
-
-  // フィールド定義（test.htmlのEMP_SET_FIELDSと同期）
-  var SECTIONS = [
-    {s:'就業場所', fields:[
-      {k:'officeName',l:'事業所名',ph:'例: 株式会社〇〇 板橋工場',tr:1},
-      {k:'officeAddr',l:'事業所住所',ph:'例: 東京都板橋区板橋1丁目2番3号',tr:1},
-      {k:'officeContact',l:'事業所電話番号',ph:'例: 03-9876-5432'},
-      {k:'foreignerJobDesc',l:'受け入れる外国人の職務内容',ph:'例: 食品製造ラインにおいて加工品の仕上げ等',wide:true,tr:1}
-    ]},
-    {s:'雇用期間', fields:[
-      {k:'contractStart',l:'雇用開始日',ph:'例: 2026-04-01',tr:1},
-      {k:'contractEnd',l:'雇用終了日',ph:'例: 2027-03-31',tr:1},
-      {k:'contractRenewal',l:'契約更新の有無',ph:'例: 更新する場合があり得る',tr:1}
-    ]},
-    {s:'賃金', fields:[
-      {k:'salaryMonthly',l:'基本給（円）',ph:'例: 200000',num:true,tr:1},
-      {k:'salaryHourly',l:'時間給（円）',ph:'例: 1050',num:true,tr:1},
-      {k:'salaryDaily',l:'日給（円）',ph:'例: 8000',num:true,tr:1},
-      {k:'calcMonthly',l:'月給換算額',ph:'例: 200000',num:true,tr:1},
-      {k:'calcHourly',l:'時間換算額',ph:'例: 1153',num:true,tr:1},
-      {k:'totalMonthly',l:'支払概算額（基本給＋手当）',ph:'例: 220000',num:true,tr:1}
-    ]},
-    {s:'固定残業代', fields:[
-      {k:'fixedOTName',l:'固定残業代 名称',ph:'例: 固定残業手当',tr:1},
-      {k:'fixedOTAmount',l:'固定残業代 金額（円）',ph:'例: 30000',num:true,tr:1},
-      {k:'fixedOTHours',l:'固定残業代 何時間分',ph:'例: 20',num:true,tr:1}
-    ]},
-    {s:'控除', fields:[
-      {k:'deductTax',l:'税金 概算額（円）',ph:'例: 8000',num:true,tr:1},
-      {k:'deductSocial',l:'社会保険料 概算額（円）',ph:'例: 30000',num:true,tr:1},
-      {k:'deductEmployment',l:'雇用保険料 概算額（円）',ph:'例: 1000',num:true,tr:1},
-      {k:'deductFood',l:'食費控除 月額（円）',ph:'例: 10000',num:true,tr:1},
-      {k:'foodDetail',l:'食費 適正額の説明・食事内容',ph:'例: 社員食堂で昼食1食500円',wide:true,tr:1},
-      {k:'deductHousing',l:'居住費控除 月額（円）',ph:'例: 20000',num:true,tr:1},
-      {k:'housingDetail',l:'居住費 適正額の説明',ph:'例: 月額13万円で借上。10名で割り1万3千円は適正',wide:true,tr:1},
-      {k:'deductUtility',l:'水道光熱費 月額（円）',ph:'例: 5000',num:true,tr:1},
-      {k:'deductOther1Name',l:'その他控除① 名目',ph:'',tr:1},
-      {k:'deductOther1Amount',l:'その他控除① 金額（円）',ph:'',num:true,tr:1},
-      {k:'netPay',l:'手取り支給額（円）',ph:'例: 160000',num:true,tr:1}
-    ]},
-    {s:'保険・健康診断', fields:[
-      {k:'healthCheckY',l:'健康診断 受診年',ph:'例: 2026',num:true,tr:1},
-      {k:'healthCheckM',l:'健康診断 受診月',ph:'例: 4',num:true,tr:1}
-    ]},
-    {s:'労働時間・休日', fields:[
-      {k:'dailyHours',l:'1日の所定労働時間（時間）',ph:'例: 8',num:true,tr:1},
-      {k:'dailyMins',l:'1日の所定労働時間（分）',ph:'例: 0',num:true,tr:1},
-      {k:'monthlyDays',l:'月所定労働日数',ph:'例: 21',num:true,tr:1},
-      {k:'monthlyH',l:'月所定労働時間（時間）',ph:'例: 170',num:true,tr:1},
-      {k:'monthlyMins',l:'月所定労働時間（分）',ph:'例: 0',num:true,tr:1},
-      {k:'yearlyDays',l:'年所定労働日数',ph:'例: 261',num:true,tr:1},
-      {k:'annualHolidays',l:'年間休日数',ph:'例: 120',num:true,tr:1},
-      {k:'paidLeave',l:'有給休暇',ph:'例: 10日（入社6ヶ月後）',tr:1}
-    ]},
-    {s:'時間外・交代制・変形労働', fields:[
-      {k:'shiftDetail',l:'シフトパターン詳細',ph:'例: 早番 7:00-16:00 / 遅番 13:00-22:00',wide:true,tr:1},
-      // flexFlgは表示しない（フォームには種類のみ送る）
-      {k:'flexType',l:'変形労働時間制の種類',ph:'',tr:1,forceCheck:1,opts:['1年単位','1ヶ月単位'],note:'※適用されている場合は種類を選択してください。適用されていない場合は未選択のまま送信してください。'},
-      {k:'flexDetail',l:'変形労働時間制の詳細',ph:'例: 1年単位の変形労働時間制',wide:true,tr:1}
-    ]},
-    {s:'退職', fields:[
-      {k:'resignNoticeDays',l:'自己都合退職 何日前までに申し出るか',ph:'例: 30',tr:1}
-    ]},
-    {s:'就業規則', fields:[
-      {k:'ruleConfirmPlace',l:'就業規則を確認できる場所や方法',ph:'例: 事務所内に備え付け',tr:1}
-    ]},
-    {s:'比較対象日本人', fields:[
-      {k:'jpCompJobDesc',l:'職務内容',ph:'例: 食品製造ライン作業（盛付・包装）',tr:1},
-      {k:'jpCompAge',l:'年齢',ph:'例: 35',num:true,tr:1},
-      {k:'jpCompGender',l:'性別',ph:'例: 男/女',tr:1},
-      {k:'jpCompExp',l:'経験年数',ph:'例: 5年',tr:1},
-      {k:'jpCompSalary',l:'月額報酬（円）',ph:'例: 250000',num:true,tr:1},
-      {k:'jpCompAllow1Name',l:'手当①名称',ph:'例: 通勤手当',tr:1},
-      {k:'jpCompAllow1Amt',l:'手当①金額（円）',ph:'',num:true,tr:1},
-      {k:'wageRegulation',l:'賃金規定の有無',ph:'',tr:1,opts:['有','無']},
-      {k:'salaryRuleApply',l:'賃金規定適用額（円）',ph:'',num:true,tr:1},
-      {k:'jpCompReason',l:'同等以上の理由',ph:'例: 同一ラインで同等業務に従事しており同等',wide:true,tr:1}
-    ]}
-  ];
-
-  SECTIONS.forEach(function(sec){
-    sec.fields.forEach(function(f){
-      if(skips['skip_'+f.k]) return;
-      // showIf条件チェック
-      if(f.showIf){ var cv=es[f.showIf.k]||''; if(cv!==f.showIf.v) return; }
-      var val = es[f.k]!=null?String(es[f.k]).trim():'';
-      // flexFlgはフォームに出さない（代わりにflexTypeで対応）
-      if(f.k === 'flexFlg') return;
-      // showIfなしで常に対象（flexType等）
-      if(f.showIf) f = Object.assign({},f,{showIf:null});
-      var _inSnapshot = snapshotKeys ? snapshotKeys.indexOf(f.k)>=0 : !val;
-      // スナップショットにflexFlgが含まれる場合、flexTypeを表示対象に
-      var _inSnapshotFlex = snapshotKeys && f.k==='flexType' && snapshotKeys.indexOf('flexFlg')>=0;
-      // スナップショットなし（古いURL）の場合は空項目を全て表示
-      var _noSnap = !snapshotKeys && !val;
-      if(_inSnapshot || _inSnapshotFlex || _noSnap) items.push(Object.assign({},f,{sec:sec.s,currentVal:val}));
-    });
-  });
-
-  // 手当（動的行）
-  var nums=['','①','②','③','④','⑤'];
-  for(var n=1;n<=5;n++){
-    var rk='allowance'+n;
-    if(skips['skip__row_'+rk]) continue;
-    if(n>1){
-      var hasData=['Name','Amount','Cond'].some(function(s){return !!(es[rk+s]);});
-      if(!hasData) break;
-    }
-    ['Name','Amount','Cond'].forEach(function(s){
-      var fk=rk+s;
-      if(skips['skip_'+fk]) return;
-      var val=es[fk]!=null?String(es[fk]).trim():'';
-      var lbl=s==='Name'?'手当'+nums[n]+'名称':s==='Amount'?'手当'+nums[n]+'金額（円）':'手当'+nums[n]+'計算方法・条件';
-      var ph=s==='Name'?'例: 通勤手当':s==='Amount'?'例: 10000':'例: 実費支給';
-      var _showA = snapshotKeys ? snapshotKeys.indexOf(fk)>=0 : !val;
-      if(_showA) items.push({sec:'手当',k:fk,l:lbl,ph:ph,num:s==='Amount',currentVal:val});
-    });
-  }
-
-  return items;
-}
-
-function renderFields(items){
-  var container = document.getElementById('fieldsContainer');
-  var curSec = '';
-  var html = '';
-  items.forEach(function(f,i){
-    if(f.sec!==curSec){
-      if(curSec) html+='</div>';
-      curSec=f.sec;
-      var _secInfo = '';
-      if(f.sec==='比較対象日本人'){
-        _secInfo = '<button type="button" onclick="(function(){var d=document.getElementById(\'jpcomp-info\');d.style.display=d.style.display===\'none\'?\'block\':\'none\';})()" style="font-size:10px;padding:2px 10px;background:#eff6ff;color:#2563eb;border:1px solid #93c5fd;border-radius:5px;cursor:pointer;font-weight:700;margin-left:8px;">❓ 説明</button>';
-        _secInfo += '<div id="jpcomp-info" style="display:none;margin-top:10px;padding:12px 14px;background:#f0f9ff;border:1px solid #bae6fd;border-radius:8px;font-size:12px;color:#0c4a6e;line-height:1.8;font-weight:400;letter-spacing:0;text-transform:none;">';
-        _secInfo += '<b>【特定技能申請】比較対象となる日本人従業員の情報入力のお願い</b><br>';
-        _secInfo += '特定技能制度において、特定技能外国人の報酬額については、日本人が同等の業務に従事する場合の報酬額と同等以上であることが求められます。そちらの説明資料を作成するために比較対象の日本人の状況提供をお願い致します。対象者は「今回の外国人と最も業務や経歴が近い日本人」を1名選んでください。<br><br>';
-        _secInfo += '・<b>職務内容・経験年数：</b> その方の現在の作業内容と、これまでの経験年数を教えてください。<br>';
-        _secInfo += '・<b>報酬・手当の内容：</b> 基本給に加え、各手当の名称と金額（直近実績）をそのままご入力ください。<br>';
-        _secInfo += '・<b>同等以上の理由：</b>「同じラインで同等業務に従事しているため」「社内の賃金規定に基づき、経歴を加味して決定したため」など、同額以上である根拠をご記入ください。';
-        _secInfo += '</div>';
-      }
-      html+='<div class="section"><div class="section-title" style="display:flex;align-items:center;flex-wrap:wrap;">'+f.sec+_secInfo+'</div>';
-    }
-    var _showIfHide = f.showIf ? (function(){ var cv=f.currentVal||''; return cv!==f.showIf.v ? 'display:none;' : ''; })() : '';
-    html+='<div class="field" id="field_'+f.k+'" style="'+_showIfHide+'">';
-    var _note = f.note ? '<span style="font-size:10px;font-weight:400;color:#64748b;margin-left:4px;">'+f.note+'</span>' : '';
-    html+='<div class="field-label">'+f.l+_note+'</div>';
-    if(f.ph) html+='<div class="field-ph">'+f.ph+'</div>';
-    var _cv = f.currentVal || '';
-    if(f.opts){
-      var onch = f.k==='flexFlg' ? ' onchange="empToggleFlexType(this.value)"' : '';
-      html+='<select name="'+f.k+'"'+onch+' style="width:100%;padding:12px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:16px;background:white;">';
-      html+='<option value="">— 選択してください —</option>';
-      f.opts.forEach(function(o){ html+='<option value="'+o+'"'+(_cv===o?' selected':'')+'>'+o+'</option>'; });
-      html+='</select>';
-    } else if(f.wide){
-      html+='<textarea name="'+f.k+'" placeholder="'+(f.ph||'')+'">'+_cv+'</textarea>';
-    } else {
-      html+='<input type="'+(f.num?'number':'text')+'" name="'+f.k+'" value="'+_cv+'" placeholder="'+(f.ph||'')+'" inputmode="'+(f.num?'numeric':'text')+'">';
-    }
-    html+='</div>';
-  });
-  if(curSec) html+='</div>';
-  container.innerHTML=html;
-}
-
-function empToggleFlexType(val){
-  var el = document.getElementById('field_flexType');
-  if(el) el.style.display = val==='適用あり' ? '' : 'none';
-  var el2 = document.getElementById('field_flexDetail');
-  if(el2) el2.style.display = val==='適用あり' ? '' : 'none';
-}
-
-function empShowError(msg){
-  document.getElementById('loadingView').style.display='none';
-  var e=document.getElementById('errorView');
-  e.style.display='block';
-  e.textContent=msg;
-  var c=document.getElementById('errorContact');
-  if(c) c.style.display='block';
-}
-
-async function empSubmitForm(){
-  var btn=document.getElementById('submitBtn');
-  var answers={};
-  document.querySelectorAll('#fieldsContainer input,#fieldsContainer textarea,#fieldsContainer select').forEach(function(el){
-    if(el.name&&el.value.trim()) answers[el.name]=el.value.trim();
-  });
-  answers._ua = navigator.userAgent;
-  if(!Object.keys(answers).filter(function(k){return k!=='_ua';}).length){
-    alert('少なくとも1項目を入力してください');
-    return;
-  }
-  btn.disabled=true;
-  btn.textContent='送信中...';
-  try{
-    var r=await sb('emp_hearing_responses',{
-      method:'POST',
-      headers:{'apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},
-      body:JSON.stringify({co_id:formCoId,emp_idx:formIdx,answers:answers,submitted_at:new Date().toISOString()})
-    });
-    if(r.ok||r.status===201){
-      document.getElementById('formView').style.display='none';
-      document.getElementById('submitWrap').style.display='none';
-      document.getElementById('doneView').style.display='block';
-    } else {
-      var t=await r.text();
-      throw new Error('status '+r.status+': '+t);
-    }
-  } catch(e){
-    btn.disabled=false;
-    btn.textContent='📤 送信する';
-    alert('送信に失敗しました。再度お試しください。\n'+e.message);
-  }
-}
-
-init();
-
-
-// type=empの場合: 雇用条件ヒアリング起動
-if (type === 'emp') {
-  document.getElementById('empFormWrapper').style.display = '';
-  document.getElementById('mainContent').style.display = 'none';
-  document.getElementById('btnWrap').style.display = 'none';
-  empInit();
-}
 </script>
-
-<!-- ===== 雇用条件ヒアリング ===== -->
-<div id="empFormWrapper" style="display:none;">
-<div class="header">
-  <div class="header-inner">
-    <div class="header-logo">OFUSA 大房行政書士法人</div>
-    <div class="header-title" id="formTitle">📋 雇用条件 追加ヒアリング</div>
-    <div class="header-sub" id="formSub">読み込み中...</div>
-  </div>
-</div>
-
-<div class="content">
-  <div id="loadingView" class="loading">読み込み中...</div>
-  <div style="max-width:680px;margin:40px auto;padding:0 20px;"><div id="errorView" class="error-box">フォームの読み込みに失敗しました。URLを確認してください。</div><div id="errorContact" style="display:none;margin-top:16px;text-align:center;font-size:13px;color:var(--gray-600);">ご不明な点は担当者までお問い合わせください。</div></div>
-  <div id="formView" style="display:none;">
-    <div class="desc-box">
-      <strong>ご担当者様へ</strong>
-      以下の項目について情報をご入力ください。入力いただいた内容は担当者に共有されます。
-    </div>
-    <div id="fieldsContainer"></div>
-  </div>
-  <div id="doneView" class="done">
-    <div class="done-icon">✅</div>
-    <div class="done-title">送信完了！</div>
-    <div class="done-sub">ありがとうございました。<br>内容は担当者に共有されました。<br>このページは閉じていただいて構いません。</div>
-  </div>
-</div>
-
-<div class="submit-wrap" id="submitWrap" style="display:none;">
-  <div class="submit-inner">
-    <button class="submit-btn" id="submitBtn" onclick="submitForm()">📤 送信する</button>
-    <div class="submit-note">送信後、担当者に内容が共有されます。</div>
-  </div>
-</div>
-</div>
 </body>
 </html>
