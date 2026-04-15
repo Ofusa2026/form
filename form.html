@@ -145,6 +145,8 @@ var caseName = params.get('name') ? decodeURIComponent(params.get('name')) : '';
 var currentLang = params.get('lang') || '';
 var responseId = params.get('response_id') || '';  // 編集モード: 既存回答のID
 var editMode = !!responseId;
+var fieldsFilter = params.get('fields') ? params.get('fields').split(',').map(function(s){return s.trim();}) : null;
+// fieldsFilter: 表示するフィールドキーの配列（nullなら全表示）
 
 // ===== 翻訳辞書 =====
 var TRANS = {
@@ -704,6 +706,96 @@ function field(id, label, inputType, required, placeholder, transKey, options) {
 }
 
 // ===== 企業フォーム =====
+
+// ===== fieldsパラメータによる絞り込み表示 =====
+// EMP_SHORTAGE_FIELDSのfKeyと対応するフォームフィールドID
+var FIELDS_TO_FORM_IDS = {
+  officeName:      ['f-officeName','f-officeNameEn'],
+  officeAddr:      ['f-officeAddr','f-officeAddrEn'],
+  foreignerJobDesc:['f-foreignerJobDesc'],
+  salaryMonthly:   ['f-salaryMonthly','f-salaryHourly','f-salaryDaily','f-totalMonthly','f-salaryType'],
+  salaryHourly:    ['f-salaryHourly','f-salaryMonthly','f-salaryType'],
+  totalMonthly:    ['f-totalMonthly'],
+  payCutoffDay:    ['f-payCutoffMonth','f-payCutoffDay'],
+  payDay:          ['f-payDayMonth','f-payDayDay'],
+  payMethod:       ['f-payMethod'],
+  startTime:       ['f-startTime','f-endTime','f-breakTime'],
+  endTime:         ['f-startTime','f-endTime','f-breakTime'],
+  breakTime:       ['f-breakTime'],
+  weeklyDays:      ['f-weeklyDays','f-weeklyH','f-weeklyMins','f-monthlyH','f-monthlyDays'],
+  weeklyH:         ['f-weeklyH','f-weeklyDays'],
+  monthlyH:        ['f-monthlyH','f-monthlyDays'],
+  overtimeFlg:     ['f-overtimeFlg'],
+  shiftFlg:        ['f-shiftFlg','f-shiftDetail'],
+  salaryRaise:     ['f-salaryRaise','f-salaryRaiseCond'],
+  bonus:           ['f-bonus','f-bonusCond'],
+  retirement:      ['f-retirement','f-retirementDetail'],
+  insKenpo:        ['f-insKenpo','f-insPension','f-insEmp','f-insLabor'],
+  insPension:      ['f-insKenpo','f-insPension','f-insEmp','f-insLabor'],
+  insEmp:          ['f-insKenpo','f-insPension','f-insEmp','f-insLabor'],
+  insLabor:        ['f-insKenpo','f-insPension','f-insEmp','f-insLabor'],
+  paidLeaveCount:  ['f-paidLeaveCount'],
+  fixedHoliday:    ['f-fixedHolidayMon','f-fixedHolidayTue','f-fixedHolidayWed','f-fixedHolidayThu','f-fixedHolidayFri','f-fixedHolidaySat','f-fixedHolidaySun','f-fixedHolidayHol'],
+  deductTax:       ['f-deductTax','f-deductSocial','f-deductEmployment'],
+  deductSocial:    ['f-deductTax','f-deductSocial','f-deductEmployment'],
+  deductHousing:   ['f-deductHousing','f-housingProvided','f-housingDetail'],
+  jpCompJobDesc:   ['f-jpCompJobDesc','f-jpCompAge','f-jpCompGender','f-jpCompExp','f-jpCompSalary','f-jpCompReason','f-salaryRuleFlg'],
+  jpCompSalary:    ['f-jpCompSalary','f-jpCompJobDesc','f-jpCompAge','f-jpCompExp','f-salaryRuleFlg'],
+};
+
+function applyFieldsFilter(fields) {
+  // 表示すべきフォームフィールドIDを収集
+  var showIds = {};
+  fields.forEach(function(fKey) {
+    var ids = FIELDS_TO_FORM_IDS[fKey] || ['f-' + fKey];
+    ids.forEach(function(id){ showIds[id] = true; });
+  });
+
+  // 全cardを取得して、関連フィールドがないカードを折りたたむ
+  var cards = document.querySelectorAll('.card');
+  cards.forEach(function(card) {
+    // カード内の全input/select/textareaのIDを確認
+    var inputs = card.querySelectorAll('input,select,textarea');
+    var hasTarget = false;
+    inputs.forEach(function(el) {
+      if (el.id && showIds[el.id]) hasTarget = true;
+    });
+    if (!hasTarget) {
+      // 企業基本情報カードは常に表示（会社名など必須）
+      var title = card.querySelector('.section-title');
+      var titleText = title ? title.textContent.trim() : '';
+      var alwaysShow = ['企業基本情報','所在地・連絡先','担当者・窓口'].indexOf(titleText) >= 0;
+      if (!alwaysShow) {
+        card.style.display = 'none';
+      }
+    }
+  });
+
+  // ヘッダーにフィルター中バナーを表示
+  var infoBox = document.getElementById('infoBox');
+  if (infoBox) {
+    infoBox.innerHTML = '📋 <strong>雇用条件ヒアリング</strong>：以下の未入力項目についてご回答ください。<br><span style="font-size:12px;color:#6b7280;">' +
+      fields.map(function(f){
+        var labels = {
+          officeName:'事業所名', officeAddr:'事業所住所', foreignerJobDesc:'外国人の職務内容',
+          salaryMonthly:'基本給', salaryHourly:'時間給', totalMonthly:'支払概算額',
+          payCutoffDay:'締め日', payDay:'支払日', payMethod:'支払方法',
+          startTime:'始業時刻', endTime:'終業時刻', breakTime:'休憩時間',
+          weeklyDays:'週所定労働日数', weeklyH:'週所定労働時間', monthlyH:'月所定労働時間',
+          overtimeFlg:'時間外労働の有無', shiftFlg:'シフト制', salaryRaise:'昇給',
+          bonus:'賞与', retirement:'退職金', insKenpo:'健康保険', insPension:'厚生年金',
+          insEmp:'雇用保険', insLabor:'労災保険', paidLeaveCount:'有給休暇日数',
+          fixedHoliday:'固定休日', deductTax:'税金控除', deductSocial:'社会保険料',
+          deductHousing:'居住費控除', jpCompJobDesc:'比較対象日本人の職務内容', jpCompSalary:'比較対象日本人の賃金'
+        };
+        return labels[f] || f;
+      }).join('・') + '</span>';
+    infoBox.style.background = '#fffbeb';
+    infoBox.style.borderColor = '#fcd34d';
+    infoBox.style.color = '#92400e';
+  }
+}
+
 function buildCompanyForm() {
   return (
   // ① 企業基本情報
@@ -1579,6 +1671,10 @@ var TYPE_LABELS = {
     document.getElementById('type-badges').innerHTML = b;
   }
   document.getElementById('formBody').innerHTML = buildForm(type);
+  // fieldsパラメータがある場合、該当フィールドを含むカードだけ表示
+  if (fieldsFilter && fieldsFilter.length && type === 'company') {
+    applyFieldsFilter(fieldsFilter);
+  }
   var verEl = document.getElementById('ver-display');
   if (verEl) verEl.textContent = FORM_VERSION;
   setLang(currentLang);
