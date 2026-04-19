@@ -568,13 +568,17 @@ function blockTokuteiKoushin() {
 
 // ===== 選択肢（indexと完全一致） =====
 var SKILL_EVAL_TYPES = ['分野別運用方針に定める評価方法による証明','技能実習２号を良好に修了'];
+var SKILL_EVAL_LABELS = {'分野別運用方針に定める評価方法による証明':'試験合格','技能実習２号を良好に修了':'技能実習２号を良好に修了'};
 var SKILL_EXAM_LIST = ['試験免除','介護技能評価試験','ビルクリーニング分野特定技能１号評価試験','ビルクリーニング分野特定技能２号評価試験','製造分野特定技能１号評価試験（機械金属加工）','製造分野特定技能２号評価試験（機械金属加工）','製造分野特定技能１号評価試験（電気電子機器組立て）','製造分野特定技能２号評価試験（電気電子機器組立て）','製造分野特定技能１号評価試験（金属表面処理）','製造分野特定技能２号評価試験（金属表面処理）','建設分野特定技能１号評価試験（土木）','建設分野特定技能２号評価試験（土木）','建設分野特定技能１号評価試験（建築）','建設分野特定技能２号評価試験（建築）','建設分野特定技能１号評価試験（ライフライン・設備）','建設分野特定技能２号評価試験（ライフライン・設備）','造船・舶用工業分野特定技能１号試験（溶接）','造船・舶用工業分野特定技能２号試験（溶接）','造船・舶用工業分野特定技能１号試験（塗装）','造船・舶用工業分野特定技能２号試験（塗装）','造船・舶用工業分野特定技能１号試験（鉄工）','造船・舶用工業分野特定技能２号試験（鉄工）','造船・舶用工業分野特定技能１号試験（仕上げ）','造船・舶用工業分野特定技能２号試験（仕上げ）','造船・舶用工業分野特定技能１号試験（機械加工）','造船・舶用工業分野特定技能２号試験（機械加工）','造船・舶用工業分野特定技能１号試験（電気機器組立て）','造船・舶用工業分野特定技能２号試験（電気機器組立て）','自動車整備分野特定技能１号評価試験','自動車整備分野特定技能２号評価試験','航空分野特定技能１号評価試験（空港グランドハンドリング）','航空分野特定技能２号評価試験（空港グランドハンドリング）','航空分野特定技能１号評価試験（航空機整備）','航空分野特定技能２号評価試験（航空機整備）','宿泊分野特定技能１号評価試験','宿泊分野特定技能２号評価試験','１号農業技能測定試験（耕種農業全般）','２号農業技能測定試験（耕種農業全般）','１号農業技能測定試験（畜産農業全般）','２号農業技能測定試験（畜産農業全般）','１号漁業技能測定試験（漁業）','２号漁業技能測定試験（漁業）','１号漁業技能測定試験（養殖業）','２号漁業技能測定試験（養殖業）','飲食料品製造業特定技能１号技能測定試験','飲食料品製造業特定技能２号技能測定試験','外食業特定技能１号技能測定試験','外食業特定技能２号技能測定試験','林業分野特定技能１号評価試験','木材産業分野特定技能１号評価試験','印刷・同関連業分野特定技能1号評価試験'];
 var JP_EXAM_LIST = ['試験免除','国際交流基金日本語基礎テスト','日本語能力試験','介護日本語評価試験'];
 var COUNTRY_LIST_ONLINE = ['日本 Japan','中国 People\'s Republic of China','ベトナム Viet Nam','韓国 Republic of Korea','フィリピン Philippines','ブラジル Brazil','ネパール Nepal','インドネシア Indonesia','ミャンマー Myanmar','台湾 Taiwan','米国 United States of America','カンボジア Cambodia','タイ Thailand','モンゴル Mongolia','バングラデシュ Bangladesh','スリランカ Sri Lanka','パキスタン Pakistan','インド India','ウズベキスタン Uzbekistan'];
 var GINOJISSHU_PROOF_LIST = ['３級の技能検定又はこれに相当する技能実習評価試験の実技試験の合格による証明','実習状況に関する書面による証明'];
 
-function makeOptions(list) {
-  return list.map(function(v){ return '<option value="' + v + '">' + v + '</option>'; }).join('');
+function makeOptions(list, labelMap) {
+  return list.map(function(v){
+    var lbl = (labelMap && labelMap[v]) ? labelMap[v] : v;
+    return '<option value="' + v + '">' + lbl + '</option>';
+  }).join('');
 }
 
 // ===== 技能証明ブロック =====
@@ -587,7 +591,7 @@ function blockSkillProof() {
   h += '<label>技能水準 評価区分<span class="req">*</span></label>';
   h += '<select id="f-skillEvalType" onchange="toggleSkillProof(1, this.value)">';
   h += '<option value="">---</option>';
-  h += makeOptions(SKILL_EVAL_TYPES);
+  h += makeOptions(SKILL_EVAL_TYPES, SKILL_EVAL_LABELS);
   h += '</select></div>';
 
   // 評価試験①（= skillExam1 + skillExamLoc1）
@@ -631,7 +635,7 @@ function blockJapaneseProof() {
   h += '<label>日本語能力 評価区分<span class="req">*</span></label>';
   h += '<select id="f-jpEvalType" onchange="toggleJpProof(1, this.value)">';
   h += '<option value="">---</option>';
-  h += makeOptions(SKILL_EVAL_TYPES);
+  h += makeOptions(SKILL_EVAL_TYPES, SKILL_EVAL_LABELS);
   h += '</select></div>';
 
   // 日本語試験①（= jpExam1 + jpExamLoc1）
