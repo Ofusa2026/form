@@ -133,7 +133,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20260422.01';
+var FORM_VERSION = 'ver.20260422.02';
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -149,6 +149,9 @@ var fieldsFilter = params.get('fields') ? params.get('fields').split(',').map(fu
 
 // 特定技能フラグ（type=tokutei_* のとき true）
 var isTokutei = (type === 'tokutei_nintei' || type === 'tokutei_koushin' || type === 'tokutei_henkou');
+
+// 技人国フラグ（type=gijinkoku_* のとき true）
+var isGijinkoku = (type === 'gijinkoku_nintei' || type === 'gijinkoku_koushin' || type === 'gijinkoku_henkou');
 
 // ===== 翻訳辞書 =====
 var TRANS = {
@@ -750,6 +753,73 @@ function blockJapaneseProof() {
   return h;
 }
 
+// ===== 技人国専用ブロック（日本語能力・役職・実務経験） =====
+function blockGijinkokuExtra() {
+  var h = '<div class="card"><div class="section-title">技人国 資格要件</div>';
+
+  // ① 日本語能力（JLPT N2 or BJT 400点以上）
+  h += '<div class="field">';
+  h += '<label>日本語能力試験（JLPT）N2、または BJTビジネス日本語能力テストで400点以上を取得していますか？ <span class="req">*</span></label>';
+  h += '<div style="font-size:11px;color:#6b7280;margin-bottom:6px;">Do you have JLPT N2, or BJT Business Japanese Proficiency Test score of 400 or above?</div>';
+  h += '<select id="f-gijinkokuJpTest">';
+  h += '<option value="">---</option>';
+  h += '<option value="はい">はい / Yes</option>';
+  h += '<option value="いいえ">いいえ / No</option>';
+  h += '</select>';
+  h += '</div>';
+
+  // ② 現職の役職
+  h += '<div class="field">';
+  h += '<label>現職の役職の有無 <span class="req">*</span></label>';
+  h += '<div style="font-size:11px;color:#6b7280;margin-bottom:6px;">Do you have a job title / position at your current workplace?</div>';
+  h += '<select id="f-gijinkokuTitleStatus" onchange="toggleGijinkokuTitle(this.value)">';
+  h += '<option value="">---</option>';
+  h += '<option value="あり">あり / Yes</option>';
+  h += '<option value="なし">なし / No</option>';
+  h += '</select>';
+  h += '</div>';
+  h += '<div id="gijinkokuTitleWrap" style="display:none;">';
+  h += '<div class="field"><label>役職名 / Job title</label>';
+  h += '<input type="text" id="f-gijinkokuTitle" placeholder="例: 主任 / リーダー / 課長 など">';
+  h += '</div></div>';
+
+  // ③ 技人国の実務経験年数
+  h += '<div class="field">';
+  h += '<label>技人国の実務経験年数の有無 <span class="req">*</span></label>';
+  h += '<div style="font-size:11px;color:#6b7280;margin-bottom:6px;">Do you have practical work experience related to this engineer/specialist visa?</div>';
+  h += '<select id="f-gijinkokuExpStatus" onchange="toggleGijinkokuExp(this.value)">';
+  h += '<option value="">---</option>';
+  h += '<option value="あり">あり / Yes</option>';
+  h += '<option value="なし">なし / No</option>';
+  h += '</select>';
+  h += '</div>';
+  h += '<div id="gijinkokuExpWrap" style="display:none;">';
+  h += '<label style="display:block;font-size:13px;font-weight:700;color:#1f2937;margin-bottom:6px;">実務経験期間 / Experience period</label>';
+  h += '<div class="grid2">';
+  h += '<div class="field"><label style="font-size:12px;font-weight:600;">年 / Years</label><input type="number" id="f-gijinkokuExpYears" placeholder="例: 3" min="0" max="50"></div>';
+  h += '<div class="field"><label style="font-size:12px;font-weight:600;">か月 / Months</label><input type="number" id="f-gijinkokuExpMonths" placeholder="例: 6" min="0" max="11"></div>';
+  h += '</div>';
+  h += '</div>';
+
+  h += '</div>';
+  return h;
+}
+
+function toggleGijinkokuTitle(val) {
+  var el = document.getElementById('gijinkokuTitleWrap');
+  if (el) el.style.display = (val === 'あり') ? 'block' : 'none';
+  if (val !== 'あり') { var i = document.getElementById('f-gijinkokuTitle'); if(i) i.value=''; }
+}
+
+function toggleGijinkokuExp(val) {
+  var el = document.getElementById('gijinkokuExpWrap');
+  if (el) el.style.display = (val === 'あり') ? 'block' : 'none';
+  if (val !== 'あり') {
+    var y = document.getElementById('f-gijinkokuExpYears'); if(y) y.value='';
+    var m = document.getElementById('f-gijinkokuExpMonths'); if(m) m.value='';
+  }
+}
+
 // ===== フォームHTML生成 =====
 function buildForm(t) {
   switch(t) {
@@ -759,10 +829,10 @@ function buildForm(t) {
     case 'tokutei_henkou':
       return blockBasic() + blockMarried() + blockTokuteiKoushin() + blockSkillProof() + blockJapaneseProof() + blockContact(false, true);
     case 'gijinkoku_nintei':
-      return blockBasic() + blockMarried() + blockTokuteiNintei() + blockEducation() + blockSkillProof() + blockJapaneseProof() + blockContact(false, false);
+      return blockBasic() + blockMarried() + blockTokuteiNintei() + blockEducation() + blockGijinkokuExtra() + blockContact(false, false);
     case 'gijinkoku_koushin':
     case 'gijinkoku_henkou':
-      return blockBasic() + blockMarried() + blockTokuteiKoushin() + blockEducation() + blockSkillProof() + blockJapaneseProof() + blockContact(false, true);
+      return blockBasic() + blockMarried() + blockTokuteiKoushin() + blockEducation() + blockGijinkokuExtra() + blockContact(false, true);
     case 'company':
       return buildCompanyForm();
     default:
@@ -1494,9 +1564,19 @@ function collectData() {
     d.eduCountry = val('f-eduCountry'); d.education = val('f-education');
     d.schoolName = val('f-schoolName'); d.completionDate = val('f-completionDate');
     d.major = val('f-major');
+    // 技人国専用の新項目
+    d.gijinkokuJpTest      = val('f-gijinkokuJpTest');
+    d.gijinkokuTitleStatus = val('f-gijinkokuTitleStatus');
+    if (d.gijinkokuTitleStatus === 'あり') d.gijinkokuTitle = val('f-gijinkokuTitle');
+    d.gijinkokuExpStatus = val('f-gijinkokuExpStatus');
+    if (d.gijinkokuExpStatus === 'あり') {
+      d.gijinkokuExpYears  = val('f-gijinkokuExpYears');
+      d.gijinkokuExpMonths = val('f-gijinkokuExpMonths');
+    }
   }
 
-  if (t !== 'company') {
+  // 技能証明・日本語証明は特定技能のみ（技人国は不要）
+  if (t !== 'company' && !isGijinkoku) {
     d.skillEvalType  = val('f-skillEvalType');
     d.skillExam1     = val('f-skillExam1');
     d.skillExamLoc1  = val('f-skillExamLoc1');
@@ -1564,23 +1644,41 @@ function validate() {
     }
   }
 
-  var sk = val('f-skillEvalType');
-  if (!sk) return '技能水準 評価区分を選択してください。';
-  if (sk === SKILL_EVAL_TYPES[0]) {
-    if (!val('f-skillExam1'))    return '技能試験名①を選択してください。';
-    if (!val('f-skillExamLoc1')) return '技能試験 受験地①を選択してください。';
-  }
-  if (sk === SKILL_EVAL_TYPES[1]) {
-    if (!val('f-gijutsuType'))  return '職種（技能実習2号）を入力してください。';
-    if (!val('f-gijutsuWork'))  return '作業を入力してください。';
-    if (!val('f-gijutsuProof')) return '修了証明を選択してください。';
-  }
+  // 技人国：新3項目の必須チェック（技能水準・日本語能力チェックは行わない）
+  if (isGijinkoku) {
+    if (!val('f-gijinkokuJpTest')) return '日本語能力（JLPT N2またはBJT 400点以上）の有無を選択してください。';
 
-  var jp = val('f-jpEvalType');
-  if (!jp) return '日本語能力 評価区分を選択してください。';
-  if (jp === SKILL_EVAL_TYPES[0]) {
-    if (!val('f-jpExam1'))    return '日本語試験名①を選択してください。';
-    if (!val('f-jpExamLoc1')) return '日本語試験 受験地①を選択してください。';
+    var titleSt = val('f-gijinkokuTitleStatus');
+    if (!titleSt) return '現職の役職の有無を選択してください。';
+    if (titleSt === 'あり' && !val('f-gijinkokuTitle')) return '役職名を入力してください。';
+
+    var expSt = val('f-gijinkokuExpStatus');
+    if (!expSt) return '技人国の実務経験年数の有無を選択してください。';
+    if (expSt === 'あり') {
+      var yy = val('f-gijinkokuExpYears');
+      var mm = val('f-gijinkokuExpMonths');
+      if (!yy && !mm) return '実務経験の年数または月数を入力してください。';
+    }
+  } else {
+    // 特定技能：従来通りの技能水準・日本語能力のチェック
+    var sk = val('f-skillEvalType');
+    if (!sk) return '技能水準 評価区分を選択してください。';
+    if (sk === SKILL_EVAL_TYPES[0]) {
+      if (!val('f-skillExam1'))    return '技能試験名①を選択してください。';
+      if (!val('f-skillExamLoc1')) return '技能試験 受験地①を選択してください。';
+    }
+    if (sk === SKILL_EVAL_TYPES[1]) {
+      if (!val('f-gijutsuType'))  return '職種（技能実習2号）を入力してください。';
+      if (!val('f-gijutsuWork'))  return '作業を入力してください。';
+      if (!val('f-gijutsuProof')) return '修了証明を選択してください。';
+    }
+
+    var jp = val('f-jpEvalType');
+    if (!jp) return '日本語能力 評価区分を選択してください。';
+    if (jp === SKILL_EVAL_TYPES[0]) {
+      if (!val('f-jpExam1'))    return '日本語試験名①を選択してください。';
+      if (!val('f-jpExamLoc1')) return '日本語試験 受験地①を選択してください。';
+    }
   }
 
   return null;
@@ -1837,7 +1935,14 @@ function prefillForm(resp) {
     addressStatus: 'f-addressStatus',
     tempReturnStatus: 'f-tempReturnStatus',
     tempReturnFrom: 'f-tempReturnFrom',
-    tempReturnTo: 'f-tempReturnTo'
+    tempReturnTo: 'f-tempReturnTo',
+    // 技人国の追加項目
+    gijinkokuJpTest: 'f-gijinkokuJpTest',
+    gijinkokuTitleStatus: 'f-gijinkokuTitleStatus',
+    gijinkokuTitle: 'f-gijinkokuTitle',
+    gijinkokuExpStatus: 'f-gijinkokuExpStatus',
+    gijinkokuExpYears: 'f-gijinkokuExpYears',
+    gijinkokuExpMonths: 'f-gijinkokuExpMonths'
   };
 
   // 特定技能の場合、residenceCard="なし" はステータスを「なし」として扱う
