@@ -133,7 +133,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20260422.04';
+var FORM_VERSION = 'ver.20260506.01';
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -1697,7 +1697,7 @@ async function submitForm() {
       res = await fetch(SUPABASE_URL + '/rest/v1/form_responses?id=eq.' + encodeURIComponent(_submitId), {
         method: 'PATCH',
         headers: { 'Content-Type':'application/json','apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY,'Prefer':'return=minimal' },
-        body: JSON.stringify({ response: response, imported_at: null })
+        body: JSON.stringify({ response: response, imported_at: null, deleted_at: null, submitted_at: new Date().toISOString() })
       });
     } else {
       res = await fetch(SUPABASE_URL + '/rest/v1/form_responses', {
@@ -1737,7 +1737,7 @@ async function saveDraft(auto) {
       res = await fetch(SUPABASE_URL + '/rest/v1/form_responses?id=eq.' + encodeURIComponent(_draftResponseId), {
         method: 'PATCH',
         headers: { 'Content-Type':'application/json','apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY,'Prefer':'return=minimal' },
-        body: JSON.stringify({ response: response, imported_at: null })
+        body: JSON.stringify({ response: response, imported_at: null, deleted_at: null })
       });
     } else {
       res = await fetch(SUPABASE_URL + '/rest/v1/form_responses?select=id', {
@@ -1845,6 +1845,7 @@ var TYPE_LABELS = {
       + '?case_id=eq.' + encodeURIComponent(caseId)
       + '&form_type=eq.' + encodeURIComponent(type)
       + '&imported_at=is.null'
+      + '&deleted_at=is.null'
       + '&order=created_at.desc&limit=1'
       + '&select=id,response,imported_at';
     if (responseId) {
