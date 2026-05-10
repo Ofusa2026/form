@@ -59,6 +59,29 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 .hint { font-size: 11px; color: #9ca3af; margin-top: 4px; }
 .req-note { font-size: 11px; color: #6b7280; margin-bottom: 12px; padding: 8px 12px; background: #f9fafb; border-radius: 8px; border-left: 3px solid #dc2626; }
 .info-box { background: #eff6ff; border-radius: 10px; padding: 12px 14px; font-size: 12px; color: #2563eb; margin-bottom: 12px; border: 1px solid #bfdbfe; }
+.info-box .case-name { display: block; font-size: 20px; font-weight: 800; color: #1e3a8a; margin-bottom: 4px; letter-spacing: .3px; }
+
+/* 名前確認モーダル */
+.name-confirm-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(15, 23, 42, .72); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); z-index: 9999; display: flex; align-items: center; justify-content: center; padding: 16px; box-sizing: border-box; }
+.name-confirm-modal { background: white; border-radius: 16px; width: 100%; max-width: 420px; padding: 24px 20px; box-shadow: 0 20px 60px rgba(0,0,0,.3); }
+.name-confirm-modal .title { font-size: 16px; font-weight: 800; color: #0f2040; text-align: center; margin-bottom: 6px; }
+.name-confirm-modal .subtitle { font-size: 12px; color: #64748b; text-align: center; margin-bottom: 18px; }
+.name-confirm-modal .name-box { background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); border: 2px solid #2563eb; border-radius: 12px; padding: 18px 14px; margin-bottom: 16px; text-align: center; }
+.name-confirm-modal .name-box .label { font-size: 11px; color: #2563eb; font-weight: 700; margin-bottom: 6px; letter-spacing: .5px; }
+.name-confirm-modal .name-box .name { font-size: 24px; font-weight: 800; color: #1e3a8a; letter-spacing: .3px; word-break: break-word; line-height: 1.3; }
+.name-confirm-modal .warn { font-size: 11px; color: #92400e; background: #fffbeb; border: 1px solid #fcd34d; border-radius: 8px; padding: 10px 12px; margin-bottom: 16px; line-height: 1.5; }
+.name-confirm-modal .buttons { display: flex; flex-direction: column; gap: 8px; }
+.name-confirm-modal .btn-yes { padding: 14px; background: #16a34a; color: white; border: none; border-radius: 10px; font-size: 15px; font-weight: 800; cursor: pointer; }
+.name-confirm-modal .btn-yes:active { background: #15803d; transform: scale(.98); }
+.name-confirm-modal .btn-no { padding: 12px; background: white; color: #dc2626; border: 2px solid #fca5a5; border-radius: 10px; font-size: 13px; font-weight: 700; cursor: pointer; }
+.name-confirm-modal .btn-no:active { background: #fef2f2; }
+
+/* 名前が違う場合の連絡画面 */
+.name-mismatch-box { background: #fef2f2; border: 2px solid #fca5a5; border-radius: 12px; padding: 16px; margin-top: 12px; }
+.name-mismatch-box .title { font-size: 14px; font-weight: 800; color: #991b1b; margin-bottom: 8px; }
+.name-mismatch-box .desc { font-size: 12px; color: #7f1d1d; line-height: 1.6; margin-bottom: 10px; }
+.name-mismatch-box .contact { background: white; border-radius: 8px; padding: 10px 12px; font-size: 12px; color: #374151; line-height: 1.6; }
+.name-mismatch-box .contact strong { color: #0f2040; }
 
 /* 送信ボタン */
 .btn-wrap { position: fixed; bottom: 0; left: 0; right: 0; padding: 12px 16px; background: white; border-top: 1px solid #e5e7eb; box-shadow: 0 -4px 12px rgba(0,0,0,.08); z-index: 50; }
@@ -119,21 +142,52 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
   </div>
 </div>
 
-<div class="container" id="mainContent">
+<!-- 名前確認モーダル -->
+<div id="nameConfirmOverlay" class="name-confirm-overlay" style="display:none;">
+  <div class="name-confirm-modal">
+    <div class="title">🔍 お名前のご確認</div>
+    <div class="subtitle">下記のお名前で間違いありませんか？</div>
+    <div class="name-box">
+      <div class="label">📋 ご依頼者</div>
+      <div class="name" id="nameConfirmName"></div>
+    </div>
+    <div class="warn">※ ご自身のお名前と異なる場合は「いいえ」を押してください。フォーム入力に進まず、ご連絡先をご案内いたします。</div>
+    <div class="buttons">
+      <button class="btn-yes" onclick="confirmName(true)">✅ はい、私の名前です</button>
+      <button class="btn-no" onclick="confirmName(false)">❌ いいえ、違います</button>
+    </div>
+  </div>
+</div>
+
+<!-- 名前が違う場合の画面 -->
+<div id="nameMismatchScreen" style="display:none;padding:20px;max-width:600px;margin:20px auto;">
+  <div class="name-mismatch-box">
+    <div class="title">⚠️ お名前にご相違があります</div>
+    <div class="desc">恐れ入りますが、フォームへのご入力は控えていただき、お手数ですが下記までご連絡をお願いいたします。</div>
+    <div class="contact">
+      <strong>大房行政書士法人</strong><br>
+      📞 03-6424-8849<br>
+      📧 info@gyosei-cambo.com<br>
+      🏢 〒144-0052 東京都大田区蒲田5-11-10 FUNDES蒲田8階
+    </div>
+  </div>
+</div>
+
+<div class="container" id="mainContent" style="display:none;">
   <div class="info-box" id="infoBox">大房行政書士法人よりご依頼の情報をご入力ください。</div>
   <div class="req-note"><span style="color:#dc2626;font-weight:800;">*</span> は必須項目です。</div>
   <div id="errorMsg" class="error-msg"></div>
   <div id="formBody"></div>
 </div>
 
-<div class="btn-wrap" id="btnWrap">
+<div class="btn-wrap" id="btnWrap" style="display:none;">
   <button class="btn-draft" onclick="saveDraft()" id="btn-draft">💾 途中保存する</button>
   <button class="btn-submit" onclick="submitForm()" id="btn-submit">送信する</button>
   <div class="draft-saved-msg" id="draftSavedMsg">✅ 途中保存しました</div>
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20260506.01';
+var FORM_VERSION = 'ver.20260511.03';
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -1822,15 +1876,36 @@ var TYPE_LABELS = {
   company:          { cat:'企業情報', kind:'', catClass:'badge-company', kindClass:'' }
 };
 
-(function init() {
-  if (caseName) {
-    document.getElementById('infoBox').textContent = '大房行政書士法人よりご依頼の情報をご入力ください。（' + caseName + '）';
-  }
+// 名前確認モーダル: caseNameがあれば最初に表示し、確認後にフォーム表示
+function _initFormBody(){
   var info = TYPE_LABELS[type];
   if (info) {
     var b = '<span class="form-type-badge ' + info.catClass + '">' + info.cat + '</span>';
     if (info.kind) b += '<span class="form-type-badge ' + info.kindClass + '">' + info.kind + '</span>';
     document.getElementById('type-badges').innerHTML = b;
+  }
+  document.getElementById('mainContent').style.display = 'block';
+  document.getElementById('btnWrap').style.display = 'block';
+}
+function confirmName(isMatch){
+  var overlay = document.getElementById('nameConfirmOverlay');
+  if (overlay) overlay.style.display = 'none';
+  if (isMatch) {
+    // 確認済みフラグをlocalStorageに保存（同案件・同タイプで再表示防止）
+    try { localStorage.setItem('ofusa_name_confirmed_' + caseId + '_' + type, '1'); } catch(e){}
+    _initFormBody();
+  } else {
+    // 名前違いの連絡画面を表示
+    document.getElementById('nameMismatchScreen').style.display = 'block';
+    // header(form-headerなど)はそのまま、本体は出さない
+  }
+}
+
+(function init() {
+  if (caseName) {
+    var _escName = String(caseName).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+    document.getElementById('infoBox').innerHTML = '<span class="case-name">' + _escName + '</span>大房行政書士法人よりご依頼の情報をご入力ください。';
+    document.getElementById('nameConfirmName').innerHTML = _escName;
   }
   document.getElementById('formBody').innerHTML = buildForm(type);
   if (fieldsFilter && fieldsFilter.length && type === 'company') {
@@ -1839,6 +1914,15 @@ var TYPE_LABELS = {
   var verEl = document.getElementById('ver-display');
   if (verEl) verEl.textContent = FORM_VERSION;
   setLang(currentLang);
+
+  // 名前確認モーダル: caseNameがあって、未確認の場合のみ表示
+  var _alreadyConfirmed = false;
+  try { _alreadyConfirmed = !!localStorage.getItem('ofusa_name_confirmed_' + caseId + '_' + type); } catch(e){}
+  if (caseName && !_alreadyConfirmed) {
+    document.getElementById('nameConfirmOverlay').style.display = 'flex';
+  } else {
+    _initFormBody();
+  }
 
   if (caseId) {
     var _draftUrl = SUPABASE_URL + '/rest/v1/form_responses'
