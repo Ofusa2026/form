@@ -187,7 +187,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20260511.03';
+var FORM_VERSION = 'ver.20260511.04';
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -1729,6 +1729,14 @@ function validate() {
   return null;
 }
 
+// フォーム種別ごとの最低キー数（必須項目を考慮した安全マージン）
+// company: name必須のみ → 1あればOK相当だが、安全のため3
+// それ以外: 氏名/生年月日/国籍/メール/結婚/(技能・JP評価)等 → 5以上は欲しい
+function _minKeysForType(t) {
+  if (t === 'company') return 1;
+  return 5;
+}
+
 async function submitForm() {
   document.getElementById('errorMsg').style.display = 'none';
   var err = validate();
@@ -1740,6 +1748,18 @@ async function submitForm() {
   }
   var response = collectData();
   Object.keys(response).forEach(function(k){ if(response[k]===''||response[k]==null) delete response[k]; });
+
+  // 🛡️ フィールド数の防御チェック: 異常に少ない場合は送信ブロック
+  var _keyCount = Object.keys(response).length;
+  var _minKeys = _minKeysForType(type);
+  if (_keyCount < _minKeys) {
+    console.error('[FORM BUG GUARD] Submit blocked. keys=' + _keyCount + ' < min=' + _minKeys + ' type=' + type + ' response=' + JSON.stringify(response));
+    var el = document.getElementById('errorMsg');
+    el.textContent = '⚠️ フォームの入力内容が正しく読み取れませんでした（' + _keyCount + '項目のみ検出）。ページを再読み込みして、もう一度入力してください。問題が続く場合は担当者までご連絡ください。';
+    el.style.display = 'block';
+    el.scrollIntoView({behavior:'smooth',block:'center'});
+    return;
+  }
 
   var btn = document.getElementById('btn-submit');
   btn.disabled = true; btn.textContent = '送信中...';
@@ -1785,6 +1805,24 @@ async function saveDraft(auto) {
   try {
     var response = collectData();
     Object.keys(response).forEach(function(k){ if(response[k]===''||response[k]==null) delete response[k]; });
+
+    // 🛡️ フィールド数の防御チェック: 異常に少ない場合は保存をスキップ
+    // ただしdraftの場合は最低1キーでも保存できる（途中保存の意味）
+    // 0キーは確実にバグなのでスキップ
+    var _keyCount = Object.keys(response).length;
+    if (_keyCount === 0) {
+      console.warn('[FORM BUG GUARD] saveDraft skipped: 0 keys. type=' + type);
+      if (btn) { btn.disabled = false; btn.textContent = '💾 途中保存する'; }
+      if (!auto) showAlert('⚠️ 入力内容が読み取れませんでした。ページを再読み込みしてください。', 'error');
+      return;
+    }
+    // residenceCard と address だけ（既知のバグパターン）の場合もスキップ
+    if (_keyCount === 2 && response.residenceCard === 'なし' && response.address === 'なし') {
+      console.warn('[FORM BUG GUARD] saveDraft skipped: only residenceCard/address keys. type=' + type);
+      if (btn) { btn.disabled = false; btn.textContent = '💾 途中保存する'; }
+      if (!auto) showAlert('⚠️ 入力内容が読み取れませんでした。ページを再読み込みしてください。', 'error');
+      return;
+    }
 
     var res;
     if (_draftResponseId) {
@@ -1937,39 +1975,55 @@ function confirmName(isMatch){
     }
     fetch(_draftUrl, {
       headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }
-    }).then(function(r){ return r.json(); })
+    }).then(function(r){
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      return r.json();
+    })
     .then(function(data) {
-      if (!data || !data.length) return;
-      var row = data[0];
-      var resp = row.response;
-      var isSubmitted = !!row.imported_at;
+      try {
+        if (!data || !data.length) return;
+        var row = data[0];
+        var resp = row.response;
+        var isSubmitted = !!row.imported_at;
 
-      if (isSubmitted) {
-        if (!responseId) return;
-        var infoEl = document.getElementById('infoBox');
-        if (infoEl) {
-          infoEl.style.background = '#fef3c7';
-          infoEl.style.borderColor = '#fcd34d';
-          infoEl.style.color = '#92400e';
-          infoEl.textContent = '✏️ 回答を編集中です。修正後、送信ボタンを押してください。';
+        if (isSubmitted) {
+          if (!responseId) return;
+          var infoEl = document.getElementById('infoBox');
+          if (infoEl) {
+            infoEl.style.background = '#fef3c7';
+            infoEl.style.borderColor = '#fcd34d';
+            infoEl.style.color = '#92400e';
+            infoEl.textContent = '✏️ 回答を編集中です。修正後、送信ボタンを押してください。';
+          }
+          var btnEl = document.getElementById('btn-submit');
+          if (btnEl) btnEl.textContent = '✏️ 修正を送信する';
+          var draftBtn = document.getElementById('btn-draft');
+          if (draftBtn) draftBtn.style.display = 'none';
+        } else {
+          _draftResponseId = row.id;
+          var infoEl = document.getElementById('infoBox');
+          if (infoEl) {
+            infoEl.style.background = '#eff6ff';
+            infoEl.style.borderColor = '#93c5fd';
+            infoEl.style.color = '#1d4ed8';
+            infoEl.textContent = '💾 途中保存した内容を復元しました。続きを入力してください。';
+          }
         }
-        var btnEl = document.getElementById('btn-submit');
-        if (btnEl) btnEl.textContent = '✏️ 修正を送信する';
-        var draftBtn = document.getElementById('btn-draft');
-        if (draftBtn) draftBtn.style.display = 'none';
-      } else {
-        _draftResponseId = row.id;
-        var infoEl = document.getElementById('infoBox');
-        if (infoEl) {
-          infoEl.style.background = '#eff6ff';
-          infoEl.style.borderColor = '#93c5fd';
-          infoEl.style.color = '#1d4ed8';
-          infoEl.textContent = '💾 途中保存した内容を復元しました。続きを入力してください。';
+
+        if (resp) {
+          try {
+            prefillForm(resp);
+          } catch (prefillErr) {
+            console.error('prefillForm error (ignored to keep form usable):', prefillErr);
+          }
         }
+      } catch (innerErr) {
+        console.error('prefill .then handler error (ignored):', innerErr);
       }
-
-      if (resp) prefillForm(resp);
-    }).catch(function(e){ console.error('prefill fetch error:', e); });
+    }).catch(function(e){
+      // fetch失敗・JSON parse失敗・HTTPエラーすべて握りつぶし、フォームは普通に使えるようにする
+      console.error('prefill fetch error (ignored to keep form usable):', e);
+    });
   }
 })();
 
@@ -2029,25 +2083,33 @@ function prefillForm(resp) {
   }
 
   Object.keys(resp).forEach(function(k) {
-    var v = resp[k];
-    if (!v && v !== 0) return;
-    var elId = keyToId[k] || ('f-' + k);
-    var el = document.getElementById(elId);
-    if (!el) return;
-    if (el.tagName === 'SELECT') {
-      for (var i = 0; i < el.options.length; i++) {
-        if (el.options[i].value === String(v) || el.options[i].text === String(v)) {
-          el.selectedIndex = i; break;
+    try {
+      var v = resp[k];
+      if (!v && v !== 0) return;
+      var elId = keyToId[k] || ('f-' + k);
+      var el = document.getElementById(elId);
+      if (!el) return;
+      if (el.tagName === 'SELECT') {
+        for (var i = 0; i < el.options.length; i++) {
+          if (el.options[i].value === String(v) || el.options[i].text === String(v)) {
+            el.selectedIndex = i; break;
+          }
         }
+        try {
+          if (el.onchange) el.onchange();
+          else { var ev = new Event('change'); el.dispatchEvent(ev); }
+        } catch (changeErr) {
+          console.error('onchange error for ' + elId + ' (ignored):', changeErr);
+        }
+      } else {
+        el.value = v;
       }
-      if (el.onchange) el.onchange();
-      else { var ev = new Event('change'); el.dispatchEvent(ev); }
-    } else {
-      el.value = v;
+    } catch (eachErr) {
+      console.error('prefill key=' + k + ' error (ignored):', eachErr);
     }
   });
 
-  prefillPayDate(resp);
+  try { prefillPayDate(resp); } catch(e) { console.error('prefillPayDate error (ignored):', e); }
 
   var maxAllow = 1;
   for (var ai = 2; ai <= 4; ai++) {
