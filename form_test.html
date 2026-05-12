@@ -187,7 +187,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20260512.01';
+var FORM_VERSION = 'ver.20260512.02';
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -1731,10 +1731,11 @@ function validate() {
 
 // フォーム種別ごとの最低キー数（必須項目を考慮した安全マージン）
 // company: name必須のみ → 1あればOK相当だが、安全のため3
-// それ以外: 氏名/生年月日/国籍/メール/結婚/(技能・JP評価)等 → 5以上は欲しい
+// それ以外: 氏名/生年月日/国籍/メール/結婚/(技能・JP評価)等 → 6以上は欲しい
+// Supabase側トリガーと同じ閾値を使用（二重防御）
 function _minKeysForType(t) {
   if (t === 'company') return 1;
-  return 5;
+  return 6;
 }
 
 async function submitForm() {
@@ -1755,10 +1756,26 @@ async function submitForm() {
   if (_keyCount < _minKeys) {
     console.error('[FORM BUG GUARD] Submit blocked. keys=' + _keyCount + ' < min=' + _minKeys + ' type=' + type + ' response=' + JSON.stringify(response));
     var el = document.getElementById('errorMsg');
-    el.textContent = '⚠️ フォームの入力内容が正しく読み取れませんでした（' + _keyCount + '項目のみ検出）。ページを再読み込みして、もう一度入力してください。問題が続く場合は担当者までご連絡ください。';
+    el.textContent = '⚠️ フォームの入力内容が正しく読み取れませんでした（' + _keyCount + '項目のみ検出）。ページを再読み込み(Ctrl+Shift+R / Cmd+Shift+R)して、もう一度入力してください。問題が続く場合は担当者までご連絡ください。';
     el.style.display = 'block';
     el.scrollIntoView({behavior:'smooth',block:'center'});
     return;
+  }
+
+  // 🛡️ 必須項目チェック（非company）: 氏名・生年月日・国籍・メールが揃っていることを確認
+  if (type !== 'company') {
+    var requiredKeys = ['applicantNameEn', 'birthdate', 'nationality', 'email'];
+    var missingKeys = requiredKeys.filter(function(k){
+      return !response[k] || String(response[k]).trim() === '';
+    });
+    if (missingKeys.length > 0) {
+      console.error('[FORM BUG GUARD] Submit blocked. missing required: ' + missingKeys.join(','));
+      var el = document.getElementById('errorMsg');
+      el.textContent = '⚠️ 必須項目が読み取れませんでした（' + missingKeys.join('、') + '）。ページを再読み込み(Ctrl+Shift+R / Cmd+Shift+R)して、もう一度入力してください。';
+      el.style.display = 'block';
+      el.scrollIntoView({behavior:'smooth',block:'center'});
+      return;
+    }
   }
 
   var btn = document.getElementById('btn-submit');
@@ -1780,7 +1797,16 @@ async function submitForm() {
         body: JSON.stringify({ case_id: caseId, form_type: type, response: response })
       });
     }
-    if (!res.ok) throw new Error('HTTP ' + res.status);
+    if (!res.ok) {
+      // Supabase側のバリデーショントリガーで拒否された場合の処理
+      var errorBody = '';
+      try { errorBody = await res.text(); } catch(_) {}
+      if (errorBody.indexOf('FORM_VALIDATION_ERROR') >= 0) {
+        // サーバー側で拒否された = フォームの中身が破損 → 再読み込みを促す
+        throw new Error('SERVER_VALIDATION_FAILED');
+      }
+      throw new Error('HTTP ' + res.status);
+    }
     document.getElementById('mainContent').innerHTML =
       '<div class="success"><div class="icon">✅</div><h2>送信完了</h2>' +
       '<p>ご回答ありがとうございました。<br>担当者が内容を確認いたします。</p></div>';
@@ -1788,8 +1814,15 @@ async function submitForm() {
   } catch(e) {
     btn.disabled = false; btn.textContent = '送信する';
     var el = document.getElementById('errorMsg');
-    el.textContent = '送信に失敗しました。(' + e.message + ')';
+    if (e.message === 'SERVER_VALIDATION_FAILED') {
+      el.innerHTML = '⚠️ サーバー側で入力内容に不備が検出されました。<br>'
+        + '<strong>ページを再読み込み(Ctrl+Shift+R / Cmd+Shift+R / iPhoneは閉じて開き直す)してから、もう一度入力してください。</strong><br>'
+        + 'それでも解決しない場合は担当者までご連絡ください。';
+    } else {
+      el.textContent = '送信に失敗しました。(' + e.message + ')';
+    }
     el.style.display = 'block';
+    el.scrollIntoView({behavior:'smooth',block:'center'});
   }
 }
 
@@ -1816,12 +1849,25 @@ async function saveDraft(auto) {
       if (!auto) showAlert('⚠️ 入力内容が読み取れませんでした。ページを再読み込みしてください。', 'error');
       return;
     }
-    // residenceCard と address だけ（既知のバグパターン）の場合もスキップ
+    // 既知バグパターン1: residenceCard と address だけ（2項目）
     if (_keyCount === 2 && response.residenceCard === 'なし' && response.address === 'なし') {
       console.warn('[FORM BUG GUARD] saveDraft skipped: only residenceCard/address keys. type=' + type);
       if (btn) { btn.disabled = false; btn.textContent = '💾 途中保存する'; }
       if (!auto) showAlert('⚠️ 入力内容が読み取れませんでした。ページを再読み込みしてください。', 'error');
       return;
+    }
+    // 既知バグパターン2: residenceCard='なし'+address='なし'+他1〜2項目だけ（必須項目が一切無い状態）
+    // → 「なし」系のデフォルト値しか入っていない=DOMが破壊された状態と判断
+    if (_keyCount <= 4 && type !== 'company') {
+      var hasRcNashi = response.residenceCard === 'なし';
+      var hasAdNashi = response.address === 'なし';
+      var hasRequiredField = !!(response.applicantNameEn || response.birthdate || response.nationality || response.email);
+      if (hasRcNashi && hasAdNashi && !hasRequiredField) {
+        console.warn('[FORM BUG GUARD] saveDraft skipped: only "なし" defaults, no required fields. keys=' + _keyCount + ' type=' + type);
+        if (btn) { btn.disabled = false; btn.textContent = '💾 途中保存する'; }
+        if (!auto) showAlert('⚠️ 入力内容が読み取れませんでした。ページを再読み込みしてください。', 'error');
+        return;
+      }
     }
 
     var res;
