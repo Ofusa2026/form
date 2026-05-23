@@ -187,7 +187,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20260523.01';
+var FORM_VERSION = 'ver.20260523.03';
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -717,8 +717,45 @@ function blockTokuteiKoushin() {
 // ===== 選択肢（indexと完全一致） =====
 var SKILL_EVAL_TYPES = ['分野別運用方針に定める評価方法による証明','技能実習２号を良好に修了'];
 var SKILL_EVAL_LABELS = {'分野別運用方針に定める評価方法による証明':'試験合格','技能実習２号を良好に修了':'技能実習２号を良好に修了'};
-var SKILL_EXAM_LIST = ['試験免除','介護技能評価試験','ビルクリーニング分野特定技能１号評価試験','ビルクリーニング分野特定技能２号評価試験','製造分野特定技能１号評価試験（機械金属加工）','製造分野特定技能２号評価試験（機械金属加工）','製造分野特定技能１号評価試験（電気電子機器組立て）','製造分野特定技能２号評価試験（電気電子機器組立て）','製造分野特定技能１号評価試験（金属表面処理）','製造分野特定技能２号評価試験（金属表面処理）','建設分野特定技能１号評価試験（土木）','建設分野特定技能２号評価試験（土木）','建設分野特定技能１号評価試験（建築）','建設分野特定技能２号評価試験（建築）','建設分野特定技能１号評価試験（ライフライン・設備）','建設分野特定技能２号評価試験（ライフライン・設備）','造船・舶用工業分野特定技能１号試験（溶接）','造船・舶用工業分野特定技能２号試験（溶接）','造船・舶用工業分野特定技能１号試験（塗装）','造船・舶用工業分野特定技能２号試験（塗装）','造船・舶用工業分野特定技能１号試験（鉄工）','造船・舶用工業分野特定技能２号試験（鉄工）','造船・舶用工業分野特定技能１号試験（仕上げ）','造船・舶用工業分野特定技能２号試験（仕上げ）','造船・舶用工業分野特定技能１号試験（機械加工）','造船・舶用工業分野特定技能２号試験（機械加工）','造船・舶用工業分野特定技能１号試験（電気機器組立て）','造船・舶用工業分野特定技能２号試験（電気機器組立て）','自動車整備分野特定技能１号評価試験','自動車整備分野特定技能２号評価試験','航空分野特定技能１号評価試験（空港グランドハンドリング）','航空分野特定技能２号評価試験（空港グランドハンドリング）','航空分野特定技能１号評価試験（航空機整備）','航空分野特定技能２号評価試験（航空機整備）','宿泊分野特定技能１号評価試験','宿泊分野特定技能２号評価試験','１号農業技能測定試験（耕種農業全般）','２号農業技能測定試験（耕種農業全般）','１号農業技能測定試験（畜産農業全般）','２号農業技能測定試験（畜産農業全般）','１号漁業技能測定試験（漁業）','２号漁業技能測定試験（漁業）','１号漁業技能測定試験（養殖業）','２号漁業技能測定試験（養殖業）','飲食料品製造業特定技能１号技能測定試験','飲食料品製造業特定技能２号技能測定試験','外食業特定技能１号技能測定試験','外食業特定技能２号技能測定試験','林業分野特定技能１号評価試験','木材産業分野特定技能１号評価試験','印刷・同関連業分野特定技能1号評価試験'];
-var JP_EXAM_LIST = ['試験免除','国際交流基金日本語基礎テスト','日本語能力試験','介護日本語評価試験'];
+
+// ver.20260523.03: 試験リストを分野別にグルーピング（3段階選択用）
+var SKILL_FIELD_GROUPS = [
+  {field:'試験免除（しけんめんじょ）', exams:['試験免除']},
+  {field:'介護（かいご）', exams:['介護技能評価試験']},
+  {field:'ビルクリーニング', exams:['ビルクリーニング分野特定技能１号評価試験','ビルクリーニング分野特定技能２号評価試験']},
+  {field:'製造分野（せいぞうぶんや）', exams:['製造分野特定技能１号評価試験（機械金属加工）','製造分野特定技能２号評価試験（機械金属加工）','製造分野特定技能１号評価試験（電気電子機器組立て）','製造分野特定技能２号評価試験（電気電子機器組立て）','製造分野特定技能１号評価試験（金属表面処理）','製造分野特定技能２号評価試験（金属表面処理）']},
+  {field:'建設分野（けんせつぶんや）', exams:['建設分野特定技能１号評価試験（土木）','建設分野特定技能２号評価試験（土木）','建設分野特定技能１号評価試験（建築）','建設分野特定技能２号評価試験（建築）','建設分野特定技能１号評価試験（ライフライン・設備）','建設分野特定技能２号評価試験（ライフライン・設備）']},
+  {field:'造船・舶用工業（ぞうせん・はくようこうぎょう）', exams:['造船・舶用工業分野特定技能１号試験（溶接）','造船・舶用工業分野特定技能２号試験（溶接）','造船・舶用工業分野特定技能１号試験（塗装）','造船・舶用工業分野特定技能２号試験（塗装）','造船・舶用工業分野特定技能１号試験（鉄工）','造船・舶用工業分野特定技能２号試験（鉄工）','造船・舶用工業分野特定技能１号試験（仕上げ）','造船・舶用工業分野特定技能２号試験（仕上げ）','造船・舶用工業分野特定技能１号試験（機械加工）','造船・舶用工業分野特定技能２号試験（機械加工）','造船・舶用工業分野特定技能１号試験（電気機器組立て）','造船・舶用工業分野特定技能２号試験（電気機器組立て）']},
+  {field:'自動車整備（じどうしゃせいび）', exams:['自動車整備分野特定技能１号評価試験','自動車整備分野特定技能２号評価試験']},
+  {field:'航空（こうくう）', exams:['航空分野特定技能１号評価試験（空港グランドハンドリング）','航空分野特定技能２号評価試験（空港グランドハンドリング）','航空分野特定技能１号評価試験（航空機整備）','航空分野特定技能２号評価試験（航空機整備）']},
+  {field:'宿泊（しゅくはく）', exams:['宿泊分野特定技能１号評価試験','宿泊分野特定技能２号評価試験']},
+  {field:'農業（のうぎょう）', exams:['１号農業技能測定試験（耕種農業全般）','２号農業技能測定試験（耕種農業全般）','１号農業技能測定試験（畜産農業全般）','２号農業技能測定試験（畜産農業全般）']},
+  {field:'漁業（ぎょぎょう）', exams:['１号漁業技能測定試験（漁業）','２号漁業技能測定試験（漁業）','１号漁業技能測定試験（養殖業）','２号漁業技能測定試験（養殖業）']},
+  {field:'飲食料品製造業（いんしょくりょうひんせいぞうぎょう）', exams:['飲食料品製造業特定技能１号技能測定試験','飲食料品製造業特定技能２号技能測定試験']},
+  {field:'外食業（がいしょくぎょう）', exams:['外食業特定技能１号技能測定試験','外食業特定技能２号技能測定試験']},
+  {field:'林業（りんぎょう）', exams:['林業分野特定技能１号評価試験']},
+  {field:'木材産業（もくざいさんぎょう）', exams:['木材産業分野特定技能１号評価試験']},
+  {field:'印刷・同関連業（いんさつ・どうかんれんぎょう）', exams:['印刷・同関連業分野特定技能1号評価試験']}
+];
+
+// 後方互換：従来のフラットなリストも提供
+var SKILL_EXAM_LIST = SKILL_FIELD_GROUPS.reduce(function(acc, g){ return acc.concat(g.exams); }, []);
+
+// 日本語試験は試験名が少ないが、同じUIを使うため分野グループ化（実質1分野）
+var JP_FIELD_GROUPS = [
+  {field:'試験免除（しけんめんじょ）', exams:['試験免除']},
+  {field:'日本語試験（にほんごしけん）', exams:['国際交流基金日本語基礎テスト','日本語能力試験','介護日本語評価試験']}
+];
+var JP_EXAM_LIST = JP_FIELD_GROUPS.reduce(function(acc, g){ return acc.concat(g.exams); }, []);
+
+// 試験名から所属分野を逆引き
+function _findFieldForExam(groups, examName){
+  for(var i=0;i<groups.length;i++){
+    if(groups[i].exams.indexOf(examName) >= 0) return groups[i].field;
+  }
+  return '';
+}
+
 var COUNTRY_LIST_ONLINE = ['日本 Japan','中国 People\'s Republic of China','ベトナム Viet Nam','韓国 Republic of Korea','フィリピン Philippines','ブラジル Brazil','ネパール Nepal','インドネシア Indonesia','ミャンマー Myanmar','台湾 Taiwan','米国 United States of America','カンボジア Cambodia','タイ Thailand','モンゴル Mongolia','バングラデシュ Bangladesh','スリランカ Sri Lanka','パキスタン Pakistan','インド India','ウズベキスタン Uzbekistan'];
 var GINOJISSHU_PROOF_LIST = ['３級の技能検定又はこれに相当する技能実習評価試験の実技試験の合格による証明','実習状況に関する書面による証明'];
 
@@ -727,6 +764,62 @@ function makeOptions(list, labelMap) {
     var lbl = (labelMap && labelMap[v]) ? labelMap[v] : v;
     return '<option value="' + v + '">' + lbl + '</option>';
   }).join('');
+}
+
+// ver.20260523.03: 分野グループからセレクトオプション生成
+function makeFieldOptions(groups) {
+  return groups.map(function(g){
+    return '<option value="' + g.field + '">' + g.field + '</option>';
+  }).join('');
+}
+
+// ver.20260523.03: 分野選択→試験名セレクトを書き換える
+function _updateExamSelect(selectId, groups, fieldValue) {
+  var sel = document.getElementById(selectId);
+  if(!sel) return;
+  // 現在値を保存（分野変更で同じ試験名が含まれない場合はクリア）
+  var prevVal = sel.value;
+  var newOptions = '<option value="">---</option>';
+  if(fieldValue){
+    var group = null;
+    for(var i=0;i<groups.length;i++){ if(groups[i].field === fieldValue){ group = groups[i]; break; } }
+    if(group){
+      newOptions += group.exams.map(function(v){
+        return '<option value="' + v + '">' + v + '</option>';
+      }).join('');
+    }
+  }
+  sel.innerHTML = newOptions;
+  // 旧値が新しいオプションに含まれていれば復元
+  if(prevVal){
+    var has = false;
+    for(var j=0;j<sel.options.length;j++){ if(sel.options[j].value === prevVal){ has = true; break; } }
+    if(has) sel.value = prevVal;
+  }
+}
+
+function onSkillFieldChange(num, fieldValue) {
+  _updateExamSelect('f-skillExam' + num, SKILL_FIELD_GROUPS, fieldValue);
+  // 試験免除を選んだら試験名セレクトを「試験免除」固定
+  var examSel = document.getElementById('f-skillExam' + num);
+  if(examSel && fieldValue === '試験免除（しけんめんじょ）'){
+    examSel.value = '試験免除';
+  }
+  // ②の場合は受験地表示の判定をやり直す
+  if(num === 2 && typeof toggleSkillExam2Loc === 'function'){
+    toggleSkillExam2Loc(examSel ? examSel.value : '');
+  }
+}
+
+function onJpFieldChange(num, fieldValue) {
+  _updateExamSelect('f-jpExam' + num, JP_FIELD_GROUPS, fieldValue);
+  var examSel = document.getElementById('f-jpExam' + num);
+  if(examSel && fieldValue === '試験免除（しけんめんじょ）'){
+    examSel.value = '試験免除';
+  }
+  if(num === 2 && typeof toggleJpExam2Loc === 'function'){
+    toggleJpExam2Loc(examSel ? examSel.value : '');
+  }
 }
 
 // ===== 技能証明ブロック =====
@@ -742,8 +835,11 @@ function blockSkillProof() {
   h += '</select></div>';
 
   h += '<div id="skillProof1Exam" style="display:none;">';
+  // ver.20260523.03: 分野→試験名の2段階セレクト
+  h += '<div class="field"><label>分野（ぶんや）①<span class="req">*</span></label>';
+  h += '<select id="f-skillField1" onchange="onSkillFieldChange(1, this.value)"><option value="">---</option>' + makeFieldOptions(SKILL_FIELD_GROUPS) + '</select></div>';
   h += '<div class="field"><label>技能試験名①（ぎのうしけんめい①）<span class="req">*</span></label>';
-  h += '<select id="f-skillExam1"><option value="">---</option>' + makeOptions(SKILL_EXAM_LIST) + '</select></div>';
+  h += '<select id="f-skillExam1"><option value="">---</option></select></div>';
   h += '<div class="field"><label>技能試験 受験地①（ぎのうしけん じゅけんち①）<span class="req">*</span></label>';
   h += '<select id="f-skillExamLoc1"><option value="">---</option>' + makeOptions(COUNTRY_LIST_ONLINE) + '</select></div>';
   h += '</div>';
@@ -758,8 +854,11 @@ function blockSkillProof() {
   h += '</div>';
 
   h += '<div class="sub-label" style="background:#eff6ff;color:#1d4ed8;border-radius:6px;padding:6px 10px;margin:12px 0 8px;font-size:12px;font-weight:700;">【技能試験②（ぎのうしけん②・2つ合格している場合）】</div>';
+  // ver.20260523.03: ②も分野→試験名の2段階セレクト
+  h += '<div class="field"><label>分野（ぶんや）②</label>';
+  h += '<select id="f-skillField2" onchange="onSkillFieldChange(2, this.value)"><option value="">なし / 該当しない</option>' + makeFieldOptions(SKILL_FIELD_GROUPS) + '</select></div>';
   h += '<div class="field"><label>技能試験名②（ぎのうしけんめい②）</label>';
-  h += '<select id="f-skillExam2" onchange="toggleSkillExam2Loc(this.value)"><option value="">なし / 該当しない</option>' + makeOptions(SKILL_EXAM_LIST) + '</select></div>';
+  h += '<select id="f-skillExam2" onchange="toggleSkillExam2Loc(this.value)"><option value="">---</option></select></div>';
   h += '<div id="skillExam2LocWrap" style="display:none;">';
   h += '<div class="field"><label>技能試験 受験地②（ぎのうしけん じゅけんち②）</label>';
   h += '<select id="f-skillExamLoc2"><option value="">---</option>' + makeOptions(COUNTRY_LIST_ONLINE) + '</select></div>';
@@ -782,8 +881,11 @@ function blockJapaneseProof() {
   h += '</select></div>';
 
   h += '<div id="jpProof1Exam" style="display:none;">';
+  // ver.20260523.03: 分野→試験名の2段階セレクト
+  h += '<div class="field"><label>分野（ぶんや）①<span class="req">*</span></label>';
+  h += '<select id="f-jpField1" onchange="onJpFieldChange(1, this.value)"><option value="">---</option>' + makeFieldOptions(JP_FIELD_GROUPS) + '</select></div>';
   h += '<div class="field"><label>日本語試験名①（にほんごしけんめい①）<span class="req">*</span></label>';
-  h += '<select id="f-jpExam1"><option value="">---</option>' + makeOptions(JP_EXAM_LIST) + '</select></div>';
+  h += '<select id="f-jpExam1"><option value="">---</option></select></div>';
   h += '<div class="field"><label>日本語試験 受験地①（にほんごしけん じゅけんち①）<span class="req">*</span></label>';
   h += '<select id="f-jpExamLoc1"><option value="">---</option>' + makeOptions(COUNTRY_LIST_ONLINE) + '</select></div>';
   h += '</div>';
@@ -793,8 +895,11 @@ function blockJapaneseProof() {
   h += '</div>';
 
   h += '<div class="sub-label" style="background:#f0fdf4;color:#15803d;border-radius:6px;padding:6px 10px;margin:12px 0 8px;font-size:12px;font-weight:700;">【日本語試験②（にほんごしけん②・2つ合格している場合）】</div>';
+  // ver.20260523.03: ②も分野→試験名の2段階セレクト
+  h += '<div class="field"><label>分野（ぶんや）②</label>';
+  h += '<select id="f-jpField2" onchange="onJpFieldChange(2, this.value)"><option value="">なし / 該当しない</option>' + makeFieldOptions(JP_FIELD_GROUPS) + '</select></div>';
   h += '<div class="field"><label>日本語試験名②（にほんごしけんめい②）</label>';
-  h += '<select id="f-jpExam2" onchange="toggleJpExam2Loc(this.value)"><option value="">なし / 該当しない</option>' + makeOptions(JP_EXAM_LIST) + '</select></div>';
+  h += '<select id="f-jpExam2" onchange="toggleJpExam2Loc(this.value)"><option value="">---</option></select></div>';
   h += '<div id="jpExam2LocWrap" style="display:none;">';
   h += '<div class="field"><label>日本語試験 受験地②（にほんごしけん じゅけんち②）</label>';
   h += '<select id="f-jpExamLoc2"><option value="">---</option>' + makeOptions(COUNTRY_LIST_ONLINE) + '</select></div>';
@@ -2172,6 +2277,45 @@ function prefillForm(resp) {
         if (el) el.value = resp[k];
       }
     });
+  }
+
+  // ver.20260523.03: 3段階セレクト(分野→試験名)の復元
+  // 保存値は試験名のみなので、試験名から分野を逆引きして、分野セレクト→onchange→試験名再セット
+  try {
+    [
+      {examKey:'skillExam1', fieldId:'f-skillField1', examId:'f-skillExam1', onChange:'onSkillFieldChange', num:1, groups:SKILL_FIELD_GROUPS},
+      {examKey:'skillExam2', fieldId:'f-skillField2', examId:'f-skillExam2', onChange:'onSkillFieldChange', num:2, groups:SKILL_FIELD_GROUPS},
+      {examKey:'jpExam1',    fieldId:'f-jpField1',    examId:'f-jpExam1',    onChange:'onJpFieldChange',    num:1, groups:JP_FIELD_GROUPS},
+      {examKey:'jpExam2',    fieldId:'f-jpField2',    examId:'f-jpExam2',    onChange:'onJpFieldChange',    num:2, groups:JP_FIELD_GROUPS}
+    ].forEach(function(cfg){
+      var examVal = resp[cfg.examKey];
+      if(!examVal) return;
+      var field = _findFieldForExam(cfg.groups, examVal);
+      if(!field) return;
+      var fSel = document.getElementById(cfg.fieldId);
+      if(fSel){
+        fSel.value = field;
+        // 試験名selectを再構築
+        if(cfg.onChange === 'onSkillFieldChange') onSkillFieldChange(cfg.num, field);
+        else onJpFieldChange(cfg.num, field);
+      }
+      // 試験名再セット
+      var eSel = document.getElementById(cfg.examId);
+      if(eSel){
+        for(var i=0;i<eSel.options.length;i++){
+          if(eSel.options[i].value === examVal){ eSel.selectedIndex = i; break; }
+        }
+        // ②の場合は受験地表示判定を再実行
+        if(cfg.num === 2){
+          try {
+            if(cfg.examKey === 'skillExam2' && typeof toggleSkillExam2Loc === 'function') toggleSkillExam2Loc(eSel.value);
+            if(cfg.examKey === 'jpExam2'    && typeof toggleJpExam2Loc    === 'function') toggleJpExam2Loc(eSel.value);
+          } catch(e){ console.error('toggle loc on prefill error:', e); }
+        }
+      }
+    });
+  } catch(restoreErr) {
+    console.error('field restore error (ignored):', restoreErr);
   }
 }
 </script>
