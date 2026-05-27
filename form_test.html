@@ -187,7 +187,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20260512.02';
+var FORM_VERSION = 'ver.20260523.03';
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -458,17 +458,17 @@ var TRANS = {
 
 function blockBasic() {
   return '<div class="card">' +
-    '<div class="section-title">基本情報</div>' +
-    field('f-name', '氏名（パスポート表記）', 'text', true, '例: NGUYEN VAN AN', 'name') +
+    '<div class="section-title">基本情報（きほんじょうほう）</div>' +
+    field('f-name', '氏名（しめい・パスポート表記）', 'text', true, '例: NGUYEN VAN AN', 'name') +
     '<div class="grid2">' +
-      field('f-birth', '生年月日', 'date', true, '', 'birth') +
-      field('f-nationality', '国籍', 'select', true, '', 'nationality',
+      field('f-birth', '生年月日（せいねんがっぴ）', 'date', true, '', 'birth') +
+      field('f-nationality', '国籍（こくせき）', 'select', true, '', 'nationality',
         ['','ベトナム','インドネシア','ミャンマー','カンボジア','ネパール','フィリピン','中国','タイ','モンゴル','その他']) +
     '</div>' +
-    field('f-birthPlace', '出生地 / Place of birth', 'text', false, '例: Ho Chi Minh City', 'birthPlace') +
+    field('f-birthPlace', '出生地（しゅっせいち） / Place of birth', 'text', false, '例: Ho Chi Minh City', 'birthPlace') +
     '<div class="grid2">' +
-      field('f-passport', 'パスポート番号', 'text', false, '例: AB1234567', 'passport') +
-      field('f-passExpiry', 'パスポート有効期限', 'date', false, '', 'passExpiry') +
+      field('f-passport', 'パスポート番号（ばんごう）', 'text', false, '例: AB1234567', 'passport') +
+      field('f-passExpiry', 'パスポート有効期限（ゆうこうきげん）', 'date', false, '', 'passExpiry') +
     '</div>' +
   '</div>';
 }
@@ -476,7 +476,7 @@ function blockBasic() {
 // ===== 在留カード番号（あり/なし切替） =====
 function blockResidenceCardTokutei() {
   var h = '<div class="field">';
-  h += '<label>在留カード <span class="req">*</span><div class="trans" data-key="residenceCardStatus"></div></label>';
+  h += '<label>在留カード（ざいりゅうカード） <span class="req">*</span><div class="trans" data-key="residenceCardStatus"></div></label>';
   h += '<select id="f-residenceCardStatus" onchange="toggleResidenceCardInput(this.value)">';
   h += '<option value="">---</option>';
   h += '<option value="あり">あり / Yes</option>';
@@ -484,7 +484,7 @@ function blockResidenceCardTokutei() {
   h += '</select>';
   h += '</div>';
   h += '<div id="residenceCardInputWrap" style="display:none;">';
-  h += field('f-residenceCard', '在留カード番号', 'text', false, '例: AB12345678CD', 'residenceCard');
+  h += field('f-residenceCard', '在留カード番号（ばんごう）', 'text', false, '例: AB12345678CD', 'residenceCard');
   h += '</div>';
   return h;
 }
@@ -492,7 +492,7 @@ function blockResidenceCardTokutei() {
 // ===== 日本の現住所（あり/なし切替） =====
 function blockAddressTokutei() {
   var h = '<div class="field">';
-  h += '<label>日本の現住所 <span class="req">*</span><div class="trans" data-key="addressStatus"></div></label>';
+  h += '<label>日本の現住所（にほんのげんじゅうしょ） <span class="req">*</span><div class="trans" data-key="addressStatus"></div></label>';
   h += '<select id="f-addressStatus" onchange="toggleAddressInput(this.value)">';
   h += '<option value="">---</option>';
   h += '<option value="あり">あり / Yes</option>';
@@ -500,7 +500,7 @@ function blockAddressTokutei() {
   h += '</select>';
   h += '</div>';
   h += '<div id="addressInputWrap" style="display:none;">';
-  h += field('f-address', '現住所（日本）', 'text', false, '例: 東京都新宿区西新宿2-1-1', 'address');
+  h += field('f-address', '現住所（げんじゅうしょ・日本）', 'text', false, '例: 東京都新宿区西新宿2-1-1', 'address');
   h += '</div>';
   return h;
 }
@@ -508,7 +508,7 @@ function blockAddressTokutei() {
 // ===== 一時帰国（特定技能・必須。ありの場合に期間カレンダー） =====
 function blockTempReturnTokutei() {
   var h = '<div class="field">';
-  h += '<label>一時帰国の有無 <span class="req">*</span><div class="trans" data-key="tempReturn"></div></label>';
+  h += '<label>一時帰国の有無（いちじききこくのうむ） <span class="req">*</span><div class="trans" data-key="tempReturn"></div></label>';
   h += '<select id="f-tempReturnStatus" onchange="toggleTempReturnDate(this.value)">';
   h += '<option value="">---</option>';
   h += '<option value="予定あり">予定あり / Yes, I have a plan</option>';
@@ -517,14 +517,14 @@ function blockTempReturnTokutei() {
   h += '</select>';
   h += '</div>';
   h += '<div id="tempReturnDateWrap" style="display:none;">';
-  h += '<div class="field"><label>出国予定日（日本を出る日）<div class="trans" data-key="tempReturnDate"></div></label><input type="date" id="f-tempReturn"></div>';
+  h += '<div class="field"><label>出国予定日（しゅっこくよていび・日本を出る日）<div class="trans" data-key="tempReturnDate"></div></label><input type="date" id="f-tempReturn"></div>';
   h += '</div>';
   return h;
 }
 
 // 共通ブロック：連絡先
 function blockContact(showResCard, showExtra) {
-  var h = '<div class="card"><div class="section-title">連絡先・住所</div>';
+  var h = '<div class="card"><div class="section-title">連絡先・住所（れんらくさき・じゅうしょ）</div>';
   h += field('f-email', 'メールアドレス', 'text', true, '例: your@email.com', 'email');
 
   if (isTokutei) {
@@ -534,11 +534,11 @@ function blockContact(showResCard, showExtra) {
     h += blockTempReturnTokutei();
   } else {
     // 技人国などは従来どおり
-    if (showResCard) h += field('f-residenceCard', '在留カード番号', 'text', false, '例: AB12345678CD', 'residenceCard');
+    if (showResCard) h += field('f-residenceCard', '在留カード番号（ばんごう）', 'text', false, '例: AB12345678CD', 'residenceCard');
     if (showExtra) {
-      h += field('f-address', '現住所（日本）', 'text', false, '例: 東京都新宿区西新宿2-1-1', 'address');
+      h += field('f-address', '現住所（げんじゅうしょ・日本）', 'text', false, '例: 東京都新宿区西新宿2-1-1', 'address');
       h += '<div class="field">';
-      h += '<label>一時帰国予定<div class="trans show" data-key="tempReturn" style="font-size:11px;color:#6366f1;font-weight:500;"></div></label>';
+      h += '<label>一時帰国予定（いちじききこくよてい）<div class="trans show" data-key="tempReturn" style="font-size:11px;color:#6366f1;font-weight:500;"></div></label>';
       h += '<select id="f-tempReturnStatus" onchange="toggleTempReturnDate(this.value)">';
       h += '<option value="">---</option>';
       h += '<option value="予定あり">予定あり / Yes, I have a plan</option>';
@@ -547,21 +547,21 @@ function blockContact(showResCard, showExtra) {
       h += '</select>';
       h += '</div>';
       h += '<div id="tempReturnDateWrap" style="display:none;">';
-      h += field('f-tempReturn', '帰国予定日', 'date', false, '', 'tempReturnDate');
+      h += field('f-tempReturn', '帰国予定日（きこくよていび）', 'date', false, '', 'tempReturnDate');
       h += '</div>';
     }
   }
   h += '</div>';
 
   // 家族情報（結婚＋在日親族を統合）
-  h += '<div class="card"><div class="section-title">家族状況 / Family Information</div>';
+  h += '<div class="card"><div class="section-title">家族状況（かぞくじょうきょう） / Family Information</div>';
 
   // 結婚
   h += field('f-married', '結婚していますか？（けっこん）/ Are you married?', 'select', true, '', 'married', ['', 'はい（Yes）', 'いいえ（No）']);
 
   // 在日親族
   h += '<div class="field">';
-  h += '<label>日本に家族はいますか？<div class="trans" data-key="hasFamily"></div></label>';
+  h += '<label>日本に家族はいますか？（にほんにかぞくはいますか）<div class="trans" data-key="hasFamily"></div></label>';
   h += '<select id="f-hasFamily" onchange="toggleFamilyBlock(this.value)">';
   h += '<option value="">---</option>';
   h += '<option value="yes">はい / Yes</option>';
@@ -577,9 +577,9 @@ function blockContact(showResCard, showExtra) {
 
   if (showExtra) {
     // 転出届
-    h += '<div class="card"><div class="section-title">転出届<span class="trans" data-key="tenshutsuTitle" style="font-weight:400;font-size:11px;margin-left:6px;color:#6b7280;border:none;padding:0;"></span></div>';
+    h += '<div class="card"><div class="section-title">転出届（てんしゅつとどけ）<span class="trans" data-key="tenshutsuTitle" style="font-weight:400;font-size:11px;margin-left:6px;color:#6b7280;border:none;padding:0;"></span></div>';
     h += '<div style="font-size:11px;color:#9ca3af;margin-bottom:10px;" id="tenshutsuNote">※ お引越しの予定がある場合のみ</div>';
-    h += field('f-tenshutsuDate', '転出届を出す日', 'date', false, '', 'tenshutsuDate');
+    h += field('f-tenshutsuDate', '転出届を出す日（てんしゅつとどけをだすひ）', 'date', false, '', 'tenshutsuDate');
     h += '</div>';
 
     // 注意事項
@@ -662,40 +662,40 @@ function blockMarried() { return ''; }
 
 // 学歴ブロック
 function blockEducation() {
-  return '<div class="card"><div class="section-title">最終学歴</div>' +
+  return '<div class="card"><div class="section-title">最終学歴（さいしゅうがくれき）</div>' +
     '<div class="grid2">' +
-      field('f-eduCountry', '出身国', 'text', false, '例: ベトナム', 'eduCountry') +
-      field('f-education', '最終学歴', 'select', false, '', 'education',
+      field('f-eduCountry', '出身国（しゅっしんこく）', 'text', false, '例: ベトナム', 'eduCountry') +
+      field('f-education', '最終学歴（さいしゅうがくれき）', 'select', false, '', 'education',
         ['','中学校','高等学校','専門学校','大学','大学院']) +
     '</div>' +
-    field('f-schoolName', '学校名', 'text', false, '例: ハノイ工科大学', 'schoolName') +
+    field('f-schoolName', '学校名（がっこうめい）', 'text', false, '例: ハノイ工科大学', 'schoolName') +
     '<div class="grid2">' +
-      field('f-completionDate', '卒業年月', 'month', false, '', 'completionDate') +
-      field('f-major', '専攻', 'text', false, '例: 機械工学', 'major') +
+      field('f-completionDate', '卒業年月（そつぎょうねんげつ）', 'month', false, '', 'completionDate') +
+      field('f-major', '専攻（せんこう）', 'text', false, '例: 機械工学', 'major') +
     '</div>' +
   '</div>';
 }
 
 // 特定技能・認定専用ブロック
 function blockTokuteiNintei() {
-  return '<div class="card"><div class="section-title">来日・在留歴</div>' +
-    field('f-entryCount', '日本に何回来たことがありますか？', 'number', true, '例: 2', 'entryCount') +
+  return '<div class="card"><div class="section-title">来日・在留歴（らいにち・ざいりゅうれき）</div>' +
+    field('f-entryCount', '日本に何回来たことがありますか？（なんかいきたことがありますか）', 'number', true, '例: 2', 'entryCount') +
     '<div class="grid2">' +
-      field('f-coeCount', 'COEの申請は何回しましたか？', 'number', true, '例: 1', 'coeCount') +
-      field('f-coeDenied', 'うち不許可の回数', 'number', false, '例: 0', 'coeDenied') +
+      field('f-coeCount', 'COEの申請は何回しましたか？（しんせいはなんかい）', 'number', true, '例: 1', 'coeCount') +
+      field('f-coeDenied', 'うち不許可の回数（ふきょかのかいすう）', 'number', false, '例: 0', 'coeDenied') +
     '</div>' +
     '<div style="font-size:11px;color:#9ca3af;margin-bottom:10px;">※日本に来たことがなくてもCOEを申請したことがある場合は入力してください</div>' +
     '<div class="grid2">' +
-      field('f-lastEntryFrom', '最後に日本に来た日', 'date', false, '', 'lastEntryFrom') +
-      field('f-lastEntryTo', '日本から自国に帰った日', 'date', false, '', 'lastEntryTo') +
+      field('f-lastEntryFrom', '最後に日本に来た日（さいごににほんにきたひ）', 'date', false, '', 'lastEntryFrom') +
+      field('f-lastEntryTo', '日本から自国に帰った日（にほんからじこくにかえったひ）', 'date', false, '', 'lastEntryTo') +
     '</div>' +
   '</div>';
 }
 
 // 特定技能・更新/変更専用ブロック
 function blockTokuteiKoushin() {
-  return '<div class="card"><div class="section-title">在留歴</div>' +
-    '<div style="font-size:13px;font-weight:700;color:#1f2937;margin-bottom:6px;">特定技能で初めて日本に来たのはいつですか？</div>' +
+  return '<div class="card"><div class="section-title">在留歴（ざいりゅうれき）</div>' +
+    '<div style="font-size:13px;font-weight:700;color:#1f2937;margin-bottom:6px;">特定技能で初めて日本に来たのはいつですか？（とくていぎのうで はじめて にほんにきたのは いつですか）</div>' +
     '<div class="trans" data-key="firstEntry"></div>' +
     '<div class="field" style="margin-bottom:10px;">' +
       '<select id="f-firstEntryStatus" onchange="toggleFirstEntryDate(this.value)" style="width:100%;padding:13px 14px;border:1.5px solid #e5e7eb;border-radius:10px;font-size:16px;background:white;-webkit-appearance:none;min-height:50px;">' +
@@ -706,9 +706,9 @@ function blockTokuteiKoushin() {
     '</div>' +
     '<div id="firstEntryDateWrap" style="display:none;">' +
       '<div class="grid3">' +
-        '<div class="field"><label>年</label><input type="number" id="f-firstEntryY" placeholder="例: 2023" min="2019" max="2030"></div>' +
-        '<div class="field"><label>月</label><input type="number" id="f-firstEntryM" placeholder="例: 4" min="1" max="12"></div>' +
-        '<div class="field"><label>日</label><input type="number" id="f-firstEntryD" placeholder="例: 1" min="1" max="31"></div>' +
+        '<div class="field"><label>年（ねん）</label><input type="number" id="f-firstEntryY" placeholder="例: 2023" min="2019" max="2030"></div>' +
+        '<div class="field"><label>月（がつ）</label><input type="number" id="f-firstEntryM" placeholder="例: 4" min="1" max="12"></div>' +
+        '<div class="field"><label>日（にち）</label><input type="number" id="f-firstEntryD" placeholder="例: 1" min="1" max="31"></div>' +
       '</div>' +
     '</div>' +
   '</div>';
@@ -717,10 +717,94 @@ function blockTokuteiKoushin() {
 // ===== 選択肢（indexと完全一致） =====
 var SKILL_EVAL_TYPES = ['分野別運用方針に定める評価方法による証明','技能実習２号を良好に修了'];
 var SKILL_EVAL_LABELS = {'分野別運用方針に定める評価方法による証明':'試験合格','技能実習２号を良好に修了':'技能実習２号を良好に修了'};
-var SKILL_EXAM_LIST = ['試験免除','介護技能評価試験','ビルクリーニング分野特定技能１号評価試験','ビルクリーニング分野特定技能２号評価試験','製造分野特定技能１号評価試験（機械金属加工）','製造分野特定技能２号評価試験（機械金属加工）','製造分野特定技能１号評価試験（電気電子機器組立て）','製造分野特定技能２号評価試験（電気電子機器組立て）','製造分野特定技能１号評価試験（金属表面処理）','製造分野特定技能２号評価試験（金属表面処理）','建設分野特定技能１号評価試験（土木）','建設分野特定技能２号評価試験（土木）','建設分野特定技能１号評価試験（建築）','建設分野特定技能２号評価試験（建築）','建設分野特定技能１号評価試験（ライフライン・設備）','建設分野特定技能２号評価試験（ライフライン・設備）','造船・舶用工業分野特定技能１号試験（溶接）','造船・舶用工業分野特定技能２号試験（溶接）','造船・舶用工業分野特定技能１号試験（塗装）','造船・舶用工業分野特定技能２号試験（塗装）','造船・舶用工業分野特定技能１号試験（鉄工）','造船・舶用工業分野特定技能２号試験（鉄工）','造船・舶用工業分野特定技能１号試験（仕上げ）','造船・舶用工業分野特定技能２号試験（仕上げ）','造船・舶用工業分野特定技能１号試験（機械加工）','造船・舶用工業分野特定技能２号試験（機械加工）','造船・舶用工業分野特定技能１号試験（電気機器組立て）','造船・舶用工業分野特定技能２号試験（電気機器組立て）','自動車整備分野特定技能１号評価試験','自動車整備分野特定技能２号評価試験','航空分野特定技能１号評価試験（空港グランドハンドリング）','航空分野特定技能２号評価試験（空港グランドハンドリング）','航空分野特定技能１号評価試験（航空機整備）','航空分野特定技能２号評価試験（航空機整備）','宿泊分野特定技能１号評価試験','宿泊分野特定技能２号評価試験','１号農業技能測定試験（耕種農業全般）','２号農業技能測定試験（耕種農業全般）','１号農業技能測定試験（畜産農業全般）','２号農業技能測定試験（畜産農業全般）','１号漁業技能測定試験（漁業）','２号漁業技能測定試験（漁業）','１号漁業技能測定試験（養殖業）','２号漁業技能測定試験（養殖業）','飲食料品製造業特定技能１号技能測定試験','飲食料品製造業特定技能２号技能測定試験','外食業特定技能１号技能測定試験','外食業特定技能２号技能測定試験','林業分野特定技能１号評価試験','木材産業分野特定技能１号評価試験','印刷・同関連業分野特定技能1号評価試験'];
-var JP_EXAM_LIST = ['試験免除','国際交流基金日本語基礎テスト','日本語能力試験','介護日本語評価試験'];
+
+// ver.20260523.03: 試験リストを分野別にグルーピング（3段階選択用）
+var SKILL_FIELD_GROUPS = [
+  {field:'試験免除（しけんめんじょ）', exams:['試験免除']},
+  {field:'介護（かいご）', exams:['介護技能評価試験']},
+  {field:'ビルクリーニング', exams:['ビルクリーニング分野特定技能１号評価試験','ビルクリーニング分野特定技能２号評価試験']},
+  {field:'製造分野（せいぞうぶんや）', exams:['製造分野特定技能１号評価試験（機械金属加工）','製造分野特定技能２号評価試験（機械金属加工）','製造分野特定技能１号評価試験（電気電子機器組立て）','製造分野特定技能２号評価試験（電気電子機器組立て）','製造分野特定技能１号評価試験（金属表面処理）','製造分野特定技能２号評価試験（金属表面処理）']},
+  {field:'建設分野（けんせつぶんや）', exams:['建設分野特定技能１号評価試験（土木）','建設分野特定技能２号評価試験（土木）','建設分野特定技能１号評価試験（建築）','建設分野特定技能２号評価試験（建築）','建設分野特定技能１号評価試験（ライフライン・設備）','建設分野特定技能２号評価試験（ライフライン・設備）']},
+  {field:'造船・舶用工業（ぞうせん・はくようこうぎょう）', exams:['造船・舶用工業分野特定技能１号試験（溶接）','造船・舶用工業分野特定技能２号試験（溶接）','造船・舶用工業分野特定技能１号試験（塗装）','造船・舶用工業分野特定技能２号試験（塗装）','造船・舶用工業分野特定技能１号試験（鉄工）','造船・舶用工業分野特定技能２号試験（鉄工）','造船・舶用工業分野特定技能１号試験（仕上げ）','造船・舶用工業分野特定技能２号試験（仕上げ）','造船・舶用工業分野特定技能１号試験（機械加工）','造船・舶用工業分野特定技能２号試験（機械加工）','造船・舶用工業分野特定技能１号試験（電気機器組立て）','造船・舶用工業分野特定技能２号試験（電気機器組立て）']},
+  {field:'自動車整備（じどうしゃせいび）', exams:['自動車整備分野特定技能１号評価試験','自動車整備分野特定技能２号評価試験']},
+  {field:'航空（こうくう）', exams:['航空分野特定技能１号評価試験（空港グランドハンドリング）','航空分野特定技能２号評価試験（空港グランドハンドリング）','航空分野特定技能１号評価試験（航空機整備）','航空分野特定技能２号評価試験（航空機整備）']},
+  {field:'宿泊（しゅくはく）', exams:['宿泊分野特定技能１号評価試験','宿泊分野特定技能２号評価試験']},
+  {field:'農業（のうぎょう）', exams:['１号農業技能測定試験（耕種農業全般）','２号農業技能測定試験（耕種農業全般）','１号農業技能測定試験（畜産農業全般）','２号農業技能測定試験（畜産農業全般）']},
+  {field:'漁業（ぎょぎょう）', exams:['１号漁業技能測定試験（漁業）','２号漁業技能測定試験（漁業）','１号漁業技能測定試験（養殖業）','２号漁業技能測定試験（養殖業）']},
+  {field:'飲食料品製造業（いんしょくりょうひんせいぞうぎょう）', exams:['飲食料品製造業特定技能１号技能測定試験','飲食料品製造業特定技能２号技能測定試験']},
+  {field:'外食業（がいしょくぎょう）', exams:['外食業特定技能１号技能測定試験','外食業特定技能２号技能測定試験']},
+  {field:'林業（りんぎょう）', exams:['林業分野特定技能１号評価試験']},
+  {field:'木材産業（もくざいさんぎょう）', exams:['木材産業分野特定技能１号評価試験']},
+  {field:'印刷・同関連業（いんさつ・どうかんれんぎょう）', exams:['印刷・同関連業分野特定技能1号評価試験']}
+];
+
+// 後方互換：従来のフラットなリストも提供
+var SKILL_EXAM_LIST = SKILL_FIELD_GROUPS.reduce(function(acc, g){ return acc.concat(g.exams); }, []);
+
+// 日本語試験は試験名が少ないが、同じUIを使うため分野グループ化（実質1分野）
+var JP_FIELD_GROUPS = [
+  {field:'試験免除（しけんめんじょ）', exams:['試験免除']},
+  {field:'日本語試験（にほんごしけん）', exams:['国際交流基金日本語基礎テスト','日本語能力試験','介護日本語評価試験']}
+];
+var JP_EXAM_LIST = JP_FIELD_GROUPS.reduce(function(acc, g){ return acc.concat(g.exams); }, []);
+
+// 試験名から所属分野を逆引き
+function _findFieldForExam(groups, examName){
+  for(var i=0;i<groups.length;i++){
+    if(groups[i].exams.indexOf(examName) >= 0) return groups[i].field;
+  }
+  return '';
+}
+
 var COUNTRY_LIST_ONLINE = ['日本 Japan','中国 People\'s Republic of China','ベトナム Viet Nam','韓国 Republic of Korea','フィリピン Philippines','ブラジル Brazil','ネパール Nepal','インドネシア Indonesia','ミャンマー Myanmar','台湾 Taiwan','米国 United States of America','カンボジア Cambodia','タイ Thailand','モンゴル Mongolia','バングラデシュ Bangladesh','スリランカ Sri Lanka','パキスタン Pakistan','インド India','ウズベキスタン Uzbekistan'];
 var GINOJISSHU_PROOF_LIST = ['３級の技能検定又はこれに相当する技能実習評価試験の実技試験の合格による証明','実習状況に関する書面による証明'];
+
+// ver.20260526.test.01: 技能実習2号 修了職種プリセット（主要なものを分野別にグルーピング）
+// 出典：外国人技能実習機構の移行対象職種（特定技能に多い職種を優先）
+var JISSHU_SHOKUSHU_GROUPS = [
+  {label: '建設 / Construction', items: ['とび','建築大工','鉄筋施工','建設機械施工','左官','配管','塗装','防水施工','タイル張り','内装仕上げ施工','コンクリート圧送施工','建築板金','型枠施工','石材施工','屋根ふき']},
+  {label: '食品 / Food', items: ['食品製造業（缶詰巻締）','加熱性水産加工食品製造業','非加熱性水産加工食品製造業','水産練り製品製造','牛豚食肉処理加工業','ハム・ソーセージ・ベーコン製造','パン製造','そう菜製造業','農産物漬物製造業','医療・福祉施設給食製造']},
+  {label: '介護 / Care', items: ['介護']},
+  {label: '農業 / Agriculture', items: ['耕種農業','畜産農業']},
+  {label: '漁業 / Fishery', items: ['漁船漁業','養殖業']},
+  {label: '機械・金属 / Machinery & Metal', items: ['機械加工','金属プレス加工','鉄工','工場板金','めっき','アルミニウム陽極酸化処理','仕上げ','機械検査','機械保全','電子機器組立て','電気機器組立て','プリント配線板製造','工業包装']},
+  {label: '繊維・衣服 / Textile', items: ['婦人子供服製造','紳士服製造','下着類製造','寝具製作','カーペット製造','帆布製品製造']},
+  {label: '溶接・塗装 / Welding & Coating', items: ['溶接','塗装']},
+  {label: '建設機械・船舶 / Construction Machinery & Shipbuilding', items: ['建設機械施工','造船','舶用機関','舶用電気電子機器']},
+  {label: 'プラスチック・ゴム / Plastics & Rubber', items: ['プラスチック成形','強化プラスチック成形','ゴム製品製造']},
+  {label: '木工・家具 / Woodwork & Furniture', items: ['家具製作','建具製作','木工']},
+  {label: '宿泊 / Accommodation', items: ['宿泊']},
+  {label: '自動車整備 / Auto Maintenance', items: ['自動車整備']},
+  {label: '印刷 / Printing', items: ['印刷','製本']}
+];
+
+function makeJisshuShokushuOptions() {
+  return JISSHU_SHOKUSHU_GROUPS.map(function(g){
+    var opts = g.items.map(function(item){ return '<option value="' + item + '">' + item + '</option>'; }).join('');
+    return '<optgroup label="' + g.label + '">' + opts + '</optgroup>';
+  }).join('');
+}
+
+// プリセット選択時の挙動
+function onGijutsuTypePresetChange(val) {
+  var otherWrap = document.getElementById('gijutsuTypeOtherWrap');
+  var unknownNote = document.getElementById('gijutsuUnknownNote');
+  var typeInput = document.getElementById('f-gijutsuType');
+  
+  if (val === '__other__') {
+    if (otherWrap) otherWrap.style.display = '';
+    if (unknownNote) unknownNote.style.display = 'none';
+    if (typeInput) typeInput.value = '';
+  } else if (val === '__unknown__') {
+    if (otherWrap) otherWrap.style.display = 'none';
+    if (unknownNote) unknownNote.style.display = '';
+    if (typeInput) typeInput.value = '__unknown__';
+  } else {
+    if (otherWrap) otherWrap.style.display = 'none';
+    if (unknownNote) unknownNote.style.display = 'none';
+    if (typeInput) typeInput.value = val;
+  }
+}
 
 function makeOptions(list, labelMap) {
   return list.map(function(v){
@@ -729,39 +813,117 @@ function makeOptions(list, labelMap) {
   }).join('');
 }
 
+// ver.20260523.03: 分野グループからセレクトオプション生成
+function makeFieldOptions(groups) {
+  return groups.map(function(g){
+    return '<option value="' + g.field + '">' + g.field + '</option>';
+  }).join('');
+}
+
+// ver.20260523.03: 分野選択→試験名セレクトを書き換える
+function _updateExamSelect(selectId, groups, fieldValue) {
+  var sel = document.getElementById(selectId);
+  if(!sel) return;
+  // 現在値を保存（分野変更で同じ試験名が含まれない場合はクリア）
+  var prevVal = sel.value;
+  var newOptions = '<option value="">---</option>';
+  if(fieldValue){
+    var group = null;
+    for(var i=0;i<groups.length;i++){ if(groups[i].field === fieldValue){ group = groups[i]; break; } }
+    if(group){
+      newOptions += group.exams.map(function(v){
+        return '<option value="' + v + '">' + v + '</option>';
+      }).join('');
+    }
+  }
+  sel.innerHTML = newOptions;
+  // 旧値が新しいオプションに含まれていれば復元
+  if(prevVal){
+    var has = false;
+    for(var j=0;j<sel.options.length;j++){ if(sel.options[j].value === prevVal){ has = true; break; } }
+    if(has) sel.value = prevVal;
+  }
+}
+
+function onSkillFieldChange(num, fieldValue) {
+  _updateExamSelect('f-skillExam' + num, SKILL_FIELD_GROUPS, fieldValue);
+  // 試験免除を選んだら試験名セレクトを「試験免除」固定
+  var examSel = document.getElementById('f-skillExam' + num);
+  if(examSel && fieldValue === '試験免除（しけんめんじょ）'){
+    examSel.value = '試験免除';
+  }
+  // ②の場合は受験地表示の判定をやり直す
+  if(num === 2 && typeof toggleSkillExam2Loc === 'function'){
+    toggleSkillExam2Loc(examSel ? examSel.value : '');
+  }
+}
+
+function onJpFieldChange(num, fieldValue) {
+  _updateExamSelect('f-jpExam' + num, JP_FIELD_GROUPS, fieldValue);
+  var examSel = document.getElementById('f-jpExam' + num);
+  if(examSel && fieldValue === '試験免除（しけんめんじょ）'){
+    examSel.value = '試験免除';
+  }
+  if(num === 2 && typeof toggleJpExam2Loc === 'function'){
+    toggleJpExam2Loc(examSel ? examSel.value : '');
+  }
+}
+
 // ===== 技能証明ブロック =====
 function blockSkillProof() {
-  var h = '<div class="card"><div class="section-title">技能水準の証明</div>';
+  var h = '<div class="card"><div class="section-title">技能水準の証明（ぎのうすいじゅんのしょうめい）</div>';
 
-  h += '<div class="sub-label" style="background:#eff6ff;color:#1d4ed8;border-radius:6px;padding:6px 10px;margin-bottom:8px;font-size:12px;font-weight:700;">【証明①】</div>';
+  h += '<div class="sub-label" style="background:#eff6ff;color:#1d4ed8;border-radius:6px;padding:6px 10px;margin-bottom:8px;font-size:12px;font-weight:700;">【証明①（しょうめい①）】</div>';
   h += '<div class="field">';
-  h += '<label>技能水準 評価区分<span class="req">*</span></label>';
+  h += '<label>技能水準 評価区分（ぎのうすいじゅん ひょうかくぶん）<span class="req">*</span></label>';
   h += '<select id="f-skillEvalType" onchange="toggleSkillProof(1, this.value)">';
   h += '<option value="">---</option>';
   h += makeOptions(SKILL_EVAL_TYPES, SKILL_EVAL_LABELS);
   h += '</select></div>';
 
   h += '<div id="skillProof1Exam" style="display:none;">';
-  h += '<div class="field"><label>技能試験名①<span class="req">*</span></label>';
-  h += '<select id="f-skillExam1"><option value="">---</option>' + makeOptions(SKILL_EXAM_LIST) + '</select></div>';
-  h += '<div class="field"><label>技能試験 受験地①<span class="req">*</span></label>';
+  // ver.20260523.03: 分野→試験名の2段階セレクト
+  h += '<div class="field"><label>分野（ぶんや）①<span class="req">*</span></label>';
+  h += '<select id="f-skillField1" onchange="onSkillFieldChange(1, this.value)"><option value="">---</option>' + makeFieldOptions(SKILL_FIELD_GROUPS) + '</select></div>';
+  h += '<div class="field"><label>技能試験名①（ぎのうしけんめい①）<span class="req">*</span></label>';
+  h += '<select id="f-skillExam1"><option value="">---</option></select></div>';
+  h += '<div class="field"><label>技能試験 受験地①（ぎのうしけん じゅけんち①）<span class="req">*</span></label>';
   h += '<select id="f-skillExamLoc1"><option value="">---</option>' + makeOptions(COUNTRY_LIST_ONLINE) + '</select></div>';
   h += '</div>';
 
   h += '<div id="skillProof1Jisshu" style="display:none;">';
-  h += '<div class="grid2">';
-  h += '<div class="field"><label>職種（技能実習2号）<span class="req">*</span></label><input type="text" id="f-gijutsuType" placeholder="例: 食品製造"></div>';
-  h += '<div class="field"><label>作業<span class="req">*</span></label><input type="text" id="f-gijutsuWork" placeholder="例: 惣菜製造"></div>';
+  // ver.20260526.test.01: 職種をプリセット選択リスト化、「その他」で自由入力可能
+  h += '<div class="field"><label>職種（しょくしゅ・技能実習2号）<span class="req">*</span> / Job Category</label>';
+  h += '<select id="f-gijutsuTypePreset" onchange="onGijutsuTypePresetChange(this.value)" style="width:100%;padding:13px 14px;border:1.5px solid #e5e7eb;border-radius:10px;font-size:16px;background:white;-webkit-appearance:none;min-height:50px;">';
+  h += '<option value="">--- 選択してください / Select ---</option>';
+  h += makeJisshuShokushuOptions();
+  h += '<option value="__other__">▼ その他（手入力）/ Other (manual input)</option>';
+  h += '<option value="__unknown__">⚠️ 分からない（担当者が確認します）/ I don\'t know</option>';
+  h += '</select></div>';
+  // 「その他」を選んだ時の手入力欄
+  h += '<div class="field" id="gijutsuTypeOtherWrap" style="display:none;"><label>職種を入力 / Enter job category</label>';
+  h += '<input type="text" id="f-gijutsuType" placeholder="例: 食品製造"></div>';
+  // 作業欄
+  h += '<div class="field" id="gijutsuWorkWrap"><label>作業（さぎょう）<span class="req">*</span> / Work</label>';
+  h += '<input type="text" id="f-gijutsuWork" placeholder="例: 惣菜製造"></div>';
+  // 「分からない」を選んだ時の補足メッセージ
+  h += '<div id="gijutsuUnknownNote" style="display:none;background:#fef3c7;border-left:4px solid #f59e0b;border-radius:6px;padding:10px 12px;margin:8px 0;font-size:12px;color:#92400e;">';
+  h += '⚠️ <strong>「技能実習修了証明書」</strong>に職種と作業が書かれています。<br>';
+  h += '⚠️ <strong>Job category and work are written on your "Technical Intern Training Completion Certificate"</strong>.<br>';
+  h += '担当者に修了証の写真を送ってください。/ Please send a photo of the certificate to the staff.';
   h += '</div>';
-  h += '<div class="field"><label>修了証明<span class="req">*</span></label>';
-  h += '<select id="f-gijutsuProof"><option value="">---</option>' + makeOptions(GINOJISSHU_PROOF_LIST) + '</select></div>';
+  h += '<div class="field"><label>修了証明（しゅうりょうしょうめい）<span class="req">*</span></label>';
+  h += '<select id="f-gijutsuProof"><option value="">---</option>' + makeOptions(GINOJISSHU_PROOF_LIST) + '<option value="__unknown__">⚠️ 分からない / I don\'t know</option></select></div>';
   h += '</div>';
 
-  h += '<div class="sub-label" style="background:#eff6ff;color:#1d4ed8;border-radius:6px;padding:6px 10px;margin:12px 0 8px;font-size:12px;font-weight:700;">【技能試験②（2つ合格している場合）】</div>';
-  h += '<div class="field"><label>技能試験名②</label>';
-  h += '<select id="f-skillExam2" onchange="toggleSkillExam2Loc(this.value)"><option value="">なし / 該当しない</option>' + makeOptions(SKILL_EXAM_LIST) + '</select></div>';
+  h += '<div class="sub-label" style="background:#eff6ff;color:#1d4ed8;border-radius:6px;padding:6px 10px;margin:12px 0 8px;font-size:12px;font-weight:700;">【技能試験②（ぎのうしけん②・2つ合格している場合）】</div>';
+  // ver.20260523.03: ②も分野→試験名の2段階セレクト
+  h += '<div class="field"><label>分野（ぶんや）②</label>';
+  h += '<select id="f-skillField2" onchange="onSkillFieldChange(2, this.value)"><option value="">なし / 該当しない</option>' + makeFieldOptions(SKILL_FIELD_GROUPS) + '</select></div>';
+  h += '<div class="field"><label>技能試験名②（ぎのうしけんめい②）</label>';
+  h += '<select id="f-skillExam2" onchange="toggleSkillExam2Loc(this.value)"><option value="">---</option></select></div>';
   h += '<div id="skillExam2LocWrap" style="display:none;">';
-  h += '<div class="field"><label>技能試験 受験地②</label>';
+  h += '<div class="field"><label>技能試験 受験地②（ぎのうしけん じゅけんち②）</label>';
   h += '<select id="f-skillExamLoc2"><option value="">---</option>' + makeOptions(COUNTRY_LIST_ONLINE) + '</select></div>';
   h += '</div>';
 
@@ -771,20 +933,23 @@ function blockSkillProof() {
 
 // ===== 日本語証明ブロック =====
 function blockJapaneseProof() {
-  var h = '<div class="card"><div class="section-title">日本語能力の証明</div>';
+  var h = '<div class="card"><div class="section-title">日本語能力の証明（にほんごのうりょくのしょうめい）</div>';
 
-  h += '<div class="sub-label" style="background:#f0fdf4;color:#15803d;border-radius:6px;padding:6px 10px;margin-bottom:8px;font-size:12px;font-weight:700;">【証明①】</div>';
+  h += '<div class="sub-label" style="background:#f0fdf4;color:#15803d;border-radius:6px;padding:6px 10px;margin-bottom:8px;font-size:12px;font-weight:700;">【証明①（しょうめい①）】</div>';
   h += '<div class="field">';
-  h += '<label>日本語能力 評価区分<span class="req">*</span></label>';
+  h += '<label>日本語能力 評価区分（にほんごのうりょく ひょうかくぶん）<span class="req">*</span></label>';
   h += '<select id="f-jpEvalType" onchange="toggleJpProof(1, this.value)">';
   h += '<option value="">---</option>';
   h += makeOptions(SKILL_EVAL_TYPES, SKILL_EVAL_LABELS);
   h += '</select></div>';
 
   h += '<div id="jpProof1Exam" style="display:none;">';
-  h += '<div class="field"><label>日本語試験名①<span class="req">*</span></label>';
-  h += '<select id="f-jpExam1"><option value="">---</option>' + makeOptions(JP_EXAM_LIST) + '</select></div>';
-  h += '<div class="field"><label>日本語試験 受験地①<span class="req">*</span></label>';
+  // ver.20260523.03: 分野→試験名の2段階セレクト
+  h += '<div class="field"><label>分野（ぶんや）①<span class="req">*</span></label>';
+  h += '<select id="f-jpField1" onchange="onJpFieldChange(1, this.value)"><option value="">---</option>' + makeFieldOptions(JP_FIELD_GROUPS) + '</select></div>';
+  h += '<div class="field"><label>日本語試験名①（にほんごしけんめい①）<span class="req">*</span></label>';
+  h += '<select id="f-jpExam1"><option value="">---</option></select></div>';
+  h += '<div class="field"><label>日本語試験 受験地①（にほんごしけん じゅけんち①）<span class="req">*</span></label>';
   h += '<select id="f-jpExamLoc1"><option value="">---</option>' + makeOptions(COUNTRY_LIST_ONLINE) + '</select></div>';
   h += '</div>';
 
@@ -792,11 +957,14 @@ function blockJapaneseProof() {
   h += '<div style="font-size:12px;color:#6b7280;padding:8px 10px;background:#f9fafb;border-radius:8px;">技能実習２号を良好に修了した場合、日本語試験は免除されます。</div>';
   h += '</div>';
 
-  h += '<div class="sub-label" style="background:#f0fdf4;color:#15803d;border-radius:6px;padding:6px 10px;margin:12px 0 8px;font-size:12px;font-weight:700;">【日本語試験②（2つ合格している場合）】</div>';
-  h += '<div class="field"><label>日本語試験名②</label>';
-  h += '<select id="f-jpExam2" onchange="toggleJpExam2Loc(this.value)"><option value="">なし / 該当しない</option>' + makeOptions(JP_EXAM_LIST) + '</select></div>';
+  h += '<div class="sub-label" style="background:#f0fdf4;color:#15803d;border-radius:6px;padding:6px 10px;margin:12px 0 8px;font-size:12px;font-weight:700;">【日本語試験②（にほんごしけん②・2つ合格している場合）】</div>';
+  // ver.20260523.03: ②も分野→試験名の2段階セレクト
+  h += '<div class="field"><label>分野（ぶんや）②</label>';
+  h += '<select id="f-jpField2" onchange="onJpFieldChange(2, this.value)"><option value="">なし / 該当しない</option>' + makeFieldOptions(JP_FIELD_GROUPS) + '</select></div>';
+  h += '<div class="field"><label>日本語試験名②（にほんごしけんめい②）</label>';
+  h += '<select id="f-jpExam2" onchange="toggleJpExam2Loc(this.value)"><option value="">---</option></select></div>';
   h += '<div id="jpExam2LocWrap" style="display:none;">';
-  h += '<div class="field"><label>日本語試験 受験地②</label>';
+  h += '<div class="field"><label>日本語試験 受験地②（にほんごしけん じゅけんち②）</label>';
   h += '<select id="f-jpExamLoc2"><option value="">---</option>' + makeOptions(COUNTRY_LIST_ONLINE) + '</select></div>';
   h += '</div>';
 
@@ -806,11 +974,11 @@ function blockJapaneseProof() {
 
 // ===== 技人国専用ブロック（日本語能力・役職・実務経験） =====
 function blockGijinkokuExtra() {
-  var h = '<div class="card"><div class="section-title">技人国 資格要件</div>';
+  var h = '<div class="card"><div class="section-title">技人国 資格要件（ぎじんこく しかくようけん）</div>';
 
   // ① 日本語能力（JLPT N2 or BJT 400点以上）
   h += '<div class="field">';
-  h += '<label>日本語能力試験（JLPT）N2、または BJTビジネス日本語能力テストで400点以上を取得していますか？ <span class="req">*</span></label>';
+  h += '<label>日本語能力試験（にほんごのうりょくしけん・JLPT）N2、または BJTビジネス日本語能力テストで400点以上を取得していますか？ <span class="req">*</span></label>';
   h += '<div style="font-size:11px;color:#6b7280;margin-bottom:6px;">Do you have JLPT N2, or BJT Business Japanese Proficiency Test score of 400 or above?</div>';
   h += '<select id="f-gijinkokuJpTest">';
   h += '<option value="">---</option>';
@@ -821,7 +989,7 @@ function blockGijinkokuExtra() {
 
   // ② 現職の役職
   h += '<div class="field">';
-  h += '<label>現職の役職の有無 <span class="req">*</span></label>';
+  h += '<label>現職の役職の有無（げんしょくのやくしょくのうむ） <span class="req">*</span></label>';
   h += '<div style="font-size:11px;color:#6b7280;margin-bottom:6px;">Do you have a job title / position at your current workplace?</div>';
   h += '<select id="f-gijinkokuTitleStatus" onchange="toggleGijinkokuTitle(this.value)">';
   h += '<option value="">---</option>';
@@ -830,13 +998,13 @@ function blockGijinkokuExtra() {
   h += '</select>';
   h += '</div>';
   h += '<div id="gijinkokuTitleWrap" style="display:none;">';
-  h += '<div class="field"><label>役職名 / Job title</label>';
+  h += '<div class="field"><label>役職名（やくしょくめい） / Job title</label>';
   h += '<input type="text" id="f-gijinkokuTitle" placeholder="例: 主任 / リーダー / 課長 など">';
   h += '</div></div>';
 
   // ③ 技人国の実務経験年数
   h += '<div class="field">';
-  h += '<label>技人国の実務経験年数の有無 <span class="req">*</span></label>';
+  h += '<label>技人国の実務経験年数の有無（ぎじんこくの じつむけいけんねんすうのうむ） <span class="req">*</span></label>';
   h += '<div style="font-size:11px;color:#6b7280;margin-bottom:6px;">Do you have practical work experience related to this engineer/specialist visa?</div>';
   h += '<select id="f-gijinkokuExpStatus" onchange="toggleGijinkokuExp(this.value)">';
   h += '<option value="">---</option>';
@@ -845,9 +1013,9 @@ function blockGijinkokuExtra() {
   h += '</select>';
   h += '</div>';
   h += '<div id="gijinkokuExpWrap" style="display:none;">';
-  h += '<label style="display:block;font-size:13px;font-weight:700;color:#1f2937;margin-bottom:6px;">実務経験期間 / Experience period</label>';
+  h += '<label style="display:block;font-size:13px;font-weight:700;color:#1f2937;margin-bottom:6px;">実務経験期間（じつむけいけんきかん） / Experience period</label>';
   h += '<div class="grid2">';
-  h += '<div class="field"><label style="font-size:12px;font-weight:600;">年 / Years</label><input type="number" id="f-gijinkokuExpYears" placeholder="例: 3" min="0" max="50"></div>';
+  h += '<div class="field"><label style="font-size:12px;font-weight:600;">年（ねん） / Years</label><input type="number" id="f-gijinkokuExpYears" placeholder="例: 3" min="0" max="50"></div>';
   h += '<div class="field"><label style="font-size:12px;font-weight:600;">か月 / Months</label><input type="number" id="f-gijinkokuExpMonths" placeholder="例: 6" min="0" max="11"></div>';
   h += '</div>';
   h += '</div>';
@@ -1420,22 +1588,22 @@ function toggleFamilyAddress(idx, val) {
 function familyMemberRow(idx) {
   var h = '<div class="officer-row" id="familyRow' + idx + '" data-fidx="' + idx + '" style="margin-bottom:12px;">';
   h += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">';
-  h += '<span style="font-size:12px;font-weight:700;color:#374151;">家族 ' + idx + ' 人目</span>';
+  h += '<span style="font-size:12px;font-weight:700;color:#374151;">家族（かぞく） ' + idx + ' 人目</span>';
   if (idx > 1) h += '<button type="button" onclick="removeFamilyMember(' + idx + ')" style="font-size:11px;padding:2px 8px;background:white;border:1px solid #fca5a5;border-radius:4px;color:#dc2626;cursor:pointer;">削除</button>';
   h += '</div>';
   h += '<div class="grid2">';
-  h += '<div class="field"><label>続柄 / Relation<div class="trans" data-key="familyRelation"></div></label><input type="text" id="f-family' + idx + 'Relation" placeholder="例: 配偶者 / Spouse"></div>';
-  h += '<div class="field"><label>家族の在留カード番号<div class="trans" data-key="familyResidenceCard"></div></label><input type="text" id="f-family' + idx + 'ResidenceCard" placeholder="例: AB12345678CD"></div>';
+  h += '<div class="field"><label>続柄（つづきがら） / Relation<div class="trans" data-key="familyRelation"></div></label><input type="text" id="f-family' + idx + 'Relation" placeholder="例: 配偶者 / Spouse"></div>';
+  h += '<div class="field"><label>家族の在留カード番号（かぞくのざいりゅうカードばんごう）<div class="trans" data-key="familyResidenceCard"></div></label><input type="text" id="f-family' + idx + 'ResidenceCard" placeholder="例: AB12345678CD"></div>';
   h += '</div>';
-  h += '<div class="field"><label>家族が働いている会社<div class="trans" data-key="familyWorkplace"></div></label><input type="text" id="f-family' + idx + 'Workplace" placeholder="例: 株式会社〇〇"></div>';
-  h += '<div class="field"><label>一緒に住んでいますか？<div class="trans" data-key="familyLiveTogether"></div></label>';
+  h += '<div class="field"><label>家族が働いている会社（かぞくがはたらいているかいしゃ）<div class="trans" data-key="familyWorkplace"></div></label><input type="text" id="f-family' + idx + 'Workplace" placeholder="例: 株式会社〇〇"></div>';
+  h += '<div class="field"><label>一緒に住んでいますか？（いっしょにすんでいますか）<div class="trans" data-key="familyLiveTogether"></div></label>';
   h += '<select id="f-family' + idx + 'LiveTogether" onchange="toggleFamilyAddress(' + idx + ', this.value)">';
   h += '<option value="">---</option>';
   h += '<option value="yes">はい / Yes</option>';
   h += '<option value="no">いいえ / No</option>';
   h += '</select></div>';
   h += '<div id="familyAddressWrap' + idx + '" style="display:none;">';
-  h += '<div class="field"><label>家族の住所<div class="trans" data-key="familyAddress"></div></label><input type="text" id="f-family' + idx + 'Address" placeholder="例: 東京都新宿区〇〇1-1-1"></div>';
+  h += '<div class="field"><label>家族の住所（かぞくのじゅうしょ）<div class="trans" data-key="familyAddress"></div></label><input type="text" id="f-family' + idx + 'Address" placeholder="例: 東京都新宿区〇〇1-1-1"></div>';
   h += '</div>';
   h += '</div>';
   return h;
@@ -2172,6 +2340,45 @@ function prefillForm(resp) {
         if (el) el.value = resp[k];
       }
     });
+  }
+
+  // ver.20260523.03: 3段階セレクト(分野→試験名)の復元
+  // 保存値は試験名のみなので、試験名から分野を逆引きして、分野セレクト→onchange→試験名再セット
+  try {
+    [
+      {examKey:'skillExam1', fieldId:'f-skillField1', examId:'f-skillExam1', onChange:'onSkillFieldChange', num:1, groups:SKILL_FIELD_GROUPS},
+      {examKey:'skillExam2', fieldId:'f-skillField2', examId:'f-skillExam2', onChange:'onSkillFieldChange', num:2, groups:SKILL_FIELD_GROUPS},
+      {examKey:'jpExam1',    fieldId:'f-jpField1',    examId:'f-jpExam1',    onChange:'onJpFieldChange',    num:1, groups:JP_FIELD_GROUPS},
+      {examKey:'jpExam2',    fieldId:'f-jpField2',    examId:'f-jpExam2',    onChange:'onJpFieldChange',    num:2, groups:JP_FIELD_GROUPS}
+    ].forEach(function(cfg){
+      var examVal = resp[cfg.examKey];
+      if(!examVal) return;
+      var field = _findFieldForExam(cfg.groups, examVal);
+      if(!field) return;
+      var fSel = document.getElementById(cfg.fieldId);
+      if(fSel){
+        fSel.value = field;
+        // 試験名selectを再構築
+        if(cfg.onChange === 'onSkillFieldChange') onSkillFieldChange(cfg.num, field);
+        else onJpFieldChange(cfg.num, field);
+      }
+      // 試験名再セット
+      var eSel = document.getElementById(cfg.examId);
+      if(eSel){
+        for(var i=0;i<eSel.options.length;i++){
+          if(eSel.options[i].value === examVal){ eSel.selectedIndex = i; break; }
+        }
+        // ②の場合は受験地表示判定を再実行
+        if(cfg.num === 2){
+          try {
+            if(cfg.examKey === 'skillExam2' && typeof toggleSkillExam2Loc === 'function') toggleSkillExam2Loc(eSel.value);
+            if(cfg.examKey === 'jpExam2'    && typeof toggleJpExam2Loc    === 'function') toggleJpExam2Loc(eSel.value);
+          } catch(e){ console.error('toggle loc on prefill error:', e); }
+        }
+      }
+    });
+  } catch(restoreErr) {
+    console.error('field restore error (ignored):', restoreErr);
   }
 }
 </script>
