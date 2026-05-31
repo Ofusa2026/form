@@ -161,7 +161,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 
 <!-- 名前が違う場合の画面 -->
 <div id="nameMismatchScreen" style="display:none;padding:20px;max-width:600px;margin:20px auto;">
-  <div class="name-mismatch-box">
+  <div class="name-mismatch-box" id="nameMismatchBox">
     <div class="title">⚠️ お名前にご相違があります</div>
     <div class="desc">恐れ入りますが、フォームへのご入力は控えていただき、お手数ですが下記までご連絡をお願いいたします。</div>
     <div class="contact">
@@ -187,7 +187,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20260531.01';
+var FORM_VERSION = 'ver.20260531.02';
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -199,6 +199,7 @@ var caseName = params.get('name') ? decodeURIComponent(params.get('name')) : '';
 var currentLang = params.get('lang') || '';
 var responseId = params.get('response_id') || '';  // 編集モード: 既存回答のID
 var editMode = !!responseId;
+var srcParam = params.get('src') || '';  // ver.20260531.02: 流入元（aidem 等）。本人不一致時の連絡先案内の出し分けに使用
 var fieldsFilter = params.get('fields') ? params.get('fields').split(',').map(function(s){return s.trim();}) : null;
 
 // 特定技能フラグ（type=tokutei_* のとき true）
@@ -2103,6 +2104,16 @@ function confirmName(isMatch){
     _initFormBody();
   } else {
     // 名前違いの連絡画面を表示
+    // ver.20260531.02: アイデム経由（src=aidem）の場合は、アイデムのご担当者宛の案内に差し替え
+    if (srcParam === 'aidem') {
+      var box = document.getElementById('nameMismatchBox');
+      if (box) {
+        box.innerHTML =
+          '<div class="title">⚠️ お名前にご相違があるようです</div>' +
+          '<div class="desc">大変恐れ入りますが、表示されているお名前がご自身のものと異なる場合は、フォームへのご入力をお控えいただきますようお願いいたします。<br><br>お手数をおかけいたしますが、ご案内の行き違いの可能性がございますので、本フォームをご案内した<strong>アイデムのご担当者さま</strong>まで、その旨ご連絡くださいますようお願い申し上げます。</div>' +
+          '<div class="contact" style="font-size:13px;color:#475569;">担当者より、改めて正しいご案内を差し上げます。<br>ご不便をおかけし申し訳ございませんが、何卒よろしくお願いいたします。</div>';
+      }
+    }
     document.getElementById('nameMismatchScreen').style.display = 'block';
     // header(form-headerなど)はそのまま、本体は出さない
   }
