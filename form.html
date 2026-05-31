@@ -187,7 +187,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20260531.02';
+var FORM_VERSION = 'ver.20260531.03';
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -2110,8 +2110,8 @@ function confirmName(isMatch){
       if (box) {
         box.innerHTML =
           '<div class="title">⚠️ お名前にご相違があるようです</div>' +
-          '<div class="desc">大変恐れ入りますが、表示されているお名前がご自身のものと異なる場合は、フォームへのご入力をお控えいただきますようお願いいたします。<br><br>お手数をおかけいたしますが、ご案内の行き違いの可能性がございますので、本フォームをご案内した<strong>アイデムのご担当者さま</strong>まで、その旨ご連絡くださいますようお願い申し上げます。</div>' +
-          '<div class="contact" style="font-size:13px;color:#475569;">担当者より、改めて正しいご案内を差し上げます。<br>ご不便をおかけし申し訳ございませんが、何卒よろしくお願いいたします。</div>';
+          '<div class="desc">大変恐れ入りますが、表示されているお名前がご自身のものと異なる場合は、フォームへのご入力をお控えいただきますようお願いいたします。</div>' +
+          '<div class="contact"><strong>株式会社アイデム支援担当者へご連絡をお願いいたします。</strong></div>';
       }
     }
     document.getElementById('nameMismatchScreen').style.display = 'block';
