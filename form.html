@@ -187,7 +187,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20260523.03';
+var FORM_VERSION = 'ver.20260531.01';
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -1002,7 +1002,7 @@ function field(id, label, inputType, required, placeholder, transKey, options) {
   h += '<label>' + label + (required ? '<span class="req">*</span>' : '') + '</label>';
   if (transKey) h += '<div class="trans" data-key="' + transKey + '"></div>';
   if (inputType === 'select') {
-    var _onchange = (id === 'f-nationality') ? ' onchange="toggleNationalityOther(this.value)"' : (id === 'f-flexFlg') ? ' onchange="toggleFlexType(this.value)"' : '';
+    var _onchange = (id === 'f-nationality') ? ' onchange="toggleNationalityOther(this.value)"' : (id === 'f-flexFlg') ? ' onchange="toggleFlexType(this.value)"' : (id === 'f-holidayType') ? ' onchange="toggleHolidayType(this.value)"' : '';
     h += '<select id="' + id + '"' + _onchange + '>';
     (options||[]).forEach(function(o) {
       h += '<option value="' + o + '">' + (o === '' ? '---' : o) + '</option>';
@@ -1288,6 +1288,7 @@ function buildCompanyForm() {
 
     '<div class="sub-label">【休日】</div>' +
     field('f-holidayType','休日の種類','select',false,'',null,['','定例日','非定例日','定例日＋非定例日']) +
+    '<div id="holiday-fixed-area" style="display:none;">' +
     '<div class="grid2">' +
       field('f-fixedHolidayMon','月曜日','select',false,'',null,['','休み','出勤']) +
       field('f-fixedHolidayTue','火曜日','select',false,'',null,['','休み','出勤']) +
@@ -1303,6 +1304,13 @@ function buildCompanyForm() {
     '<div class="grid2">' +
       field('f-fixedHolidaySun','日曜日','select',false,'',null,['','休み','出勤']) +
       field('f-fixedHolidayHol','祝日','select',false,'',null,['','休み','出勤']) +
+    '</div>' +
+    '</div>' +
+    '<div id="holiday-nonreg-area" style="display:none;">' +
+    '<div class="grid2">' +
+      field('f-nonRegWeeklyDays','週あたりの休日日数','number',false,'例: 2') +
+      field('f-nonRegMonthlyDays','月あたりの休日日数','number',false,'例: 8') +
+    '</div>' +
     '</div>' +
     field('f-otherHoliday','その他休日（非定例日等）','text',false,'例: GW・夏季・年末年始') +
     field('f-annualHolidays','年間休日数','number',false,'例: 120') +
@@ -1512,6 +1520,15 @@ function toggleFlexType(val) {
   if (el) el.style.display = val === '適用あり' ? 'block' : 'none';
 }
 
+function toggleHolidayType(val) {
+  var fixedArea = document.getElementById('holiday-fixed-area');
+  var nonRegArea = document.getElementById('holiday-nonreg-area');
+  var showFixed = (val === '定例日' || val === '定例日＋非定例日');
+  var showNonReg = (val === '非定例日' || val === '定例日＋非定例日');
+  if (fixedArea) fixedArea.style.display = showFixed ? 'block' : 'none';
+  if (nonRegArea) nonRegArea.style.display = showNonReg ? 'block' : 'none';
+}
+
 function toggleFamilyBlock(val) {
   var el = document.getElementById('familyDetailWrap');
   if (el) el.style.display = (val === 'yes') ? 'block' : 'none';
@@ -1650,6 +1667,7 @@ function collectData() {
       fixedHolidayFri: val('f-fixedHolidayFri'), fixedHolidaySat: val('f-fixedHolidaySat'),
       fixedHolidaySun: val('f-fixedHolidaySun'), fixedHolidayHol: val('f-fixedHolidayHol'),
       otherHoliday: val('f-otherHoliday'), annualHolidays: val('f-annualHolidays'),
+      nonRegWeeklyDays: val('f-nonRegWeeklyDays'), nonRegMonthlyDays: val('f-nonRegMonthlyDays'),
       contractStart: val('f-contractStart'), contractEnd: val('f-contractEnd'),
       contractRenewal: val('f-contractRenewal'), contractRenewalCond: val('f-contractRenewalCond'),
       contractRenewalPeriod: val('f-contractRenewalPeriod'),
