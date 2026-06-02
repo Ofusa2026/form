@@ -187,7 +187,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20260531.03';
+var FORM_VERSION = 'ver.20260602.01';
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -518,7 +518,8 @@ function blockTempReturnTokutei() {
   h += '</select>';
   h += '</div>';
   h += '<div id="tempReturnDateWrap" style="display:none;">';
-  h += '<div class="field"><label>出国予定日（しゅっこくよていび・日本を出る日）<div class="trans" data-key="tempReturnDate"></div></label><input type="date" id="f-tempReturn"></div>';
+  h += '<div class="field"><label>出国予定日（しゅっこくよていび・日本を出る日）<div class="trans" data-key="tempReturnFrom"></div></label><input type="date" id="f-tempReturn"></div>';
+  h += '<div class="field"><label>入国予定日（にゅうこくよていび・日本に戻る日）<div class="trans" data-key="tempReturnTo"></div></label><input type="date" id="f-tempReturnIn"></div>';
   h += '</div>';
   return h;
 }
@@ -548,7 +549,8 @@ function blockContact(showResCard, showExtra) {
       h += '</select>';
       h += '</div>';
       h += '<div id="tempReturnDateWrap" style="display:none;">';
-      h += field('f-tempReturn', '帰国予定日（きこくよていび）', 'date', false, '', 'tempReturnDate');
+      h += field('f-tempReturn', '出国予定日（しゅっこくよていび・日本を出る日）', 'date', false, '', 'tempReturnFrom');
+      h += field('f-tempReturnIn', '入国予定日（にゅうこくよていび・日本に戻る日）', 'date', false, '', 'tempReturnTo');
       h += '</div>';
     }
   }
@@ -1497,6 +1499,7 @@ function toggleTempReturnDate(val) {
   if (el) el.style.display = val === '予定あり' ? 'block' : 'none';
   if (val !== '予定あり') {
     var di = document.getElementById('f-tempReturn'); if(di) di.value='';
+    var di2 = document.getElementById('f-tempReturnIn'); if(di2) di2.value='';
   }
 }
 
@@ -1708,12 +1711,14 @@ function collectData() {
     d.tempReturnStatus = tr;
     if (tr === '予定あり') {
       d.tempReturn = val('f-tempReturn');
+      d.tempReturnIn = val('f-tempReturnIn');
     }
   } else {
     // 従来型
     d.residenceCard = val('f-residenceCard');
     d.address = val('f-address');
     d.tempReturn = val('f-tempReturn');
+    d.tempReturnIn = val('f-tempReturnIn');
   }
 
   if (t === 'tokutei_nintei' || t === 'gijinkoku_nintei') {
@@ -2215,6 +2220,7 @@ function prefillForm(resp) {
     residenceCard: 'f-residenceCard', address: 'f-address',
     residenceStatus: 'f-residenceStatus', completionDate: 'f-completionDate',
     tempReturn: 'f-tempReturn',
+    tempReturnIn: 'f-tempReturnIn',
     entryCount: 'f-entryCount', coeCount: 'f-coeCount', coeDenied: 'f-coeDenied',
     lastEntryFrom: 'f-lastEntryFrom', lastEntryTo: 'f-lastEntryTo',
     firstEntry: 'f-firstEntryStatus',
