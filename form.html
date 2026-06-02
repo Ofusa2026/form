@@ -49,6 +49,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 .field input:focus, .field select:focus, .field textarea:focus { border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,.1); }
 .field textarea { min-height: 80px; resize: vertical; font-size: 16px; }
 .field input[type="date"] { font-size: 15px; }
+.field input[type="checkbox"] { -webkit-appearance: auto; appearance: auto; width: 18px; height: 18px; min-height: 0; padding: 0; border-radius: 4px; flex: none; }
 
 /* グリッド */
 .grid2 { display: grid; grid-template-columns: 1fr; gap: 0; }
@@ -187,7 +188,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20260602.02';
+var FORM_VERSION = 'ver.20260602.03';
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
