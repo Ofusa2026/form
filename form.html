@@ -188,7 +188,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20260602.03';
+var FORM_VERSION = 'ver.20260603.01';
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -763,6 +763,20 @@ function _findFieldForExam(groups, examName){
 
 var COUNTRY_LIST_ONLINE = ['日本 Japan','中国 People\'s Republic of China','ベトナム Viet Nam','韓国 Republic of Korea','フィリピン Philippines','ブラジル Brazil','ネパール Nepal','インドネシア Indonesia','ミャンマー Myanmar','台湾 Taiwan','米国 United States of America','カンボジア Cambodia','タイ Thailand','モンゴル Mongolia','バングラデシュ Bangladesh','スリランカ Sri Lanka','パキスタン Pakistan','インド India','ウズベキスタン Uzbekistan'];
 var GINOJISSHU_PROOF_LIST = ['３級の技能検定又はこれに相当する技能実習評価試験の実技試験の合格による証明','実習状況に関する書面による証明'];
+// ver.20260603.01: 技能実習2号 職種・作業マスター（index.html と完全一致）
+var GINOJISSHU_TYPE_LIST=['耕種農業','畜産農業','林業','漁船漁業','養殖業','さく井','建築板金','冷凍空気調和機器施工','建具製作','建築大工','型枠施工','鉄筋施工','とび','石材施エ','タイル張り','かわらぶき','左官','配管','熱絶縁施工','内装仕上げ施工','サッシ施工','防水施工','コンクリート圧送施工','ウェルポイント施工','表装','建設機械施工','築炉','缶詰巻締','食鳥処理加工業','加熱性水産加工　食品製造業','非加熱性水産加工　食品製造業','水産練り製品製造','牛豚食肉処理加工業','ハム・ソーセージ・ベーコン製造','パン製造','そう菜製造業','農産物漬物製造業','医療・福祉施設給食製造','紡績運転','織布運転','染色','ニット製品製造','たて編ニット生地製造','婦人子供服製造','紳士服製造','下着類製造','寝具製作','カーペット製造','帆布製品製造','布はく縫製','座席シート縫製','鋳造','鍛造','ダイカスト','機械加工','金属プレス加工','鉄工','工場板金','めっき','アルミニウム陽極酸化処理','仕上げ','機械検査','機械保全','電子機器組立て','電気機器組立て','プリント配線板製造','アルミニウム圧延・押出製品製造','金属熱処理業','家具製作','印刷','製本','プラスチック成形','強化プラスチック成形','塗装','溶接','工業包装','紙器・段ボール箱製造','陶磁器工業製品製造','自動車整備','ビルクリーニング','介護','クリーニング','リネンサプライ','コンクリート製品製造','宿泊','ＲＰＦ製造職種','鉄道施設保守整備','ゴム製品製造','鉄道車両整備','木材加工','空港グランドハンドリング','ボイラーメンテナンス'];
+var GINOJISSHU_WORK_MAP={'耕種農業':['施設園芸','畑作・野菜','果樹'],'畜産農業':['養豚','養鶏','酪農','養牛'],'林業':['育林','素材生産'],'漁船漁業':['かつお一本釣り漁業','延縄漁業','いか釣り漁業','まき網漁業','ひき網漁業','刺し網漁業','定置網漁業','かに・えびかご漁業','棒受け網漁業'],'養殖業':['ほたてがい・まがき養殖'],'さく井':['パーカッション式さく井工事','ロータリー式さく井工事'],'建築板金':['ダクト板金','内外装板金'],'冷凍空気調和機器施工':['冷凍空気調和機器施工'],'建具製作':['木製建具手加工','木製建具機械加工'],'建築大工':['大工工事'],'型枠施工':['型枠工事'],'鉄筋施工':['鉄筋組立て'],'とび':['とび'],'石材施エ':['石材施工','石張り'],'タイル張り':['タイル張り'],'かわらぶき':['かわらぶき'],'左官':['左官'],'配管':['建築配管','プラント配管'],'熱絶縁施工':['保温保冷工事'],'内装仕上げ施工':['プラスチック系床仕上げ工事','カーペット系床仕上げ工事','銘木フローリング工事','硬質床仕上げ工事','石張り工事','タイル張り工事','畳工事','ボード仕上げ工事','壁紙張り工事'],'サッシ施工':['ビル用サッシ施工'],'防水施工':['シーリング防水工事'],'コンクリート圧送施工':['コンクリート圧送工事'],'ウェルポイント施工':['ウェルポイント工事'],'表装':['壁装'],'建設機械施工':['押土・整地','積込み','掘削','締固め'],'築炉':['築炉'],'缶詰巻締':['缶詰巻締'],'食鳥処理加工業':['食鳥処理加工業'],'加熱性水産加工　食品製造業':['節類製造','加熱乾製品製造','調味加工品製造','くん製品製造','容器詰製品製造','かまぼこ製品製造'],'非加熱性水産加工　食品製造業':['塩蔵品製造','乾製品製造','発酵食品製造','調理加工品製造','生食用加工品製造'],'水産練り製品製造':['かまぼこ製品製造'],'牛豚食肉処理加工業':['牛豚部分肉製造'],'ハム・ソーセージ・ベーコン製造':['ハム・ソーセージ・ベーコン製造'],'パン製造':['パン製造'],'そう菜製造業':['そう菜加工'],'農産物漬物製造業':['農産物漬物製造'],'医療・福祉施設給食製造':['医療・福祉施設給食製造'],'紡績運転':['前紡工程','精紡工程','巻糸工程','合撚糸工程'],'織布運転':['準備工程','製織工程','仕上工程'],'染色':['糸染色','織物・ニット染色','染色仕上'],'ニット製品製造':['靴下製造','丸編みニット製造'],'たて編ニット生地製造':['たて編ニット生地製造'],'婦人子供服製造':['婦人子供既製服縫製'],'紳士服製造':['紳士既製服製造'],'下着類製造':['下着類製造'],'寝具製作':['寝具製作'],'カーペット製造':['織じゅうたん製造','タフテッドカーペット製造','ニードルパンチカーペット製造'],'帆布製品製造':['帆布製品製造'],'布はく縫製':['ワイシャツ製造'],'座席シート縫製':['自動車シート縫製'],'鋳造':['鋳鉄鋳物鋳造','非鉄金属鋳物鋳造'],'鍛造':['ハンマ型鍛造','プレス型鍛造'],'ダイカスト':['ホットチャンバダイカスト','コールドチャンバダイカスト'],'機械加工':['普通旋盤','フライス盤','数値制御旋盤','マシニングセンタ'],'金属プレス加工':['金属プレス'],'鉄工':['構造物鉄工','製缶'],'工場板金':['機械板金'],'めっき':['電気めっき','溶融亜鉛めっき'],'アルミニウム陽極酸化処理':['陽極酸化処理'],'仕上げ':['治工具仕上げ','金型仕上げ','機械組立て仕上げ'],'機械検査':['機械検査'],'機械保全':['機械系保全','電気系保全'],'電子機器組立て':['電子機器組立て'],'電気機器組立て':['回転電機組立て','変圧器組立て','配電盤・制御盤組立て','開閉制御器具組立て','回転電機巻線製造'],'プリント配線板製造':['プリント配線板設計','プリント配線板製造'],'アルミニウム圧延・押出製品製造':['アルミニウム圧延製品製造','アルミニウム押出製品製造'],'金属熱処理業':['熱処理'],'家具製作':['家具手加工','家具機械加工'],'印刷':['オフセット印刷','グラビア印刷'],'製本':['製本'],'プラスチック成形':['圧縮成形','射出成形','インフレーション成形','ブロー成形'],'強化プラスチック成形':['手積み積層成形'],'塗装':['建築塗装','金属塗装','鋼橋塗装','噴霧塗装'],'溶接':['手溶接','半自動溶接'],'工業包装':['工業包装'],'紙器・段ボール箱製造':['印刷箱打抜き','印刷箱製箱','貼箱製造','段ボール箱製造'],'陶磁器工業製品製造':['機械ろくろ成形','圧力鋳込み成形','パッド印刷'],'自動車整備':['自動車整備'],'ビルクリーニング':['ビルクリーニング'],'介護':['介護'],'クリーニング':['クリーニング'],'リネンサプライ':['リネンサプライ仕上げ'],'コンクリート製品製造':['コンクリート製品製造'],'宿泊':['接客・衛生管理'],'ＲＰＦ製造職種':['ＲＰＦ製造'],'鉄道施設保守整備':['軌道保守整備','電気設備保守整備'],'ゴム製品製造':['成形加工','仕上・検査'],'鉄道車両整備':['鉄道車両整備'],'木材加工':['製材','木材チップ製造'],'空港グランドハンドリング':['航空機地上支援','航空貨物取扱'],'ボイラーメンテナンス':['ボイラーメンテナンス']};
+// 職種選択時に作業の選択肢を切り替える
+function _updateGijutsuWorkSelect(selectedType){
+  var sel = document.getElementById('f-gijutsuWork');
+  if(!sel) return;
+  var prevVal = sel.value;
+  var opts = GINOJISSHU_WORK_MAP[selectedType] || [];
+  var html = '<option value="">---</option>';
+  opts.forEach(function(o){ html += '<option value="' + o + '">' + o + '</option>'; });
+  sel.innerHTML = html;
+  if(prevVal && opts.indexOf(prevVal) >= 0) sel.value = prevVal;
+}
 
 function makeOptions(list, labelMap) {
   return list.map(function(v){
@@ -851,8 +865,10 @@ function blockSkillProof() {
 
   h += '<div id="skillProof1Jisshu" style="display:none;">';
   h += '<div class="grid2">';
-  h += '<div class="field"><label>職種（しょくしゅ・技能実習2号）<span class="req">*</span></label><input type="text" id="f-gijutsuType" placeholder="例: 食品製造"></div>';
-  h += '<div class="field"><label>作業（さぎょう）<span class="req">*</span></label><input type="text" id="f-gijutsuWork" placeholder="例: 惣菜製造"></div>';
+  h += '<div class="field"><label>職種（しょくしゅ・技能実習2号）<span class="req">*</span></label>';
+  h += '<select id="f-gijutsuType" onchange="_updateGijutsuWorkSelect(this.value)"><option value="">---</option>' + makeOptions(GINOJISSHU_TYPE_LIST) + '</select></div>';
+  h += '<div class="field"><label>作業（さぎょう）<span class="req">*</span></label>';
+  h += '<select id="f-gijutsuWork"><option value="">---</option></select></div>';
   h += '</div>';
   h += '<div class="field"><label>修了証明（しゅうりょうしょうめい）<span class="req">*</span></label>';
   h += '<select id="f-gijutsuProof"><option value="">---</option>' + makeOptions(GINOJISSHU_PROOF_LIST) + '</select></div>';
@@ -2386,6 +2402,26 @@ function prefillForm(resp) {
   } catch(restoreErr) {
     console.error('field restore error (ignored):', restoreErr);
   }
+  // ver.20260603.01: 技能実習2号 職種・作業の復元
+  try {
+    if(resp.gijutsuType){
+      var gtSel = document.getElementById('f-gijutsuType');
+      if(gtSel){
+        for(var gi=0;gi<gtSel.options.length;gi++){
+          if(gtSel.options[gi].value === resp.gijutsuType){ gtSel.selectedIndex = gi; break; }
+        }
+        _updateGijutsuWorkSelect(resp.gijutsuType);
+      }
+      if(resp.gijutsuWork){
+        var gwSel = document.getElementById('f-gijutsuWork');
+        if(gwSel){
+          for(var gj=0;gj<gwSel.options.length;gj++){
+            if(gwSel.options[gj].value === resp.gijutsuWork){ gwSel.selectedIndex = gj; break; }
+          }
+        }
+      }
+    }
+  } catch(e) { console.error('gijutsu restore error (ignored):', e); }
 }
 </script>
 </body>
