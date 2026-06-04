@@ -188,7 +188,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20260603.01';
+var FORM_VERSION = 'ver.20260603.02';
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -212,6 +212,7 @@ var isGijinkoku = (type === 'gijinkoku_nintei' || type === 'gijinkoku_koushin' |
 // ===== 翻訳辞書 =====
 var TRANS = {
   en: {
+    skillField1:'Field ①', skillField2:'Field ②', jpField1:'Field ①', jpField2:'Field ②',
     name:'Full Name (as in passport)', birth:'Date of Birth', nationality:'Nationality',
     passport:'Passport Number', passExpiry:'Passport Expiry Date',
     married:'Are you married?', email:'Email Address',
@@ -248,6 +249,7 @@ var TRANS = {
     tenshutsuDate:'Date of submitting change of address notification',tenshutsuTitle:'/ Change of Address',tenshutsuNote:'※ Only if you have a planned move'
   },
   vi: {
+    skillField1:'Lĩnh vực ①', skillField2:'Lĩnh vực ②', jpField1:'Lĩnh vực ①', jpField2:'Lĩnh vực ②',
     name:'Họ và tên (theo hộ chiếu)', birth:'Ngày sinh', nationality:'Quốc tịch',
     passport:'Số hộ chiếu', passExpiry:'Ngày hết hạn hộ chiếu',
     married:'Bạn đã kết hôn chưa?', email:'Địa chỉ email',
@@ -284,6 +286,7 @@ var TRANS = {
     tenshutsuDate:'Ngày nộp thông báo thay đổi địa chỉ',tenshutsuTitle:'/ Thay đổi địa chỉ',tenshutsuNote:'※ Chỉ khi có kế hoạch chuyển nhà'
   },
   id: {
+    skillField1:'Bidang ①', skillField2:'Bidang ②', jpField1:'Bidang ①', jpField2:'Bidang ②',
     name:'Nama Lengkap (sesuai paspor)', birth:'Tanggal Lahir', nationality:'Kewarganegaraan',
     passport:'Nomor Paspor', passExpiry:'Masa Berlaku Paspor',
     married:'Apakah Anda sudah menikah?', email:'Alamat Email',
@@ -319,6 +322,7 @@ var TRANS = {
     tenshutsuDate:'Tanggal pelaporan pindah alamat',tenshutsuTitle:'/ Pindah Alamat',tenshutsuNote:'※ Hanya jika ada rencana pindah'
   },
   my: {
+    skillField1:'နယ်ပယ် ①', skillField2:'နယ်ပယ် ②', jpField1:'နယ်ပယ် ①', jpField2:'နယ်ပယ် ②',
     name:'အမည် (နိုင်ငံကူးလက်မှတ်)', birth:'မွေးသက္ကရာဇ်', nationality:'နိုင်ငံသား',
     passport:'ပတ်စ်ပို့ နံပါတ်', passExpiry:'သက်တမ်းကုန်ဆုံးရက်',
     married:'အိမ်ထောင်ရှိပါသလား？', email:'အီးမေးလ်',
@@ -353,6 +357,7 @@ var TRANS = {
     tenshutsuDate:'နေရပ်ပြောင်းရွှေ့ကြောင်း အကြောင်းကြားစာ တင်သွင်းမည့်ရက်',tenshutsuTitle:'/ နေရာပြောင်းရွှေ့မှု',tenshutsuNote:'※ ပြောင်းရွှေ့ရန် စီစဉ်ထားပါက သာ'
   },
   km: {
+    skillField1:'វិស័យ ①', skillField2:'វិស័យ ②', jpField1:'វិស័យ ①', jpField2:'វិស័យ ②',
     name:'ឈ្មោះ (តាមលិខិតឆ្លងដែន)', birth:'ថ្ងៃខែឆ្នាំកំណើត', nationality:'សញ្ជាតិ',
     passport:'លេខលិខិតឆ្លងដែន', passExpiry:'ថ្ងៃផុតសុពលភាព',
     married:'តើអ្នកបានរៀបការហើយឬ？', email:'អ៊ីមែល',
@@ -387,6 +392,7 @@ var TRANS = {
     tenshutsuDate:'ថ្ងៃដាក់លិខិតជូនដំណឹងផ្លាស់ប្តូរអាសយដ្ឋាន',tenshutsuTitle:'/ ផ្លាស់ប្តូរអាសយដ្ឋាន',tenshutsuNote:'※ តែក្នុងករណីមានផែនការ引越しប៉ុណ្ណោះ'
   },
   ne: {
+    skillField1:'क्षेत्र ①', skillField2:'क्षेत्र ②', jpField1:'क्षेत्र ①', jpField2:'क्षेत्र ②',
     name:'पूरा नाम (राहदानी अनुसार)', birth:'जन्म मिति', nationality:'राष्ट्रियता',
     passport:'राहदानी नम्बर', passExpiry:'राहदानी म्याद सकिने मिति',
     married:'के तपाईं विवाहित हुनुहुन्छ？', email:'इमेल ठेगाना',
@@ -421,6 +427,7 @@ var TRANS = {
     tenshutsuDate:'ठेगाना परिवर्तन सूचना दिने मिति',tenshutsuTitle:'/ ठेगाना परिवर्तन',tenshutsuNote:'※ सर्ने योजना भएमा मात्र'
   },
   zh: {
+    skillField1:'领域①', skillField2:'领域②', jpField1:'领域①', jpField2:'领域②',
     name:'姓名（护照记载）', birth:'出生日期', nationality:'国籍',
     passport:'护照号码', passExpiry:'护照有效期',
     married:'您结婚了吗？', email:'电子邮件地址',
@@ -847,7 +854,7 @@ function blockSkillProof() {
 
   h += '<div class="sub-label" style="background:#eff6ff;color:#1d4ed8;border-radius:6px;padding:6px 10px;margin-bottom:8px;font-size:12px;font-weight:700;">【証明①（しょうめい①）】</div>';
   h += '<div class="field">';
-  h += '<label>技能水準 評価区分（ぎのうすいじゅん ひょうかくぶん）<span class="req">*</span></label>';
+  h += '<label>技能水準 評価区分（ぎのうすいじゅん ひょうかくぶん）<span class="req">*</span><div class="trans" data-key="skillProof1Type"></div></label>';
   h += '<select id="f-skillEvalType" onchange="toggleSkillProof(1, this.value)">';
   h += '<option value="">---</option>';
   h += makeOptions(SKILL_EVAL_TYPES, SKILL_EVAL_LABELS);
@@ -855,33 +862,33 @@ function blockSkillProof() {
 
   h += '<div id="skillProof1Exam" style="display:none;">';
   // ver.20260523.03: 分野→試験名の2段階セレクト
-  h += '<div class="field"><label>分野（ぶんや）①<span class="req">*</span></label>';
+  h += '<div class="field"><label>分野（ぶんや）①<span class="req">*</span><div class="trans" data-key="skillField1"></div></label>';
   h += '<select id="f-skillField1" onchange="onSkillFieldChange(1, this.value)"><option value="">---</option>' + makeFieldOptions(SKILL_FIELD_GROUPS) + '</select></div>';
-  h += '<div class="field"><label>技能試験名①（ぎのうしけんめい①）<span class="req">*</span></label>';
+  h += '<div class="field"><label>技能試験名①（ぎのうしけんめい①）<span class="req">*</span><div class="trans" data-key="skillProof1Field"></div></label>';
   h += '<select id="f-skillExam1"><option value="">---</option></select></div>';
-  h += '<div class="field"><label>技能試験 受験地①（ぎのうしけん じゅけんち①）<span class="req">*</span></label>';
+  h += '<div class="field"><label>技能試験 受験地①（ぎのうしけん じゅけんち①）<span class="req">*</span><div class="trans" data-key="skillProof1Place"></div></label>';
   h += '<select id="f-skillExamLoc1"><option value="">---</option>' + makeOptions(COUNTRY_LIST_ONLINE) + '</select></div>';
   h += '</div>';
 
   h += '<div id="skillProof1Jisshu" style="display:none;">';
   h += '<div class="grid2">';
-  h += '<div class="field"><label>職種（しょくしゅ・技能実習2号）<span class="req">*</span></label>';
+  h += '<div class="field"><label>職種（しょくしゅ・技能実習2号）<span class="req">*</span><div class="trans" data-key="skillProof1Job"></div></label>';
   h += '<select id="f-gijutsuType" onchange="_updateGijutsuWorkSelect(this.value)"><option value="">---</option>' + makeOptions(GINOJISSHU_TYPE_LIST) + '</select></div>';
-  h += '<div class="field"><label>作業（さぎょう）<span class="req">*</span></label>';
+  h += '<div class="field"><label>作業（さぎょう）<span class="req">*</span><div class="trans" data-key="skillProof1Task"></div></label>';
   h += '<select id="f-gijutsuWork"><option value="">---</option></select></div>';
   h += '</div>';
-  h += '<div class="field"><label>修了証明（しゅうりょうしょうめい）<span class="req">*</span></label>';
+  h += '<div class="field"><label>修了証明（しゅうりょうしょうめい）<span class="req">*</span><div class="trans" data-key="skillProof1Doc"></div></label>';
   h += '<select id="f-gijutsuProof"><option value="">---</option>' + makeOptions(GINOJISSHU_PROOF_LIST) + '</select></div>';
   h += '</div>';
 
   h += '<div class="sub-label" style="background:#eff6ff;color:#1d4ed8;border-radius:6px;padding:6px 10px;margin:12px 0 8px;font-size:12px;font-weight:700;">【技能試験②（ぎのうしけん②・2つ合格している場合）】</div>';
   // ver.20260523.03: ②も分野→試験名の2段階セレクト
-  h += '<div class="field"><label>分野（ぶんや）②</label>';
+  h += '<div class="field"><label>分野（ぶんや）②<div class="trans" data-key="skillField2"></div></label>';
   h += '<select id="f-skillField2" onchange="onSkillFieldChange(2, this.value)"><option value="">なし / 該当しない</option>' + makeFieldOptions(SKILL_FIELD_GROUPS) + '</select></div>';
-  h += '<div class="field"><label>技能試験名②（ぎのうしけんめい②）</label>';
+  h += '<div class="field"><label>技能試験名②（ぎのうしけんめい②）<div class="trans" data-key="skillProof2Field"></div></label>';
   h += '<select id="f-skillExam2" onchange="toggleSkillExam2Loc(this.value)"><option value="">---</option></select></div>';
   h += '<div id="skillExam2LocWrap" style="display:none;">';
-  h += '<div class="field"><label>技能試験 受験地②（ぎのうしけん じゅけんち②）</label>';
+  h += '<div class="field"><label>技能試験 受験地②（ぎのうしけん じゅけんち②）<div class="trans" data-key="skillProof2Place"></div></label>';
   h += '<select id="f-skillExamLoc2"><option value="">---</option>' + makeOptions(COUNTRY_LIST_ONLINE) + '</select></div>';
   h += '</div>';
 
@@ -895,7 +902,7 @@ function blockJapaneseProof() {
 
   h += '<div class="sub-label" style="background:#f0fdf4;color:#15803d;border-radius:6px;padding:6px 10px;margin-bottom:8px;font-size:12px;font-weight:700;">【証明①（しょうめい①）】</div>';
   h += '<div class="field">';
-  h += '<label>日本語能力 評価区分（にほんごのうりょく ひょうかくぶん）<span class="req">*</span></label>';
+  h += '<label>日本語能力 評価区分（にほんごのうりょく ひょうかくぶん）<span class="req">*</span><div class="trans" data-key="jpProof1Type"></div></label>';
   h += '<select id="f-jpEvalType" onchange="toggleJpProof(1, this.value)">';
   h += '<option value="">---</option>';
   h += makeOptions(SKILL_EVAL_TYPES, SKILL_EVAL_LABELS);
@@ -903,11 +910,11 @@ function blockJapaneseProof() {
 
   h += '<div id="jpProof1Exam" style="display:none;">';
   // ver.20260523.03: 分野→試験名の2段階セレクト
-  h += '<div class="field"><label>分野（ぶんや）①<span class="req">*</span></label>';
+  h += '<div class="field"><label>分野（ぶんや）①<span class="req">*</span><div class="trans" data-key="jpField1"></div></label>';
   h += '<select id="f-jpField1" onchange="onJpFieldChange(1, this.value)"><option value="">---</option>' + makeFieldOptions(JP_FIELD_GROUPS) + '</select></div>';
-  h += '<div class="field"><label>日本語試験名①（にほんごしけんめい①）<span class="req">*</span></label>';
+  h += '<div class="field"><label>日本語試験名①（にほんごしけんめい①）<span class="req">*</span><div class="trans" data-key="jpProof1ExamType"></div></label>';
   h += '<select id="f-jpExam1"><option value="">---</option></select></div>';
-  h += '<div class="field"><label>日本語試験 受験地①（にほんごしけん じゅけんち①）<span class="req">*</span></label>';
+  h += '<div class="field"><label>日本語試験 受験地①（にほんごしけん じゅけんち①）<span class="req">*</span><div class="trans" data-key="jpProof1Place"></div></label>';
   h += '<select id="f-jpExamLoc1"><option value="">---</option>' + makeOptions(COUNTRY_LIST_ONLINE) + '</select></div>';
   h += '</div>';
 
@@ -917,12 +924,12 @@ function blockJapaneseProof() {
 
   h += '<div class="sub-label" style="background:#f0fdf4;color:#15803d;border-radius:6px;padding:6px 10px;margin:12px 0 8px;font-size:12px;font-weight:700;">【日本語試験②（にほんごしけん②・2つ合格している場合）】</div>';
   // ver.20260523.03: ②も分野→試験名の2段階セレクト
-  h += '<div class="field"><label>分野（ぶんや）②</label>';
+  h += '<div class="field"><label>分野（ぶんや）②<div class="trans" data-key="jpField2"></div></label>';
   h += '<select id="f-jpField2" onchange="onJpFieldChange(2, this.value)"><option value="">なし / 該当しない</option>' + makeFieldOptions(JP_FIELD_GROUPS) + '</select></div>';
-  h += '<div class="field"><label>日本語試験名②（にほんごしけんめい②）</label>';
+  h += '<div class="field"><label>日本語試験名②（にほんごしけんめい②）<div class="trans" data-key="jpProof2ExamType"></div></label>';
   h += '<select id="f-jpExam2" onchange="toggleJpExam2Loc(this.value)"><option value="">---</option></select></div>';
   h += '<div id="jpExam2LocWrap" style="display:none;">';
-  h += '<div class="field"><label>日本語試験 受験地②（にほんごしけん じゅけんち②）</label>';
+  h += '<div class="field"><label>日本語試験 受験地②（にほんごしけん じゅけんち②）<div class="trans" data-key="jpProof2Place"></div></label>';
   h += '<select id="f-jpExamLoc2"><option value="">---</option>' + makeOptions(COUNTRY_LIST_ONLINE) + '</select></div>';
   h += '</div>';
 
