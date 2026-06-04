@@ -188,7 +188,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20260603.02';
+var FORM_VERSION = 'ver.20260603.03';
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -682,7 +682,7 @@ function blockEducation() {
     '</div>' +
     field('f-schoolName', '学校名（がっこうめい）', 'text', false, '例: ハノイ工科大学', 'schoolName') +
     '<div class="grid2">' +
-      field('f-completionDate', '卒業年月（そつぎょうねんげつ）', 'month', false, '', 'completionDate') +
+      field('f-completionDate', '卒業年月日（そつぎょうねんがっぴ）', 'date', true, '', 'completionDate') +
       field('f-major', '専攻（せんこう）', 'text', false, '例: 機械工学', 'major') +
     '</div>' +
   '</div>';
@@ -1013,7 +1013,7 @@ function buildForm(t) {
     case 'tokutei_henkou':
       return blockBasic() + blockMarried() + blockTokuteiKoushin() + blockSkillProof() + blockJapaneseProof() + blockContact(false, true);
     case 'gijinkoku_nintei':
-      return blockBasic() + blockMarried() + blockTokuteiNintei() + blockEducation() + blockGijinkokuExtra() + blockContact(false, false);
+      return blockBasic() + blockMarried() + blockEducation() + blockGijinkokuExtra() + blockContact(false, false);
     case 'gijinkoku_koushin':
     case 'gijinkoku_henkou':
       return blockBasic() + blockMarried() + blockEducation() + blockGijinkokuExtra() + blockContact(false, true);
@@ -1846,8 +1846,8 @@ function validate() {
   if (!val('f-nationality')) return '国籍は必須です。';
   if (!val('f-email')) return 'メールアドレスは必須です。';
   if (!val('f-married')) return '結婚しているかどうかを選択してください。';
-  if ((type==='tokutei_nintei'||type==='gijinkoku_nintei') && !val('f-entryCount')) return '来日回数を入力してください。';
-  if ((type==='tokutei_nintei'||type==='gijinkoku_nintei') && !val('f-coeCount')) return 'COE申請回数を入力してください。';
+  if (type==='tokutei_nintei' && !val('f-entryCount')) return '来日回数を入力してください。';
+  if (type==='tokutei_nintei' && !val('f-coeCount')) return 'COE申請回数を入力してください。';
 
   // 特定技能：在留カード・現住所・一時帰国の必須チェック
   if (isTokutei) {
@@ -1868,6 +1868,7 @@ function validate() {
 
   // 技人国：新3項目の必須チェック（技能水準・日本語能力チェックは行わない）
   if (isGijinkoku) {
+    if (!val('f-completionDate')) return '卒業年月日を入力してください。';
     if (!val('f-gijinkokuJpTest')) return '日本語能力（JLPT N2またはBJT 400点以上）の有無を選択してください。';
 
     var titleSt = val('f-gijinkokuTitleStatus');
