@@ -188,7 +188,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20260603.03';
+var FORM_VERSION = 'ver.20260605.01';
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -1969,10 +1969,10 @@ async function submitForm() {
         body: JSON.stringify({ response: response, imported_at: null, deleted_at: null, submitted_at: new Date().toISOString() })
       });
     } else {
-      res = await fetch(SUPABASE_URL + '/rest/v1/form_responses', {
+      res = await fetch(SUPABASE_URL + '/rest/v1/form_responses?select=id', {
         method: 'POST',
-        headers: { 'Content-Type':'application/json','apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY,'Prefer':'return=minimal' },
-        body: JSON.stringify({ case_id: caseId, form_type: type, response: response })
+        headers: { 'Content-Type':'application/json','apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY,'Prefer':'return=representation' },
+        body: JSON.stringify({ case_id: caseId, form_type: type, response: response, submitted_at: new Date().toISOString() })
       });
     }
     if (!res.ok) {
@@ -1985,10 +1985,28 @@ async function submitForm() {
       }
       throw new Error('HTTP ' + res.status);
     }
-    document.getElementById('mainContent').innerHTML =
-      '<div class="success"><div class="icon">✅</div><h2>送信完了</h2>' +
-      '<p>ご回答ありがとうございました。<br>担当者が内容を確認いたします。</p></div>';
-    document.getElementById('btnWrap').style.display = 'none';
+    // ver.20260605.01: 送信後も入力内容を画面に残す（mainContentを置き換えない）。完了バナーを上部に表示。
+    // 送信したレコードIDを確定（新規POST時はレスポンスから取得）→ 「修正を再送信」で同じ行をPATCHし重複を防ぐ
+    var _doneId = _submitId;
+    if (!_doneId) {
+      try { var _arr = await res.json(); if (_arr && _arr[0] && _arr[0].id) _doneId = _arr[0].id; } catch(_) {}
+    }
+    if (_doneId) _draftResponseId = _doneId;
+    var _mc = document.getElementById('mainContent');
+    var okBanner = document.getElementById('submitOkBanner');
+    if (!okBanner) {
+      okBanner = document.createElement('div');
+      okBanner.id = 'submitOkBanner';
+      okBanner.style.cssText = 'background:#dcfce7;border:1px solid #86efac;color:#166534;border-radius:12px;padding:16px;margin:0 0 16px;font-weight:800;text-align:center;font-size:15px;';
+      if (_mc) _mc.insertBefore(okBanner, _mc.firstChild);
+    }
+    okBanner.innerHTML = '✅ 送信が完了しました。ご回答ありがとうございました。<br>'
+      + '<span style="font-weight:400;font-size:13px;line-height:1.7;display:inline-block;margin-top:6px;">入力内容はこのまま表示されています。修正する場合は内容を直して、もう一度「修正を再送信する」を押してください。</span>';
+    try { okBanner.scrollIntoView({ behavior:'smooth', block:'start' }); } catch(_) {}
+    btn.disabled = false;
+    btn.textContent = '✏️ 修正を再送信する';
+    var _draftBtn0 = document.getElementById('btn-draft');
+    if (_draftBtn0) _draftBtn0.style.display = 'none';
   } catch(e) {
     btn.disabled = false; btn.textContent = '送信する';
     var el = document.getElementById('errorMsg');
@@ -2200,12 +2218,11 @@ function confirmName(isMatch){
     var _draftUrl = SUPABASE_URL + '/rest/v1/form_responses'
       + '?case_id=eq.' + encodeURIComponent(caseId)
       + '&form_type=eq.' + encodeURIComponent(type)
-      + '&imported_at=is.null'
       + '&deleted_at=is.null'
       + '&order=created_at.desc&limit=1'
-      + '&select=id,response,imported_at';
+      + '&select=id,response,imported_at,submitted_at';
     if (responseId) {
-      _draftUrl = SUPABASE_URL + '/rest/v1/form_responses?id=eq.' + encodeURIComponent(responseId) + '&select=id,response,imported_at';
+      _draftUrl = SUPABASE_URL + '/rest/v1/form_responses?id=eq.' + encodeURIComponent(responseId) + '&select=id,response,imported_at,submitted_at';
     }
     fetch(_draftUrl, {
       headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }
@@ -2218,24 +2235,25 @@ function confirmName(isMatch){
         if (!data || !data.length) return;
         var row = data[0];
         var resp = row.response;
-        var isSubmitted = !!row.imported_at;
-
-        if (isSubmitted) {
-          if (!responseId) return;
-          var infoEl = document.getElementById('infoBox');
+        var isImported = !!row.imported_at;
+        var isSubmitted = !!row.submitted_at;
+        // ver.20260605.01: 取込後・送信後も同じ行を表示し、再送信は同じ行をPATCHする（送信しても内容が消えない）
+        _draftResponseId = row.id;
+        var infoEl = document.getElementById('infoBox');
+        var btnEl = document.getElementById('btn-submit');
+        var draftBtn = document.getElementById('btn-draft');
+        if (isImported || isSubmitted) {
           if (infoEl) {
-            infoEl.style.background = '#fef3c7';
-            infoEl.style.borderColor = '#fcd34d';
-            infoEl.style.color = '#92400e';
-            infoEl.textContent = '✏️ 回答を編集中です。修正後、送信ボタンを押してください。';
+            infoEl.style.background = '#dcfce7';
+            infoEl.style.borderColor = '#86efac';
+            infoEl.style.color = '#166534';
+            infoEl.textContent = isImported
+              ? '✅ 送信・取込済みの内容を表示しています。修正する場合は内容を直して「修正を再送信する」を押してください。'
+              : '✅ 送信済みの内容を表示しています。修正する場合は内容を直して「修正を再送信する」を押してください。';
           }
-          var btnEl = document.getElementById('btn-submit');
-          if (btnEl) btnEl.textContent = '✏️ 修正を送信する';
-          var draftBtn = document.getElementById('btn-draft');
+          if (btnEl) btnEl.textContent = '✏️ 修正を再送信する';
           if (draftBtn) draftBtn.style.display = 'none';
         } else {
-          _draftResponseId = row.id;
-          var infoEl = document.getElementById('infoBox');
           if (infoEl) {
             infoEl.style.background = '#eff6ff';
             infoEl.style.borderColor = '#93c5fd';
