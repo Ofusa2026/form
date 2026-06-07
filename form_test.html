@@ -187,10 +187,12 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20260523.03';
+var FORM_VERSION = 'ver.20260608.test.01';
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
+// ver.20260608.test.01: 在留カード/パスポート撮影→項目自動入力（OCR）。送信先は案件管理GAS(anken) v4.0 の ocrResidenceCard アクション。
+var GAS_OCR_URL = 'https://script.google.com/macros/s/AKfycbxxBta5g1jXVzTf-s4EgaIbMc3No42aaH8guMOorQQ8HZl2SlNu-8vpu0fCFj_rjKsalQ/exec';
 
 var params = new URLSearchParams(location.search);
 var caseId  = params.get('case') || '';
@@ -459,6 +461,7 @@ var TRANS = {
 function blockBasic() {
   return '<div class="card">' +
     '<div class="section-title">基本情報（きほんじょうほう）</div>' +
+    blockCardCapture() +
     field('f-name', '氏名（しめい・パスポート表記）', 'text', true, '例: NGUYEN VAN AN', 'name') +
     '<div class="grid2">' +
       field('f-birth', '生年月日（せいねんがっぴ）', 'date', true, '', 'birth') +
@@ -471,6 +474,142 @@ function blockBasic() {
       field('f-passExpiry', 'パスポート有効期限（ゆうこうきげん）', 'date', false, '', 'passExpiry') +
     '</div>' +
   '</div>';
+}
+
+// ===== ver.20260608.test.01: 在留カード/パスポート撮影→自動入力（OCR） =====
+function blockCardCapture() {
+  var slots = [
+    {id:'ocrCardFront', label:'在留カード 表 / Card front'},
+    {id:'ocrCardBack',  label:'在留カード 裏 / Card back'},
+    {id:'ocrPassport',  label:'パスポート / Passport'}
+  ];
+  var h = '<div style="border:1.5px dashed #94a3b8;border-radius:12px;padding:14px;margin-bottom:16px;background:#f8fafc;">';
+  h += '<div style="font-weight:700;font-size:14px;margin-bottom:3px;">\uD83D\uDCF7 カードを撮って自動入力</div>';
+  h += '<div style="font-size:12px;color:#64748b;margin-bottom:10px;">Take a photo of your residence card / passport to auto-fill.</div>';
+  slots.forEach(function(s){
+    h += '<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">';
+    h += '<div id="'+s.id+'_thumb" style="width:54px;height:36px;flex:none;border-radius:6px;background:#e2e8f0;background-size:cover;background-position:center;display:flex;align-items:center;justify-content:center;font-size:15px;color:#94a3b8;">\uD83D\uDCF7</div>';
+    h += '<div style="flex:1;min-width:0;"><div style="font-size:12px;font-weight:600;">'+s.label+'</div>';
+    h += '<input type="file" accept="image/*" capture="environment" style="font-size:11px;max-width:100%;" onchange="ocrPickFile(\''+s.id+'\',this)"></div>';
+    h += '</div>';
+  });
+  h += '<button type="button" id="ocrRunBtn" onclick="runCardOcr()" style="width:100%;margin-top:6px;padding:11px;border:none;border-radius:9px;background:#2f5d50;color:#fff;font-weight:700;font-size:14px;cursor:pointer;">読み取って入力 / Scan</button>';
+  h += '<div id="ocrStatus" style="font-size:12px;color:#2f5d50;margin-top:8px;display:none;line-height:1.5;"></div>';
+  h += '<div style="font-size:11px;color:#94a3b8;margin-top:8px;line-height:1.5;">読み取り後は内容を必ず確認・修正してください。/ Please review and correct after scanning.</div>';
+  h += '</div>';
+  return h;
+}
+
+var _ocrImages = {}; // slotId -> {tag, base64, mimeType}
+var OCR_SLOT_TAGS = { ocrCardFront:'在留カード（表）', ocrCardBack:'在留カード（裏）', ocrPassport:'パスポート' };
+
+// 端末側で長辺〜1024pxに縮小しJPEG化（GASサイズ制限回避＋トークン節約）
+function ocrCompress(file, maxDim, quality) {
+  return new Promise(function(resolve, reject){
+    var reader = new FileReader();
+    reader.onload = function(e){
+      var img = new Image();
+      img.onload = function(){
+        var scale = Math.min(1, maxDim / Math.max(img.width, img.height));
+        var cw = Math.round(img.width * scale), ch = Math.round(img.height * scale);
+        var canvas = document.createElement('canvas');
+        canvas.width = cw; canvas.height = ch;
+        canvas.getContext('2d').drawImage(img, 0, 0, cw, ch);
+        var dataUrl = canvas.toDataURL('image/jpeg', quality);
+        resolve({ base64: dataUrl.split(',')[1], mimeType:'image/jpeg', preview: dataUrl });
+      };
+      img.onerror = reject;
+      img.src = e.target.result;
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+function ocrPickFile(slotId, input) {
+  var file = input.files && input.files[0];
+  if (!file) return;
+  ocrCompress(file, 1024, 0.7).then(function(r){
+    _ocrImages[slotId] = { tag: OCR_SLOT_TAGS[slotId] || slotId, base64: r.base64, mimeType: r.mimeType };
+    var thumb = document.getElementById(slotId + '_thumb');
+    if (thumb) { thumb.style.backgroundImage = 'url(' + r.preview + ')'; thumb.textContent = ''; }
+  }).catch(function(){ alert('画像の読み込みに失敗しました。もう一度お試しください。'); });
+}
+
+function runCardOcr() {
+  var keys = Object.keys(_ocrImages);
+  if (keys.length === 0) { alert('先にカードまたはパスポートを撮影してください。'); return; }
+  var btn = document.getElementById('ocrRunBtn');
+  var status = document.getElementById('ocrStatus');
+  if (btn) { btn.disabled = true; btn.textContent = '読み取り中… / Scanning…'; }
+  if (status) { status.style.display = 'block'; status.style.color = '#2f5d50'; status.textContent = 'AIが読み取っています…（数秒〜十数秒）'; }
+
+  var images = keys.map(function(k){ return _ocrImages[k]; });
+  var folderId = new URLSearchParams(location.search).get('folder') || '';
+  var payload = { action:'ocrResidenceCard', data:{ images: images, folderId: folderId, filePrefix: (caseName || caseId || 'card') } };
+
+  fetch(GAS_OCR_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // preflight回避
+    body: JSON.stringify(payload)
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(res){
+    if (!res || res.status !== 'ok') { throw new Error(res && res.msg ? res.msg : '読み取りに失敗しました'); }
+    applyOcrFields(res.fields || {});
+    var saved = (res.savedFiles || []).filter(function(f){ return f && f.url; }).length;
+    if (status) { status.style.color = '#2f5d50'; status.textContent = '\u2705 読み取り完了。内容を確認・修正してください。' + (saved ? '（画像' + saved + '件を保存しました）' : ''); }
+  })
+  .catch(function(e){
+    if (status) { status.style.color = '#b4541f'; status.textContent = '\u274C 読み取りに失敗しました（' + e.message + '）。明るい場所でカード全体が入るように撮り直してください。'; }
+  })
+  .then(function(){
+    if (btn) { btn.disabled = false; btn.textContent = '読み取って入力 / Scan'; }
+  });
+}
+
+function _ocrSetVal(id, v) {
+  if (v == null || v === '') return;
+  var el = document.getElementById(id);
+  if (el) el.value = v;
+}
+
+function applyOcrFields(f) {
+  f = f || {};
+  _ocrSetVal('f-name', f.name_roman);
+  _ocrSetVal('f-birth', f.birth_date);
+
+  // 国籍：セレクト候補に一致させ、無ければ「その他」＋自由入力
+  if (f.nationality) {
+    var sel = document.getElementById('f-nationality');
+    if (sel) {
+      var matched = false;
+      for (var i = 0; i < sel.options.length; i++) {
+        var ov = sel.options[i].value;
+        if (ov && (f.nationality.indexOf(ov) >= 0 || ov.indexOf(f.nationality) >= 0)) { sel.value = ov; matched = true; break; }
+      }
+      if (!matched) sel.value = 'その他';
+      if (typeof toggleNationalityOther === 'function') toggleNationalityOther(sel.value);
+      if (!matched) _ocrSetVal('f-nationalityOther', f.nationality);
+    }
+  }
+
+  _ocrSetVal('f-passport', f.passport_number);
+  _ocrSetVal('f-passExpiry', f.passport_expiry);
+
+  // 在留カード番号：あれば「あり」に切り替えて入力
+  if (f.card_number) {
+    var rcs = document.getElementById('f-residenceCardStatus');
+    if (rcs) { rcs.value = 'あり'; if (typeof toggleResidenceCardInput === 'function') toggleResidenceCardInput('あり'); }
+    _ocrSetVal('f-residenceCard', f.card_number);
+  }
+
+  // 住所：あれば「あり」に切り替えて入力
+  if (f.address) {
+    var as = document.getElementById('f-addressStatus');
+    if (as) { as.value = 'あり'; if (typeof toggleAddressInput === 'function') toggleAddressInput('あり'); }
+    _ocrSetVal('f-address', f.address);
+  }
 }
 
 // ===== 在留カード番号（あり/なし切替） =====
