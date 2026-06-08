@@ -187,7 +187,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20260608.test.01';
+var FORM_VERSION = 'ver.20260608.test.03';
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -492,6 +492,9 @@ function blockCardCapture() {
     h += '<div style="flex:1;min-width:0;"><div style="font-size:12px;font-weight:600;">'+s.label+'</div>';
     h += '<input type="file" accept="image/*" capture="environment" style="font-size:11px;max-width:100%;" onchange="ocrPickFile(\''+s.id+'\',this)"></div>';
     h += '</div>';
+    if (s.id === 'ocrPassport') {
+      h += '<button type="button" onclick="startMrzScan()" style="width:100%;margin:2px 0 10px;padding:9px;border:1.5px solid #2f5d50;border-radius:9px;background:#fff;color:#2f5d50;font-weight:700;font-size:13px;cursor:pointer;">\uD83D\uDCF8 パスポートをかざして読取 (MRZ) / Hold passport to scan</button>';
+    }
   });
   h += '<button type="button" id="ocrRunBtn" onclick="runCardOcr()" style="width:100%;margin-top:6px;padding:11px;border:none;border-radius:9px;background:#2f5d50;color:#fff;font-weight:700;font-size:14px;cursor:pointer;">読み取って入力 / Scan</button>';
   h += '<div id="ocrStatus" style="font-size:12px;color:#2f5d50;margin-top:8px;display:none;line-height:1.5;"></div>';
@@ -574,23 +577,54 @@ function _ocrSetVal(id, v) {
   if (el) el.value = v;
 }
 
+// ローマ字/英字の国名 → 日本語セレクト値へ正規化（一致しなければ '' を返す）
+var OCR_NATIONALITY_MAP = {
+  'VIET NAM':'ベトナム','VIETNAM':'ベトナム','VNM':'ベトナム',
+  'INDONESIA':'インドネシア','IDN':'インドネシア',
+  'MYANMAR':'ミャンマー','BURMA':'ミャンマー','MMR':'ミャンマー',
+  'CAMBODIA':'カンボジア','KHM':'カンボジア',
+  'NEPAL':'ネパール','NPL':'ネパール',
+  'PHILIPPINES':'フィリピン','PHL':'フィリピン','PHILIPPINE':'フィリピン',
+  'CHINA':'中国','CHN':'中国',"PEOPLE'S REPUBLIC OF CHINA":'中国',
+  'THAILAND':'タイ','THA':'タイ',
+  'MONGOLIA':'モンゴル','MNG':'モンゴル'
+};
+function ocrMapNationality(raw, sel) {
+  if (!raw) return '';
+  var s = String(raw).trim();
+  var up = s.toUpperCase();
+  // 1) 完全一致（ローマ字表）
+  if (OCR_NATIONALITY_MAP[up]) return OCR_NATIONALITY_MAP[up];
+  // 2) 日本語セレクト値が含まれる（「ベトナム」等）
+  for (var i = 0; i < sel.options.length; i++) {
+    var ov = sel.options[i].value;
+    if (ov && ov !== 'その他' && s.indexOf(ov) >= 0) return ov;
+  }
+  // 3) ローマ字表のキーが部分的に含まれる（「VIET NAM ...」「Socialist Republic of VIET NAM」等）
+  for (var key in OCR_NATIONALITY_MAP) {
+    if (up.indexOf(key) >= 0) return OCR_NATIONALITY_MAP[key];
+  }
+  return '';
+}
+
 function applyOcrFields(f) {
   f = f || {};
   _ocrSetVal('f-name', f.name_roman);
   _ocrSetVal('f-birth', f.birth_date);
 
-  // 国籍：セレクト候補に一致させ、無ければ「その他」＋自由入力
+  // 国籍：ローマ字国名（VIET NAM 等）も日本語セレクトに一致させる。一致したら「その他」に落とさない
   if (f.nationality) {
     var sel = document.getElementById('f-nationality');
     if (sel) {
-      var matched = false;
-      for (var i = 0; i < sel.options.length; i++) {
-        var ov = sel.options[i].value;
-        if (ov && (f.nationality.indexOf(ov) >= 0 || ov.indexOf(f.nationality) >= 0)) { sel.value = ov; matched = true; break; }
+      var target = ocrMapNationality(f.nationality, sel);
+      if (target) {
+        sel.value = target;
+        if (typeof toggleNationalityOther === 'function') toggleNationalityOther(target);
+      } else {
+        sel.value = 'その他';
+        if (typeof toggleNationalityOther === 'function') toggleNationalityOther('その他');
+        _ocrSetVal('f-nationalityOther', f.nationality);
       }
-      if (!matched) sel.value = 'その他';
-      if (typeof toggleNationalityOther === 'function') toggleNationalityOther(sel.value);
-      if (!matched) _ocrSetVal('f-nationalityOther', f.nationality);
     }
   }
 
@@ -610,6 +644,197 @@ function applyOcrFields(f) {
     if (as) { as.value = 'あり'; if (typeof toggleAddressInput === 'function') toggleAddressInput('あり'); }
     _ocrSetVal('f-address', f.address);
   }
+}
+
+// ============================================================
+// パスポート MRZ リアルタイム読取（端末内・AI不使用）
+// 下部2行(TD3, 各44桁)をカメラから読み、チェックデジットが合った時だけ確定
+// ============================================================
+var _mrz = { stream:null, worker:null, raf:null, busy:false, active:false, video:null, canvas:null, overlay:null };
+
+function _mrzLoadTesseract() {
+  return new Promise(function(resolve, reject){
+    if (window.Tesseract) { resolve(); return; }
+    var sc = document.createElement('script');
+    sc.src = 'https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js';
+    sc.onload = function(){ resolve(); };
+    sc.onerror = function(){ reject(new Error('OCRライブラリの読込に失敗')); };
+    document.head.appendChild(sc);
+  });
+}
+
+function _mrzStatus(msg, color) {
+  var el = document.getElementById('mrzStatusText');
+  if (el) { el.textContent = msg; if (color) el.style.color = color; }
+}
+
+function startMrzScan() {
+  if (_mrz.active) return;
+  _mrz.active = true;
+  // オーバーレイ生成
+  var ov = document.createElement('div');
+  ov.id = 'mrzOverlay';
+  ov.style.cssText = 'position:fixed;inset:0;z-index:99999;background:#000;display:flex;flex-direction:column;align-items:center;justify-content:center;';
+  ov.innerHTML =
+    '<video id="mrzVideo" playsinline autoplay muted style="max-width:100%;max-height:70vh;"></video>' +
+    '<div style="position:absolute;top:0;left:0;right:0;padding:14px;color:#fff;font-size:13px;text-align:center;background:linear-gradient(#000a,transparent);">パスポートの写真ページ下部（&lt;&lt;&lt;の2行）を枠に合わせてください<br>Align the bottom 2 lines (MRZ) inside the frame</div>' +
+    '<div style="position:absolute;left:6%;right:6%;bottom:24%;height:74px;border:2px solid #34d399;border-radius:8px;box-shadow:0 0 0 9999px #0006;"></div>' +
+    '<div id="mrzStatusText" style="position:absolute;bottom:13%;left:0;right:0;text-align:center;color:#34d399;font-size:13px;font-weight:700;">カメラを起動しています…</div>' +
+    '<button type="button" onclick="stopMrzScan()" style="position:absolute;bottom:5%;padding:11px 26px;border:none;border-radius:10px;background:#fff;color:#111;font-weight:700;font-size:14px;">キャンセル / Cancel</button>';
+  document.body.appendChild(ov);
+  _mrz.overlay = ov;
+
+  _mrzLoadTesseract()
+    .then(function(){
+      return navigator.mediaDevices.getUserMedia({ video: { facingMode:{ ideal:'environment' }, width:{ ideal:1920 }, height:{ ideal:1080 } }, audio:false });
+    })
+    .then(function(stream){
+      _mrz.stream = stream;
+      var v = document.getElementById('mrzVideo');
+      _mrz.video = v;
+      v.srcObject = stream;
+      return v.play();
+    })
+    .then(function(){
+      return Tesseract.createWorker('eng');
+    })
+    .then(function(worker){
+      _mrz.worker = worker;
+      return worker.setParameters({
+        tessedit_char_whitelist: '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ<',
+        tessedit_pageseg_mode: '6'
+      }).then(function(){ return worker; });
+    })
+    .then(function(){
+      _mrzStatus('かざしてください…（明るい場所が成功しやすいです）', '#34d399');
+      _mrz.canvas = document.createElement('canvas');
+      _mrzTick();
+    })
+    .catch(function(e){
+      _mrzStatus('❌ ' + e.message + '（撮影→AIをお使いください）', '#f87171');
+    });
+}
+
+function stopMrzScan() {
+  _mrz.active = false;
+  if (_mrz.raf) { clearTimeout(_mrz.raf); _mrz.raf = null; }
+  if (_mrz.stream) { _mrz.stream.getTracks().forEach(function(t){ t.stop(); }); _mrz.stream = null; }
+  if (_mrz.worker) { try { _mrz.worker.terminate(); } catch(e){} _mrz.worker = null; }
+  if (_mrz.overlay && _mrz.overlay.parentNode) _mrz.overlay.parentNode.removeChild(_mrz.overlay);
+  _mrz.overlay = null; _mrz.video = null; _mrz.busy = false;
+}
+
+function _mrzTick() {
+  if (!_mrz.active) return;
+  if (_mrz.busy) { _mrz.raf = setTimeout(_mrzTick, 300); return; }
+  var v = _mrz.video;
+  if (!v || !v.videoWidth) { _mrz.raf = setTimeout(_mrzTick, 300); return; }
+  _mrz.busy = true;
+
+  // 下部35%（MRZ帯）を切り出し、2倍に拡大してグレースケール化
+  var vw = v.videoWidth, vh = v.videoHeight;
+  var cropY = Math.floor(vh * 0.62), cropH = vh - cropY;
+  var scale = 2;
+  var cv = _mrz.canvas;
+  cv.width = vw * scale; cv.height = cropH * scale;
+  var ctx = cv.getContext('2d');
+  ctx.drawImage(v, 0, cropY, vw, cropH, 0, 0, cv.width, cv.height);
+  // 簡易グレースケール＋コントラスト
+  try {
+    var img = ctx.getImageData(0, 0, cv.width, cv.height);
+    var dt = img.data;
+    for (var i = 0; i < dt.length; i += 4) {
+      var g = (dt[i]*0.3 + dt[i+1]*0.59 + dt[i+2]*0.11);
+      g = g < 110 ? 0 : 255;
+      dt[i] = dt[i+1] = dt[i+2] = g;
+    }
+    ctx.putImageData(img, 0, 0);
+  } catch(e){}
+
+  _mrz.worker.recognize(cv).then(function(r){
+    var parsed = _mrzParse(r.data.text || '');
+    if (parsed) {
+      _mrzStatus('✅ 読み取りました', '#34d399');
+      applyOcrFields(parsed);
+      var st = document.getElementById('ocrStatus');
+      if (st) { st.style.display='block'; st.style.color='#2f5d50'; st.textContent='✅ パスポート(MRZ)を読み取りました。内容を確認してください。'; }
+      stopMrzScan();
+      return;
+    }
+    _mrz.busy = false;
+    if (_mrz.active) _mrz.raf = setTimeout(_mrzTick, 250);
+  }).catch(function(){
+    _mrz.busy = false;
+    if (_mrz.active) _mrz.raf = setTimeout(_mrzTick, 400);
+  });
+}
+
+// MRZ チェックデジット（重み 7,3,1）
+function _mrzCheck(str) {
+  var w = [7,3,1], sum = 0;
+  for (var i = 0; i < str.length; i++) {
+    var c = str.charCodeAt(i), v;
+    if (c >= 48 && c <= 57) v = c - 48;        // 0-9
+    else if (c >= 65 && c <= 90) v = c - 55;   // A-Z = 10..35
+    else v = 0;                                 // '<'
+    sum += v * w[i % 3];
+  }
+  return sum % 10;
+}
+
+function _mrzDate(s, isExpiry) {
+  if (!/^\d{6}$/.test(s)) return '';
+  var yy = parseInt(s.slice(0,2), 10), mm = s.slice(2,4), dd = s.slice(4,6);
+  var cur = new Date().getFullYear();
+  var year = 2000 + yy;
+  if (!isExpiry && year > cur) year = 1900 + yy; // 生年月日は未来にならない
+  return year + '-' + mm + '-' + dd;
+}
+
+// TD3パスポートMRZ（2行×44桁）をパース。主要チェックデジットが合えば確定
+function _mrzParse(text) {
+  var lines = String(text).toUpperCase().split(/\r?\n/)
+    .map(function(l){ return l.replace(/[^A-Z0-9<]/g, ''); })
+    .filter(function(l){ return l.length >= 30; });
+  // 44桁前後の行ペアを探す（line1は'P'始まり、line2は数値構造）
+  for (var a = 0; a < lines.length; a++) {
+    for (var b = 0; b < lines.length; b++) {
+      if (a === b) continue;
+      var l1 = lines[a], l2 = lines[b];
+      if (l1.charAt(0) !== 'P') continue;
+      // 44桁に正規化（長すぎ→先頭44、短すぎ→'<'埋め）
+      l1 = (l1 + '<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<').slice(0,44);
+      l2 = (l2 + '<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<').slice(0,44);
+
+      var passNo = l2.slice(0,9), cdPass = l2.charAt(9);
+      var nat = l2.slice(10,13);
+      var dob = l2.slice(13,19), cdDob = l2.charAt(19);
+      var sex = l2.charAt(20);
+      var exp = l2.slice(21,27), cdExp = l2.charAt(27);
+
+      var okPass = (String(_mrzCheck(passNo)) === cdPass);
+      var okDob  = (String(_mrzCheck(dob)) === cdDob);
+      var okExp  = (String(_mrzCheck(exp)) === cdExp);
+      if (!(okPass && okDob && okExp)) continue; // 3つ全て合致時のみ確定（誤読を弾く）
+
+      // 氏名（line1 5桁目以降：SURNAME<<GIVEN）
+      var nameRaw = l1.slice(5);
+      var np = nameRaw.split('<<');
+      var surname = (np[0] || '').replace(/</g, ' ').trim();
+      var given = (np[1] || '').replace(/</g, ' ').trim().replace(/\s+/g, ' ');
+      var fullName = (surname + ' ' + given).replace(/\s+/g, ' ').trim();
+
+      return {
+        name_roman: fullName,
+        passport_number: passNo.replace(/</g, ''),
+        nationality: nat.replace(/</g, ''),       // 3文字コード(VNM等)→applyで日本語化
+        birth_date: _mrzDate(dob, false),
+        sex: (sex === 'M' ? '男 / Male' : sex === 'F' ? '女 / Female' : ''),
+        passport_expiry: _mrzDate(exp, true)
+      };
+    }
+  }
+  return null;
 }
 
 // ===== 在留カード番号（あり/なし切替） =====
