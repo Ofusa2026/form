@@ -188,7 +188,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20260608.test.07';
+var FORM_VERSION = 'ver.20260608.test.08';
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -612,7 +612,7 @@ function runCardOcr() {
 
   var images = keys.map(function(k){ return _ocrImages[k]; });
   var folderId = new URLSearchParams(location.search).get('folder') || '';
-  var payload = { action:'ocrResidenceCard', data:{ images: images, folderId: folderId, filePrefix: (caseName || caseId || 'card') } };
+  var payload = { action:'ocrResidenceCard', data:{ images: images, folderId: folderId, filePrefix: (caseName || caseId || 'card'), caseId: caseId } };
 
   _ocrRunning = fetch(GAS_OCR_URL, {
     method: 'POST',
