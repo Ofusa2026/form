@@ -188,7 +188,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20260608.test.11';
+var FORM_VERSION = 'ver.20260608.test.12';
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -495,9 +495,9 @@ function blockStepPhotos(isNintei, isTokutei) {
     slots.push({id:'ocrCardBack',  label:'在留（ざいりゅう）カード 裏（うら） / Card back', sample:true});
   }
   if (isTokutei) {
-    slots.push({id:'ocrSkillCert',  label:'技能合格証（ぎのうごうかくしょう） / Skill cert', sample:false});
-    slots.push({id:'ocrJpCert',     label:'日本語合格証（にほんごごうかくしょう） / Japanese cert', sample:false});
-    slots.push({id:'ocrSenmonkyu',  label:'専門級（せんもんきゅう）・技能実習評価 / Senmonkyu', sample:false});
+    slots.push({id:'ocrSkillCert',  label:'技能合格証（ぎのうごうかくしょう） / Skill cert', sample:false, tkey:'certSkillDesc', desc:'特定技能（とくていぎのう）評価試験（ひょうかしけん）の合格証（ごうかくしょう）。試験（しけん）に合格（ごうかく）したときにもらった紙（かみ）です（分野（ぶんや）ごとに発行団体（はっこうだんたい）が異（こと）なります）。'});
+    slots.push({id:'ocrJpCert',     label:'日本語合格証（にほんごごうかくしょう） / Japanese cert', sample:false, tkey:'certJpDesc', desc:'日本語能力試験（にほんごのうりょくしけん）／JFT・JLPTなどの合格証（ごうかくしょう）。なくした場合（ばあい）は試験団体（しけんだんたい）に再発行（さいはっこう）を依頼（いらい）してください。'});
+    slots.push({id:'ocrSenmonkyu',  label:'専門級（せんもんきゅう）・技能実習評価 / Senmonkyu', sample:false, tkey:'certSenmonDesc', desc:'技能実習（ぎのうじっしゅう）の専門級（せんもんきゅう）・3級（きゅう）の合格証（ごうかくしょう）。不合格（ふごうかく）だった場合（ばあい）は評価調書（ひょうかちょうしょ）を提出（ていしゅつ）してください。'});
   }
   var h = '<div class="card">';
   h += '<div class="section-title">② 写真（しゃしん）を撮影（さつえい）／選択（せんたく）<div class="trans" data-key="wizPhotoTitle"></div></div>';
@@ -518,6 +518,7 @@ function blockStepPhotos(isNintei, isTokutei) {
     h += '<label style="'+pick+'background:#eef2f7;color:#334155;">📁 フォルダ/選択（せんたく）<input type="file" accept="image/*" style="display:none;" onchange="ocrPickFile(\''+s.id+'\',this)"></label>';
     if (s.sample) h += '<button type="button" onclick="toggleSample(\''+s.id+'\')" style="'+pick+'background:#fff;color:#2f5d50;border:1px solid #cbd5e1;">📖 見本（みほん）</button>';
     h += '</div>';
+    if (s.desc) h += '<div style="font-size:11px;color:#64748b;margin-top:6px;line-height:1.6;">'+s.desc+'<div class="trans" data-key="'+(s.tkey||'')+'" style="color:#6366f1;margin-top:2px;"></div></div>';
     h += '</div></div>';
     if (s.sample) h += '<div id="'+s.id+'_sample" style="display:none;margin-top:10px;padding:8px;background:#f8fafc;border-radius:8px;">'+_sampleSvg(s.id)+'</div>';
     h += '</div>';
@@ -2734,6 +2735,34 @@ setInterval(function(){
     }
   };
   for (var l in W) { if (TRANS[l]) { for (var k in W[l]) TRANS[l][k] = W[l][k]; } }
+})();
+
+
+// ver.20260608.test.12: 合格証スロットの説明文（データアップ zinzai_dataup と同内容）
+(function(){
+  var W2 = {
+    en: {
+      certSkillDesc:'Certificate of the Specified Skills Evaluation Test. The certificate you received when you passed; the issuing organization differs by field.',
+      certJpDesc:'Certificate of a Japanese language proficiency test (JLPT / JFT, etc.). If lost, request a reissue from the test organizer.',
+      certSenmonDesc:'Technical Intern certificate (Specialist / Level 3). If you failed the test, submit an evaluation report (hyouka chousho) instead.'
+    },
+    vi: {
+      certSkillDesc:'Chứng chỉ kỳ thi đánh giá kỹ năng đặc định. Giấy bạn nhận khi đỗ; tổ chức cấp khác nhau theo lĩnh vực.',
+      certJpDesc:'Chứng chỉ kỳ thi năng lực tiếng Nhật (JLPT / JFT...). Nếu mất, yêu cầu cấp lại từ tổ chức thi.',
+      certSenmonDesc:'Chứng chỉ thực tập kỹ năng (Chuyên ngành / Cấp 3). Nếu không đỗ, vui lòng nộp bản đánh giá (hyouka chousho).'
+    },
+    id: {
+      certSkillDesc:'Sertifikat Ujian Evaluasi Keterampilan Khusus. Lembaga penerbit berbeda tergantung bidang.',
+      certJpDesc:'Sertifikat ujian kemampuan bahasa Jepang (JLPT / JFT, dll.). Jika hilang, minta penerbitan ulang ke penyelenggara.',
+      certSenmonDesc:'Sertifikat Pemagangan (Spesialis / Level 3). Jika tidak lulus, serahkan laporan evaluasi (hyouka chousho).'
+    },
+    zh: {
+      certSkillDesc:'特定技能评价测试合格证。通过考试时获得的证书；各领域发证机构不同。',
+      certJpDesc:'日语能力测试（JLPT／JFT等）合格证。遗失时请向考试机构申请补发。',
+      certSenmonDesc:'技能实习专项级·3级合格证。如未合格，请提交评价调书。'
+    }
+  };
+  for (var l in W2) { if (TRANS[l]) { for (var k in W2[l]) TRANS[l][k] = W2[l][k]; } }
 })();
 
 function setLang(l) {
