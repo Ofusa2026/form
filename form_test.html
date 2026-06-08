@@ -188,7 +188,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20260608.test.06';
+var FORM_VERSION = 'ver.20260608.test.07';
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -493,20 +493,29 @@ function blockStepPhotos(isNintei) {
     slots.push({id:'ocrCardBack',  label:'在留カード 裏 / Card back'});
   }
   var h = '<div class="card">';
-  h += '<div class="section-title">② 写真を撮影（AIが項目を読み取り）</div>';
+  h += '<div class="section-title">② 写真を撮影／選択（AIが項目を読み取り）</div>';
   h += '<div style="font-size:13px;color:#475569;margin-bottom:10px;line-height:1.6;">' +
-       (isNintei ? 'パスポートを撮影してください。' : 'パスポートと在留カードを撮影してください。') +
-       '<br>出生地・住所など、MRZにない項目も読み取れます。<br><span style="color:#94a3b8;">この手順はスキップできます。/ You can skip this step.</span></div>';
+       (isNintei ? 'パスポートを撮影または選択してください。' : 'パスポートと在留カードを撮影または選択してください。') +
+       '<br>選んだら自動で読み取ります。出生地・住所などMRZにない項目も取得します。<br><span style="color:#94a3b8;">この手順はスキップできます。/ You can skip this step.</span></div>';
+  var pick = 'display:inline-flex;align-items:center;gap:4px;padding:7px 10px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;';
   slots.forEach(function(s){
-    h += '<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">';
-    h += '<div id="'+s.id+'_thumb" style="width:54px;height:36px;flex:none;border-radius:6px;background:#e2e8f0;background-size:cover;background-position:center;display:flex;align-items:center;justify-content:center;font-size:15px;color:#94a3b8;">\uD83D\uDCF7</div>';
-    h += '<div style="flex:1;min-width:0;"><div style="font-size:12px;font-weight:600;">'+s.label+'</div>';
-    h += '<input type="file" accept="image/*" capture="environment" style="font-size:11px;max-width:100%;" onchange="ocrPickFile(\''+s.id+'\',this)"></div>';
+    h += '<div style="margin-bottom:12px;padding:10px;border:1px solid #e5e7eb;border-radius:10px;background:#fff;">';
+    h += '<div style="display:flex;align-items:flex-start;gap:10px;">';
+    h += '<div id="'+s.id+'_thumb" style="width:54px;height:36px;flex:none;border-radius:6px;background:#e2e8f0;background-size:cover;background-position:center;display:flex;align-items:center;justify-content:center;font-size:15px;color:#94a3b8;">📷</div>';
+    h += '<div style="flex:1;min-width:0;">';
+    h += '<div style="font-size:12px;font-weight:600;margin-bottom:5px;">'+s.label+'</div>';
+    h += '<div style="display:flex;gap:6px;flex-wrap:wrap;">';
+    h += '<label style="'+pick+'background:#2f5d50;color:#fff;">📷 撮影<input type="file" accept="image/*" capture="environment" style="display:none;" onchange="ocrPickFile(\''+s.id+'\',this)"></label>';
+    h += '<label style="'+pick+'background:#eef2f7;color:#334155;">📁 フォルダ/選択<input type="file" accept="image/*" style="display:none;" onchange="ocrPickFile(\''+s.id+'\',this)"></label>';
+    h += '<button type="button" onclick="toggleSample(\''+s.id+'\')" style="'+pick+'background:#fff;color:#2f5d50;border:1px solid #cbd5e1;">📖 見本</button>';
+    h += '</div>';
+    h += '</div></div>';
+    h += '<div id="'+s.id+'_sample" style="display:none;margin-top:10px;padding:8px;background:#f8fafc;border-radius:8px;">'+_sampleSvg(s.id)+'</div>';
     h += '</div>';
   });
-  h += '<button type="button" id="ocrRunBtn" onclick="runCardOcr()" style="width:100%;margin-top:6px;padding:12px;border:none;border-radius:10px;background:#2f5d50;color:#fff;font-weight:700;font-size:14px;cursor:pointer;">読み取って入力 / Scan</button>';
+  h += '<button type="button" id="ocrRunBtn" onclick="runCardOcr()" style="width:100%;margin-top:4px;padding:12px;border:none;border-radius:10px;background:#2f5d50;color:#fff;font-weight:700;font-size:14px;cursor:pointer;">読み取って入力 / Scan</button>';
   h += '<div id="ocrStatus" style="font-size:12px;color:#2f5d50;margin-top:8px;display:none;line-height:1.5;"></div>';
-  h += '<div style="font-size:11px;color:#94a3b8;margin-top:8px;line-height:1.5;">読み取り後は次の画面で内容を必ず確認・修正してください。/ Please review on the next step.</div>';
+  h += '<div style="font-size:11px;color:#94a3b8;margin-top:8px;line-height:1.5;">写真を選ぶと自動で読み取ります。読み取り後は④で内容を必ず確認してください。</div>';
   h += '</div>';
   return h;
 }
@@ -518,7 +527,7 @@ function wizNav(step) {
   if (step === 3) h += '<button type="button" onclick="goWizardStep(2)" style="'+ghost+'">← 戻る</button>';
   if (step === 4) h += '<button type="button" onclick="goWizardStep(3)" style="'+ghost+'">← 戻る</button>';
   if (step === 2) h += '<button type="button" onclick="goWizardStep(3)" style="'+primary+'">次へ / Next →</button>';
-  if (step === 3) h += '<button type="button" onclick="goWizardStep(4)" style="'+primary+'">次へ / Next →</button>';
+  if (step === 3) h += '<button type="button" onclick="nextFromPhotos()" style="'+primary+'">次へ / Next →</button>';
   h += '</div>';
   return h;
 }
@@ -553,6 +562,7 @@ function blockBasic() {
 
 // ===== ver.20260608.test.01: 在留カード/パスポート撮影→自動入力（OCR） =====
 var _ocrImages = {}; // slotId -> {tag, base64, mimeType}
+var _ocrDirty = false, _ocrRunning = null, _ocrAutoTimer = null;
 var OCR_SLOT_TAGS = { ocrCardFront:'在留カード（表）', ocrCardBack:'在留カード（裏）', ocrPassport:'パスポート' };
 
 // 端末側で長辺〜1024pxに縮小しJPEG化（GASサイズ制限回避＋トークン節約）
@@ -585,12 +595,16 @@ function ocrPickFile(slotId, input) {
     _ocrImages[slotId] = { tag: OCR_SLOT_TAGS[slotId] || slotId, base64: r.base64, mimeType: r.mimeType };
     var thumb = document.getElementById(slotId + '_thumb');
     if (thumb) { thumb.style.backgroundImage = 'url(' + r.preview + ')'; thumb.textContent = ''; }
+    _ocrDirty = true;
+    if (_ocrAutoTimer) clearTimeout(_ocrAutoTimer);
+    _ocrAutoTimer = setTimeout(function(){ if (Object.keys(_ocrImages).length) runCardOcr(); }, 1000);
   }).catch(function(){ alert('画像の読み込みに失敗しました。もう一度お試しください。'); });
 }
 
 function runCardOcr() {
   var keys = Object.keys(_ocrImages);
-  if (keys.length === 0) { alert('先にカードまたはパスポートを撮影してください。'); return; }
+  if (keys.length === 0) { alert('先にカードまたはパスポートを撮影／選択してください。'); return Promise.resolve(); }
+  if (_ocrRunning) return _ocrRunning;
   var btn = document.getElementById('ocrRunBtn');
   var status = document.getElementById('ocrStatus');
   if (btn) { btn.disabled = true; btn.textContent = '読み取り中… / Scanning…'; }
@@ -600,7 +614,7 @@ function runCardOcr() {
   var folderId = new URLSearchParams(location.search).get('folder') || '';
   var payload = { action:'ocrResidenceCard', data:{ images: images, folderId: folderId, filePrefix: (caseName || caseId || 'card') } };
 
-  fetch(GAS_OCR_URL, {
+  _ocrRunning = fetch(GAS_OCR_URL, {
     method: 'POST',
     headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // preflight回避
     body: JSON.stringify(payload)
@@ -609,6 +623,7 @@ function runCardOcr() {
   .then(function(res){
     if (!res || res.status !== 'ok') { throw new Error(res && res.msg ? res.msg : '読み取りに失敗しました'); }
     applyOcrFields(res.fields || {});
+    _ocrDirty = false;
     var saved = (res.savedFiles || []).filter(function(f){ return f && f.url; }).length;
     if (status) { status.style.color = '#2f5d50'; status.textContent = '\u2705 読み取り完了。内容を確認・修正してください。' + (saved ? '（画像' + saved + '件を保存しました）' : ''); }
   })
@@ -617,7 +632,57 @@ function runCardOcr() {
   })
   .then(function(){
     if (btn) { btn.disabled = false; btn.textContent = '読み取って入力 / Scan'; }
+    _ocrRunning = null;
   });
+  return _ocrRunning;
+}
+
+function nextFromPhotos() {
+  var has = Object.keys(_ocrImages).length > 0;
+  if (has && _ocrDirty) { runCardOcr().then(function(){ goWizardStep(4); }); }
+  else { goWizardStep(4); }
+}
+
+function toggleSample(slotId) {
+  var el = document.getElementById(slotId + '_sample');
+  if (el) el.style.display = (el.style.display === 'none' || !el.style.display) ? 'block' : 'none';
+}
+function _sampleSvg(slotId) {
+  if (slotId === 'ocrPassport') return _sampleSvgPassport();
+  if (slotId === 'ocrCardFront') return _sampleSvgCardFront();
+  if (slotId === 'ocrCardBack') return _sampleSvgCardBack();
+  return '';
+}
+function _sampleSvgPassport() {
+  return '<svg viewBox="0 0 210 130" width="150" style="display:block;">' +
+    '<rect x="4" y="4" width="202" height="122" rx="8" fill="#eef2f7" stroke="#b9c2cf" stroke-width="2"/>' +
+    '<rect x="14" y="16" width="52" height="64" rx="3" fill="#cfd6df"/><circle cx="40" cy="40" r="13" fill="#aab3bd"/><path d="M24 74 q16 -17 32 0 z" fill="#aab3bd"/>' +
+    '<rect x="78" y="20" width="120" height="7" rx="3" fill="#c4ccd5"/><rect x="78" y="33" width="96" height="7" rx="3" fill="#c4ccd5"/><rect x="78" y="46" width="112" height="7" rx="3" fill="#c4ccd5"/><rect x="78" y="59" width="80" height="7" rx="3" fill="#c4ccd5"/>' +
+    '<rect x="10" y="92" width="190" height="28" rx="4" fill="#064e3b" stroke="#34d399" stroke-width="2"/>' +
+    '<text x="16" y="104" font-family="monospace" font-size="8" font-weight="bold" fill="#34d399">P&lt;JPNYAMADA&lt;&lt;TARO&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;</text>' +
+    '<text x="16" y="115" font-family="monospace" font-size="8" font-weight="bold" fill="#34d399">TR12345679JPN9001011M3001011&lt;&lt;</text>' +
+  '</svg><div style="font-size:11px;color:#64748b;margin-top:4px;">顔写真ページ全体（下の2行＝MRZまで）を写す</div>';
+}
+function _sampleSvgCardFront() {
+  return '<svg viewBox="0 0 210 130" width="150" style="display:block;">' +
+    '<rect x="4" y="4" width="202" height="122" rx="8" fill="#f7fbff" stroke="#9db8d6" stroke-width="2"/>' +
+    '<rect x="4" y="4" width="202" height="16" rx="8" fill="#1d4ed8"/><text x="10" y="16" font-size="8" font-weight="bold" fill="#fff">在留カード RESIDENCE CARD</text>' +
+    '<rect x="150" y="28" width="48" height="60" rx="3" fill="#cfd6df"/><circle cx="174" cy="50" r="13" fill="#aab3bd"/><path d="M158 82 q16 -16 32 0 z" fill="#aab3bd"/>' +
+    '<text x="12" y="38" font-size="7" fill="#64748b">氏名 NAME</text><rect x="12" y="41" width="120" height="7" rx="2" fill="#c4ccd5"/>' +
+    '<text x="12" y="58" font-size="7" fill="#64748b">生年月日／国籍</text><rect x="12" y="61" width="110" height="7" rx="2" fill="#c4ccd5"/>' +
+    '<text x="12" y="78" font-size="7" fill="#64748b">在留資格／在留期間</text><rect x="12" y="81" width="120" height="7" rx="2" fill="#c4ccd5"/>' +
+    '<rect x="12" y="100" width="186" height="18" rx="3" fill="#fff7e6" stroke="#e0a23a" stroke-width="1.5"/><text x="18" y="112" font-size="8" font-weight="bold" fill="#b4541f">番号 AB12345678CD</text>' +
+  '</svg><div style="font-size:11px;color:#64748b;margin-top:4px;">表面：氏名・在留資格・在留期間・カード番号</div>';
+}
+function _sampleSvgCardBack() {
+  return '<svg viewBox="0 0 210 130" width="150" style="display:block;">' +
+    '<rect x="4" y="4" width="202" height="122" rx="8" fill="#f7fbff" stroke="#9db8d6" stroke-width="2"/>' +
+    '<rect x="10" y="12" width="190" height="34" rx="4" fill="#e7efe9" stroke="#34d399" stroke-width="2"/>' +
+    '<text x="16" y="24" font-size="8" font-weight="bold" fill="#2f5d50">住居地 ADDRESS（最新をここに記載）</text>' +
+    '<rect x="16" y="29" width="170" height="6" rx="2" fill="#9fc3b2"/><rect x="16" y="38" width="120" height="6" rx="2" fill="#9fc3b2"/>' +
+    '<text x="12" y="60" font-size="7" fill="#64748b">資格外活動許可欄</text><rect x="12" y="63" width="186" height="14" rx="2" fill="#eef2f7"/>' +
+    '<text x="12" y="90" font-size="7" fill="#64748b">在留期間更新等</text><rect x="12" y="93" width="186" height="14" rx="2" fill="#eef2f7"/>' +
+  '</svg><div style="font-size:11px;color:#2f5d50;margin-top:4px;font-weight:700;">裏面：最新の住居地（住所）。表より裏を優先します</div>';
 }
 
 function _ocrSetVal(id, v) {
