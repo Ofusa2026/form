@@ -175,6 +175,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 
 <div class="container" id="mainContent" style="display:none;">
   <div class="info-box" id="infoBox">大房行政書士法人よりご依頼の情報をご入力ください。</div>
+  <div id="wizProgress" style="font-size:12px;font-weight:700;color:#2f5d50;background:#e7efe9;border-radius:8px;padding:7px 12px;margin-bottom:10px;text-align:center;">ステップ 2 / 4</div>
   <div class="req-note"><span style="color:#dc2626;font-weight:800;">*</span> は必須項目です。</div>
   <div id="errorMsg" class="error-msg"></div>
   <div id="formBody"></div>
@@ -187,7 +188,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20260608.test.04';
+var FORM_VERSION = 'ver.20260608.test.06';
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -458,10 +459,84 @@ var TRANS = {
 
 // ===== フォームHTML定義 =====
 
+// ============================================================
+// ver.20260608.test.06: 4ステップ・ウィザード
+//   ①本人確認(既存overlay) → ②MRZ → ③写真(スキップ可/認定は在留カードなし) → ④入力
+//   ※フィールドは全てDOMに置いたまま表示/非表示で切替（翻訳・下書き・送信を壊さない）
+// ============================================================
+function buildWizard(t) {
+  var fieldsHtml = buildForm(t); // ④の入力項目（撮影ブロックは外済み）
+  var isNinteiLocal = (t === 'tokutei_nintei' || t === 'gijinkoku_nintei');
+  var h = '';
+  h += '<div class="wiz-step" data-step="2">' + blockStepMrz() + wizNav(2) + '</div>';
+  h += '<div class="wiz-step" data-step="3" style="display:none;">' + blockStepPhotos(isNinteiLocal) + wizNav(3) + '</div>';
+  h += '<div class="wiz-step" data-step="4" style="display:none;">' + fieldsHtml + wizNav(4) + '</div>';
+  return h;
+}
+
+function blockStepMrz() {
+  var h = '<div class="card">';
+  h += '<div class="section-title">① パスポートをかざして読取（MRZ）</div>';
+  h += '<div style="font-size:13px;color:#475569;margin-bottom:10px;line-height:1.6;">パスポートをカメラにかざすと、氏名・旅券番号・国籍・生年月日・有効期限を自動入力します。<br>Hold your passport to the camera to auto-fill.</div>';
+  h += '<div style="background:#0f2030;border-radius:10px;padding:10px;margin-bottom:12px;">' + _mrzSampleSvg() + '<div style="text-align:center;color:#34d399;font-size:11px;margin-top:4px;">緑の2行（MRZ）を読み取ります</div></div>';
+  h += '<button type="button" onclick="startMrzScan()" style="width:100%;padding:14px;border:none;border-radius:10px;background:#2f5d50;color:#fff;font-weight:700;font-size:15px;cursor:pointer;">\uD83D\uDCF8 かざして読取スタート</button>';
+  h += '<div id="mrzResult" style="font-size:13px;color:#2f5d50;margin-top:10px;display:none;line-height:1.5;font-weight:700;"></div>';
+  h += '<div style="font-size:11px;color:#94a3b8;margin-top:10px;line-height:1.5;">読めないときは「次へ」でスキップできます。後の手順や手入力でも入力できます。/ You can skip with Next.</div>';
+  h += '</div>';
+  return h;
+}
+
+function blockStepPhotos(isNintei) {
+  var slots = [{id:'ocrPassport', label:'パスポート / Passport'}];
+  if (!isNintei) {
+    slots.push({id:'ocrCardFront', label:'在留カード 表 / Card front'});
+    slots.push({id:'ocrCardBack',  label:'在留カード 裏 / Card back'});
+  }
+  var h = '<div class="card">';
+  h += '<div class="section-title">② 写真を撮影（AIが項目を読み取り）</div>';
+  h += '<div style="font-size:13px;color:#475569;margin-bottom:10px;line-height:1.6;">' +
+       (isNintei ? 'パスポートを撮影してください。' : 'パスポートと在留カードを撮影してください。') +
+       '<br>出生地・住所など、MRZにない項目も読み取れます。<br><span style="color:#94a3b8;">この手順はスキップできます。/ You can skip this step.</span></div>';
+  slots.forEach(function(s){
+    h += '<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">';
+    h += '<div id="'+s.id+'_thumb" style="width:54px;height:36px;flex:none;border-radius:6px;background:#e2e8f0;background-size:cover;background-position:center;display:flex;align-items:center;justify-content:center;font-size:15px;color:#94a3b8;">\uD83D\uDCF7</div>';
+    h += '<div style="flex:1;min-width:0;"><div style="font-size:12px;font-weight:600;">'+s.label+'</div>';
+    h += '<input type="file" accept="image/*" capture="environment" style="font-size:11px;max-width:100%;" onchange="ocrPickFile(\''+s.id+'\',this)"></div>';
+    h += '</div>';
+  });
+  h += '<button type="button" id="ocrRunBtn" onclick="runCardOcr()" style="width:100%;margin-top:6px;padding:12px;border:none;border-radius:10px;background:#2f5d50;color:#fff;font-weight:700;font-size:14px;cursor:pointer;">読み取って入力 / Scan</button>';
+  h += '<div id="ocrStatus" style="font-size:12px;color:#2f5d50;margin-top:8px;display:none;line-height:1.5;"></div>';
+  h += '<div style="font-size:11px;color:#94a3b8;margin-top:8px;line-height:1.5;">読み取り後は次の画面で内容を必ず確認・修正してください。/ Please review on the next step.</div>';
+  h += '</div>';
+  return h;
+}
+
+function wizNav(step) {
+  var ghost = 'flex:1;padding:12px;border:1.5px solid #cbd5e1;border-radius:10px;background:#fff;color:#475569;font-weight:700;font-size:14px;cursor:pointer;';
+  var primary = 'flex:2;padding:12px;border:none;border-radius:10px;background:#2f5d50;color:#fff;font-weight:700;font-size:14px;cursor:pointer;';
+  var h = '<div style="display:flex;gap:10px;margin:10px 0 4px;">';
+  if (step === 3) h += '<button type="button" onclick="goWizardStep(2)" style="'+ghost+'">← 戻る</button>';
+  if (step === 4) h += '<button type="button" onclick="goWizardStep(3)" style="'+ghost+'">← 戻る</button>';
+  if (step === 2) h += '<button type="button" onclick="goWizardStep(3)" style="'+primary+'">次へ / Next →</button>';
+  if (step === 3) h += '<button type="button" onclick="goWizardStep(4)" style="'+primary+'">次へ / Next →</button>';
+  h += '</div>';
+  return h;
+}
+
+function goWizardStep(n) {
+  var steps = document.querySelectorAll('.wiz-step');
+  for (var i = 0; i < steps.length; i++) {
+    steps[i].style.display = (parseInt(steps[i].getAttribute('data-step'), 10) === n) ? 'block' : 'none';
+  }
+  var bw = document.getElementById('btnWrap'); if (bw) bw.style.display = (n === 4) ? 'block' : 'none';
+  var rn = document.querySelector('.req-note'); if (rn) rn.style.display = (n === 4) ? 'block' : 'none';
+  var pg = document.getElementById('wizProgress'); if (pg) pg.textContent = 'ステップ ' + n + ' / 4';
+  try { window.scrollTo(0, 0); } catch(e){}
+}
+
 function blockBasic() {
   return '<div class="card">' +
     '<div class="section-title">基本情報（きほんじょうほう）</div>' +
-    blockCardCapture() +
     field('f-name', '氏名（しめい・パスポート表記）', 'text', true, '例: NGUYEN VAN AN', 'name') +
     '<div class="grid2">' +
       field('f-birth', '生年月日（せいねんがっぴ）', 'date', true, '', 'birth') +
@@ -477,32 +552,6 @@ function blockBasic() {
 }
 
 // ===== ver.20260608.test.01: 在留カード/パスポート撮影→自動入力（OCR） =====
-function blockCardCapture() {
-  var slots = [
-    {id:'ocrCardFront', label:'在留カード 表 / Card front'},
-    {id:'ocrCardBack',  label:'在留カード 裏 / Card back'},
-    {id:'ocrPassport',  label:'パスポート / Passport'}
-  ];
-  var h = '<div style="border:1.5px dashed #94a3b8;border-radius:12px;padding:14px;margin-bottom:16px;background:#f8fafc;">';
-  h += '<div style="font-weight:700;font-size:14px;margin-bottom:3px;">\uD83D\uDCF7 カードを撮って自動入力</div>';
-  h += '<div style="font-size:12px;color:#64748b;margin-bottom:10px;">Take a photo of your residence card / passport to auto-fill.</div>';
-  slots.forEach(function(s){
-    h += '<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">';
-    h += '<div id="'+s.id+'_thumb" style="width:54px;height:36px;flex:none;border-radius:6px;background:#e2e8f0;background-size:cover;background-position:center;display:flex;align-items:center;justify-content:center;font-size:15px;color:#94a3b8;">\uD83D\uDCF7</div>';
-    h += '<div style="flex:1;min-width:0;"><div style="font-size:12px;font-weight:600;">'+s.label+'</div>';
-    h += '<input type="file" accept="image/*" capture="environment" style="font-size:11px;max-width:100%;" onchange="ocrPickFile(\''+s.id+'\',this)"></div>';
-    h += '</div>';
-    if (s.id === 'ocrPassport') {
-      h += '<button type="button" onclick="startMrzScan()" style="width:100%;margin:2px 0 10px;padding:9px;border:1.5px solid #2f5d50;border-radius:9px;background:#fff;color:#2f5d50;font-weight:700;font-size:13px;cursor:pointer;">\uD83D\uDCF8 パスポートをかざして読取 (MRZ) / Hold passport to scan</button>';
-    }
-  });
-  h += '<button type="button" id="ocrRunBtn" onclick="runCardOcr()" style="width:100%;margin-top:6px;padding:11px;border:none;border-radius:9px;background:#2f5d50;color:#fff;font-weight:700;font-size:14px;cursor:pointer;">読み取って入力 / Scan</button>';
-  h += '<div id="ocrStatus" style="font-size:12px;color:#2f5d50;margin-top:8px;display:none;line-height:1.5;"></div>';
-  h += '<div style="font-size:11px;color:#94a3b8;margin-top:8px;line-height:1.5;">読み取り後は内容を必ず確認・修正してください。/ Please review and correct after scanning.</div>';
-  h += '</div>';
-  return h;
-}
-
 var _ocrImages = {}; // slotId -> {tag, base64, mimeType}
 var OCR_SLOT_TAGS = { ocrCardFront:'在留カード（表）', ocrCardBack:'在留カード（裏）', ocrPassport:'パスポート' };
 
@@ -611,6 +660,7 @@ function applyOcrFields(f) {
   f = f || {};
   _ocrSetVal('f-name', f.name_roman);
   _ocrSetVal('f-birth', f.birth_date);
+  _ocrSetVal('f-birthPlace', f.birth_place);
 
   // 国籍：ローマ字国名（VIET NAM 等）も日本語セレクトに一致させる。一致したら「その他」に落とさない
   if (f.nationality) {
@@ -779,8 +829,8 @@ function _mrzTick() {
     if (parsed) {
       _mrzStatus('✅ 読み取りました', '#34d399');
       applyOcrFields(parsed);
-      var st = document.getElementById('ocrStatus');
-      if (st) { st.style.display='block'; st.style.color='#2f5d50'; st.textContent='✅ パスポート(MRZ)を読み取りました。内容を確認してください。'; }
+      var st = document.getElementById('mrzResult');
+      if (st) { st.style.display='block'; st.style.color='#2f5d50'; st.textContent='✅ MRZを読み取りました（氏名・旅券番号・国籍・生年月日・有効期限）。「次へ」で進んでください。'; }
       stopMrzScan();
       return;
     }
@@ -2524,7 +2574,13 @@ function _initFormBody(){
     document.getElementById('type-badges').innerHTML = b;
   }
   document.getElementById('mainContent').style.display = 'block';
-  document.getElementById('btnWrap').style.display = 'block';
+  if (type === 'company') {
+    document.getElementById('btnWrap').style.display = 'block';
+    var _pg = document.getElementById('wizProgress'); if (_pg) _pg.style.display = 'none';
+    var _rn = document.querySelector('.req-note'); if (_rn) _rn.style.display = 'block';
+  } else {
+    goWizardStep(2);
+  }
 }
 function confirmName(isMatch){
   var overlay = document.getElementById('nameConfirmOverlay');
@@ -2546,7 +2602,7 @@ function confirmName(isMatch){
     document.getElementById('infoBox').innerHTML = '<span class="case-name">' + _escName + '</span>大房行政書士法人よりご依頼の情報をご入力ください。';
     document.getElementById('nameConfirmName').innerHTML = _escName;
   }
-  document.getElementById('formBody').innerHTML = buildForm(type);
+  document.getElementById('formBody').innerHTML = (type === 'company') ? buildForm(type) : buildWizard(type);
   if (fieldsFilter && fieldsFilter.length && type === 'company') {
     applyFieldsFilter(fieldsFilter);
   }
