@@ -188,7 +188,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20260608.test.09';
+var FORM_VERSION = 'ver.20260608.test.10';
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -529,7 +529,7 @@ function wizNav(step) {
   if (step === 3) h += '<button type="button" onclick="goWizardStep(2)" style="'+ghost+'">← 戻る（もどる）</button>';
   if (step === 4) h += '<button type="button" onclick="goWizardStep(3)" style="'+ghost+'">← 戻る（もどる）</button>';
   if (step === 2) h += '<button type="button" onclick="goWizardStep(3)" style="'+primary+'">次（つぎ）へ / Next →</button>';
-  if (step === 3) h += '<button type="button" onclick="nextFromPhotos()" style="'+primary+'">次（つぎ）へ / Next →</button>';
+  if (step === 3) h += '<button type="button" id="wizNext3" onclick="nextFromPhotos()" style="'+primary+'">次（つぎ）へ / Next →</button>';
   h += '</div>';
   return h;
 }
@@ -610,6 +610,7 @@ function runCardOcr() {
   var btn = document.getElementById('ocrRunBtn');
   var status = document.getElementById('ocrStatus');
   if (btn) { btn.disabled = true; btn.textContent = '読み取り中… / Scanning…'; }
+  var nb = document.getElementById('wizNext3'); if (nb) { nb.disabled = true; nb.style.opacity = '0.45'; nb.style.pointerEvents = 'none'; }
   if (status) { status.style.display = 'block'; status.style.color = '#2f5d50'; status.textContent = 'AIが読み取っています…（数秒〜十数秒）'; }
 
   var images = keys.map(function(k){ return _ocrImages[k]; });
@@ -633,7 +634,8 @@ function runCardOcr() {
     if (status) { status.style.color = '#b4541f'; status.textContent = '\u274C 読み取りに失敗しました（' + e.message + '）。明るい場所でカード全体が入るように撮り直してください。'; }
   })
   .then(function(){
-    if (btn) { btn.disabled = false; btn.textContent = '読み取って入力 / Scan'; }
+    if (btn) { btn.disabled = false; btn.textContent = '読（よ）み取（と）って入力（にゅうりょく） / Scan'; }
+    var nb2 = document.getElementById('wizNext3'); if (nb2) { nb2.disabled = false; nb2.style.opacity = '1'; nb2.style.pointerEvents = 'auto'; }
     _ocrRunning = null;
   });
   return _ocrRunning;
