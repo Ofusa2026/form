@@ -187,7 +187,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20260608.test.03';
+var FORM_VERSION = 'ver.20260608.test.04';
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -668,6 +668,25 @@ function _mrzStatus(msg, color) {
   if (el) { el.textContent = msg; if (color) el.style.color = color; }
 }
 
+// パスポートのどこにMRZ（緑の2行）があるかを示す図解（SVG・実画像不要）
+function _mrzSampleSvg() {
+  return '' +
+  '<svg viewBox="0 0 260 150" width="172" style="max-width:62%;height:auto;display:block;margin:0 auto;">' +
+    '<rect x="6" y="6" width="248" height="138" rx="10" fill="#fbf7ee" stroke="#cbb994" stroke-width="2"/>' +
+    '<rect x="18" y="22" width="58" height="72" rx="4" fill="#d6dae0"/>' +
+    '<circle cx="47" cy="46" r="15" fill="#aab3bd"/>' +
+    '<path d="M28 88 q19 -20 38 0 z" fill="#aab3bd"/>' +
+    '<rect x="90" y="26" width="150" height="7" rx="3" fill="#c9cfd6"/>' +
+    '<rect x="90" y="40" width="120" height="7" rx="3" fill="#c9cfd6"/>' +
+    '<rect x="90" y="54" width="142" height="7" rx="3" fill="#c9cfd6"/>' +
+    '<rect x="90" y="68" width="104" height="7" rx="3" fill="#c9cfd6"/>' +
+    '<rect x="90" y="82" width="130" height="7" rx="3" fill="#c9cfd6"/>' +
+    '<rect x="12" y="104" width="236" height="34" rx="5" fill="#064e3b" stroke="#34d399" stroke-width="2.5"/>' +
+    '<text x="19" y="119" font-family="monospace" font-size="9" font-weight="bold" fill="#34d399">P&lt;JPNYAMADA&lt;&lt;TARO&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;</text>' +
+    '<text x="19" y="132" font-family="monospace" font-size="9" font-weight="bold" fill="#34d399">TR12345679JPN9001011M30010110&lt;&lt;</text>' +
+  '</svg>';
+}
+
 function startMrzScan() {
   if (_mrz.active) return;
   _mrz.active = true;
@@ -677,7 +696,11 @@ function startMrzScan() {
   ov.style.cssText = 'position:fixed;inset:0;z-index:99999;background:#000;display:flex;flex-direction:column;align-items:center;justify-content:center;';
   ov.innerHTML =
     '<video id="mrzVideo" playsinline autoplay muted style="max-width:100%;max-height:70vh;"></video>' +
-    '<div style="position:absolute;top:0;left:0;right:0;padding:14px;color:#fff;font-size:13px;text-align:center;background:linear-gradient(#000a,transparent);">パスポートの写真ページ下部（&lt;&lt;&lt;の2行）を枠に合わせてください<br>Align the bottom 2 lines (MRZ) inside the frame</div>' +
+    '<div style="position:absolute;top:0;left:0;right:0;padding:10px 12px 14px;color:#fff;text-align:center;background:linear-gradient(#000c,#000a,transparent);">' +
+      '<div style="font-size:13px;font-weight:700;margin-bottom:6px;">パスポートの<span style="color:#34d399;">緑色の2行</span>を、下の緑枠に合わせてください</div>' +
+      _mrzSampleSvg() +
+      '<div style="font-size:11px;color:#cbd5e1;margin-top:4px;">Align the green 2 lines (MRZ) at the bottom of your passport</div>' +
+    '</div>' +
     '<div style="position:absolute;left:6%;right:6%;bottom:24%;height:74px;border:2px solid #34d399;border-radius:8px;box-shadow:0 0 0 9999px #0006;"></div>' +
     '<div id="mrzStatusText" style="position:absolute;bottom:13%;left:0;right:0;text-align:center;color:#34d399;font-size:13px;font-weight:700;">カメラを起動しています…</div>' +
     '<button type="button" onclick="stopMrzScan()" style="position:absolute;bottom:5%;padding:11px 26px;border:none;border-radius:10px;background:#fff;color:#111;font-weight:700;font-size:14px;">キャンセル / Cancel</button>';
