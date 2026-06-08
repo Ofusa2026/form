@@ -188,10 +188,11 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20260605.02';
+var FORM_VERSION = 'ver.20260609.01';
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
+function callRpc(fn, body){ return fetch(SUPABASE_URL + '/rest/v1/rpc/' + fn, { method:'POST', headers:{'Content-Type':'application/json','apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY}, body: JSON.stringify(body||{}) }); }
 
 var params = new URLSearchParams(location.search);
 var caseId  = params.get('case') || '';
@@ -1961,21 +1962,8 @@ async function submitForm() {
   btn.disabled = true; btn.textContent = '送信中...';
 
   try {
-    var res;
     var _submitId = _draftResponseId || responseId;
-    if (_submitId) {
-      res = await fetch(SUPABASE_URL + '/rest/v1/form_responses?id=eq.' + encodeURIComponent(_submitId), {
-        method: 'PATCH',
-        headers: { 'Content-Type':'application/json','apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY,'Prefer':'return=minimal' },
-        body: JSON.stringify({ response: response, imported_at: null, deleted_at: null, submitted_at: new Date().toISOString() })
-      });
-    } else {
-      res = await fetch(SUPABASE_URL + '/rest/v1/form_responses?select=id', {
-        method: 'POST',
-        headers: { 'Content-Type':'application/json','apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY,'Prefer':'return=representation' },
-        body: JSON.stringify({ case_id: caseId, form_type: type, response: response, submitted_at: new Date().toISOString() })
-      });
-    }
+    var res = await callRpc('form_save', { p_case_id: caseId, p_form_type: type, p_response_id: _submitId || '', p_response: response, p_submit: true });
     if (!res.ok) {
       // Supabase側のバリデーショントリガーで拒否された場合の処理
       var errorBody = '';
@@ -1989,9 +1977,7 @@ async function submitForm() {
     // ver.20260605.01: 送信後も入力内容を画面に残す（mainContentを置き換えない）。完了バナーを上部に表示。
     // 送信したレコードIDを確定（新規POST時はレスポンスから取得）→ 「修正を再送信」で同じ行をPATCHし重複を防ぐ
     var _doneId = _submitId;
-    if (!_doneId) {
-      try { var _arr = await res.json(); if (_arr && _arr[0] && _arr[0].id) _doneId = _arr[0].id; } catch(_) {}
-    }
+    try { var _obj = await res.json(); if (_obj && _obj.id) _doneId = _obj.id; } catch(_) {}
     if (_doneId) _draftResponseId = _doneId;
     var _mc = document.getElementById('mainContent');
     var okBanner = document.getElementById('submitOkBanner');
@@ -2067,23 +2053,13 @@ async function saveDraft(auto) {
       }
     }
 
-    var res;
-    if (_draftResponseId) {
-      res = await fetch(SUPABASE_URL + '/rest/v1/form_responses?id=eq.' + encodeURIComponent(_draftResponseId), {
-        method: 'PATCH',
-        headers: { 'Content-Type':'application/json','apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY,'Prefer':'return=minimal' },
-        body: JSON.stringify({ response: response, imported_at: null, deleted_at: null })
-      });
-    } else {
-      res = await fetch(SUPABASE_URL + '/rest/v1/form_responses?select=id', {
-        method: 'POST',
-        headers: { 'Content-Type':'application/json','apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY,'Prefer':'return=representation' },
-        body: JSON.stringify({ case_id: caseId, form_type: type, response: response })
-      });
-      if (res.ok) {
+    var _wasNew = !_draftResponseId;
+    var res = await callRpc('form_save', { p_case_id: caseId, p_form_type: type, p_response_id: _draftResponseId || '', p_response: response, p_submit: false });
+    if (res.ok && _wasNew) {
+      try {
         var data = await res.json();
-        if (data && data[0] && data[0].id) {
-          _draftResponseId = data[0].id;
+        if (data && data.id) {
+          _draftResponseId = data.id;
           var newUrl = location.pathname + '?case=' + encodeURIComponent(caseId)
             + '&type=' + encodeURIComponent(type)
             + (caseName ? '&name=' + encodeURIComponent(caseName) : '')
@@ -2091,7 +2067,7 @@ async function saveDraft(auto) {
             + (currentLang ? '&lang=' + encodeURIComponent(currentLang) : '');
           history.replaceState(null, '', newUrl);
         }
-      }
+      } catch(_) {}
     }
 
     if (!res.ok) throw new Error('HTTP ' + res.status);
@@ -2216,25 +2192,14 @@ function confirmName(isMatch){
   }
 
   if (caseId) {
-    var _draftUrl = SUPABASE_URL + '/rest/v1/form_responses'
-      + '?case_id=eq.' + encodeURIComponent(caseId)
-      + '&form_type=eq.' + encodeURIComponent(type)
-      + '&deleted_at=is.null'
-      + '&order=created_at.desc&limit=1'
-      + '&select=id,response,imported_at,submitted_at';
-    if (responseId) {
-      _draftUrl = SUPABASE_URL + '/rest/v1/form_responses?id=eq.' + encodeURIComponent(responseId) + '&select=id,response,imported_at,submitted_at';
-    }
-    fetch(_draftUrl, {
-      headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }
-    }).then(function(r){
+    callRpc('form_load', { p_case_id: caseId, p_form_type: type, p_response_id: responseId || '' }).then(function(r){
       if (!r.ok) throw new Error('HTTP ' + r.status);
       return r.json();
     })
     .then(function(data) {
       try {
-        if (!data || !data.length) return;
-        var row = data[0];
+        if (!data) return;
+        var row = data;
         var resp = row.response;
         var isImported = !!row.imported_at;
         var isSubmitted = !!row.submitted_at;
