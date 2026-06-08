@@ -188,7 +188,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20260608.test.10';
+var FORM_VERSION = 'ver.20260608.test.11';
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -467,9 +467,10 @@ var TRANS = {
 function buildWizard(t) {
   var fieldsHtml = buildForm(t); // ④の入力項目（撮影ブロックは外済み）
   var isNinteiLocal = (t === 'tokutei_nintei' || t === 'gijinkoku_nintei');
+  var isTokuteiLocal = (String(t).indexOf('tokutei') === 0);
   var h = '';
   h += '<div class="wiz-step" data-step="2">' + blockStepMrz() + wizNav(2) + '</div>';
-  h += '<div class="wiz-step" data-step="3" style="display:none;">' + blockStepPhotos(isNinteiLocal) + wizNav(3) + '</div>';
+  h += '<div class="wiz-step" data-step="3" style="display:none;">' + blockStepPhotos(isNinteiLocal, isTokuteiLocal) + wizNav(3) + '</div>';
   h += '<div class="wiz-step" data-step="4" style="display:none;">' + fieldsHtml + wizNav(4) + '</div>';
   return h;
 }
@@ -487,16 +488,22 @@ function blockStepMrz() {
   return h;
 }
 
-function blockStepPhotos(isNintei) {
-  var slots = [{id:'ocrPassport', label:'パスポート / Passport'}];
+function blockStepPhotos(isNintei, isTokutei) {
+  var slots = [{id:'ocrPassport', label:'パスポート / Passport', sample:true}];
   if (!isNintei) {
-    slots.push({id:'ocrCardFront', label:'在留（ざいりゅう）カード 表（おもて） / Card front'});
-    slots.push({id:'ocrCardBack',  label:'在留（ざいりゅう）カード 裏（うら） / Card back'});
+    slots.push({id:'ocrCardFront', label:'在留（ざいりゅう）カード 表（おもて） / Card front', sample:true});
+    slots.push({id:'ocrCardBack',  label:'在留（ざいりゅう）カード 裏（うら） / Card back', sample:true});
+  }
+  if (isTokutei) {
+    slots.push({id:'ocrSkillCert',  label:'技能合格証（ぎのうごうかくしょう） / Skill cert', sample:false});
+    slots.push({id:'ocrJpCert',     label:'日本語合格証（にほんごごうかくしょう） / Japanese cert', sample:false});
+    slots.push({id:'ocrSenmonkyu',  label:'専門級（せんもんきゅう）・技能実習評価 / Senmonkyu', sample:false});
   }
   var h = '<div class="card">';
   h += '<div class="section-title">② 写真（しゃしん）を撮影（さつえい）／選択（せんたく）<div class="trans" data-key="wizPhotoTitle"></div></div>';
   h += '<div style="font-size:13px;color:#475569;margin-bottom:6px;line-height:1.7;">' +
        (isNintei ? 'パスポートを撮影（さつえい）または選択（せんたく）してください。' : 'パスポートと在留（ざいりゅう）カードを撮影（さつえい）または選択（せんたく）してください。') +
+       (isTokutei ? '<br>合格証（ごうかくしょう）があれば一緒（いっしょ）に選（えら）んでください。' : '') +
        '<br>選（えら）ぶと自動（じどう）で読（よ）み取（と）ります。出生地（しゅっせいち）・住所（じゅうしょ）などMRZにない項目（こうもく）も取得（しゅとく）します。<br><span style="color:#94a3b8;">この手順（てじゅん）はスキップできます。</span></div>';
   h += '<div class="trans show" data-key="wizPhotoDesc" style="font-size:12px;color:#6366f1;margin-bottom:10px;"></div>';
   var pick = 'display:inline-flex;align-items:center;gap:4px;padding:7px 10px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;';
@@ -509,10 +516,10 @@ function blockStepPhotos(isNintei) {
     h += '<div style="display:flex;gap:6px;flex-wrap:wrap;">';
     h += '<label style="'+pick+'background:#2f5d50;color:#fff;">📷 撮影（さつえい）<input type="file" accept="image/*" capture="environment" style="display:none;" onchange="ocrPickFile(\''+s.id+'\',this)"></label>';
     h += '<label style="'+pick+'background:#eef2f7;color:#334155;">📁 フォルダ/選択（せんたく）<input type="file" accept="image/*" style="display:none;" onchange="ocrPickFile(\''+s.id+'\',this)"></label>';
-    h += '<button type="button" onclick="toggleSample(\''+s.id+'\')" style="'+pick+'background:#fff;color:#2f5d50;border:1px solid #cbd5e1;">📖 見本（みほん）</button>';
+    if (s.sample) h += '<button type="button" onclick="toggleSample(\''+s.id+'\')" style="'+pick+'background:#fff;color:#2f5d50;border:1px solid #cbd5e1;">📖 見本（みほん）</button>';
     h += '</div>';
     h += '</div></div>';
-    h += '<div id="'+s.id+'_sample" style="display:none;margin-top:10px;padding:8px;background:#f8fafc;border-radius:8px;">'+_sampleSvg(s.id)+'</div>';
+    if (s.sample) h += '<div id="'+s.id+'_sample" style="display:none;margin-top:10px;padding:8px;background:#f8fafc;border-radius:8px;">'+_sampleSvg(s.id)+'</div>';
     h += '</div>';
   });
   h += '<button type="button" id="ocrRunBtn" onclick="runCardOcr()" style="width:100%;margin-top:4px;padding:12px;border:none;border-radius:10px;background:#2f5d50;color:#fff;font-weight:700;font-size:14px;cursor:pointer;">読（よ）み取（と）って入力（にゅうりょく） / Scan</button>';
@@ -565,7 +572,7 @@ function blockBasic() {
 // ===== ver.20260608.test.01: 在留カード/パスポート撮影→自動入力（OCR） =====
 var _ocrImages = {}; // slotId -> {tag, base64, mimeType}
 var _ocrDirty = false, _ocrRunning = null, _ocrAutoTimer = null;
-var OCR_SLOT_TAGS = { ocrCardFront:'在留カード（表）', ocrCardBack:'在留カード（裏）', ocrPassport:'パスポート' };
+var OCR_SLOT_TAGS = { ocrCardFront:'在留カード（表）', ocrCardBack:'在留カード（裏）', ocrPassport:'パスポート', ocrJpCert:'合格証（日本語）', ocrSkillCert:'合格証（技能）', ocrSenmonkyu:'専門級' };
 
 // 端末側で長辺〜1024pxに縮小しJPEG化（GASサイズ制限回避＋トークン節約）
 function ocrCompress(file, maxDim, quality) {
@@ -763,6 +770,84 @@ function applyOcrFields(f) {
     if (as) { as.value = 'あり'; if (typeof toggleAddressInput === 'function') toggleAddressInput('あり'); }
     _ocrSetVal('f-address', f.address);
   }
+
+  // 証明書（合格証・専門級）→ 技能/日本語証明欄へ best-effort 反映（④で要確認）
+  try {
+    if (f.skill_exam_name) { applyCertSkill(f); }
+    else if (f.senmonkyu === 'true' || f.senmonkyu === true || f.ginou_shokushu) { applySenmonkyu(f); }
+    if (f.jp_exam_name) { applyCertJp(f); }
+  } catch (e) { /* 反映できないときは手動入力にまかせる */ }
+}
+
+// セレクトに該当optionがあれば選択（無ければ何もしない）
+function _selectIfOption(id, val) {
+  var el = document.getElementById(id);
+  if (!el || !val) return false;
+  for (var i = 0; i < el.options.length; i++) {
+    if (el.options[i].value === val) { el.value = val; return true; }
+  }
+  return false;
+}
+
+// 日本語合格証 → 日本語能力の証明
+function applyCertJp(f) {
+  var n = f.jp_exam_name || ''; if (!n) return;
+  var exam = '';
+  if (/基礎|JFT|kiso/i.test(n)) exam = '国際交流基金日本語基礎テスト';
+  else if (/能力|JLPT|N\s*[1-5]/i.test(n)) exam = '日本語能力試験';
+  else if (/介護/.test(n)) exam = '介護日本語評価試験';
+  if (!exam) return;
+  var ev = document.getElementById('f-jpEvalType'); if (!ev) return;
+  ev.value = '分野別運用方針に定める評価方法による証明';
+  if (typeof toggleJpProof === 'function') toggleJpProof(1, ev.value);
+  var field = '日本語試験（にほんごしけん）';
+  var ff = document.getElementById('f-jpField1');
+  if (ff) { ff.value = field; if (typeof onJpFieldChange === 'function') onJpFieldChange(1, field); }
+  _selectIfOption('f-jpExam1', exam);
+}
+
+// 技能合格証 → 技能水準の証明（試験合格）。試験名をリストに照合
+function applyCertSkill(f) {
+  var name = f.skill_exam_name || ''; if (!name) return;
+  var matched = '';
+  for (var i = 0; i < SKILL_EXAM_LIST.length; i++) { if (SKILL_EXAM_LIST[i] === name) { matched = SKILL_EXAM_LIST[i]; break; } }
+  if (!matched) {
+    for (var j = 0; j < SKILL_EXAM_LIST.length; j++) {
+      if (name.indexOf(SKILL_EXAM_LIST[j]) >= 0 || SKILL_EXAM_LIST[j].indexOf(name) >= 0) { matched = SKILL_EXAM_LIST[j]; break; }
+    }
+  }
+  if (!matched) return;
+  var field = _findFieldForExam(SKILL_FIELD_GROUPS, matched);
+  var ev = document.getElementById('f-skillEvalType'); if (!ev) return;
+  ev.value = '分野別運用方針に定める評価方法による証明';
+  if (typeof toggleSkillProof === 'function') toggleSkillProof(1, ev.value);
+  var ff = document.getElementById('f-skillField1');
+  if (ff && field) { ff.value = field; if (typeof onSkillFieldChange === 'function') onSkillFieldChange(1, field); }
+  _selectIfOption('f-skillExam1', matched);
+}
+
+// 専門級・技能実習評価 → 技能実習2号を良好に修了
+function applySenmonkyu(f) {
+  var ev = document.getElementById('f-skillEvalType'); if (!ev) return;
+  ev.value = '技能実習２号を良好に修了';
+  if (typeof toggleSkillProof === 'function') toggleSkillProof(1, ev.value);
+  _selectIfOption('f-gijutsuProof', '３級の技能検定又はこれに相当する技能実習評価試験の実技試験の合格による証明');
+  if (f.ginou_shokushu) {
+    var preset = document.getElementById('f-gijutsuTypePreset');
+    if (preset) {
+      var hit = false;
+      for (var i = 0; i < preset.options.length; i++) {
+        if (preset.options[i].value === f.ginou_shokushu) { preset.value = f.ginou_shokushu; hit = true; break; }
+      }
+      if (hit) { if (typeof onGijutsuTypePresetChange === 'function') onGijutsuTypePresetChange(f.ginou_shokushu); }
+      else {
+        preset.value = '__other__';
+        if (typeof onGijutsuTypePresetChange === 'function') onGijutsuTypePresetChange('__other__');
+        var ti = document.getElementById('f-gijutsuType'); if (ti) ti.value = f.ginou_shokushu;
+      }
+    }
+  }
+  if (f.ginou_sagyou) { var w = document.getElementById('f-gijutsuWork'); if (w) w.value = f.ginou_sagyou; }
 }
 
 // ============================================================
