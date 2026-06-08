@@ -175,7 +175,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 
 <div class="container" id="mainContent" style="display:none;">
   <div class="info-box" id="infoBox">大房行政書士法人よりご依頼の情報をご入力ください。</div>
-  <div id="wizProgress" style="font-size:12px;font-weight:700;color:#2f5d50;background:#e7efe9;border-radius:8px;padding:7px 12px;margin-bottom:10px;text-align:center;">ステップ 2 / 4</div>
+  <div id="wizProgress" style="font-size:12px;font-weight:700;color:#2f5d50;background:#e7efe9;border-radius:8px;padding:7px 12px;margin-bottom:10px;text-align:center;">ステップ（手順 てじゅん） 2 / 4</div>
   <div class="req-note"><span style="color:#dc2626;font-weight:800;">*</span> は必須項目です。</div>
   <div id="errorMsg" class="error-msg"></div>
   <div id="formBody"></div>
@@ -188,7 +188,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20260608.test.08';
+var FORM_VERSION = 'ver.20260608.test.09';
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -476,12 +476,13 @@ function buildWizard(t) {
 
 function blockStepMrz() {
   var h = '<div class="card">';
-  h += '<div class="section-title">① パスポートをかざして読取（MRZ）</div>';
-  h += '<div style="font-size:13px;color:#475569;margin-bottom:10px;line-height:1.6;">パスポートをカメラにかざすと、氏名・旅券番号・国籍・生年月日・有効期限を自動入力します。<br>Hold your passport to the camera to auto-fill.</div>';
-  h += '<div style="background:#0f2030;border-radius:10px;padding:10px;margin-bottom:12px;">' + _mrzSampleSvg() + '<div style="text-align:center;color:#34d399;font-size:11px;margin-top:4px;">緑の2行（MRZ）を読み取ります</div></div>';
-  h += '<button type="button" onclick="startMrzScan()" style="width:100%;padding:14px;border:none;border-radius:10px;background:#2f5d50;color:#fff;font-weight:700;font-size:15px;cursor:pointer;">\uD83D\uDCF8 かざして読取スタート</button>';
+  h += '<div class="section-title">① パスポートをかざして読（よ）み取（と）り（MRZ）<div class="trans" data-key="wizMrzTitle"></div></div>';
+  h += '<div style="font-size:13px;color:#475569;margin-bottom:6px;line-height:1.7;">パスポートをカメラにかざすと、氏名（しめい）・旅券番号（りょけんばんごう）・国籍（こくせき）・生年月日（せいねんがっぴ）・有効期限（ゆうこうきげん）を自動（じどう）で入力（にゅうりょく）します。</div>';
+  h += '<div class="trans show" data-key="wizMrzDesc" style="font-size:12px;color:#6366f1;margin-bottom:10px;"></div>';
+  h += '<div style="background:#0f2030;border-radius:10px;padding:10px;margin-bottom:12px;">' + _mrzSampleSvg() + '<div style="text-align:center;color:#34d399;font-size:11px;margin-top:4px;">緑（みどり）の2行（ぎょう）（MRZ）を読（よ）み取（と）ります</div></div>';
+  h += '<button type="button" onclick="startMrzScan()" style="width:100%;padding:14px;border:none;border-radius:10px;background:#2f5d50;color:#fff;font-weight:700;font-size:15px;cursor:pointer;">📸 かざして読（よ）み取（と）りスタート / Scan</button>';
   h += '<div id="mrzResult" style="font-size:13px;color:#2f5d50;margin-top:10px;display:none;line-height:1.5;font-weight:700;"></div>';
-  h += '<div style="font-size:11px;color:#94a3b8;margin-top:10px;line-height:1.5;">読めないときは「次へ」でスキップできます。後の手順や手入力でも入力できます。/ You can skip with Next.</div>';
+  h += '<div style="font-size:11px;color:#94a3b8;margin-top:10px;line-height:1.6;">読（よ）めないときは「次（つぎ）へ」でスキップできます。/ You can skip with Next.</div>';
   h += '</div>';
   return h;
 }
@@ -489,14 +490,15 @@ function blockStepMrz() {
 function blockStepPhotos(isNintei) {
   var slots = [{id:'ocrPassport', label:'パスポート / Passport'}];
   if (!isNintei) {
-    slots.push({id:'ocrCardFront', label:'在留カード 表 / Card front'});
-    slots.push({id:'ocrCardBack',  label:'在留カード 裏 / Card back'});
+    slots.push({id:'ocrCardFront', label:'在留（ざいりゅう）カード 表（おもて） / Card front'});
+    slots.push({id:'ocrCardBack',  label:'在留（ざいりゅう）カード 裏（うら） / Card back'});
   }
   var h = '<div class="card">';
-  h += '<div class="section-title">② 写真を撮影／選択（AIが項目を読み取り）</div>';
-  h += '<div style="font-size:13px;color:#475569;margin-bottom:10px;line-height:1.6;">' +
-       (isNintei ? 'パスポートを撮影または選択してください。' : 'パスポートと在留カードを撮影または選択してください。') +
-       '<br>選んだら自動で読み取ります。出生地・住所などMRZにない項目も取得します。<br><span style="color:#94a3b8;">この手順はスキップできます。/ You can skip this step.</span></div>';
+  h += '<div class="section-title">② 写真（しゃしん）を撮影（さつえい）／選択（せんたく）<div class="trans" data-key="wizPhotoTitle"></div></div>';
+  h += '<div style="font-size:13px;color:#475569;margin-bottom:6px;line-height:1.7;">' +
+       (isNintei ? 'パスポートを撮影（さつえい）または選択（せんたく）してください。' : 'パスポートと在留（ざいりゅう）カードを撮影（さつえい）または選択（せんたく）してください。') +
+       '<br>選（えら）ぶと自動（じどう）で読（よ）み取（と）ります。出生地（しゅっせいち）・住所（じゅうしょ）などMRZにない項目（こうもく）も取得（しゅとく）します。<br><span style="color:#94a3b8;">この手順（てじゅん）はスキップできます。</span></div>';
+  h += '<div class="trans show" data-key="wizPhotoDesc" style="font-size:12px;color:#6366f1;margin-bottom:10px;"></div>';
   var pick = 'display:inline-flex;align-items:center;gap:4px;padding:7px 10px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;';
   slots.forEach(function(s){
     h += '<div style="margin-bottom:12px;padding:10px;border:1px solid #e5e7eb;border-radius:10px;background:#fff;">';
@@ -505,17 +507,17 @@ function blockStepPhotos(isNintei) {
     h += '<div style="flex:1;min-width:0;">';
     h += '<div style="font-size:12px;font-weight:600;margin-bottom:5px;">'+s.label+'</div>';
     h += '<div style="display:flex;gap:6px;flex-wrap:wrap;">';
-    h += '<label style="'+pick+'background:#2f5d50;color:#fff;">📷 撮影<input type="file" accept="image/*" capture="environment" style="display:none;" onchange="ocrPickFile(\''+s.id+'\',this)"></label>';
-    h += '<label style="'+pick+'background:#eef2f7;color:#334155;">📁 フォルダ/選択<input type="file" accept="image/*" style="display:none;" onchange="ocrPickFile(\''+s.id+'\',this)"></label>';
-    h += '<button type="button" onclick="toggleSample(\''+s.id+'\')" style="'+pick+'background:#fff;color:#2f5d50;border:1px solid #cbd5e1;">📖 見本</button>';
+    h += '<label style="'+pick+'background:#2f5d50;color:#fff;">📷 撮影（さつえい）<input type="file" accept="image/*" capture="environment" style="display:none;" onchange="ocrPickFile(\''+s.id+'\',this)"></label>';
+    h += '<label style="'+pick+'background:#eef2f7;color:#334155;">📁 フォルダ/選択（せんたく）<input type="file" accept="image/*" style="display:none;" onchange="ocrPickFile(\''+s.id+'\',this)"></label>';
+    h += '<button type="button" onclick="toggleSample(\''+s.id+'\')" style="'+pick+'background:#fff;color:#2f5d50;border:1px solid #cbd5e1;">📖 見本（みほん）</button>';
     h += '</div>';
     h += '</div></div>';
     h += '<div id="'+s.id+'_sample" style="display:none;margin-top:10px;padding:8px;background:#f8fafc;border-radius:8px;">'+_sampleSvg(s.id)+'</div>';
     h += '</div>';
   });
-  h += '<button type="button" id="ocrRunBtn" onclick="runCardOcr()" style="width:100%;margin-top:4px;padding:12px;border:none;border-radius:10px;background:#2f5d50;color:#fff;font-weight:700;font-size:14px;cursor:pointer;">読み取って入力 / Scan</button>';
+  h += '<button type="button" id="ocrRunBtn" onclick="runCardOcr()" style="width:100%;margin-top:4px;padding:12px;border:none;border-radius:10px;background:#2f5d50;color:#fff;font-weight:700;font-size:14px;cursor:pointer;">読（よ）み取（と）って入力（にゅうりょく） / Scan</button>';
   h += '<div id="ocrStatus" style="font-size:12px;color:#2f5d50;margin-top:8px;display:none;line-height:1.5;"></div>';
-  h += '<div style="font-size:11px;color:#94a3b8;margin-top:8px;line-height:1.5;">写真を選ぶと自動で読み取ります。読み取り後は④で内容を必ず確認してください。</div>';
+  h += '<div style="font-size:11px;color:#94a3b8;margin-top:8px;line-height:1.6;">写真（しゃしん）を選（えら）ぶと自動（じどう）で読（よ）み取（と）ります。読（よ）み取（と）り後（ご）は④で内容（ないよう）を必（かなら）ず確認（かくにん）してください。</div>';
   h += '</div>';
   return h;
 }
@@ -524,10 +526,10 @@ function wizNav(step) {
   var ghost = 'flex:1;padding:12px;border:1.5px solid #cbd5e1;border-radius:10px;background:#fff;color:#475569;font-weight:700;font-size:14px;cursor:pointer;';
   var primary = 'flex:2;padding:12px;border:none;border-radius:10px;background:#2f5d50;color:#fff;font-weight:700;font-size:14px;cursor:pointer;';
   var h = '<div style="display:flex;gap:10px;margin:10px 0 4px;">';
-  if (step === 3) h += '<button type="button" onclick="goWizardStep(2)" style="'+ghost+'">← 戻る</button>';
-  if (step === 4) h += '<button type="button" onclick="goWizardStep(3)" style="'+ghost+'">← 戻る</button>';
-  if (step === 2) h += '<button type="button" onclick="goWizardStep(3)" style="'+primary+'">次へ / Next →</button>';
-  if (step === 3) h += '<button type="button" onclick="nextFromPhotos()" style="'+primary+'">次へ / Next →</button>';
+  if (step === 3) h += '<button type="button" onclick="goWizardStep(2)" style="'+ghost+'">← 戻る（もどる）</button>';
+  if (step === 4) h += '<button type="button" onclick="goWizardStep(3)" style="'+ghost+'">← 戻る（もどる）</button>';
+  if (step === 2) h += '<button type="button" onclick="goWizardStep(3)" style="'+primary+'">次（つぎ）へ / Next →</button>';
+  if (step === 3) h += '<button type="button" onclick="nextFromPhotos()" style="'+primary+'">次（つぎ）へ / Next →</button>';
   h += '</div>';
   return h;
 }
@@ -539,7 +541,7 @@ function goWizardStep(n) {
   }
   var bw = document.getElementById('btnWrap'); if (bw) bw.style.display = (n === 4) ? 'block' : 'none';
   var rn = document.querySelector('.req-note'); if (rn) rn.style.display = (n === 4) ? 'block' : 'none';
-  var pg = document.getElementById('wizProgress'); if (pg) pg.textContent = 'ステップ ' + n + ' / 4';
+  var pg = document.getElementById('wizProgress'); if (pg) pg.textContent = 'ステップ（手順 てじゅん） ' + n + ' / 4';
   try { window.scrollTo(0, 0); } catch(e){}
 }
 
@@ -2596,6 +2598,56 @@ setInterval(function(){
     saveDraft(true);
   }
 }, 60000);
+
+
+// ver.20260608.test.09: ウィザード（②MRZ・③写真）の見出し・説明を翻訳対象に追加
+(function(){
+  var W = {
+    en: {
+      wizMrzTitle:'Hold passport to scan (MRZ)',
+      wizMrzDesc:'Hold your passport to the camera to auto-fill name, passport no., nationality, date of birth and expiry. You can skip with Next.',
+      wizPhotoTitle:'Photo of passport / residence card',
+      wizPhotoDesc:'Choose or take a photo and it is read automatically. Items not in the MRZ (place of birth, address) are also captured. You can skip this step.'
+    },
+    vi: {
+      wizMrzTitle:'Đưa hộ chiếu vào để quét (MRZ)',
+      wizMrzDesc:'Đưa hộ chiếu vào camera để tự động điền họ tên, số hộ chiếu, quốc tịch, ngày sinh và ngày hết hạn. Có thể bỏ qua bằng "Tiếp theo".',
+      wizPhotoTitle:'Ảnh hộ chiếu / thẻ cư trú',
+      wizPhotoDesc:'Chọn hoặc chụp ảnh, hệ thống sẽ tự động đọc. Các mục không có trong MRZ (nơi sinh, địa chỉ) cũng được lấy. Có thể bỏ qua bước này.'
+    },
+    id: {
+      wizMrzTitle:'Arahkan paspor untuk dipindai (MRZ)',
+      wizMrzDesc:'Arahkan paspor ke kamera untuk mengisi otomatis nama, nomor paspor, kewarganegaraan, tanggal lahir, dan masa berlaku. Bisa dilewati dengan "Berikutnya".',
+      wizPhotoTitle:'Foto paspor / kartu izin tinggal',
+      wizPhotoDesc:'Pilih atau ambil foto, akan dibaca otomatis. Data yang tidak ada di MRZ (tempat lahir, alamat) juga diambil. Langkah ini bisa dilewati.'
+    },
+    my: {
+      wizMrzTitle:'ပတ်စ်ပို့ကို ကင်မရာရှေ့ထားပြီး ဖတ်ပါ (MRZ)',
+      wizMrzDesc:'ပတ်စ်ပို့ကို ကင်မရာရှေ့ထားလျှင် အမည်၊ ပတ်စ်ပို့နံပါတ်၊ နိုင်ငံသား၊ မွေးနေ့နှင့် သက်တမ်းကုန်ရက်ကို အလိုအလျောက်ဖြည့်ပါမည်။ "ရှေ့သို့" ဖြင့် ကျော်နိုင်သည်။',
+      wizPhotoTitle:'ပတ်စ်ပို့ / နေထိုင်ခွင့်ကတ် ဓာတ်ပုံ',
+      wizPhotoDesc:'ဓာတ်ပုံရွေး သို့မဟုတ် ရိုက်ပါ၊ အလိုအလျောက်ဖတ်ပါမည်။ MRZ တွင်မပါသော အချက် (မွေးဖွားရာ၊ နေရပ်လိပ်စာ) ကိုပါ ရယူပါမည်။ ဤအဆင့်ကို ကျော်နိုင်သည်။'
+    },
+    km: {
+      wizMrzTitle:'បញ្ជូនលិខិតឆ្លងដែនទៅម៉ាស៊ីនថត (MRZ)',
+      wizMrzDesc:'ដាក់លិខិតឆ្លងដែននៅមុខកាមេរ៉ា ដើម្បីបំពេញឈ្មោះ លេខលិខិតឆ្លងដែន សញ្ជាតិ ថ្ងៃខែឆ្នាំកំណើត និងថ្ងៃផុតកំណត់ដោយស្វ័យប្រវត្តិ។ អាចរំលងដោយ "បន្ទាប់"។',
+      wizPhotoTitle:'រូបថតលិខិតឆ្លងដែន / កាតស្នាក់នៅ',
+      wizPhotoDesc:'ជ្រើស ឬថតរូប នោះវានឹងអានដោយស្វ័យប្រវត្តិ។ ព័ត៌មានដែលគ្មានក្នុង MRZ (ទីកន្លែងកំណើត អាសយដ្ឋាន) ក៏ត្រូវបានយកដែរ។ អាចរំលងជំហាននេះបាន។'
+    },
+    ne: {
+      wizMrzTitle:'राहदानी क्यामेरामा देखाएर स्क्यान गर्नुहोस् (MRZ)',
+      wizMrzDesc:'राहदानीलाई क्यामेरामा देखाउनुहोस्, नाम, राहदानी नम्बर, राष्ट्रियता, जन्म मिति र म्याद स्वतः भरिन्छ। "अर्को" बाट छाड्न सकिन्छ।',
+      wizPhotoTitle:'राहदानी / बसोबास कार्डको फोटो',
+      wizPhotoDesc:'फोटो छान्नुहोस् वा खिच्नुहोस्, स्वतः पढिन्छ। MRZ मा नभएका कुरा (जन्मस्थान, ठेगाना) पनि लिइन्छ। यो चरण छाड्न सकिन्छ।'
+    },
+    zh: {
+      wizMrzTitle:'将护照对准摄像头识别（MRZ）',
+      wizMrzDesc:'将护照对准摄像头，自动填写姓名、护照号码、国籍、出生日期和有效期。可用「下一步」跳过。',
+      wizPhotoTitle:'护照／在留卡照片',
+      wizPhotoDesc:'选择或拍摄照片后会自动识别。MRZ 中没有的项目（出生地、住址）也会获取。此步骤可跳过。'
+    }
+  };
+  for (var l in W) { if (TRANS[l]) { for (var k in W[l]) TRANS[l][k] = W[l][k]; } }
+})();
 
 function setLang(l) {
   currentLang = l;
