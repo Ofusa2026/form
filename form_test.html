@@ -188,7 +188,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20260609.test.01';
+var FORM_VERSION = 'ver.20260616.test.01';
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -1650,9 +1650,24 @@ function buildForm(t) {
       return blockBasic() + blockMarried() + blockEducation() + blockGijinkokuExtra() + blockContact(false, true);
     case 'company':
       return buildCompanyForm();
+    case 'card_delivery':
+      return buildCardDeliveryForm();
     default:
       return '<div class="type-unknown"><h2>❌ フォームが指定されていません</h2><p>URLに ?type=... パラメータが必要です。</p></div>';
   }
+}
+
+// ===== 新在留カードの送付先フォーム（card_delivery） =====
+function buildCardDeliveryForm() {
+  var h = '<div class="card">';
+  h += '<div class="section-title">新しい在留カードの送付先 / Delivery address for your new residence card</div>';
+  h += '<p style="font-size:13px;color:#475569;line-height:1.6;margin:0 0 14px;">在留資格の許可が下りました。新しい在留カードをお送りします。受け取れるご住所をご記入ください。<br>Your application was approved. Please tell us where to send your new residence card.</p>';
+  h += field('f-cdName', 'お名前（受取人）/ Recipient name', 'text', true, '例: NGUYEN VAN A');
+  h += field('f-cdZip', '郵便番号 / Postal code', 'text', true, '例: 135-0091');
+  h += field('f-cdAddress', 'ご住所 / Address（都道府県・市区町村・番地・建物名・部屋番号）', 'text', true, '例: 東京都港区台場2-3-4 ○○ハイツ201');
+  h += field('f-cdPhone', '電話番号 / Phone', 'text', true, '例: 090-1234-5678');
+  h += '</div>';
+  return h;
 }
 
 // ===== フィールドHTML生成ヘルパー =====
@@ -2280,6 +2295,14 @@ function val(id) { var el=document.getElementById(id); return el ? el.value.trim
 
 function collectData() {
   var t = type;
+  if (t === 'card_delivery') {
+    return {
+      recipientName: val('f-cdName'),
+      jpPostalCode: val('f-cdZip'),
+      jpAddress: val('f-cdAddress'),
+      phone: val('f-cdPhone')
+    };
+  }
   if (t === 'company') {
     var officers = {};
     document.querySelectorAll('.officer-row').forEach(function(row) {
@@ -2468,6 +2491,13 @@ function collectData() {
 }
 
 function validate() {
+  if (type === 'card_delivery') {
+    if (!val('f-cdName')) return 'お名前を入力してください。';
+    if (!val('f-cdZip')) return '郵便番号を入力してください。';
+    if (!val('f-cdAddress')) return 'ご住所を入力してください。';
+    if (!val('f-cdPhone')) return '電話番号を入力してください。';
+    return null;
+  }
   if (type === 'company') {
     if (!val('f-coName')) return '会社名は必須です。';
     return null;
@@ -2543,6 +2573,7 @@ function validate() {
 // Supabase側トリガーと同じ閾値を使用（二重防御）
 function _minKeysForType(t) {
   if (t === 'company') return 1;
+  if (t === 'card_delivery') return 2;
   return 6;
 }
 
@@ -2570,8 +2601,8 @@ async function submitForm() {
     return;
   }
 
-  // 🛡️ 必須項目チェック（非company）: 氏名・生年月日・国籍・メールが揃っていることを確認
-  if (type !== 'company') {
+  // 🛡️ 必須項目チェック（非company・非card_delivery）: 氏名・生年月日・国籍・メールが揃っていることを確認
+  if (type !== 'company' && type !== 'card_delivery') {
     var requiredKeys = ['applicantNameEn', 'birthdate', 'nationality', 'email'];
     var missingKeys = requiredKeys.filter(function(k){
       return !response[k] || String(response[k]).trim() === '';
@@ -2820,7 +2851,8 @@ var TYPE_LABELS = {
   gijinkoku_nintei: { cat:'技人国', kind:'認定', catClass:'badge-gijinkoku', kindClass:'badge-nintei' },
   gijinkoku_koushin:{ cat:'技人国', kind:'更新', catClass:'badge-gijinkoku', kindClass:'badge-koushin' },
   gijinkoku_henkou: { cat:'技人国', kind:'変更', catClass:'badge-gijinkoku', kindClass:'badge-koushin' },
-  company:          { cat:'企業情報', kind:'', catClass:'badge-company', kindClass:'' }
+  company:          { cat:'企業情報', kind:'', catClass:'badge-company', kindClass:'' },
+  card_delivery:    { cat:'在留カード送付先', kind:'', catClass:'badge-company', kindClass:'' }
 };
 
 // 名前確認モーダル: caseNameがあれば最初に表示し、確認後にフォーム表示
@@ -2832,7 +2864,7 @@ function _initFormBody(){
     document.getElementById('type-badges').innerHTML = b;
   }
   document.getElementById('mainContent').style.display = 'block';
-  if (type === 'company') {
+  if (type === 'company' || type === 'card_delivery') {
     document.getElementById('btnWrap').style.display = 'block';
     var _pg = document.getElementById('wizProgress'); if (_pg) _pg.style.display = 'none';
     var _rn = document.querySelector('.req-note'); if (_rn) _rn.style.display = 'block';
@@ -2860,7 +2892,7 @@ function confirmName(isMatch){
     document.getElementById('infoBox').innerHTML = '<span class="case-name">' + _escName + '</span>大房行政書士法人よりご依頼の情報をご入力ください。';
     document.getElementById('nameConfirmName').innerHTML = _escName;
   }
-  document.getElementById('formBody').innerHTML = (type === 'company') ? buildForm(type) : buildWizard(type);
+  document.getElementById('formBody').innerHTML = (type === 'company' || type === 'card_delivery') ? buildForm(type) : buildWizard(type);
   if (fieldsFilter && fieldsFilter.length && type === 'company') {
     applyFieldsFilter(fieldsFilter);
   }
