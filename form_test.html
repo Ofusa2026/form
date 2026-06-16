@@ -188,7 +188,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20260616.test.01';
+var FORM_VERSION = 'ver.20260616.test.02';
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -1661,11 +1661,11 @@ function buildForm(t) {
 function buildCardDeliveryForm() {
   var h = '<div class="card">';
   h += '<div class="section-title">新しい在留カードの送付先 / Delivery address for your new residence card</div>';
-  h += '<p style="font-size:13px;color:#475569;line-height:1.6;margin:0 0 14px;">在留資格の許可が下りました。新しい在留カードをお送りします。受け取れるご住所をご記入ください。<br>Your application was approved. Please tell us where to send your new residence card.</p>';
+  h += '<p style="font-size:13px;color:#475569;line-height:1.6;margin:0 0 14px;">在留資格の許可が下りました。新しい在留カードをお送りします。<b>お名前とご住所はあらかじめ入力されています</b>ので、変更があれば直してご確認ください。<br>Your name and address are pre-filled. Please correct them if needed.</p>';
   h += field('f-cdName', 'お名前（受取人）/ Recipient name', 'text', true, '例: NGUYEN VAN A');
   h += field('f-cdZip', '郵便番号 / Postal code', 'text', true, '例: 135-0091');
   h += field('f-cdAddress', 'ご住所 / Address（都道府県・市区町村・番地・建物名・部屋番号）', 'text', true, '例: 東京都港区台場2-3-4 ○○ハイツ201');
-  h += field('f-cdPhone', '電話番号 / Phone', 'text', true, '例: 090-1234-5678');
+  h += field('f-cdPhone', '電話番号 / Phone（あれば／空欄でもOK）', 'text', false, '例: 090-1234-5678');
   h += '</div>';
   return h;
 }
@@ -2495,7 +2495,6 @@ function validate() {
     if (!val('f-cdName')) return 'お名前を入力してください。';
     if (!val('f-cdZip')) return '郵便番号を入力してください。';
     if (!val('f-cdAddress')) return 'ご住所を入力してください。';
-    if (!val('f-cdPhone')) return '電話番号を入力してください。';
     return null;
   }
   if (type === 'company') {
@@ -2855,6 +2854,24 @@ var TYPE_LABELS = {
   card_delivery:    { cat:'在留カード送付先', kind:'', catClass:'badge-company', kindClass:'' }
 };
 
+// 新在留カード送付先フォーム: お名前・ご住所を自動入力（住所はRPCで取得しURLに載せない）
+function prefillCardDelivery(){
+  var nameEl = document.getElementById('f-cdName');
+  if (nameEl && caseName) nameEl.value = caseName;
+  if (!caseId) return;
+  callRpc('form_prefill_card', { p_case_id: caseId })
+    .then(function(r){ return r.ok ? r.json() : null; })
+    .then(function(d){
+      if (!d || typeof d !== 'object') return;
+      var setVal = function(id, v){ var el = document.getElementById(id); if (el && v && !el.value) el.value = v; };
+      if (d.name) setVal('f-cdName', d.name);
+      setVal('f-cdZip', d.jpPostalCode);
+      setVal('f-cdAddress', d.jpAddress);
+      setVal('f-cdPhone', d.phone);
+    })
+    .catch(function(){});
+}
+
 // 名前確認モーダル: caseNameがあれば最初に表示し、確認後にフォーム表示
 function _initFormBody(){
   var info = TYPE_LABELS[type];
@@ -2893,6 +2910,7 @@ function confirmName(isMatch){
     document.getElementById('nameConfirmName').innerHTML = _escName;
   }
   document.getElementById('formBody').innerHTML = (type === 'company' || type === 'card_delivery') ? buildForm(type) : buildWizard(type);
+  if (type === 'card_delivery') prefillCardDelivery();
   if (fieldsFilter && fieldsFilter.length && type === 'company') {
     applyFieldsFilter(fieldsFilter);
   }
