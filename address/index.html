@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex,nofollow">
+<title>在留カードの送付先 / Delivery address</title>
+<style>
+  :root{
+    --navy:#0f2040; --line:#e5e7eb; --muted:#64748b; --bg:#f1f5f9;
+    --accent:#1d4ed8; --ok:#16a34a; --err:#dc2626;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--bg); color:#0f172a;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Hiragino Kaku Gothic ProN","Noto Sans JP",sans-serif;
+    line-height:1.6; -webkit-text-size-adjust:100%;
+  }
+  ruby rt{ font-size:.6em; color:var(--muted); font-weight:400; }
+  .wrap{ max-width:560px; margin:0 auto; padding:0 0 60px; }
+  header{
+    background:var(--navy); color:#fff; padding:20px 20px 18px; text-align:center;
+  }
+  header .org{ font-size:12px; opacity:.75; letter-spacing:.5px; }
+  header h1{ font-size:19px; margin:6px 0 2px; font-weight:700; }
+  header .en{ font-size:12px; opacity:.8; }
+  .body{ padding:18px 18px 0; }
+  .case-box{
+    background:#fff; border:1px solid var(--line); border-radius:12px;
+    padding:13px 15px; font-size:14px; margin-bottom:14px;
+  }
+  .case-box .cn{ font-weight:700; color:var(--navy); }
+  .intro{ font-size:13.5px; color:#334155; margin:0 0 16px; }
+  .intro b{ color:var(--navy); }
+  .card{
+    background:#fff; border:1px solid var(--line); border-radius:14px; padding:18px 16px 6px;
+  }
+  .field{ margin-bottom:16px; }
+  label{ display:block; font-size:14px; font-weight:600; margin-bottom:7px; }
+  label .req{ color:var(--err); margin-left:4px; }
+  label .en{ font-weight:400; color:var(--muted); font-size:12px; }
+  input{
+    width:100%; padding:13px 14px; border:1.5px solid var(--line); border-radius:10px;
+    font-size:16px; outline:none; background:#fff; -webkit-appearance:none; min-height:50px;
+  }
+  input:focus{ border-color:var(--accent); }
+  .zip-row{ margin:-8px 0 14px; display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+  .btn-mini{
+    font-size:13px; padding:8px 12px; border:1.5px solid #cbd5e1; border-radius:9px;
+    background:#f8fafc; color:var(--navy); cursor:pointer;
+  }
+  .btn-mini:active{ background:#eef2f7; }
+  .hint{ font-size:12px; color:var(--muted); }
+  .hint.ok{ color:var(--ok); }
+  .hint.err{ color:var(--err); }
+  .note{ font-size:12px; color:var(--muted); margin-top:-4px; }
+  .submit-wrap{ padding:18px; }
+  button.submit{
+    width:100%; padding:16px; border:none; border-radius:12px; background:var(--navy); color:#fff;
+    font-size:17px; font-weight:700; cursor:pointer;
+  }
+  button.submit:disabled{ opacity:.6; cursor:default; }
+  .errmsg{
+    display:none; background:#fef2f2; color:var(--err); border:1px solid #fecaca;
+    border-radius:10px; padding:12px 14px; font-size:14px; margin:0 18px 8px;
+  }
+  .success{ text-align:center; padding:48px 24px; }
+  .success .ic{ font-size:54px; }
+  .success h2{ color:var(--navy); margin:10px 0 6px; }
+  .success p{ color:#334155; font-size:14px; }
+  .ver{ text-align:center; font-size:10px; color:#94a3b8; margin-top:24px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="org">大房行政書士法人 / OFUSA</div>
+    <h1>新（あたら）しい<ruby>在留<rt>ざいりゅう</rt></ruby><ruby>カード<rt></rt></ruby>の<ruby>送付先<rt>そうふさき</rt></ruby></h1>
+    <div class="en">Delivery address for your new residence card</div>
+  </header>
+
+  <div id="main" class="body">
+    <div id="caseBox" class="case-box" style="display:none;"></div>
+
+    <p class="intro">
+      <ruby>在留<rt>ざいりゅう</rt></ruby><ruby>資格<rt>しかく</rt></ruby>の<ruby>許可<rt>きょか</rt></ruby>が<ruby>下<rt>お</rt></ruby>りました。<ruby>新<rt>あたら</rt></ruby>しい<ruby>在留<rt>ざいりゅう</rt></ruby>カードを<ruby>郵送<rt>ゆうそう</rt></ruby>します。<br>
+      <b>お<ruby>名前<rt>なまえ</rt></ruby>とご<ruby>住所<rt>じゅうしょ</rt></ruby>は、あらかじめ<ruby>入力<rt>にゅうりょく</rt></ruby>されています。</b><ruby>違<rt>ちが</rt></ruby>うときは<ruby>直<rt>なお</rt></ruby>してください。<br>
+      <span style="color:#64748b;font-size:12px;">Your name and address are pre-filled. Please correct them if needed.</span>
+    </p>
+
+    <div class="card">
+      <div class="field">
+        <label>お<ruby>名前<rt>なまえ</rt></ruby>（<ruby>受取人<rt>うけとりにん</rt></ruby>）<span class="req">*</span> <span class="en">/ Recipient name</span></label>
+        <input type="text" id="f-name" placeholder="例: NGUYEN VAN A">
+      </div>
+
+      <div class="field" style="margin-bottom:8px;">
+        <label>ご<ruby>住所<rt>じゅうしょ</rt></ruby><span class="req">*</span> <span class="en">/ Address</span></label>
+        <div class="note"><ruby>都道府県<rt>とどうふけん</rt></ruby>・<ruby>市区町村<rt>しくちょうそん</rt></ruby>・<ruby>番地<rt>ばんち</rt></ruby>・<ruby>建物名<rt>たてものめい</rt></ruby>・<ruby>部屋番号<rt>へやばんごう</rt></ruby>まで</div>
+        <input type="text" id="f-address" placeholder="例: 東京都港区台場2-3-4 ○○ハイツ201" style="margin-top:7px;" onblur="estimateZip(false)">
+      </div>
+
+      <div class="field" style="margin-bottom:6px;">
+        <label><ruby>郵便番号<rt>ゆうびんばんごう</rt></ruby><span class="req">*</span> <span class="en">/ Postal code</span></label>
+        <div class="note">ご<ruby>住所<rt>じゅうしょ</rt></ruby>から<ruby>自動<rt>じどう</rt></ruby>で<ruby>入<rt>はい</rt></ruby>ります</div>
+        <input type="text" id="f-zip" placeholder="例: 135-0091" style="margin-top:7px;" inputmode="numeric">
+      </div>
+      <div class="zip-row">
+        <button type="button" class="btn-mini" onclick="estimateZip(true)">🔍 <ruby>住所<rt>じゅうしょ</rt></ruby>から<ruby>郵便番号<rt>ゆうびんばんごう</rt></ruby>を<ruby>取得<rt>しゅとく</rt></ruby></button>
+        <span id="zipHint" class="hint"></span>
+      </div>
+
+      <div class="field" style="margin-bottom:6px;">
+        <label><ruby>電話番号<rt>でんわばんごう</rt></ruby> <span class="en">/ Phone（あれば・<ruby>空欄<rt>くうらん</rt></ruby>でもOK）</span></label>
+        <input type="text" id="f-phone" placeholder="例: 090-1234-5678" inputmode="tel">
+      </div>
+    </div>
+  </div>
+
+  <div id="errmsg" class="errmsg"></div>
+
+  <div id="submitWrap" class="submit-wrap">
+    <button type="button" class="submit" id="btn-submit" onclick="submitForm()"><ruby>送信<rt>そうしん</rt></ruby>する / Submit</button>
+  </div>
+
+  <div class="ver" id="ver"></div>
+</div>
+
+<script>
+var ADDRESS_VERSION = 'ver.20260616.01';
+
+var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
+var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
+// 住所→郵便番号 推定（Gmail取込GAS v2.24+ の addr2zip アクション）
+var GAS_GEO_URL = 'https://script.google.com/macros/s/AKfycbwOcaCf_Q_m6NMIYEOc-smyY_9pho_2cqZq4fhJB_YC9LtSY2EwPekmXSrMKWY4pDAA2A/exec';
+
+var FORM_TYPE = 'card_delivery';
+
+var params = new URLSearchParams(location.search);
+var caseId   = params.get('case') || '';
+var caseName = params.get('name') ? decodeURIComponent(params.get('name')) : '';
+
+function $(id){ return document.getElementById(id); }
+function val(id){ var e = $(id); return e ? (e.value || '').trim() : ''; }
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function callRpc(fn, body){
+  return fetch(SUPABASE_URL + '/rest/v1/rpc/' + fn, {
+    method:'POST',
+    headers:{ 'Content-Type':'application/json', 'apikey':SUPABASE_KEY, 'Authorization':'Bearer '+SUPABASE_KEY },
+    body: JSON.stringify(body || {})
+  });
+}
+
+// ===== 住所 → 郵便番号 推定（GAS addr2zip をJSONP） =====
+var _zipEstimating = false;
+function estimateZip(force){
+  var addrEl = $('f-address'), zipEl = $('f-zip'), hintEl = $('zipHint');
+  if (!addrEl || !zipEl) return;
+  var addr = (addrEl.value || '').trim();
+  if (!addr){ if (force && hintEl){ hintEl.className='hint err'; hintEl.textContent='先にご住所を入力してください。'; } return; }
+  if (!force && zipEl.value.trim()) return;          // 既に郵便番号があれば自動上書きしない
+  if (_zipEstimating) return;
+  if (!GAS_GEO_URL) return;
+  _zipEstimating = true;
+  if (hintEl){ hintEl.className='hint'; hintEl.textContent='住所から郵便番号を取得中…'; }
+  var cb = '_zipCb' + Date.now();
+  var done = false;
+  var cleanup = function(){ try{ delete window[cb]; }catch(e){} var s=$(cb); if(s&&s.parentNode) s.parentNode.removeChild(s); };
+  var finish = function(){ if(done) return; done=true; _zipEstimating=false; clearTimeout(timer); cleanup(); };
+  var timer = setTimeout(function(){ if(done) return; finish(); if(hintEl){ hintEl.className='hint err'; hintEl.textContent='郵便番号を自動取得できませんでした。手入力してください。'; } }, 8000);
+  window[cb] = function(res){
+    if (done) return; finish();
+    if (res && res.status === 'ok' && res.zip){
+      zipEl.value = res.zip;
+      if (hintEl){ hintEl.className='hint ok'; hintEl.textContent='住所から推定しました（違うときは直してください）'; }
+    } else {
+      if (hintEl){ hintEl.className='hint err'; hintEl.textContent='郵便番号を自動取得できませんでした。手入力してください。'; }
+    }
+  };
+  var s = document.createElement('script');
+  s.id = cb;
+  s.src = GAS_GEO_URL + '?action=addr2zip&addr=' + encodeURIComponent(addr) + '&callback=' + cb;
+  s.onerror = function(){ finish(); if(hintEl){ hintEl.className='hint err'; hintEl.textContent='郵便番号を自動取得できませんでした。手入力してください。'; } };
+  document.body.appendChild(s);
+}
+
+// ===== 自動入力（お名前=URL、住所等=RPC） =====
+function prefill(){
+  if (caseName && !$('f-name').value) $('f-name').value = caseName;
+  if (!caseId) return;
+  callRpc('form_prefill_card', { p_case_id: caseId })
+    .then(function(r){ return r.ok ? r.json() : null; })
+    .then(function(d){
+      if (!d || typeof d !== 'object') return;
+      var setIf = function(id, v){ var e=$(id); if(e && v && !e.value) e.value = v; };
+      if (d.name) setIf('f-name', d.name);
+      setIf('f-zip', d.jpPostalCode);
+      setIf('f-address', d.jpAddress);
+      setIf('f-phone', d.phone);
+      if (val('f-address') && !val('f-zip')) estimateZip(false);  // 住所あり・郵便番号なし→推定
+    })
+    .catch(function(){});
+}
+
+function validate(){
+  if (!val('f-name')) return 'お名前を入力してください。';
+  if (!val('f-address')) return 'ご住所を入力してください。';
+  if (!val('f-zip')) return '郵便番号を入力してください。';
+  return null;
+}
+
+function showErr(msg){
+  var el = $('errmsg'); el.textContent = msg; el.style.display = 'block';
+  el.scrollIntoView({ behavior:'smooth', block:'center' });
+}
+
+function submitForm(){
+  $('errmsg').style.display = 'none';
+  var err = validate();
+  if (err){ showErr(err); return; }
+  var response = {
+    recipientName: val('f-name'),
+    jpPostalCode:  val('f-zip'),
+    jpAddress:     val('f-address'),
+    phone:         val('f-phone')
+  };
+  Object.keys(response).forEach(function(k){ if(!response[k]) delete response[k]; });
+
+  var btn = $('btn-submit');
+  btn.disabled = true; btn.textContent = '送信中... / Sending...';
+
+  callRpc('form_save', { p_case_id: caseId, p_form_type: FORM_TYPE, p_response_id: '', p_response: response, p_submit: true })
+    .then(function(res){
+      if (!res.ok){
+        return res.text().then(function(t){
+          if (t && t.indexOf('FORM_VALIDATION_ERROR') >= 0) throw new Error('SERVER_VALIDATION_FAILED');
+          throw new Error('HTTP ' + res.status);
+        });
+      }
+      return res.json();
+    })
+    .then(function(){
+      $('main').style.display = 'none';
+      $('submitWrap').style.display = 'none';
+      $('errmsg').style.display = 'none';
+      var s = document.createElement('div');
+      s.className = 'success';
+      s.innerHTML = '<div class="ic">✅</div><h2>送信完了 / Done</h2>' +
+        '<p>ご回答ありがとうございました。<br>担当者が内容を確認いたします。<br>' +
+        '<span style="color:#64748b;font-size:12px;">Thank you. We will send your residence card to this address.</span></p>';
+      $('main').parentNode.insertBefore(s, $('main'));
+    })
+    .catch(function(e){
+      btn.disabled = false; btn.textContent = '送信する / Submit';
+      if (e.message === 'SERVER_VALIDATION_FAILED'){
+        showErr('⚠️ 入力内容に不備がありました。ページを再読み込み（リロード）して、もう一度入力してください。');
+      } else {
+        showErr('送信に失敗しました。通信環境をご確認のうえ、もう一度お試しください。(' + e.message + ')');
+      }
+    });
+}
+
+// ===== init =====
+(function init(){
+  if (caseName){
+    var box = $('caseBox');
+    box.style.display = 'block';
+    box.innerHTML = '<span class="cn">' + esc(caseName) + '</span> 様<br><span style="color:#64748b;font-size:12px;">大房行政書士法人よりご依頼の情報です。</span>';
+  }
+  var v = $('ver'); if (v) v.textContent = ADDRESS_VERSION;
+  prefill();
+})();
+</script>
+</body>
+</html>
