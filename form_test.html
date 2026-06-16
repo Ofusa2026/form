@@ -188,13 +188,15 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20260616.test.02';
+var FORM_VERSION = 'ver.20260616.test.03';
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
 function callRpc(fn, body){ return fetch(SUPABASE_URL + '/rest/v1/rpc/' + fn, { method:'POST', headers:{'Content-Type':'application/json','apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY}, body: JSON.stringify(body||{}) }); }
 // ver.20260608.test.01: 在留カード/パスポート撮影→項目自動入力（OCR）。送信先は案件管理GAS(anken) v4.0 の ocrResidenceCard アクション。
 var GAS_OCR_URL = 'https://script.google.com/macros/s/AKfycbxxBta5g1jXVzTf-s4EgaIbMc3No42aaH8guMOorQQ8HZl2SlNu-8vpu0fCFj_rjKsalQ/exec';
+// 住所→郵便番号 推定（Gmail取込GAS v2.24+ の addr2zip アクション）
+var GAS_GEO_URL = 'https://script.google.com/macros/s/AKfycbwOcaCf_Q_m6NMIYEOc-smyY_9pho_2cqZq4fhJB_YC9LtSY2EwPekmXSrMKWY4pDAA2A/exec';
 
 var params = new URLSearchParams(location.search);
 var caseId  = params.get('case') || '';
@@ -1663,8 +1665,12 @@ function buildCardDeliveryForm() {
   h += '<div class="section-title">新しい在留カードの送付先 / Delivery address for your new residence card</div>';
   h += '<p style="font-size:13px;color:#475569;line-height:1.6;margin:0 0 14px;">在留資格の許可が下りました。新しい在留カードをお送りします。<b>お名前とご住所はあらかじめ入力されています</b>ので、変更があれば直してご確認ください。<br>Your name and address are pre-filled. Please correct them if needed.</p>';
   h += field('f-cdName', 'お名前（受取人）/ Recipient name', 'text', true, '例: NGUYEN VAN A');
-  h += field('f-cdZip', '郵便番号 / Postal code', 'text', true, '例: 135-0091');
   h += field('f-cdAddress', 'ご住所 / Address（都道府県・市区町村・番地・建物名・部屋番号）', 'text', true, '例: 東京都港区台場2-3-4 ○○ハイツ201');
+  h += field('f-cdZip', '郵便番号 / Postal code（住所から自動で入ります）', 'text', true, '例: 135-0091');
+  h += '<div style="margin:-6px 0 12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">';
+  h += '<button type="button" onclick="estimateZipFromAddress(true)" style="font-size:13px;padding:7px 12px;border:1.5px solid #cbd5e1;border-radius:8px;background:#f8fafc;color:#0f2040;cursor:pointer;">🔍 住所から郵便番号を取得</button>';
+  h += '<span id="cdZipHint" style="font-size:12px;color:#64748b;"></span>';
+  h += '</div>';
   h += field('f-cdPhone', '電話番号 / Phone（あれば／空欄でもOK）', 'text', false, '例: 090-1234-5678');
   h += '</div>';
   return h;
@@ -2855,9 +2861,50 @@ var TYPE_LABELS = {
 };
 
 // 新在留カード送付先フォーム: お名前・ご住所を自動入力（住所はRPCで取得しURLに載せない）
+// 住所 → 郵便番号 推定（GAS addr2zip をJSONPで呼ぶ）。推定できなければ何もしない（手入力のまま）
+var _zipEstimating = false;
+function estimateZipFromAddress(force){
+  var addrEl = document.getElementById('f-cdAddress');
+  var zipEl  = document.getElementById('f-cdZip');
+  var hintEl = document.getElementById('cdZipHint');
+  if (!addrEl || !zipEl) return;
+  var addr = (addrEl.value || '').trim();
+  if (!addr) { if (force && hintEl) hintEl.textContent = '先にご住所を入力してください。'; return; }
+  if (!force && zipEl.value.trim()) return;            // 既に郵便番号があれば自動では上書きしない
+  if (_zipEstimating) return;
+  if (typeof GAS_GEO_URL === 'undefined' || !GAS_GEO_URL) return;
+  _zipEstimating = true;
+  if (hintEl) hintEl.textContent = '住所から郵便番号を取得中…';
+  var cb = '_cdZipCb' + Date.now();
+  var done = false;
+  var cleanup = function(){ try { delete window[cb]; } catch(e){} var s = document.getElementById(cb); if (s && s.parentNode) s.parentNode.removeChild(s); };
+  var finish = function(){ if (done) return; done = true; _zipEstimating = false; clearTimeout(timer); cleanup(); };
+  var timer = setTimeout(function(){ if (done) return; finish(); if (hintEl) hintEl.textContent = ''; }, 8000);
+  window[cb] = function(res){
+    if (done) return; finish();
+    if (res && res.status === 'ok' && res.zip) {
+      zipEl.value = res.zip;
+      if (hintEl) hintEl.textContent = '住所から推定しました（違うときは直してください）';
+    } else {
+      if (hintEl) hintEl.textContent = '郵便番号を自動取得できませんでした。手入力してください。';
+    }
+  };
+  var s = document.createElement('script');
+  s.id = cb;
+  s.src = GAS_GEO_URL + '?action=addr2zip&addr=' + encodeURIComponent(addr) + '&callback=' + cb;
+  s.onerror = function(){ finish(); if (hintEl) hintEl.textContent = '郵便番号を自動取得できませんでした。手入力してください。'; };
+  document.body.appendChild(s);
+}
+
 function prefillCardDelivery(){
   var nameEl = document.getElementById('f-cdName');
   if (nameEl && caseName) nameEl.value = caseName;
+  // 住所欄を離れたら（変更されたら）郵便番号が空のとき自動推定
+  var addrEl = document.getElementById('f-cdAddress');
+  if (addrEl && !addrEl._cdZipBound) {
+    addrEl._cdZipBound = true;
+    addrEl.addEventListener('blur', function(){ estimateZipFromAddress(false); });
+  }
   if (!caseId) return;
   callRpc('form_prefill_card', { p_case_id: caseId })
     .then(function(r){ return r.ok ? r.json() : null; })
@@ -2868,6 +2915,10 @@ function prefillCardDelivery(){
       setVal('f-cdZip', d.jpPostalCode);
       setVal('f-cdAddress', d.jpAddress);
       setVal('f-cdPhone', d.phone);
+      // 住所が入っていて郵便番号が空なら、住所から自動推定
+      var zEl = document.getElementById('f-cdZip');
+      var aEl = document.getElementById('f-cdAddress');
+      if (aEl && aEl.value.trim() && zEl && !zEl.value.trim()) estimateZipFromAddress(false);
     })
     .catch(function(){});
 }
