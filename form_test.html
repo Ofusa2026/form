@@ -259,7 +259,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20260624.test.15';
+var FORM_VERSION = 'ver.20260624.test.16';
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -1915,6 +1915,13 @@ function fieldT(id, label, type, req, placeholder, transKey, opts, tipText) {
       id === 'f-housingProvided' ? ' onchange="toggleHousingDetail(this.value)"' :
       id === 'f-foodProvided'    ? ' onchange="toggleFoodDetail(this.value)"' :
       id === 'f-shiftFlg'        ? ' onchange="toggleShiftDetail(this.value)"' :
+      id === 'f-salaryRaise'     ? ' onchange="toggleSalaryRaiseCond(this.value)"' :
+      id === 'f-bonus'           ? ' onchange="toggleBonusCond(this.value)"' :
+      id === 'f-retirement'      ? ' onchange="toggleRetirementDetail(this.value)"' :
+      id === 'f-severancePay'    ? ' onchange="toggleSeveranceRate(this.value)"' :
+      id === 'f-insKenpo'        ? ' onchange="toggleNationalHealthIns(this.value)"' :
+      id === 'f-insPension'      ? ' onchange="toggleNationalPensionIns(this.value)"' :
+      id === 'f-housingOwnership'? ' onchange="toggleHousingOwnership(this.value)"' :
       '';
     h += '<select id="' + id + '"' + _onchange + '>';
     (opts||[]).forEach(function(o){ h += '<option value="' + o + '">' + (o||'選択してください') + '</option>'; });
@@ -1969,6 +1976,7 @@ function switchCoPage(page) {
     t3.style.background='#475569'; t3.style.color='white';
   }
   _initTips();
+  _initAutoCalc();
   window.scrollTo({top:0, behavior:'smooth'});
 }
 
@@ -2007,6 +2015,7 @@ function buildCompanyPage1() {
       fieldT('f-coZip','郵便番号','text',false,'例: 160-0022','','','ハイフンあり・なしどちらでも可です。') +
       fieldT('f-coPref','都道府県','text',false,'例: 東京都','','','') +
     '</div>' +
+    '<button type="button" onclick="zipToAddress()" style="font-size:11px;padding:6px 14px;background:white;border:1.5px solid #0891b2;color:#0891b2;border-radius:6px;cursor:pointer;font-weight:700;margin-top:-8px;margin-bottom:12px;">🔍 郵便番号から住所を自動入力</button>' +
     fieldT('f-coCity','市区町村','text',false,'例: 新宿区','','','') +
     fieldT('f-coAddress','町名番地・建物名','text',false,'例: 新宿2丁目1番1号 〇〇ビル3F','','','') +
     fieldT('f-coAddressEn','住所（英語）','text',false,'例: 3F OO Bldg., 2-1-1 Shinjuku, Shinjuku-ku, Tokyo','','','雇用条件書英語版・支援計画書英語版に記載します。') +
@@ -2041,6 +2050,7 @@ function buildCompanyPage1() {
       fieldT('f-consultNameEn','担当者名（英語）','text',false,'例: TANAKA ICHIRO','','','') +
     '</div>' +
     fieldT('f-consultTel','電話番号','text',false,'例: 03-1234-5678','','','') +
+    '<button type="button" onclick="copyCoTelToConsult()" style="font-size:11px;padding:6px 14px;background:white;border:1.5px solid #db2777;color:#db2777;border-radius:6px;cursor:pointer;font-weight:700;margin-top:-8px;margin-bottom:12px;">📋 本社電話番号をコピー</button>' +
 
     '<div class="sub-label">【役員情報】' + tip('tip_officer','申請書類（役員名簿等）に記載する役員の情報。履歴事項全部証明書（謄本）に記載の役員を全員記入してください。') + '</div>' +
     '<div style="font-size:11px;color:#6b7280;margin-bottom:8px;">代表者を含む全役員を記入してください</div>' +
@@ -2058,6 +2068,7 @@ function buildCompanyPage2() {
   '<div class="card" data-section="office">' +
     '<div class="section-title"><span class="section-step" style="background:#0d9488;">1</span>🏭 就業場所（事業所）</div>' +
     '<div style="font-size:11px;color:#6b7280;background:#f0f9ff;border-radius:8px;padding:10px;margin-bottom:12px;border-left:3px solid #0ea5e9;">本社と就業場所が同じ場合も記入してください。</div>' +
+    '<button type="button" onclick="copyCoToOffice()" style="width:100%;padding:10px;background:#0d9488;color:white;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;margin-bottom:12px;">📋 本社情報をコピー（名称・住所・電話）</button>' +
     fieldT('f-officeName','事業所名','text',false,'例: 株式会社〇〇 板橋工場','','','雇用条件書Ⅱ（就業の場所）に記載します。') +
     fieldT('f-officeNameEn','事業所名（英語）','text',false,'例: OO Co., Ltd. Itabashi Factory','','','英語版雇用条件書に記載します。') +
     fieldT('f-officeAddress','事業所住所','text',false,'例: 東京都板橋区板橋1丁目2番3号','','','') +
@@ -2078,6 +2089,10 @@ function buildCompanyPage2() {
       fieldT('f-contractStart','契約開始日','date',false,'','','','雇用開始予定日を記入してください。') +
       fieldT('f-contractEnd','契約終了日','date',false,'','','','在留期間の満了日以内で設定してください。') +
     '</div>' +
+    '<div style="display:flex;gap:8px;margin-top:-8px;margin-bottom:12px;">' +
+      '<button type="button" onclick="setContractEnd(1)" style="flex:1;padding:8px;background:white;border:1.5px solid #2563eb;color:#2563eb;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;">📅 開始日の1年後をセット</button>' +
+      '<button type="button" onclick="setContractEnd(2)" style="flex:1;padding:8px;background:white;border:1.5px solid #7c3aed;color:#7c3aed;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;">📅 開始日の2年後をセット</button>' +
+    '</div>' +
     fieldT('f-entryDate','入国予定日','date',false,'','','','新規入国の場合のみ記入。すでに日本にいる場合は空欄でOKです。') +
     fieldT('f-contractRenewal','契約更新の有無','select',false,'',null,['','更新する場合があり得る','更新しない','自動更新'],'雇用条件書Ⅰ-2に記載します。') +
     fieldT('f-renewalCriteria','更新の判断基準','select',false,'',null,['','契約期間満了時の業務量','労働者の勤務成績・態度','業務を遂行する能力','会社の経営状況','従事している業務の進捗状況','その他'],'「更新する場合があり得る」の場合に選択してください。') +
@@ -2089,6 +2104,7 @@ function buildCompanyPage2() {
       fieldT('f-salaryMonthly','基本給（円）','number',false,'例: 200000','','','固定残業代・手当を含まない基本的な給与額。') +
     '</div>' +
     fieldT('f-totalMonthly','月額支払概算額（税引き前）','number',false,'例: 228350','','','基本給＋固定残業代＋手当の合計（支払総額）。ラセンズ入力に使用します。') +
+    '<button type="button" onclick="calcTotalMonthly()" style="font-size:11px;padding:6px 14px;background:white;border:1.5px solid #ea580c;color:#ea580c;border-radius:6px;cursor:pointer;font-weight:700;margin-top:-8px;margin-bottom:12px;">⚡ 基本給＋手当＋固定残業代を自動合計</button>' +
 
     '<div class="sub-label">【手当】</div>' +
     '<div id="allowanceRows">' + allowanceRow(1) + '</div>' +
@@ -2129,9 +2145,11 @@ function buildCompanyPage2() {
     fieldT('f-housingProvided','居住費徴収の有無','select',false,'',null,['','有','無'],'会社が社員寮等を提供し家賃を控除する場合は「有」を選択してください。') +
     fieldT('f-deductHousing','居住費控除 月額（円）','number',false,'例: 13000','','','') +
     fieldT('f-housingDetail','居住費 適正額の説明','textarea',false,'例: 月額13万円で借上の物件。居住人数10名のため1万3千円は適正。','','','近隣相場と比較して適正であることを説明してください。') +
+    '<button type="button" onclick="genHousingDetail()" style="font-size:11px;padding:6px 14px;background:white;border:1.5px solid #ea580c;color:#ea580c;border-radius:6px;cursor:pointer;font-weight:700;margin-top:-8px;margin-bottom:12px;">📝 適正額説明文を自動生成</button>' +
     fieldT('f-foodProvided','食費徴収の有無','select',false,'',null,['','有','無'],'社員食堂等の食事代を控除する場合は「有」を選択してください。') +
     fieldT('f-deductFood','食費控除 月額（円）','number',false,'例: 10000','','','') +
     fieldT('f-foodDetail','食費 適正額の説明・食事内容','textarea',false,'例: 社員食堂で昼食1食500円。月20日×500円=10,000円は適正。','','','') +
+    '<button type="button" onclick="genFoodDetail()" style="font-size:11px;padding:6px 14px;background:white;border:1.5px solid #ea580c;color:#ea580c;border-radius:6px;cursor:pointer;font-weight:700;margin-top:-8px;margin-bottom:12px;">📝 適正額説明文を自動生成</button>' +
     '<div class="grid2">' +
       fieldT('f-deductUtility','水道光熱費 月額（円）','number',false,'なければ 0','','','') +
       fieldT('f-deductOther1Name','その他控除① 名目','text',false,'例: 通信費','','','') +
@@ -2206,6 +2224,7 @@ function buildCompanyPage2() {
       fieldT('f-yearlyH','年所定労働時間','number',false,'例: 2080','','','') +
     '</div>' +
     fieldT('f-overtimeFlg','所定労働時間外労働の有無','select',false,'',null,['','有','無'],'残業が発生する場合は「有」を選択してください。') +
+    '<button type="button" onclick="calcAllHours()" style="width:100%;padding:10px;background:#d97706;color:white;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;margin-bottom:12px;">⚡ 労働時間を自動計算（始業・終業・休憩・年間休日から算出）</button>' +
     '<div class="sub-label">【交代制・変形労働時間制】</div>' +
     fieldT('f-shiftFlg','交代制（シフト制）の採用','select',false,'',null,['','あり','なし'],'') +
     fieldT('f-shiftDetail','シフトパターン詳細','textarea',false,'例: 早番 7:00-16:00 / 遅番 13:00-22:00（週ごとに交代）','','','') +
@@ -2242,6 +2261,7 @@ function buildCompanyPage2() {
     '</div>' +
     fieldT('f-otherHoliday','その他休日（GW・夏季・年末年始等）','text',false,'例: GW5日・夏季3日・年末年始5日','','','') +
     fieldT('f-annualHolidays','年間休日数','number',false,'例: 120','','','') +
+    '<button type="button" onclick="calcAllHours()" style="font-size:11px;padding:6px 14px;background:white;border:1.5px solid #d97706;color:#d97706;border-radius:6px;cursor:pointer;font-weight:700;margin-top:-8px;margin-bottom:12px;">⚡ 年間休日数から労働時間を再計算</button>' +
     '<div class="sub-label">【休暇】</div>' +
     '<div class="grid2">' +
       fieldT('f-paidLeaveCount','年次有給休暇 付与日数（6か月後）','number',false,'例: 10','','','6か月継続勤務後の付与日数。法定では10日。') +
@@ -2261,6 +2281,7 @@ function buildCompanyPage2() {
       fieldT('f-resignNoticeTo','届出先','text',false,'例: 社長・工場長等','','','') +
     '</div>' +
     fieldT('f-dismissalReason','解雇の事由及び手続','textarea',false,'例: やむを得ない事由がある場合に限り、30日前予告または30日分以上の平均賃金を支払い解雇する。','','','') +
+    '<button type="button" onclick="insertDismissalText()" style="font-size:11px;padding:6px 14px;background:white;border:1.5px solid #dc2626;color:#dc2626;border-radius:6px;cursor:pointer;font-weight:700;margin-top:-8px;margin-bottom:12px;">📝 法令準拠の定型文を挿入</button>' +
     fieldT('f-returnFare','帰国旅費の負担','select',false,'',null,['','会社が負担する','本人が負担する（会社は支援する）'],'雇用条件書Ⅸ-5に記載します。') +
   '</div>'
   );
@@ -2322,6 +2343,7 @@ function buildCompanyPage3() {
     fieldT('f-jpCompSalaryRule','賃金規定に基づく同等報酬額（円）','number',false,'例: 220000','','','賃金規定がある場合、規定に基づいて算出した報酬額を記入してください。') +
     fieldT('f-jpCompLicense','比較する日本人の保有資格（建設分野の場合は必ず記載）','textarea',false,'例: 一級技能士・基幹技能士など','','','建設分野の場合、同等技能の証明として保有資格の記載が必要です。他分野でも資格があれば記載してください。') +
     fieldT('f-jpCompReason','同等以上の理由','textarea',false,'例: 同一ラインで同等業務に従事しており、経験年数・職務内容が同等であるため','','','') +
+    '<button type="button" onclick="genJpCompReason()" style="font-size:11px;padding:6px 14px;background:white;border:1.5px solid #b45309;color:#b45309;border-radius:6px;cursor:pointer;font-weight:700;margin-top:-8px;margin-bottom:12px;">📝 定型文を自動生成</button>' +
   '</div>'
   );
 }
@@ -2488,6 +2510,250 @@ function toggleFirstEntryDate(val) {
 function toggleFlexType(val) {
   var el = document.getElementById('flexTypeWrap');
   if (el) el.style.display = val === '適用あり' ? 'block' : 'none';
+}
+
+// ===== 企業フォーム 自動化関数群 =====
+
+// --- コピーボタン ---
+function copyCoToOffice() {
+  var map = {
+    'f-officeName': document.getElementById('f-coName') ? document.getElementById('f-coName').value : '',
+    'f-officeAddress': [
+      document.getElementById('f-coPref') ? document.getElementById('f-coPref').value : '',
+      document.getElementById('f-coCity') ? document.getElementById('f-coCity').value : '',
+      document.getElementById('f-coAddress') ? document.getElementById('f-coAddress').value : ''
+    ].join(''),
+    'f-officeTel': document.getElementById('f-coTel') ? document.getElementById('f-coTel').value : ''
+  };
+  Object.keys(map).forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el && map[id]) { el.value = map[id]; el.dispatchEvent(new Event('input')); }
+  });
+}
+function copyCoTelToConsult() {
+  var src = document.getElementById('f-coTel');
+  var dst = document.getElementById('f-consultTel');
+  if (src && dst) { dst.value = src.value; dst.dispatchEvent(new Event('input')); }
+}
+
+// --- 郵便番号→住所 ---
+function zipToAddress() {
+  var zip = (document.getElementById('f-coZip') || {}).value || '';
+  zip = zip.replace(/[^0-9]/g, '');
+  if (zip.length !== 7) return;
+  fetch('https://zipcloud.ibsnet.co.jp/api/search?zipcode=' + zip)
+    .then(function(r){ return r.json(); })
+    .then(function(d){
+      if (!d.results) return;
+      var r = d.results[0];
+      var pref = document.getElementById('f-coPref');
+      var city = document.getElementById('f-coCity');
+      var addr = document.getElementById('f-coAddress');
+      if (pref) { pref.value = r.address1; pref.dispatchEvent(new Event('input')); }
+      if (city) { city.value = r.address2 + r.address3; city.dispatchEvent(new Event('input')); }
+      if (addr && !addr.value) addr.focus();
+    }).catch(function(){});
+}
+
+// --- 労働時間 自動計算 ---
+function calcDailyHours() {
+  var st = document.getElementById('f-startTime');
+  var et = document.getElementById('f-endTime');
+  var br = document.getElementById('f-breakTime');
+  var dh = document.getElementById('f-dailyHours');
+  if (!st || !et || !br || !dh) return;
+  var sv = st.value, ev = et.value;
+  if (!sv || !ev) return;
+  var sm = parseInt(sv.split(':')[0])*60 + parseInt(sv.split(':')[1]);
+  var em = parseInt(ev.split(':')[0])*60 + parseInt(ev.split(':')[1]);
+  var brk = parseFloat(br.value) || 0;
+  var total = (em - sm - brk) / 60;
+  if (total > 0) { dh.value = Math.round(total * 100) / 100; dh.dispatchEvent(new Event('input')); calcAllHours(); }
+}
+function calcAllHours() {
+  var dh = parseFloat((document.getElementById('f-dailyHours')||{}).value) || 0;
+  var hol = parseFloat((document.getElementById('f-annualHolidays')||{}).value) || 0;
+  var yearlyDays = 365 - hol;
+  var yearlyH = Math.round(yearlyDays * dh * 10) / 10;
+  var weeklyH = Math.round(yearlyH / 52.14 * 10) / 10;
+  var monthlyH = Math.round(yearlyH / 12 * 10) / 10;
+  var monthlyDays = Math.round(yearlyDays / 12 * 10) / 10;
+  var set = function(id, val) {
+    var el = document.getElementById(id);
+    if (el && val > 0) { el.value = val; el.dispatchEvent(new Event('input')); }
+  };
+  set('f-yearlyDays', yearlyDays);
+  set('f-yearlyH', yearlyH);
+  set('f-weeklyH', weeklyH);
+  set('f-monthlyH', monthlyH);
+  set('f-monthlyDays', monthlyDays);
+}
+
+// --- 月額合計 自動計算 ---
+function calcTotalMonthly() {
+  var base = parseFloat((document.getElementById('f-salaryMonthly')||{}).value) || 0;
+  var fixed = parseFloat((document.getElementById('f-fixedOTAmount')||{}).value) || 0;
+  var allow = 0;
+  for (var i = 1; i <= 4; i++) {
+    allow += parseFloat((document.getElementById('f-allowance'+i+'Amount')||{}).value) || 0;
+  }
+  var total = base + fixed + allow;
+  var el = document.getElementById('f-totalMonthly');
+  if (el && total > 0) { el.value = total; el.dispatchEvent(new Event('input')); }
+}
+
+// --- 年間休日数 自動計算補助 ---
+function calcAnnualHolidays() {
+  var days = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun','Hol'];
+  var weeklyOff = 0;
+  days.forEach(function(d) {
+    var el = document.getElementById('f-fixedHoliday'+d);
+    if (el && el.value === '休み') weeklyOff++;
+  });
+  var weekly = parseInt((document.getElementById('f-nonRegWeeklyDays')||{}).value) || weeklyOff;
+  var other = 15; // GW+夏季+年末年始の概算
+  var total = Math.round(weekly * 52) + other;
+  var el = document.getElementById('f-annualHolidays');
+  if (el) { el.value = total; el.dispatchEvent(new Event('input')); calcAllHours(); }
+}
+
+// --- 契約終了日 自動セット ---
+function setContractEnd(years) {
+  var start = document.getElementById('f-contractStart');
+  var end = document.getElementById('f-contractEnd');
+  if (!start || !start.value || !end) return;
+  var d = new Date(start.value);
+  d.setFullYear(d.getFullYear() + years);
+  d.setDate(d.getDate() - 1);
+  end.value = d.toISOString().split('T')[0];
+  end.dispatchEvent(new Event('input'));
+}
+
+// --- show/hide 系 ---
+function toggleHousingDetail(val) {
+  var els = ['f-deductHousing','f-housingDetail'];
+  var show = val === '有';
+  els.forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el && el.closest('.field')) el.closest('.field').style.display = show ? 'block' : 'none';
+  });
+}
+function toggleFoodDetail(val) {
+  var els = ['f-deductFood','f-foodDetail'];
+  var show = val === '有';
+  els.forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el && el.closest('.field')) el.closest('.field').style.display = show ? 'block' : 'none';
+  });
+}
+function toggleShiftDetail(val) {
+  var el = document.getElementById('f-shiftDetail');
+  if (el && el.closest('.field')) el.closest('.field').style.display = val === 'あり' ? 'block' : 'none';
+}
+function toggleSalaryRaiseCond(val) {
+  var el = document.getElementById('f-salaryRaiseCond');
+  if (el && el.closest('.field')) el.closest('.field').style.display = val === '有' ? 'block' : 'none';
+}
+function toggleBonusCond(val) {
+  var el = document.getElementById('f-bonusCond');
+  if (el && el.closest('.field')) el.closest('.field').style.display = val === '有' ? 'block' : 'none';
+}
+function toggleRetirementDetail(val) {
+  var el = document.getElementById('f-retirementDetail');
+  if (el && el.closest('.field')) el.closest('.field').style.display = val === '有' ? 'block' : 'none';
+}
+function toggleSeveranceRate(val) {
+  var el = document.getElementById('f-severancePayRate');
+  if (el && el.closest('.field')) el.closest('.field').style.display = val === '有' ? 'block' : 'none';
+}
+function toggleNationalHealthIns(val) {
+  var el = document.getElementById('f-insNationalHealth');
+  if (el && el.closest('.field')) el.closest('.field').style.display = val.indexOf('未加入') >= 0 ? 'block' : 'none';
+}
+function toggleNationalPensionIns(val) {
+  var el = document.getElementById('f-insNationalPension');
+  if (el && el.closest('.field')) el.closest('.field').style.display = val.indexOf('未加入') >= 0 ? 'block' : 'none';
+}
+function toggleHousingOwnership(val) {
+  var ids = ['f-cohabitants','f-actualCostDesc'];
+  var show = val && val !== '提供なし（本人が自分で探す）';
+  ids.forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el && el.closest('.field')) el.closest('.field').style.display = show ? 'block' : 'none';
+  });
+}
+
+// --- 定型文挿入 ---
+function insertDismissalText() {
+  var el = document.getElementById('f-dismissalReason');
+  if (!el) return;
+  el.value = 'やむを得ない事由がある場合に限り、少なくとも30日前に予告をするか、又は30日分以上の平均賃金を支払って解雇する。特定技能外国人の責めに帰すべき事由に基づいて解雇する場合には、所轄労働基準監督署長の認定を受けることにより予告も平均賃金の支払も行わず即時解雇されることもあり得る。';
+  el.dispatchEvent(new Event('input'));
+}
+function genHousingDetail() {
+  var amt = (document.getElementById('f-deductHousing')||{}).value || '○○';
+  var num = (document.getElementById('f-cohabitants')||{}).value || '○';
+  var rent = (document.getElementById('f-deductHousing')||{}).value;
+  // 総家賃は控除額×人数を推定
+  var total = rent && num ? parseInt(rent) * parseInt(num) : null;
+  var el = document.getElementById('f-housingDetail');
+  if (!el) return;
+  var text = total
+    ? '月額' + total.toLocaleString() + '円で借上の物件。居住人数' + num + '名のため1人あたり' + parseInt(amt).toLocaleString() + '円は近隣相場と比較して適正額である。'
+    : '月額○○円で借上の物件。居住人数○名のため1人あたり' + amt + '円は近隣相場と比較して適正額である。';
+  el.value = text;
+  el.dispatchEvent(new Event('input'));
+}
+function genFoodDetail() {
+  var amt = (document.getElementById('f-deductFood')||{}).value || '○○';
+  var el = document.getElementById('f-foodDetail');
+  if (!el) return;
+  el.value = '社員食堂（または弁当支給）により食費として月額' + parseInt(amt).toLocaleString() + '円を控除する。実費相当額であり適正額である。';
+  el.dispatchEvent(new Event('input'));
+}
+function genJpCompReason() {
+  var job = (document.getElementById('f-jpCompJobDesc')||{}).value || '同等の業務';
+  var exp = (document.getElementById('f-jpCompExp')||{}).value || '同等';
+  var el = document.getElementById('f-jpCompReason');
+  if (!el) return;
+  el.value = '比較対象の日本人は、特定技能外国人と同一の就業場所において' + job + 'に従事しており、経験年数（' + exp + '）・職務内容・業務範囲が同等である。両者の報酬を比較した結果、特定技能外国人の報酬は同等以上であることを確認した。';
+  el.dispatchEvent(new Event('input'));
+}
+
+// --- 初期化：計算トリガーを登録 ---
+function _initAutoCalc() {
+  var triggers = {
+    'f-startTime':    calcDailyHours,
+    'f-endTime':      calcDailyHours,
+    'f-breakTime':    calcDailyHours,
+    'f-annualHolidays': calcAllHours,
+    'f-dailyHours':   calcAllHours,
+    'f-salaryMonthly':  calcTotalMonthly,
+    'f-fixedOTAmount':  calcTotalMonthly,
+    'f-coZip': function() { var z = (document.getElementById('f-coZip')||{}).value||''; if(z.replace(/[^0-9]/g,'').length===7) zipToAddress(); }
+  };
+  for(var i=1;i<=4;i++) triggers['f-allowance'+i+'Amount'] = calcTotalMonthly;
+  Object.keys(triggers).forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) { el.addEventListener('input', triggers[id]); el.addEventListener('change', triggers[id]); }
+  });
+  // 初期状態でhide系を適用
+  var hideInits = [
+    ['f-housingProvided', toggleHousingDetail],
+    ['f-foodProvided', toggleFoodDetail],
+    ['f-shiftFlg', toggleShiftDetail],
+    ['f-salaryRaise', toggleSalaryRaiseCond],
+    ['f-bonus', toggleBonusCond],
+    ['f-retirement', toggleRetirementDetail],
+    ['f-severancePay', toggleSeveranceRate],
+    ['f-insKenpo', toggleNationalHealthIns],
+    ['f-insPension', toggleNationalPensionIns],
+    ['f-housingOwnership', toggleHousingOwnership],
+  ];
+  hideInits.forEach(function(pair) {
+    var el = document.getElementById(pair[0]);
+    if (el) pair[1](el.value);
+  });
 }
 
 function toggleFamilyBlock(val) {
@@ -3240,6 +3506,8 @@ function confirmName(isMatch){
   _initTips();
   // 入力済み判定（薄オレンジ→白）
   _initFilledState();
+  // 自動計算・連動表示初期化
+  _initAutoCalc();
   // 会社名自動入力
   if (type === 'company' && caseName) {
     var coNameEl = document.getElementById('f-coName');
