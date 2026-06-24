@@ -259,7 +259,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20260624.test.13';
+var FORM_VERSION = 'ver.20260624.test.14';
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -2312,6 +2312,7 @@ function buildCompanyPage3() {
     '</div>' +
     fieldT('f-salaryRuleFlg','賃金規定の有無','select',false,'',null,['','有','無'],'') +
     fieldT('f-jpCompSalaryRule','賃金規定に基づく同等報酬額（円）','number',false,'例: 220000','','','賃金規定がある場合、規定に基づいて算出した報酬額を記入してください。') +
+    fieldT('f-jpCompLicense','比較する日本人の保有資格（建設分野の場合は必ず記載）','textarea',false,'例: 一級技能士・基幹技能士など','','','建設分野の場合、同等技能の証明として保有資格の記載が必要です。他分野でも資格があれば記載してください。') +
     fieldT('f-jpCompReason','同等以上の理由','textarea',false,'例: 同一ラインで同等業務に従事しており、経験年数・職務内容が同等であるため','','','') +
   '</div>'
   );
