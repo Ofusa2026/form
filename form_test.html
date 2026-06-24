@@ -259,7 +259,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20260624.test.36';
+var FORM_VERSION = 'ver.20260624.test.37';
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -2348,7 +2348,7 @@ function buildCompanyPage3() {
     fieldT('f-housingOwnership','住居形態','select',false,'',null,['','自己所有（会社所有の社員寮等）','借上（会社が借り上げた物件）','提供なし（本人が自分で探す）'],'') +
     fieldT('f-cohabitants','同居人数（外国人含む）','number',false,'例: 3','','','') +
     fieldT('f-actualCostDesc','実費相当の説明','textarea',false,'例: 月額13万円で借上の物件。居住人数10名のため1人当たり1万3千円は適正。','','','') +
-    '<button type="button" onclick="genActualCostDesc()" style="font-size:11px;padding:6px 14px;background:white;border:1.5px solid #16a34a;color:#16a34a;border-radius:6px;cursor:pointer;font-weight:700;margin-top:-8px;margin-bottom:12px;">サンプル文章を挿入</button>' +
+    '<button type="button" onclick="genActualCostDesc()" style="font-size:12px;padding:8px 16px;background:#16a34a;color:white;border:none;border-radius:8px;cursor:pointer;font-weight:700;margin-top:-8px;margin-bottom:12px;width:100%;">定型文を自動生成</button>' +
   '</div>' +
 
   // 比較対象日本人
