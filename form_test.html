@@ -259,7 +259,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20260624.test.35';
+var FORM_VERSION = 'ver.20260624.test.36';
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -2348,6 +2348,7 @@ function buildCompanyPage3() {
     fieldT('f-housingOwnership','住居形態','select',false,'',null,['','自己所有（会社所有の社員寮等）','借上（会社が借り上げた物件）','提供なし（本人が自分で探す）'],'') +
     fieldT('f-cohabitants','同居人数（外国人含む）','number',false,'例: 3','','','') +
     fieldT('f-actualCostDesc','実費相当の説明','textarea',false,'例: 月額13万円で借上の物件。居住人数10名のため1人当たり1万3千円は適正。','','','') +
+    '<button type="button" onclick="genActualCostDesc()" style="font-size:11px;padding:6px 14px;background:white;border:1.5px solid #16a34a;color:#16a34a;border-radius:6px;cursor:pointer;font-weight:700;margin-top:-8px;margin-bottom:12px;">サンプル文章を挿入</button>' +
   '</div>' +
 
   // 比較対象日本人
@@ -2729,6 +2730,19 @@ function insertDismissalText() {
   el.value = 'やむを得ない事由がある場合に限り、少なくとも30日前に予告をするか、又は30日分以上の平均賃金を支払って解雇する。特定技能外国人の責めに帰すべき事由に基づいて解雇する場合には、所轄労働基準監督署長の認定を受けることにより予告も平均賃金の支払も行わず即時解雇されることもあり得る。';
   el.dispatchEvent(new Event('input'));
 }
+function genActualCostDesc() {
+  var ownership = (document.getElementById('f-housingOwnership')||{}).value || '';
+  var num = (document.getElementById('f-cohabitants')||{}).value || '○';
+  var deduct = (document.getElementById('f-deductHousing')||{}).value || '○○';
+  var el = document.getElementById('f-actualCostDesc');
+  if (!el) return;
+  var total = (parseInt(deduct)||0) * (parseInt(num)||0);
+  var totalStr = total > 0 ? total.toLocaleString() : '○○';
+  var ownershipStr = ownership.indexOf('自己所有') >= 0 ? '自社所有の社員寮' : '借上の物件';
+  el.value = '月額' + totalStr + '円で' + ownershipStr + '。居住人数' + num + '名のため1人当たり' + parseInt(deduct).toLocaleString() + '円は近隣相場と比較して適正額である。';
+  el.dispatchEvent(new Event('input'));
+}
+
 function genHousingDetail() {
   var amt = (document.getElementById('f-deductHousing')||{}).value || '○○';
   var num = (document.getElementById('f-cohabitants')||{}).value || '○';
