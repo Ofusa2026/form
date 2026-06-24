@@ -253,16 +253,16 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <div class="btn-wrap" id="btnWrap" style="display:none;">
-  <div style="position:relative;">
-    <button class="btn-draft" onclick="saveDraft()" id="btn-draft">💾 途中保存する</button>
-    <button type="button" id="co-reset-float" onclick="resetCurrentPageAuto()" style="position:absolute;top:50%;right:8px;transform:translateY(-50%);padding:4px 10px;background:#fff0f0;color:#dc2626;border:1px solid #fca5a5;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;display:none;">🗑️ リセット</button>
+  <div style="display:flex;gap:8px;margin-bottom:8px;">
+    <button type="button" id="co-reset-float" onclick="resetCurrentPageAuto()" style="flex:0 0 auto;padding:14px 16px;background:#fff0f0;color:#dc2626;border:1.5px solid #fca5a5;border-radius:12px;font-size:12px;font-weight:800;cursor:pointer;display:none;white-space:nowrap;">🗑️ リセット</button>
+    <button class="btn-draft" onclick="saveDraft()" id="btn-draft" style="flex:1;margin-bottom:0;">💾 途中保存する</button>
   </div>
   <button class="btn-submit" onclick="submitForm()" id="btn-submit">送信する</button>
   <div class="draft-saved-msg" id="draftSavedMsg">✅ 途中保存しました</div>
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20260624.test.28';
+var FORM_VERSION = 'ver.20260624.test.29';
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
