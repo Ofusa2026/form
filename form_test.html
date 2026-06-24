@@ -259,7 +259,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20260624.test.42';
+var FORM_VERSION = 'ver.20260624.test.43';
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -2347,7 +2347,7 @@ function buildCompanyPage3() {
     '<div style="font-size:11px;color:#6b7280;background:#f9fafb;border-radius:8px;padding:10px;margin-bottom:12px;">会社が外国人の住居を提供する場合に記入してください。本人が自分で探す場合は空欄でOKです。</div>' +
     fieldT('f-housingOwnership','住居形態','select',false,'',null,['','自己所有（会社所有の社員寮等）','借上（会社が借り上げた物件）','提供なし（本人が自分で探す）'],'') +
     fieldT('f-cohabitants','同居人数（外国人含む）','number',false,'例: 3','','','') +
-    '<div class="field" id="wrap-actualCostDesc"><label>実費相当の説明</label>' +
+    '<div class="field" id="wrap-actualCostDesc" style="display:block"><label>実費相当の説明</label>' +
     '<textarea id="f-actualCostDesc" placeholder="例: 月額13万円で借上の物件。居住人数10名のため1人当たり1万3千円は適正。"></textarea>' +
     '<button type="button" onclick="genActualCostDesc()" style="margin-top:6px;font-size:11px;padding:6px 14px;background:white;border:1.5px solid #16a34a;color:#16a34a;border-radius:6px;cursor:pointer;font-weight:700;">定型文を自動生成</button>' +
     '</div>' +
@@ -2716,17 +2716,12 @@ function toggleRenewalLimitMemo(val) {
 }
 function toggleHousingOwnership(val) {
   var show = val && val !== '提供なし（本人が自分で探す）';
-  ['f-cohabitants','wrap-actualCostDesc'].forEach(function(id) {
-    var el = document.getElementById(id);
-    if (el) el.style.display = show ? 'block' : 'none';
-    else {
-      var f = document.getElementById('f-'+id.replace('wrap-',''));
-      if (f && f.closest('.field')) f.closest('.field').style.display = show ? 'block' : 'none';
-    }
-  });
   // f-cohabitantsはfieldで制御
   var co = document.getElementById('f-cohabitants');
   if (co && co.closest('.field')) co.closest('.field').style.display = show ? 'block' : 'none';
+  // wrap-actualCostDesc（ボタン含む）を制御
+  var wrap = document.getElementById('wrap-actualCostDesc');
+  if (wrap) wrap.style.display = show ? 'block' : 'none';
 }
 
 // --- 定型文挿入 ---
