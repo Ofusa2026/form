@@ -90,13 +90,16 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 .trans.show { display: block; }
 .field input, .field select, .field textarea {
   width: 100%; padding: 13px 14px; border: 1.5px solid #e5e7eb; border-radius: 10px;
-  font-size: 16px; outline: none; transition: border .15s; background: white;
+  font-size: 16px; outline: none; transition: border .15s, background .2s; background: #fff7ed;
   -webkit-appearance: none; appearance: none; min-height: 50px;
 }
+.field input.filled, .field select.filled, .field textarea.filled { background: white; border-color: #d1fae5; }
 .field select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b7280' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; padding-right: 36px; }
-.field input:focus, .field select:focus, .field textarea:focus { border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,.1); }
+.field select.filled { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b7280' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; padding-right: 36px; }
+.field input:focus, .field select:focus, .field textarea:focus { border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,.1); background: white; }
 .field textarea { min-height: 80px; resize: vertical; font-size: 16px; }
 .field input[type="date"] { font-size: 15px; }
+.field input[type="time"] { font-size: 15px; }
 
 /* グリッド */
 .grid2 { display: grid; grid-template-columns: 1fr; gap: 0; }
@@ -256,7 +259,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20260624.test.07';
+var FORM_VERSION = 'ver.20260624.test.08';
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -1852,6 +1855,21 @@ function applyFieldsFilter(fields) {
   }
 }
 
+// 入力済み判定：未入力=薄オレンジ、入力済み=白
+function _initFilledState() {
+  function check(el) {
+    var filled = el.tagName === 'SELECT'
+      ? el.value !== '' && el.selectedIndex > 0
+      : el.value.trim() !== '';
+    el.classList.toggle('filled', filled);
+  }
+  document.querySelectorAll('.field input, .field select, .field textarea').forEach(function(el) {
+    check(el); // 初期状態（途中保存復元など）
+    el.addEventListener('input', function() { check(el); });
+    el.addEventListener('change', function() { check(el); });
+  });
+}
+
 // ?マーク ツールチップ ── addEventListener直接登録版
 function tip(id, text) {
   return '<span class="tip-wrap"><button type="button" class="tip-btn" data-tip="' + text.replace(/'/g,"&#39;").replace(/"/g,"&quot;") + '">?</button></span>';
@@ -3218,6 +3236,8 @@ function confirmName(isMatch){
   }
   // ツールチップ初期化（DOM生成後に登録）
   _initTips();
+  // 入力済み判定（薄オレンジ→白）
+  _initFilledState();
   // 会社名自動入力
   if (type === 'company' && caseName) {
     var coNameEl = document.getElementById('f-coName');
