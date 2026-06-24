@@ -259,7 +259,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20260624.test.21';
+var FORM_VERSION = 'ver.20260624.test.22';
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -1977,6 +1977,7 @@ function switchCoPage(page) {
   }
   _initTips();
   _initAutoCalc();
+  _initNameAutoFill();
   window.scrollTo({top:0, behavior:'smooth'});
 }
 
@@ -2737,6 +2738,108 @@ function genJpCompReason() {
   if (!el) return;
   el.value = '比較対象の日本人は、特定技能外国人と同一の就業場所において' + job + 'に従事しており、経験年数（' + exp + '）・職務内容・業務範囲が同等である。両者の報酬を比較した結果、特定技能外国人の報酬は同等以上であることを確認した。';
   el.dispatchEvent(new Event('input'));
+}
+
+// ===== ひらがな→ヘボン式ローマ字変換 =====
+var HEPBURN = {
+  'あ':'A','い':'I','う':'U','え':'E','お':'O',
+  'か':'KA','き':'KI','く':'KU','け':'KE','こ':'KO',
+  'さ':'SA','し':'SHI','す':'SU','せ':'SE','そ':'SO',
+  'た':'TA','ち':'CHI','つ':'TSU','て':'TE','と':'TO',
+  'な':'NA','に':'NI','ぬ':'NU','ね':'NE','の':'NO',
+  'は':'HA','ひ':'HI','ふ':'FU','へ':'HE','ほ':'HO',
+  'ま':'MA','み':'MI','む':'MU','め':'ME','も':'MO',
+  'や':'YA','ゆ':'YU','よ':'YO',
+  'ら':'RA','り':'RI','る':'RU','れ':'RE','ろ':'RO',
+  'わ':'WA','を':'WO','ん':'N',
+  'が':'GA','ぎ':'GI','ぐ':'GU','げ':'GE','ご':'GO',
+  'ざ':'ZA','じ':'JI','ず':'ZU','ぜ':'ZE','ぞ':'ZO',
+  'だ':'DA','ぢ':'JI','づ':'ZU','で':'DE','ど':'DO',
+  'ば':'BA','び':'BI','ぶ':'BU','べ':'BE','ぼ':'BO',
+  'ぱ':'PA','ぴ':'PI','ぷ':'PU','ぺ':'PE','ぽ':'PO',
+  'きゃ':'KYA','きゅ':'KYU','きょ':'KYO',
+  'しゃ':'SHA','しゅ':'SHU','しょ':'SHO',
+  'ちゃ':'CHA','ちゅ':'CHU','ちょ':'CHO',
+  'にゃ':'NYA','にゅ':'NYU','にょ':'NYO',
+  'ひゃ':'HYA','ひゅ':'HYU','ひょ':'HYO',
+  'みゃ':'MYA','みゅ':'MYU','みょ':'MYO',
+  'りゃ':'RYA','りゅ':'RYU','りょ':'RYO',
+  'ぎゃ':'GYA','ぎゅ':'GYU','ぎょ':'GYO',
+  'じゃ':'JA','じゅ':'JU','じょ':'JO',
+  'びゃ':'BYA','びゅ':'BYU','びょ':'BYO',
+  'ぴゃ':'PYA','ぴゅ':'PYU','ぴょ':'PYO',
+  'っ':'', // 促音は次の子音を重ねる（簡易処理）
+  'ー':'-','　':' ',' ':' ',
+};
+function toHepburn(kana) {
+  if (!kana) return '';
+  // カタカナ→ひらがな変換
+  kana = kana.replace(/[\u30A1-\u30F6]/g, function(c){ return String.fromCharCode(c.charCodeAt(0)-0x60); });
+  var result = '';
+  var i = 0;
+  while (i < kana.length) {
+    // 2文字組み合わせ優先
+    var two = kana.slice(i, i+2);
+    if (HEPBURN[two]) { result += HEPBURN[two]; i += 2; continue; }
+    var one = kana[i];
+    if (HEPBURN[one] !== undefined) { result += HEPBURN[one]; }
+    else { result += one; } // 漢字等はそのまま
+    i++;
+  }
+  // 姓名の間のスペースで大文字化
+  return result.split(' ').map(function(w){ return w ? w[0].toUpperCase() + w.slice(1).toLowerCase() : ''; }).join(' ');
+}
+
+// ===== 役職→英語対応表 =====
+var TITLE_EN = {
+  '代表取締役':'CEO','代表取締役社長':'CEO','社長':'CEO',
+  '取締役':'Director','取締役副社長':'Vice President',
+  '専務取締役':'Executive Director','常務取締役':'Managing Director',
+  '会長':'Chairman','副会長':'Vice Chairman',
+  '専務':'Executive Managing Director','常務':'Managing Director',
+  '副社長':'Vice President','執行役員':'Executive Officer',
+  '人事部長':'HR Manager','人事部':'HR Department',
+  '総務部長':'General Affairs Manager','総務部':'General Affairs',
+  '経理部長':'Accounting Manager','営業部長':'Sales Manager',
+  '工場長':'Plant Manager','所長':'Director','支店長':'Branch Manager',
+  '部長':'General Manager','課長':'Section Manager','係長':'Supervisor',
+  '主任':'Chief','担当者':'Staff','担当':'Staff',
+  '理事長':'President','理事':'Director','事務局長':'Secretary General',
+  '施設長':'Facility Director','センター長':'Center Director',
+};
+function toTitleEn(title) {
+  if (!title) return '';
+  // 完全一致優先、次に部分一致
+  if (TITLE_EN[title]) return TITLE_EN[title];
+  for (var key in TITLE_EN) {
+    if (title.indexOf(key) >= 0) return TITLE_EN[key];
+  }
+  return '';
+}
+
+// ===== 氏名・役職の自動変換を登録 =====
+function _initNameAutoFill() {
+  var pairs = [
+    // [ひらがな入力元, 英語出力先, 種別]
+    ['f-coRepName',    'f-coRepNameEn',    'name'],
+    ['f-coRepTitle',   'f-coRepTitleEn',   'title'],
+    ['f-coAuthorName', 'f-coAuthorNameEn', 'name'],
+    ['f-consultName',  'f-consultNameEn',  'name'],
+  ];
+  pairs.forEach(function(pair) {
+    var src = document.getElementById(pair[0]);
+    var dst = document.getElementById(pair[1]);
+    if (!src || !dst) return;
+    src.addEventListener('input', function() {
+      if (dst.dataset.manualEdit) return; // 手動入力済みは上書きしない
+      var converted = pair[2] === 'name' ? toHepburn(src.value).toUpperCase() : toTitleEn(src.value);
+      if (converted) { dst.value = converted; dst.dispatchEvent(new Event('input')); }
+    });
+    // 英語欄を手動編集したらフラグを立てる
+    dst.addEventListener('input', function() { dst.dataset.manualEdit = '1'; });
+    // 英語欄を空にしたらフラグをリセット
+    dst.addEventListener('change', function() { if (!dst.value) delete dst.dataset.manualEdit; });
+  });
 }
 
 // 特定技能 分野→区分マッピング
@@ -3566,6 +3669,8 @@ function confirmName(isMatch){
   _initFilledState();
   // 自動計算・連動表示初期化
   _initAutoCalc();
+  // 氏名・役職の自動英語変換
+  _initNameAutoFill();
   // 会社名自動入力
   if (type === 'company' && caseName) {
     var coNameEl = document.getElementById('f-coName');
