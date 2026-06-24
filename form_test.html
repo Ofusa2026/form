@@ -259,7 +259,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20260624.test.18';
+var FORM_VERSION = 'ver.20260624.test.19';
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -2101,9 +2101,6 @@ function buildCompanyPage2() {
       fieldT('f-salaryType','給与形態','select',false,'',null,['','月給','時給','日給'],'雇用条件書Ⅶ-1に記載します。特定技能は月給制が一般的です。') +
       fieldT('f-salaryMonthly','基本給（円）','number',false,'例: 200000','','','固定残業代・手当を含まない基本的な給与額。') +
     '</div>' +
-    fieldT('f-totalMonthly','月額支払概算額（税引き前）','number',false,'例: 228350','','','基本給＋固定残業代＋手当の合計（支払総額）。ラセンズ入力に使用します。') +
-    '<button type="button" onclick="calcTotalMonthly()" style="font-size:11px;padding:6px 14px;background:white;border:1.5px solid #ea580c;color:#ea580c;border-radius:6px;cursor:pointer;font-weight:700;margin-top:-8px;margin-bottom:12px;">⚡ 基本給＋手当＋固定残業代を自動合計</button>' +
-
     '<div class="sub-label">【手当】</div>' +
     '<div id="allowanceRows">' + allowanceRow(1) + '</div>' +
     '<button type="button" id="addAllowanceBtn" onclick="addAllowanceRow()" style="font-size:11px;padding:4px 14px;background:white;border:1.5px dashed #c7d2fe;border-radius:6px;color:#6366f1;cursor:pointer;font-weight:700;margin-bottom:10px;">＋ 手当を追加（最大4つ）</button>' +
