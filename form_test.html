@@ -31,8 +31,56 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 .container { max-width: 680px; margin: 0 auto; padding: 16px 12px 160px; }
 
 /* カード */
-.card { background: white; border-radius: 12px; padding: 16px; margin-bottom: 12px; box-shadow: 0 1px 4px rgba(0,0,0,.08); }
-.section-title { font-size: 13px; font-weight: 800; color: #0f2040; border-left: 3px solid #2563eb; padding-left: 10px; margin-bottom: 14px; }
+/* セクション色分け */
+.card { background: white; border-radius: 12px; padding: 16px; margin-bottom: 12px; box-shadow: 0 1px 4px rgba(0,0,0,.08); border-top: 4px solid #e5e7eb; }
+.card[data-section="basic"]    { border-top-color: #2563eb; }
+.card[data-section="address"]  { border-top-color: #0891b2; }
+.card[data-section="office"]   { border-top-color: #0d9488; }
+.card[data-section="rep"]      { border-top-color: #7c3aed; }
+.card[data-section="consult"]  { border-top-color: #db2777; }
+.card[data-section="officer"]  { border-top-color: #9333ea; }
+.card[data-section="employment"]{ border-top-color: #ea580c; }
+.card[data-section="labor"]    { border-top-color: #d97706; }
+.card[data-section="retire"]   { border-top-color: #dc2626; }
+.card[data-section="resign"]   { border-top-color: #64748b; }
+.card[data-section="housing"]  { border-top-color: #16a34a; }
+.card[data-section="jpcomp"]   { border-top-color: #b45309; }
+
+.section-title { font-size: 13px; font-weight: 800; color: #0f2040; border-left: 3px solid #2563eb; padding-left: 10px; margin-bottom: 14px; display: flex; align-items: center; gap: 6px; }
+.card[data-section="basic"]     .section-title { border-left-color: #2563eb; color: #1e3a8a; }
+.card[data-section="address"]   .section-title { border-left-color: #0891b2; color: #0e7490; }
+.card[data-section="office"]    .section-title { border-left-color: #0d9488; color: #0f766e; }
+.card[data-section="rep"]       .section-title { border-left-color: #7c3aed; color: #6d28d9; }
+.card[data-section="consult"]   .section-title { border-left-color: #db2777; color: #be185d; }
+.card[data-section="officer"]   .section-title { border-left-color: #9333ea; color: #7e22ce; }
+.card[data-section="employment"].section-title { border-left-color: #ea580c; color: #c2410c; }
+.card[data-section="labor"]     .section-title { border-left-color: #d97706; color: #b45309; }
+.card[data-section="retire"]    .section-title { border-left-color: #dc2626; color: #b91c1c; }
+.card[data-section="resign"]    .section-title { border-left-color: #64748b; color: #475569; }
+.card[data-section="housing"]   .section-title { border-left-color: #16a34a; color: #15803d; }
+.card[data-section="jpcomp"]    .section-title { border-left-color: #b45309; color: #92400e; }
+
+.section-icon { font-size: 16px; }
+.section-step { display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; border-radius: 50%; font-size: 10px; font-weight: 800; color: white; flex-shrink: 0; }
+.card[data-section="basic"]     .section-step { background: #2563eb; }
+.card[data-section="address"]   .section-step { background: #0891b2; }
+.card[data-section="office"]    .section-step { background: #0d9488; }
+.card[data-section="rep"]       .section-step { background: #7c3aed; }
+.card[data-section="consult"]   .section-step { background: #db2777; }
+.card[data-section="officer"]   .section-step { background: #9333ea; }
+.card[data-section="employment"].section-step { background: #ea580c; }
+.card[data-section="labor"]     .section-step { background: #d97706; }
+.card[data-section="retire"]    .section-step { background: #dc2626; }
+.card[data-section="resign"]    .section-step { background: #64748b; }
+.card[data-section="housing"]   .section-step { background: #16a34a; }
+.card[data-section="jpcomp"]    .section-step { background: #b45309; }
+
+/* ページ上部の進捗バー */
+.form-progress { background: white; border-radius: 10px; padding: 12px 14px; margin-bottom: 12px; box-shadow: 0 1px 4px rgba(0,0,0,.08); }
+.form-progress-label { font-size: 11px; color: #6b7280; margin-bottom: 8px; font-weight: 600; }
+.form-progress-steps { display: flex; gap: 3px; flex-wrap: wrap; }
+.form-progress-step { flex: 1; min-width: 40px; height: 28px; border-radius: 6px; font-size: 9px; font-weight: 700; display: flex; align-items: center; justify-content: center; color: white; opacity: .85; cursor: pointer; transition: opacity .15s, transform .15s; text-align: center; line-height: 1.2; padding: 2px; }
+.form-progress-step:hover { opacity: 1; transform: translateY(-1px); }
 
 /* フィールド */
 .field { margin-bottom: 16px; }
@@ -117,13 +165,14 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 .type-unknown p { font-size: 13px; color: #6b7280; }
 
 /* ?マーク ツールチップ */
-.tip-btn { display: inline-flex; align-items: center; justify-content: center; width: 16px; height: 16px; background: #e0e7ff; color: #4f46e5; border-radius: 50%; font-size: 10px; font-weight: 800; cursor: pointer; border: none; padding: 0; margin-left: 5px; line-height: 1; flex-shrink: 0; vertical-align: middle; }
-.tip-btn:hover { background: #4f46e5; color: white; }
-.tip-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 8000; display: none; }
+.tip-btn { display: inline-flex; align-items: center; justify-content: center; width: 17px; height: 17px; background: #e0e7ff; color: #4f46e5; border-radius: 50%; font-size: 10px; font-weight: 800; cursor: pointer; border: none; padding: 0; margin-left: 5px; line-height: 1; flex-shrink: 0; vertical-align: middle; transition: background .15s; }
+.tip-btn:hover, .tip-btn.active { background: #4f46e5; color: white; }
+.tip-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 8000; display: none; background: transparent; }
 .tip-overlay.show { display: block; }
-.tip-popup { position: fixed; z-index: 8001; background: #1e3a5f; color: white; border-radius: 10px; padding: 12px 14px; font-size: 12px; line-height: 1.6; max-width: 280px; box-shadow: 0 8px 24px rgba(0,0,0,.3); display: none; pointer-events: none; }
+.tip-popup { position: fixed; z-index: 8001; background: #1e293b; color: white; border-radius: 10px; padding: 12px 36px 12px 14px; font-size: 12px; line-height: 1.7; max-width: 280px; box-shadow: 0 8px 24px rgba(0,0,0,.35); display: none; pointer-events: auto; }
 .tip-popup.show { display: block; }
-.tip-popup::before { content: ''; position: absolute; width: 8px; height: 8px; background: #1e3a5f; transform: rotate(45deg); top: -4px; left: 16px; }
+.tip-popup::before { content: ''; position: absolute; width: 8px; height: 8px; background: #1e293b; transform: rotate(45deg); top: -4px; left: 16px; }
+.tip-close { position: absolute; top: 8px; right: 10px; background: rgba(255,255,255,.15); border: none; color: white; border-radius: 50%; width: 20px; height: 20px; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; line-height: 1; }
 
 /* 新規追加バッジ */
 .new-badge { display: inline-block; font-size: 9px; font-weight: 700; background: #dcfce7; color: #15803d; border-radius: 3px; padding: 1px 5px; margin-left: 4px; vertical-align: middle; }
@@ -209,7 +258,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20260624.test.01';
+var FORM_VERSION = 'ver.20260624.test.02';
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -1806,32 +1855,43 @@ function applyFieldsFilter(fields) {
 }
 
 // ?マーク ツールチップ
+var _activeTipBtn = null;
 function tip(id, text) {
-  return '<button type="button" class="tip-btn" onclick="showTip(event,\'' + id + '\')" data-tip="' + text.replace(/'/g,"&#39;").replace(/"/g,"&quot;") + '">?</button>';
+  return '<button type="button" class="tip-btn" onclick="showTip(event,this)" data-tip="' + text.replace(/'/g,"&#39;").replace(/"/g,"&quot;") + '">?</button>';
 }
-function showTip(e, id) {
+function showTip(e, btn) {
   e.stopPropagation();
-  var btn = e.currentTarget;
   var text = btn.getAttribute('data-tip');
   var popup = document.getElementById('tipPopup');
   var overlay = document.getElementById('tipOverlay');
-  popup.textContent = text;
+  // 同じボタンを再押し → 閉じる
+  if (_activeTipBtn === btn && popup.classList.contains('show')) {
+    hideTip(); return;
+  }
+  if (_activeTipBtn) _activeTipBtn.classList.remove('active');
+  _activeTipBtn = btn;
+  btn.classList.add('active');
+  popup.innerHTML = text + '<button class="tip-close" onclick="hideTip()">✕</button>';
   var rect = btn.getBoundingClientRect();
   popup.style.display = 'block';
-  var pw = popup.offsetWidth;
-  var ph = popup.offsetHeight;
+  popup.classList.remove('show');
+  var pw = Math.min(popup.offsetWidth, 280);
+  popup.style.maxWidth = '280px';
   var left = Math.min(rect.left, window.innerWidth - pw - 12);
   left = Math.max(left, 8);
-  var top = rect.bottom + 8;
-  if (top + ph > window.innerHeight - 12) top = rect.top - ph - 8;
+  var top = rect.bottom + 10;
+  if (top + popup.offsetHeight > window.innerHeight - 12) top = rect.top - popup.offsetHeight - 10;
   popup.style.left = left + 'px';
   popup.style.top = top + 'px';
   popup.classList.add('show');
   overlay.classList.add('show');
 }
 function hideTip() {
-  document.getElementById('tipPopup').classList.remove('show');
-  document.getElementById('tipOverlay').classList.remove('show');
+  var popup = document.getElementById('tipPopup');
+  var overlay = document.getElementById('tipOverlay');
+  popup.classList.remove('show');
+  overlay.classList.remove('show');
+  if (_activeTipBtn) { _activeTipBtn.classList.remove('active'); _activeTipBtn = null; }
 }
 
 // ラベル+?マーク付きフィールド
@@ -1853,9 +1913,27 @@ function fieldT(id, label, type, req, placeholder, transKey, opts, tipText) {
 }
 
 function buildCompanyForm() {
-  return (
+  var progress = '<div class="form-progress">' +
+    '<div class="form-progress-label">📋 入力セクション一覧（クリックでジャンプ）</div>' +
+    '<div class="form-progress-steps">' +
+      '<div class="form-progress-step" style="background:#2563eb;" onclick="document.getElementById(\'sec-basic\').scrollIntoView({behavior:\'smooth\'})">①<br>企業<br>基本</div>' +
+      '<div class="form-progress-step" style="background:#0891b2;" onclick="document.getElementById(\'sec-address\').scrollIntoView({behavior:\'smooth\'})">②<br>所在地</div>' +
+      '<div class="form-progress-step" style="background:#0d9488;" onclick="document.getElementById(\'sec-office\').scrollIntoView({behavior:\'smooth\'})">③<br>就業<br>場所</div>' +
+      '<div class="form-progress-step" style="background:#7c3aed;" onclick="document.getElementById(\'sec-rep\').scrollIntoView({behavior:\'smooth\'})">④<br>代表<br>者</div>' +
+      '<div class="form-progress-step" style="background:#db2777;" onclick="document.getElementById(\'sec-consult\').scrollIntoView({behavior:\'smooth\'})">⑤<br>相談<br>窓口</div>' +
+      '<div class="form-progress-step" style="background:#9333ea;" onclick="document.getElementById(\'sec-officer\').scrollIntoView({behavior:\'smooth\'})">⑥<br>役員</div>' +
+      '<div class="form-progress-step" style="background:#ea580c;" onclick="document.getElementById(\'sec-employment\').scrollIntoView({behavior:\'smooth\'})">⑦<br>雇用<br>条件</div>' +
+      '<div class="form-progress-step" style="background:#d97706;" onclick="document.getElementById(\'sec-labor\').scrollIntoView({behavior:\'smooth\'})">⑧<br>労働<br>時間</div>' +
+      '<div class="form-progress-step" style="background:#dc2626;" onclick="document.getElementById(\'sec-retire\').scrollIntoView({behavior:\'smooth\'})">⑨<br>退職</div>' +
+      '<div class="form-progress-step" style="background:#64748b;" onclick="document.getElementById(\'sec-resign\').scrollIntoView({behavior:\'smooth\'})">⑩<br>離職<br>者</div>' +
+      '<div class="form-progress-step" style="background:#16a34a;" onclick="document.getElementById(\'sec-housing\').scrollIntoView({behavior:\'smooth\'})">⑪<br>住居</div>' +
+      '<div class="form-progress-step" style="background:#b45309;" onclick="document.getElementById(\'sec-jpcomp\').scrollIntoView({behavior:\'smooth\'})">⑫<br>比較<br>日本人</div>' +
+    '</div>' +
+  '</div>';
+
+  return progress + (
   // ① 企業基本情報
-  '<div class="card"><div class="section-title">① 企業基本情報</div>' +
+  '<div class="card" id="sec-basic" data-section="basic"><div class="section-title"><span class="section-step">1</span>🏢 企業基本情報</div>' +
     fieldT('f-coName','会社名','text',true,'例: 株式会社〇〇食品','','','雇用条件書・支援計画書等の全書類に記載する正式名称を入力してください。') +
     fieldT('f-coNameKana','会社名（ひらがな）','text',false,'例: かぶしきかいしゃ〇〇しょくひん','','','支援計画書の読み仮名欄に使用します。') +
     fieldT('f-coNameEn','会社名（英語）','text',false,'例: OO Foods Co., Ltd.','','','英語版書類（雇用条件書）に記載します。') +
@@ -1880,7 +1958,7 @@ function buildCompanyForm() {
   '</div>' +
 
   // ② 所在地
-  '<div class="card"><div class="section-title">② 所在地</div>' +
+  '<div class="card" id="sec-address" data-section="address"><div class="section-title"><span class="section-step">2</span>📍 所在地</div>' +
     '<div class="grid2">' +
       fieldT('f-coZip','郵便番号','text',false,'例: 160-0022','','','ハイフンあり・なしどちらでも可です。') +
       fieldT('f-coPref','都道府県','text',false,'例: 東京都','','','') +
@@ -1892,7 +1970,7 @@ function buildCompanyForm() {
   '</div>' +
 
   // ③ 就業場所（事業所）
-  '<div class="card"><div class="section-title">③ 就業場所（事業所）</div>' +
+  '<div class="card" id="sec-office" data-section="office"><div class="section-title"><span class="section-step">3</span>🏭 就業場所（事業所）</div>' +
     '<div style="font-size:11px;color:#6b7280;background:#f0f9ff;border-radius:8px;padding:10px;margin-bottom:12px;border-left:3px solid #0ea5e9;">本社所在地と就業場所が同じ場合も記入してください。複数拠点がある場合はメインの就業場所を記入してください。</div>' +
     fieldT('f-officeName','事業所名','text',false,'例: 株式会社〇〇 板橋工場','','','雇用条件書Ⅱ（就業の場所）に記載します。本社と同じ場合も記入してください。') +
     fieldT('f-officeNameEn','事業所名（英語）','text',false,'例: OO Co., Ltd. Itabashi Factory','','','英語版雇用条件書に記載します。') +
@@ -1905,7 +1983,7 @@ function buildCompanyForm() {
   '</div>' +
 
   // ④ 代表者・作成責任者
-  '<div class="card"><div class="section-title">④ 代表者・作成責任者</div>' +
+  '<div class="card" id="sec-rep" data-section="rep"><div class="section-title"><span class="section-step">4</span>👤 代表者・作成責任者</div>' +
     '<div class="sub-label">【代表者】</div>' +
     '<div class="grid2">' +
       fieldT('f-coRepName','氏名','text',false,'例: 山田 太郎','','','雇用条件書に記名捺印する方の氏名です。') +
@@ -1924,7 +2002,7 @@ function buildCompanyForm() {
   '</div>' +
 
   // ⑤ 雇用管理相談窓口
-  '<div class="card"><div class="section-title">⑤ 雇用管理相談窓口</div>' +
+  '<div class="card" id="sec-consult" data-section="consult"><div class="section-title"><span class="section-step">5</span>💬 雇用管理相談窓口</div>' +
     '<div style="font-size:11px;color:#6b7280;background:#f9fafb;border-radius:8px;padding:10px;margin-bottom:12px;">特定技能外国人からの雇用条件・支援に関する相談を受け付ける担当者の情報です。雇用条件書Ⅸ-4に記載します。</div>' +
     fieldT('f-consultDept','部署名','text',false,'例: 人事部','','','') +
     '<div class="grid2">' +
@@ -1935,7 +2013,7 @@ function buildCompanyForm() {
   '</div>' +
 
   // ⑥ 役員情報
-  '<div class="card"><div class="section-title">⑥ 役員情報</div>' +
+  '<div class="card" id="sec-officer" data-section="officer"><div class="section-title"><span class="section-step">6</span>🎖 役員情報</div>' +
     '<div style="font-size:11px;color:#6b7280;background:#f9fafb;border-radius:8px;padding:10px;margin-bottom:12px;">代表者を含む全役員を記入してください。役員が5名を超える場合は「＋ 役員を追加」で追加できます。' + tip('tip_officer','申請書類（役員名簿等）に記載する役員の情報です。履歴事項全部証明書（謄本）に記載の役員を全員記入してください。') + '</div>' +
     '<div id="officers-container">' +
       officerRow(1) + officerRow(2) + officerRow(3) +
@@ -1944,7 +2022,7 @@ function buildCompanyForm() {
   '</div>' +
 
   // ⑦ 雇用条件（給与・控除・社会保険・契約期間をここに集約）
-  '<div class="card"><div class="section-title">⑦ 雇用条件</div>' +
+  '<div class="card" id="sec-employment" data-section="employment"><div class="section-title"><span class="section-step">7</span>💴 雇用条件</div>' +
 
     '<div class="sub-label">【契約期間】</div>' +
     '<div style="font-size:11px;color:#6b7280;margin-bottom:10px;">雇用条件書Ⅰに記載します。' + tip('tip_contract','特定技能は1年以内の有期契約が一般的です。在留期間内の契約となるようにしてください。') + '</div>' +
@@ -2063,7 +2141,7 @@ function buildCompanyForm() {
   '</div>' +
 
   // ⑧ 労働時間・休日・休暇
-  '<div class="card"><div class="section-title">⑧ 労働時間・休日・休暇</div>' +
+  '<div class="card" id="sec-labor" data-section="labor"><div class="section-title"><span class="section-step">8</span>⏰ 労働時間・休日・休暇</div>' +
     '<div class="sub-label">【所定労働時間】</div>' +
     '<div class="grid2">' +
       fieldT('f-startTime','始業時刻','time',false,'','','','雇用条件書Ⅳ-1(1)に記載します。') +
@@ -2137,7 +2215,7 @@ function buildCompanyForm() {
   '</div>' +
 
   // ⑨ 退職
-  '<div class="card"><div class="section-title">⑨ 退職に関する事項</div>' +
+  '<div class="card" id="sec-retire" data-section="retire"><div class="section-title"><span class="section-step">9</span>🚪 退職に関する事項</div>' +
     '<div style="font-size:11px;color:#6b7280;background:#f9fafb;border-radius:8px;padding:10px;margin-bottom:12px;">雇用条件書Ⅷに記載します。</div>' +
     '<div class="grid2">' +
       fieldT('f-resignNoticeDays','自己都合退職 届出日数（何日前）','number',false,'例: 14','','','退職希望日の何日前に申し出る必要があるかを記入してください。一般的には14〜30日前。') +
@@ -2148,7 +2226,7 @@ function buildCompanyForm() {
   '</div>' +
 
   // ⑩ 離職者・行方不明者情報
-  '<div class="card"><div class="section-title">⑩ 離職者・行方不明者情報</div>' +
+  '<div class="card" id="sec-resign" data-section="resign"><div class="section-title"><span class="section-step">10</span>📊 離職者・行方不明者情報</div>' +
     '<div style="font-size:11px;color:#6b7280;background:#f9fafb;border-radius:8px;padding:10px;margin-bottom:12px;">過去1年以内の離職者数です。これが基準を超えると特定技能の受け入れができなくなる場合があります。' + tip('tip_resign','特定技能の受入れ可能人数や適合性審査に影響します。正確に記入してください。') + '</div>' +
     '<div class="sub-label">【自己都合離職者（直近1年以内）】</div>' +
     '<div class="grid2">' +
@@ -2165,7 +2243,7 @@ function buildCompanyForm() {
   '</div>' +
 
   // ⑪ 住居（支援計画書用）
-  '<div class="card"><div class="section-title">⑪ 住居（支援計画書用）</div>' +
+  '<div class="card" id="sec-housing" data-section="housing"><div class="section-title"><span class="section-step">11</span>🏠 住居（支援計画書用）</div>' +
     '<div style="font-size:11px;color:#6b7280;background:#f9fafb;border-radius:8px;padding:10px;margin-bottom:12px;">会社が外国人の住居を提供する場合に記入してください。本人が自分で住居を探す場合は空欄でOKです。' + tip('tip_housing','支援計画書に記載する住居情報です。控除額が近隣相場と比較して適正であることを説明する必要があります。') + '</div>' +
     fieldT('f-housingOwnership','住居形態','select',false,'',null,['','自己所有（会社所有の社員寮等）','借上（会社が借り上げた物件）','提供なし（本人が自分で探す）'],'') +
     fieldT('f-cohabitants','同居人数（外国人含む）','number',false,'例: 3','','','その住居に住む全員の人数（外国人本人を含む）。') +
@@ -2173,7 +2251,7 @@ function buildCompanyForm() {
   '</div>' +
 
   // ⑫ 比較対象日本人
-  '<div class="card"><div class="section-title">⑫ 比較対象日本人</div>' +
+  '<div class="card" id="sec-jpcomp" data-section="jpcomp"><div class="section-title"><span class="section-step">12</span>⚖️ 比較対象日本人</div>' +
     '<div style="font-size:11px;color:#6b7280;background:#fffbeb;border-radius:8px;padding:10px;margin-bottom:12px;border-left:3px solid #f59e0b;">同等の業務に従事する日本人従業員と「同等以上の報酬」であることを証明するために必要な情報です。' + tip('tip_jpcomp','同等の業務に従事する日本人がいない場合は、類似職種の外部データ（厚労省の賃金構造基本統計調査等）を参照することもできます。') + '</div>' +
     '<div class="grid2">' +
       fieldT('f-jpCompAge','年齢','number',false,'例: 35','','','') +
