@@ -259,7 +259,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20260624.test.25';
+var FORM_VERSION = 'ver.20260624.test.26';
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -3704,6 +3704,10 @@ function confirmName(isMatch){
   _initAutoCalc();
   // 氏名・役職の自動英語変換
   _initNameAutoFill();
+  // 企業フォームのページ初期化（リセットボタン等を正しく表示）
+  if (type === 'company' && document.getElementById('co-page1')) {
+    switchCoPage(1);
+  }
   // 会社名自動入力
   if (type === 'company' && caseName) {
     var coNameEl = document.getElementById('f-coName');
