@@ -259,7 +259,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20260624.test.16';
+var FORM_VERSION = 'ver.20260624.test.17';
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -2091,11 +2091,10 @@ function buildCompanyPage2() {
     '</div>' +
     '<div style="display:flex;gap:8px;margin-top:-8px;margin-bottom:12px;">' +
       '<button type="button" onclick="setContractEnd(1)" style="flex:1;padding:8px;background:white;border:1.5px solid #2563eb;color:#2563eb;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;">📅 開始日の1年後をセット</button>' +
-      '<button type="button" onclick="setContractEnd(2)" style="flex:1;padding:8px;background:white;border:1.5px solid #7c3aed;color:#7c3aed;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;">📅 開始日の2年後をセット</button>' +
+      '<button type="button" onclick="setContractEnd(3)" style="flex:1;padding:8px;background:white;border:1.5px solid #7c3aed;color:#7c3aed;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;">📅 開始日の3年後をセット</button>' +
     '</div>' +
     fieldT('f-entryDate','入国予定日','date',false,'','','','新規入国の場合のみ記入。すでに日本にいる場合は空欄でOKです。') +
     fieldT('f-contractRenewal','契約更新の有無','select',false,'',null,['','更新する場合があり得る','更新しない','自動更新'],'雇用条件書Ⅰ-2に記載します。') +
-    fieldT('f-renewalCriteria','更新の判断基準','select',false,'',null,['','契約期間満了時の業務量','労働者の勤務成績・態度','業務を遂行する能力','会社の経営状況','従事している業務の進捗状況','その他'],'「更新する場合があり得る」の場合に選択してください。') +
     fieldT('f-renewalLimit','更新上限','select',false,'',null,['','なし','あり（回数・期間を備考に記入）'],'更新回数や通算契約期間の上限がある場合は「あり」を選択してください。') +
 
     '<div class="sub-label" style="margin-top:16px;">【給与】</div>' +
@@ -2202,37 +2201,7 @@ function buildCompanyPage2() {
   // 労働時間
   '<div class="card" data-section="labor">' +
     '<div class="section-title"><span class="section-step" style="background:#d97706;">3</span>⏰ 労働時間・休日・休暇</div>' +
-    '<div class="sub-label">【所定労働時間】</div>' +
-    '<div class="grid2">' +
-      fieldT('f-startTime','始業時刻','time',false,'','','','雇用条件書Ⅳ-1(1)に記載します。') +
-      fieldT('f-endTime','終業時刻','time',false,'','','','') +
-    '</div>' +
-    '<div class="grid2">' +
-      fieldT('f-breakTime','休憩時間（分）','number',false,'例: 60','','','8時間超の労働には60分以上の休憩が必要です。') +
-      fieldT('f-dailyHours','1日所定労働時間（時間）','number',false,'例: 8','','','') +
-    '</div>' +
-    '<div class="grid2">' +
-      fieldT('f-weeklyDays','週所定労働日数','number',false,'例: 5','','','') +
-      fieldT('f-weeklyH','週所定労働時間','number',false,'例: 40','','','法定労働時間は週40時間以内です。') +
-    '</div>' +
-    '<div class="grid2">' +
-      fieldT('f-monthlyDays','月所定労働日数','number',false,'例: 21','','','') +
-      fieldT('f-monthlyH','月所定労働時間','number',false,'例: 170','','','') +
-    '</div>' +
-    '<div class="grid2">' +
-      fieldT('f-yearlyDays','年所定労働日数','number',false,'例: 261','','','') +
-      fieldT('f-yearlyH','年所定労働時間','number',false,'例: 2080','','','') +
-    '</div>' +
-    fieldT('f-overtimeFlg','所定労働時間外労働の有無','select',false,'',null,['','有','無'],'残業が発生する場合は「有」を選択してください。') +
-    '<button type="button" onclick="calcAllHours()" style="width:100%;padding:10px;background:#d97706;color:white;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;margin-bottom:12px;">⚡ 労働時間を自動計算（始業・終業・休憩・年間休日から算出）</button>' +
-    '<div class="sub-label">【交代制・変形労働時間制】</div>' +
-    fieldT('f-shiftFlg','交代制（シフト制）の採用','select',false,'',null,['','あり','なし'],'') +
-    fieldT('f-shiftDetail','シフトパターン詳細','textarea',false,'例: 早番 7:00-16:00 / 遅番 13:00-22:00（週ごとに交代）','','','') +
-    fieldT('f-flexFlg','変形時間労働制の適用','select',false,'',null,['','適用あり','適用なし'],'') +
-    '<div id="flexTypeWrap" style="display:none;">' +
-      fieldT('f-flexType','変形労働時間制の種類','select',false,'',null,['','1年単位','1ヶ月単位'],'') +
-    '</div>' +
-    fieldT('f-flexDetail','変形労働時間制の詳細','text',false,'例: 1年単位の変形労働時間制（単位：月、最大週平均40時間）','','','') +
+
     '<div class="sub-label">【休日】</div>' +
     fieldT('f-holidayType','休日の種類','select',false,'',null,['','定例日','非定例日','定例日＋非定例日'],'定例日＝毎週特定の曜日が休み。非定例日＝シフトで変動する休日。') +
     '<div id="holiday-fixed-area" style="display:none;">' +
@@ -2261,7 +2230,40 @@ function buildCompanyPage2() {
     '</div>' +
     fieldT('f-otherHoliday','その他休日（GW・夏季・年末年始等）','text',false,'例: GW5日・夏季3日・年末年始5日','','','') +
     fieldT('f-annualHolidays','年間休日数','number',false,'例: 120','','','') +
-    '<button type="button" onclick="calcAllHours()" style="font-size:11px;padding:6px 14px;background:white;border:1.5px solid #d97706;color:#d97706;border-radius:6px;cursor:pointer;font-weight:700;margin-top:-8px;margin-bottom:12px;">⚡ 年間休日数から労働時間を再計算</button>' +
+
+    '<div class="sub-label">【所定労働時間】</div>' +
+    '<div style="font-size:11px;color:#6b7280;background:#fffbeb;border-radius:8px;padding:8px 12px;margin-bottom:10px;border-left:3px solid #d97706;">年間休日数を入力してから⚡ボタンで自動計算できます</div>' +
+    '<div class="grid2">' +
+      fieldT('f-startTime','始業時刻','time',false,'','','','雇用条件書Ⅳ-1(1)に記載します。') +
+      fieldT('f-endTime','終業時刻','time',false,'','','','') +
+    '</div>' +
+    '<div class="grid2">' +
+      fieldT('f-breakTime','休憩時間（分）','number',false,'例: 60','','','8時間超の労働には60分以上の休憩が必要です。') +
+      fieldT('f-dailyHours','1日所定労働時間（時間）','number',false,'例: 8','','','') +
+    '</div>' +
+    '<div class="grid2">' +
+      fieldT('f-weeklyDays','週所定労働日数','number',false,'例: 5','','','') +
+      fieldT('f-weeklyH','週所定労働時間','number',false,'例: 40','','','法定労働時間は週40時間以内です。') +
+    '</div>' +
+    '<div class="grid2">' +
+      fieldT('f-monthlyDays','月所定労働日数','number',false,'例: 21','','','') +
+      fieldT('f-monthlyH','月所定労働時間','number',false,'例: 170','','','') +
+    '</div>' +
+    '<div class="grid2">' +
+      fieldT('f-yearlyDays','年所定労働日数','number',false,'例: 261','','','') +
+      fieldT('f-yearlyH','年所定労働時間','number',false,'例: 2080','','','') +
+    '</div>' +
+    fieldT('f-overtimeFlg','所定労働時間外労働の有無','select',false,'',null,['','有','無'],'残業が発生する場合は「有」を選択してください。') +
+    '<button type="button" onclick="calcAllHours()" style="width:100%;padding:10px;background:#d97706;color:white;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;margin-bottom:12px;">⚡ 労働時間を自動計算（始業・終業・休憩・年間休日から算出）</button>' +
+
+    '<div class="sub-label">【交代制・変形労働時間制】</div>' +
+    fieldT('f-shiftFlg','交代制（シフト制）の採用','select',false,'',null,['','あり','なし'],'') +
+    fieldT('f-shiftDetail','シフトパターン詳細','textarea',false,'例: 早番 7:00-16:00 / 遅番 13:00-22:00（週ごとに交代）','','','') +
+    fieldT('f-flexFlg','変形時間労働制の適用','select',false,'',null,['','適用あり','適用なし'],'') +
+    '<div id="flexTypeWrap" style="display:none;">' +
+      fieldT('f-flexType','変形労働時間制の種類','select',false,'',null,['','1年単位','1ヶ月単位'],'') +
+    '</div>' +
+    fieldT('f-flexDetail','変形労働時間制の詳細','text',false,'例: 1年単位の変形労働時間制（単位：月、最大週平均40時間）','','','') +
     '<div class="sub-label">【休暇】</div>' +
     '<div class="grid2">' +
       fieldT('f-paidLeaveCount','年次有給休暇 付与日数（6か月後）','number',false,'例: 10','','','6か月継続勤務後の付与日数。法定では10日。') +
@@ -2280,8 +2282,6 @@ function buildCompanyPage2() {
       fieldT('f-resignNoticeDays','自己都合退職 届出日数（何日前）','number',false,'例: 14','','','退職希望日の何日前に申し出る必要があるか。一般的には14〜30日前。') +
       fieldT('f-resignNoticeTo','届出先','text',false,'例: 社長・工場長等','','','') +
     '</div>' +
-    fieldT('f-dismissalReason','解雇の事由及び手続','textarea',false,'例: やむを得ない事由がある場合に限り、30日前予告または30日分以上の平均賃金を支払い解雇する。','','','') +
-    '<button type="button" onclick="insertDismissalText()" style="font-size:11px;padding:6px 14px;background:white;border:1.5px solid #dc2626;color:#dc2626;border-radius:6px;cursor:pointer;font-weight:700;margin-top:-8px;margin-bottom:12px;">📝 法令準拠の定型文を挿入</button>' +
     fieldT('f-returnFare','帰国旅費の負担','select',false,'',null,['','会社が負担する','本人が負担する（会社は支援する）'],'雇用条件書Ⅸ-5に記載します。') +
   '</div>'
   );
