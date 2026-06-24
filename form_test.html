@@ -256,7 +256,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20260624.test.06';
+var FORM_VERSION = 'ver.20260624.test.07';
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -1852,43 +1852,37 @@ function applyFieldsFilter(fields) {
   }
 }
 
-// ?マーク ツールチップ ── シンプル確実版
-var _tipOpen = false;
-var _activeTipBtn = null;
+// ?マーク ツールチップ ── addEventListener直接登録版
 function tip(id, text) {
-  return '<button type="button" class="tip-btn" data-tip="' + text.replace(/'/g,"&#39;").replace(/"/g,"&quot;") + '" onclick="showTip(event,this)">?</button>';
+  return '<span class="tip-wrap"><button type="button" class="tip-btn" data-tip="' + text.replace(/'/g,"&#39;").replace(/"/g,"&quot;") + '">?</button></span>';
 }
-function showTip(e, btn) {
-  e.stopPropagation();
+function _initTips() {
   var popup = document.getElementById('tipPopup');
   if (!popup) return;
-  // 同じボタン再押し → 閉じる
-  if (_tipOpen && _activeTipBtn === btn) { hideTip(); return; }
-  if (_activeTipBtn) _activeTipBtn.classList.remove('active');
-  _activeTipBtn = btn;
-  btn.classList.add('active');
-  popup.textContent = btn.getAttribute('data-tip');
-  popup.removeAttribute('style');
-  popup.classList.add('show');
-  // 位置
-  var rect = btn.getBoundingClientRect();
-  var left = Math.max(8, Math.min(rect.left, window.innerWidth - 292));
-  var top = rect.bottom + 10;
-  if (top + 80 > window.innerHeight) top = rect.top - 90;
-  popup.style.left = left + 'px';
-  popup.style.top = top + 'px';
-  _tipOpen = true;
+  var _cur = null;
+  function close() {
+    popup.classList.remove('show');
+    if (_cur) { _cur.classList.remove('active'); _cur = null; }
+  }
+  document.querySelectorAll('.tip-btn').forEach(function(btn) {
+    btn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      if (_cur === btn && popup.classList.contains('show')) { close(); return; }
+      if (_cur) _cur.classList.remove('active');
+      _cur = btn;
+      btn.classList.add('active');
+      popup.textContent = btn.getAttribute('data-tip');
+      popup.classList.add('show');
+      var r = btn.getBoundingClientRect();
+      var left = Math.max(8, Math.min(r.left, window.innerWidth - 292));
+      var top = r.bottom + 10;
+      if (top + 80 > window.innerHeight) top = r.top - 90;
+      popup.style.left = left + 'px';
+      popup.style.top = top + 'px';
+    });
+  });
+  document.addEventListener('click', close);
 }
-function hideTip() {
-  var popup = document.getElementById('tipPopup');
-  if (popup) popup.classList.remove('show');
-  if (_activeTipBtn) { _activeTipBtn.classList.remove('active'); _activeTipBtn = null; }
-  _tipOpen = false;
-}
-// どこかクリックしたら閉じる（capture=trueで最優先）
-document.addEventListener('click', function(e) {
-  if (_tipOpen && !e.target.classList.contains('tip-btn')) hideTip();
-}, true);
 
 // ラベル+?マーク付きフィールド
 function fieldT(id, label, type, req, placeholder, transKey, opts, tipText) {
@@ -3221,6 +3215,13 @@ function confirmName(isMatch){
   if (type === 'card_delivery') prefillCardDelivery();
   if (fieldsFilter && fieldsFilter.length && type === 'company') {
     applyFieldsFilter(fieldsFilter);
+  }
+  // ツールチップ初期化（DOM生成後に登録）
+  _initTips();
+  // 会社名自動入力
+  if (type === 'company' && caseName) {
+    var coNameEl = document.getElementById('f-coName');
+    if (coNameEl && !coNameEl.value) coNameEl.value = caseName;
   }
   var verEl = document.getElementById('ver-display');
   if (verEl) verEl.textContent = FORM_VERSION;
