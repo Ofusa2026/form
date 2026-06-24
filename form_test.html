@@ -167,9 +167,9 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 /* ?マーク ツールチップ */
 .tip-btn { display: inline-flex; align-items: center; justify-content: center; width: 17px; height: 17px; background: #e0e7ff; color: #4f46e5; border-radius: 50%; font-size: 10px; font-weight: 800; cursor: pointer; border: none; padding: 0; margin-left: 5px; line-height: 1; flex-shrink: 0; vertical-align: middle; transition: background .15s; }
 .tip-btn:hover, .tip-btn.active { background: #4f46e5; color: white; }
-.tip-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 8000; display: none; background: rgba(0,0,0,0.01); cursor: pointer; }
-.tip-overlay.show { display: block; }
-.tip-popup { position: fixed; z-index: 7999; background: #1e293b; color: white; border-radius: 10px; padding: 12px 14px; font-size: 12px; line-height: 1.7; max-width: 280px; box-shadow: 0 8px 24px rgba(0,0,0,.35); display: none; pointer-events: none; }
+.tip-btn { display: inline-flex; align-items: center; justify-content: center; width: 17px; height: 17px; background: #e0e7ff; color: #4f46e5; border-radius: 50%; font-size: 10px; font-weight: 800; cursor: pointer; border: none; padding: 0; margin-left: 5px; line-height: 1; flex-shrink: 0; vertical-align: middle; transition: background .15s; }
+.tip-btn:hover, .tip-btn.active { background: #4f46e5; color: white; }
+.tip-popup { position: fixed; z-index: 9999; background: #1e293b; color: white; border-radius: 10px; padding: 12px 14px; font-size: 12px; line-height: 1.7; max-width: 280px; box-shadow: 0 8px 24px rgba(0,0,0,.35); display: none; pointer-events: none; }
 .tip-popup.show { display: block; }
 .tip-popup::before { content: ''; position: absolute; width: 8px; height: 8px; background: #1e293b; transform: rotate(45deg); top: -4px; left: 16px; }
 
@@ -185,7 +185,6 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 <body>
 
 <!-- ?マーク ツールチップ -->
-<div class="tip-overlay" id="tipOverlay" onclick="hideTip()"></div>
 <div class="tip-popup" id="tipPopup"></div>
 
 <!-- 翻訳バー -->
@@ -257,7 +256,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20260624.test.04';
+var FORM_VERSION = 'ver.20260624.test.05';
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -1853,39 +1852,40 @@ function applyFieldsFilter(fields) {
   }
 }
 
-// ?マーク ツールチップ（外クリックで自然に消える）
+// ?マーク ツールチップ
 var _activeTipBtn = null;
+var _tipListenerAdded = false;
 function tip(id, text) {
   return '<button type="button" class="tip-btn" onclick="showTip(event,this)" data-tip="' + text.replace(/'/g,"&#39;").replace(/"/g,"&quot;") + '">?</button>';
 }
 function showTip(e, btn) {
   e.stopPropagation();
-  var text = btn.getAttribute('data-tip');
   var popup = document.getElementById('tipPopup');
-  var overlay = document.getElementById('tipOverlay');
+  // 同じボタン再押し → 閉じる
   if (_activeTipBtn === btn && popup.classList.contains('show')) { hideTip(); return; }
   if (_activeTipBtn) _activeTipBtn.classList.remove('active');
   _activeTipBtn = btn;
   btn.classList.add('active');
-  popup.textContent = text;
-  var rect = btn.getBoundingClientRect();
+  popup.textContent = btn.getAttribute('data-tip');
+  // 位置計算
   popup.style.display = 'block';
   popup.classList.remove('show');
-  var pw = Math.min(popup.offsetWidth, 280);
-  var left = Math.min(rect.left, window.innerWidth - pw - 12);
-  left = Math.max(left, 8);
+  var rect = btn.getBoundingClientRect();
+  var left = Math.max(8, Math.min(rect.left, window.innerWidth - popup.offsetWidth - 12));
   var top = rect.bottom + 10;
   if (top + popup.offsetHeight > window.innerHeight - 12) top = rect.top - popup.offsetHeight - 10;
   popup.style.left = left + 'px';
   popup.style.top = top + 'px';
   popup.classList.add('show');
-  overlay.classList.add('show');
+  // bodyにワンショットのクリックリスナーを登録
+  if (!_tipListenerAdded) {
+    _tipListenerAdded = true;
+    document.body.addEventListener('click', function() { hideTip(); }, true);
+  }
 }
 function hideTip() {
   var popup = document.getElementById('tipPopup');
-  var overlay = document.getElementById('tipOverlay');
   if (popup) popup.classList.remove('show');
-  if (overlay) overlay.classList.remove('show');
   if (_activeTipBtn) { _activeTipBtn.classList.remove('active'); _activeTipBtn = null; }
 }
 
