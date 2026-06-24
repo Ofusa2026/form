@@ -259,7 +259,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20260624.test.38';
+var FORM_VERSION = 'ver.20260624.test.39';
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -2349,8 +2349,8 @@ function buildCompanyPage3() {
     fieldT('f-cohabitants','同居人数（外国人含む）','number',false,'例: 3','','','') +
     '<div class="field"><label>実費相当の説明</label>' +
     '<textarea id="f-actualCostDesc" placeholder="例: 月額13万円で借上の物件。居住人数10名のため1人当たり1万3千円は適正。"></textarea>' +
-    '<button type="button" onclick="genActualCostDesc()" style="margin-top:6px;font-size:12px;padding:8px 16px;background:#16a34a;color:white;border:none;border-radius:8px;cursor:pointer;font-weight:700;width:100%;">定型文を自動生成</button>' +
     '</div>' +
+    '<button type="button" onclick="genActualCostDesc()" style="font-size:11px;padding:6px 14px;background:white;border:1.5px solid #16a34a;color:#16a34a;border-radius:6px;cursor:pointer;font-weight:700;margin-top:-8px;margin-bottom:12px;">定型文を自動生成</button>' +
   '</div>' +
 
   // 比較対象日本人
