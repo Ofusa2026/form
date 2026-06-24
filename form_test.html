@@ -259,7 +259,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20260624.test.11';
+var FORM_VERSION = 'ver.20260624.test.12';
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -2242,8 +2242,7 @@ function buildCompanyPage2() {
     fieldT('f-otherLeavePaid','その他休暇（有給）内容','text',false,'例: 慶弔休暇3日、誕生日休暇1日','','','') +
     fieldT('f-otherLeaveUnpaid','その他休暇（無給）内容','text',false,'例: 産前産後休業、育児休業','','','') +
     fieldT('f-tempReturnLeave','一時帰国休暇の対応','select',false,'',null,['','年次有給休暇の範囲内で取得可','会社独自の帰国休暇制度あり'],'支援計画書に記載します。') +
-  '</div>' +
-
+  '</div>'
   );
 }
 
