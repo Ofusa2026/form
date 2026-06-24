@@ -259,7 +259,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20260624.test.37';
+var FORM_VERSION = 'ver.20260624.test.38';
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -2347,8 +2347,10 @@ function buildCompanyPage3() {
     '<div style="font-size:11px;color:#6b7280;background:#f9fafb;border-radius:8px;padding:10px;margin-bottom:12px;">会社が外国人の住居を提供する場合に記入してください。本人が自分で探す場合は空欄でOKです。</div>' +
     fieldT('f-housingOwnership','住居形態','select',false,'',null,['','自己所有（会社所有の社員寮等）','借上（会社が借り上げた物件）','提供なし（本人が自分で探す）'],'') +
     fieldT('f-cohabitants','同居人数（外国人含む）','number',false,'例: 3','','','') +
-    fieldT('f-actualCostDesc','実費相当の説明','textarea',false,'例: 月額13万円で借上の物件。居住人数10名のため1人当たり1万3千円は適正。','','','') +
-    '<button type="button" onclick="genActualCostDesc()" style="font-size:12px;padding:8px 16px;background:#16a34a;color:white;border:none;border-radius:8px;cursor:pointer;font-weight:700;margin-top:-8px;margin-bottom:12px;width:100%;">定型文を自動生成</button>' +
+    '<div class="field"><label>実費相当の説明</label>' +
+    '<textarea id="f-actualCostDesc" placeholder="例: 月額13万円で借上の物件。居住人数10名のため1人当たり1万3千円は適正。"></textarea>' +
+    '<button type="button" onclick="genActualCostDesc()" style="margin-top:6px;font-size:12px;padding:8px 16px;background:#16a34a;color:white;border:none;border-radius:8px;cursor:pointer;font-weight:700;width:100%;">定型文を自動生成</button>' +
+    '</div>' +
   '</div>' +
 
   // 比較対象日本人
