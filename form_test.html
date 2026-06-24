@@ -259,7 +259,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20260624.test.17';
+var FORM_VERSION = 'ver.20260624.test.18';
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -2093,7 +2093,6 @@ function buildCompanyPage2() {
       '<button type="button" onclick="setContractEnd(1)" style="flex:1;padding:8px;background:white;border:1.5px solid #2563eb;color:#2563eb;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;">📅 開始日の1年後をセット</button>' +
       '<button type="button" onclick="setContractEnd(3)" style="flex:1;padding:8px;background:white;border:1.5px solid #7c3aed;color:#7c3aed;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;">📅 開始日の3年後をセット</button>' +
     '</div>' +
-    fieldT('f-entryDate','入国予定日','date',false,'','','','新規入国の場合のみ記入。すでに日本にいる場合は空欄でOKです。') +
     fieldT('f-contractRenewal','契約更新の有無','select',false,'',null,['','更新する場合があり得る','更新しない','自動更新'],'雇用条件書Ⅰ-2に記載します。') +
     fieldT('f-renewalLimit','更新上限','select',false,'',null,['','なし','あり（回数・期間を備考に記入）'],'更新回数や通算契約期間の上限がある場合は「あり」を選択してください。') +
 
