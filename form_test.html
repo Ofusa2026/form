@@ -259,7 +259,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20260624.test.19';
+var FORM_VERSION = 'ver.20260624.test.20';
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -2074,7 +2074,30 @@ function buildCompanyPage2() {
     fieldT('f-officeAddress','事業所住所','text',false,'例: 東京都板橋区板橋1丁目2番3号','','','') +
     fieldT('f-officeTel','事業所電話番号','text',false,'例: 03-9876-5432','','','') +
     fieldT('f-contractType','契約の形態','select',false,'',null,['','直接雇用','派遣（農業・漁業のみ可）'],'ラセンズ（在留資格申請システム）への入力に必要です。特定技能は原則直接雇用です。') +
-    fieldT('f-jobCategory','業務内容（特定技能分野・区分）','text',false,'例: 飲食料品製造業 / 飲食料品製造','','','分野と業務区分を「/」で区切って記入してください。') +
+    '<div class="field"><label>特定技能 分野' + tip('tip_bunya','特定技能の対象分野を選択してください。分野を選ぶと対応する業務区分が表示されます。') + '</label>' +
+    '<select id="f-jobBunya" onchange="onBunyaChange(this.value)">' +
+      '<option value="">選択してください</option>' +
+      '<option>介護</option>' +
+      '<option>ビルクリーニング</option>' +
+      '<option>素形材・産業機械・電気電子情報関連製造業</option>' +
+      '<option>建設</option>' +
+      '<option>造船・舶用工業</option>' +
+      '<option>自動車整備</option>' +
+      '<option>航空</option>' +
+      '<option>宿泊</option>' +
+      '<option>農業</option>' +
+      '<option>漁業</option>' +
+      '<option>飲食料品製造業</option>' +
+      '<option>外食業</option>' +
+      '<option>林業</option>' +
+      '<option>木材産業</option>' +
+      '<option>鉄道</option>' +
+      '<option>自動車運送業</option>' +
+    '</select></div>' +
+    '<div class="field"><label>業務区分' + tip('tip_kukun','上の分野を先に選択してください。') + '</label>' +
+    '<select id="f-jobKubun"><option value="">（分野を先に選択）</option></select>' +
+    '<input type="hidden" id="f-jobCategory">' +
+    '</div>' +
     fieldT('f-jobDescription','受け入れる外国人の職務内容','textarea',false,'例: 食品製造ラインにおいて加工品の仕上げ・品質判別等に従事','','','雇用条件書Ⅲ（従事すべき業務の内容）に記載します。具体的な作業内容を記入してください。') +
     fieldT('f-foreignerJobTitle','職務上の地位・役職名','text',false,'例: 製造スタッフ（一般）','','','ラセンズへの入力項目です。「一般」「班長」等、職務上の地位を入力してください。') +
   '</div>' +
@@ -2714,6 +2737,45 @@ function genJpCompReason() {
   if (!el) return;
   el.value = '比較対象の日本人は、特定技能外国人と同一の就業場所において' + job + 'に従事しており、経験年数（' + exp + '）・職務内容・業務範囲が同等である。両者の報酬を比較した結果、特定技能外国人の報酬は同等以上であることを確認した。';
   el.dispatchEvent(new Event('input'));
+}
+
+// 特定技能 分野→区分マッピング
+var BUNYA_KUBUN = {
+  '介護': ['介護'],
+  'ビルクリーニング': ['ビルクリーニング'],
+  '素形材・産業機械・電気電子情報関連製造業': ['機械金属加工','電気電子機器組立て','金属表面処理'],
+  '建設': ['土木','建築','ライフライン・設備'],
+  '造船・舶用工業': ['溶接','塗装','鉄工','仕上げ','機械加工','電気機器組み立て'],
+  '自動車整備': ['自動車整備'],
+  '航空': ['空港グランドハンドリング','航空機整備'],
+  '宿泊': ['宿泊'],
+  '農業': ['耕種農業全般','畜産農業全般'],
+  '漁業': ['漁業（底引き網・刺し網・まき網・ひき縄釣り・その他釣り・養殖除く）','養殖業'],
+  '飲食料品製造業': ['飲食料品製造業全般'],
+  '外食業': ['外食業全般'],
+  '林業': ['林業全般'],
+  '木材産業': ['木材産業全般'],
+  '鉄道': ['軌道整備','電気設備整備','車両整備','運輸係員'],
+  '自動車運送業': ['トラック','バス','タクシー'],
+};
+function onBunyaChange(bunya) {
+  var kubunSel = document.getElementById('f-jobKubun');
+  var hidden = document.getElementById('f-jobCategory');
+  if (!kubunSel) return;
+  kubunSel.innerHTML = '<option value="">選択してください</option>';
+  var list = BUNYA_KUBUN[bunya] || [];
+  list.forEach(function(k) {
+    var opt = document.createElement('option');
+    opt.value = k; opt.textContent = k;
+    kubunSel.appendChild(opt);
+  });
+  kubunSel.onchange = function() {
+    if (hidden) { hidden.value = bunya + ' / ' + kubunSel.value; hidden.dispatchEvent(new Event('input')); }
+    if (kubunSel.value) kubunSel.classList.add('filled'); else kubunSel.classList.remove('filled');
+  };
+  if (hidden) hidden.value = bunya;
+  var bunyaSel = document.getElementById('f-jobBunya');
+  if (bunyaSel) bunyaSel.classList.add('filled');
 }
 
 // --- 初期化：計算トリガーを登録 ---
