@@ -259,7 +259,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20260624.test.20';
+var FORM_VERSION = 'ver.20260624.test.21';
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -1985,11 +1985,11 @@ function buildCompanyPage1() {
   // ── 企業情報 ──
   '<div class="card" data-section="basic">' +
     '<div class="section-title"><span class="section-step" style="background:#2563eb;">1</span>🏢 企業基本情報</div>' +
-    fieldT('f-coName','会社名','text',true,'例: 株式会社〇〇食品','','','雇用条件書・支援計画書等の全書類に記載する正式名称を入力してください。') +
-    fieldT('f-coNameKana','会社名（ひらがな）','text',false,'例: かぶしきかいしゃ〇〇しょくひん','','','支援計画書の読み仮名欄に使用します。') +
-    fieldT('f-coNameEn','会社名（英語）','text',false,'例: OO Foods Co., Ltd.','','','英語版書類（雇用条件書）に記載します。') +
+    fieldT('f-coName','会社名','text',true,'例: 株式会社〇〇食品','','','') +
+    fieldT('f-coNameKana','会社名（ひらがな）','text',false,'例: かぶしきかいしゃ〇〇しょくひん','','','') +
+    fieldT('f-coNameEn','会社名（英語）','text',false,'例: OO Foods Co., Ltd.','','','') +
     '<div class="grid2">' +
-      fieldT('f-coCorpNo','法人番号（13桁）','text',false,'例: 1234567890123','','','国税庁が指定した13桁の番号。国税庁法人番号公表サイトで確認できます。') +
+      fieldT('f-coCorpNo','法人番号（13桁）','text',false,'例: 1234567890123','','','国税庁が指定した13桁の番号。 国税庁法人番号公表サイトでも確認可能です。 https://www.houjin-bangou.nta.go.jp/') +
       fieldT('f-coEmpInsNo','雇用保険適用事業所番号','text',false,'例: 12-345678-9','','','ハローワークへの届出で付与される番号。離職票などに記載されています。') +
     '</div>' +
     fieldT('f-coLaborInsNo','労働保険番号','text',false,'例: 12-3456-789012-000','','','労働保険の保険関係成立届を提出した際に付与される番号です。') +
@@ -2004,7 +2004,7 @@ function buildCompanyPage1() {
     fieldT('f-coAnnualSales','年間売上金額（円）','number',false,'例: 500000000','','','直近決算期の年間売上高を入力してください。') +
     '<div class="grid2">' +
       fieldT('f-coReceivedLast1y','過去1年の中長期在留者受入人数','number',false,'例: 5','','','直近1年以内に受け入れた中長期在留者（特定技能・技人国等）の総数。') +
-      fieldT('f-coReceivedLast2y','過去2年前の中長期在留者受入人数','number',false,'例: 3','','','2年前（1年以上前〜2年以内）に受け入れた中長期在留者の総数。') +
+      fieldT('f-coReceivedLast2y','過去2年前の中長期在留者受入人数','number',false,'例: 3','','','') +
     '</div>' +
   '</div>' +
 
@@ -2012,13 +2012,13 @@ function buildCompanyPage1() {
   '<div class="card" data-section="address">' +
     '<div class="section-title"><span class="section-step" style="background:#0891b2;">2</span>📍 所在地</div>' +
     '<div class="grid2">' +
-      fieldT('f-coZip','郵便番号','text',false,'例: 160-0022','','','ハイフンあり・なしどちらでも可です。') +
+      fieldT('f-coZip','郵便番号','text',false,'例: 160-0022','','','') +
       fieldT('f-coPref','都道府県','text',false,'例: 東京都','','','') +
     '</div>' +
     '<button type="button" onclick="zipToAddress()" style="font-size:11px;padding:6px 14px;background:white;border:1.5px solid #0891b2;color:#0891b2;border-radius:6px;cursor:pointer;font-weight:700;margin-top:-8px;margin-bottom:12px;">🔍 郵便番号から住所を自動入力</button>' +
     fieldT('f-coCity','市区町村','text',false,'例: 新宿区','','','') +
     fieldT('f-coAddress','町名番地・建物名','text',false,'例: 新宿2丁目1番1号 〇〇ビル3F','','','') +
-    fieldT('f-coAddressEn','住所（英語）','text',false,'例: 3F OO Bldg., 2-1-1 Shinjuku, Shinjuku-ku, Tokyo','','','雇用条件書英語版・支援計画書英語版に記載します。') +
+    fieldT('f-coAddressEn','住所（英語）','text',false,'例: 3F OO Bldg., 2-1-1 Shinjuku, Shinjuku-ku, Tokyo','','','') +
     fieldT('f-coTel','電話番号','text',false,'例: 03-1234-5678','','','') +
   '</div>' +
 
@@ -2032,13 +2032,13 @@ function buildCompanyPage1() {
       fieldT('f-coRepTitle','役職','text',false,'例: 代表取締役','','','') +
     '</div>' +
     '<div class="grid2">' +
-      fieldT('f-coRepNameEn','氏名（英語）','text',false,'例: YAMADA TARO','','','英語版雇用条件書に記載します。パスポート表記に準じてください。') +
+      fieldT('f-coRepNameEn','氏名（英語）','text',false,'例: YAMADA TARO','','','') +
       fieldT('f-coRepTitleEn','役職（英語）','text',false,'例: President','','','') +
     '</div>' +
 
     '<div class="sub-label">【作成責任者】</div>' +
     '<div class="grid2">' +
-      fieldT('f-coAuthorName','氏名','text',false,'例: 佐藤 花子','','','書類の作成を担当した責任者の氏名。代表者と同じ場合も記入してください。') +
+      fieldT('f-coAuthorName','氏名','text',false,'例: 佐藤 花子','','','各申請書類における作成責任者（担当者）のお名前をお願いします。') +
       fieldT('f-coAuthorTitle','役職','text',false,'例: 人事部長','','','') +
     '</div>' +
     fieldT('f-coAuthorNameEn','作成責任者氏名（英語）','text',false,'例: SATO HANAKO','','','') +
@@ -2069,11 +2069,11 @@ function buildCompanyPage2() {
     '<div class="section-title"><span class="section-step" style="background:#0d9488;">1</span>🏭 就業場所（事業所）</div>' +
     '<div style="font-size:11px;color:#6b7280;background:#f0f9ff;border-radius:8px;padding:10px;margin-bottom:12px;border-left:3px solid #0ea5e9;">本社と就業場所が同じ場合も記入してください。</div>' +
     '<button type="button" onclick="copyCoToOffice()" style="width:100%;padding:10px;background:#0d9488;color:white;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;margin-bottom:12px;">📋 本社情報をコピー（名称・住所・電話）</button>' +
-    fieldT('f-officeName','事業所名','text',false,'例: 株式会社〇〇 板橋工場','','','雇用条件書Ⅱ（就業の場所）に記載します。') +
-    fieldT('f-officeNameEn','事業所名（英語）','text',false,'例: OO Co., Ltd. Itabashi Factory','','','英語版雇用条件書に記載します。') +
+    fieldT('f-officeName','事業所名','text',false,'例: 株式会社〇〇 板橋工場','','','') +
+    fieldT('f-officeNameEn','事業所名（英語）','text',false,'例: OO Co., Ltd. Itabashi Factory','','','') +
     fieldT('f-officeAddress','事業所住所','text',false,'例: 東京都板橋区板橋1丁目2番3号','','','') +
     fieldT('f-officeTel','事業所電話番号','text',false,'例: 03-9876-5432','','','') +
-    fieldT('f-contractType','契約の形態','select',false,'',null,['','直接雇用','派遣（農業・漁業のみ可）'],'ラセンズ（在留資格申請システム）への入力に必要です。特定技能は原則直接雇用です。') +
+    fieldT('f-contractType','契約の形態','select',false,'',null,['','直接雇用','派遣（農業・漁業のみ可）'],'特定技能は原則直接雇用です。') +
     '<div class="field"><label>特定技能 分野' + tip('tip_bunya','特定技能の対象分野を選択してください。分野を選ぶと対応する業務区分が表示されます。') + '</label>' +
     '<select id="f-jobBunya" onchange="onBunyaChange(this.value)">' +
       '<option value="">選択してください</option>' +
@@ -2098,8 +2098,8 @@ function buildCompanyPage2() {
     '<select id="f-jobKubun"><option value="">（分野を先に選択）</option></select>' +
     '<input type="hidden" id="f-jobCategory">' +
     '</div>' +
-    fieldT('f-jobDescription','受け入れる外国人の職務内容','textarea',false,'例: 食品製造ラインにおいて加工品の仕上げ・品質判別等に従事','','','雇用条件書Ⅲ（従事すべき業務の内容）に記載します。具体的な作業内容を記入してください。') +
-    fieldT('f-foreignerJobTitle','職務上の地位・役職名','text',false,'例: 製造スタッフ（一般）','','','ラセンズへの入力項目です。「一般」「班長」等、職務上の地位を入力してください。') +
+    fieldT('f-jobDescription','受け入れる外国人の職務内容','textarea',false,'例: 食品製造ラインにおいて加工品の仕上げ・品質判別等に従事','','','具体的な作業予定内容を記入してください。') +
+    fieldT('f-foreignerJobTitle','職務上の地位・役職名','text',false,'例: 製造スタッフ（一般）','','','「一般」「班長」等、職務上の地位を入力してください。') +
   '</div>' +
 
   // ── 雇用条件 ──
@@ -2116,13 +2116,13 @@ function buildCompanyPage2() {
       '<button type="button" onclick="setContractEnd(1)" style="flex:1;padding:8px;background:white;border:1.5px solid #2563eb;color:#2563eb;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;">📅 開始日の1年後をセット</button>' +
       '<button type="button" onclick="setContractEnd(3)" style="flex:1;padding:8px;background:white;border:1.5px solid #7c3aed;color:#7c3aed;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;">📅 開始日の3年後をセット</button>' +
     '</div>' +
-    fieldT('f-contractRenewal','契約更新の有無','select',false,'',null,['','更新する場合があり得る','更新しない','自動更新'],'雇用条件書Ⅰ-2に記載します。') +
+    fieldT('f-contractRenewal','契約更新の有無','select',false,'',null,['','更新する場合があり得る','更新しない','自動更新'],'') +
     fieldT('f-renewalLimit','更新上限','select',false,'',null,['','なし','あり（回数・期間を備考に記入）'],'更新回数や通算契約期間の上限がある場合は「あり」を選択してください。') +
 
     '<div class="sub-label" style="margin-top:16px;">【給与】</div>' +
     '<div class="grid2">' +
-      fieldT('f-salaryType','給与形態','select',false,'',null,['','月給','時給','日給'],'雇用条件書Ⅶ-1に記載します。特定技能は月給制が一般的です。') +
-      fieldT('f-salaryMonthly','基本給（円）','number',false,'例: 200000','','','固定残業代・手当を含まない基本的な給与額。') +
+      fieldT('f-salaryType','給与形態','select',false,'',null,['','月給','時給','日給'],'') +
+      fieldT('f-salaryMonthly','基本給（円）','number',false,'例: 200000','','','固定残業代・手当を含まない基本的な給与額です。') +
     '</div>' +
     '<div class="sub-label">【手当】</div>' +
     '<div id="allowanceRows">' + allowanceRow(1) + '</div>' +
@@ -2253,7 +2253,7 @@ function buildCompanyPage2() {
     '<div class="sub-label">【所定労働時間】</div>' +
     '<div style="font-size:11px;color:#6b7280;background:#fffbeb;border-radius:8px;padding:8px 12px;margin-bottom:10px;border-left:3px solid #d97706;">年間休日数を入力してから⚡ボタンで自動計算できます</div>' +
     '<div class="grid2">' +
-      fieldT('f-startTime','始業時刻','time',false,'','','','雇用条件書Ⅳ-1(1)に記載します。') +
+      fieldT('f-startTime','始業時刻','time',false,'','','','') +
       fieldT('f-endTime','終業時刻','time',false,'','','','') +
     '</div>' +
     '<div class="grid2">' +
@@ -2290,7 +2290,7 @@ function buildCompanyPage2() {
     '</div>' +
     fieldT('f-otherLeavePaid','その他休暇（有給）内容','text',false,'例: 慶弔休暇3日、誕生日休暇1日','','','') +
     fieldT('f-otherLeaveUnpaid','その他休暇（無給）内容','text',false,'例: 産前産後休業、育児休業','','','') +
-    fieldT('f-tempReturnLeave','一時帰国休暇の対応','select',false,'',null,['','年次有給休暇の範囲内で取得可','会社独自の帰国休暇制度あり'],'支援計画書に記載します。') +
+    fieldT('f-tempReturnLeave','一時帰国休暇の対応','select',false,'',null,['','年次有給休暇の範囲内で取得可','会社独自の帰国休暇制度あり'],'わかる場合のみ記載をお願いします。') +
   '</div>' +
 
   // 退職
@@ -2301,7 +2301,7 @@ function buildCompanyPage2() {
       fieldT('f-resignNoticeDays','自己都合退職 届出日数（何日前）','number',false,'例: 14','','','退職希望日の何日前に申し出る必要があるか。一般的には14〜30日前。') +
       fieldT('f-resignNoticeTo','届出先','text',false,'例: 社長・工場長等','','','') +
     '</div>' +
-    fieldT('f-returnFare','帰国旅費の負担','select',false,'',null,['','会社が負担する','本人が負担する（会社は支援する）'],'雇用条件書Ⅸ-5に記載します。') +
+    fieldT('f-returnFare','帰国旅費の負担','select',false,'',null,['','会社が負担する','本人が負担する（会社は支援する）'],'わかる場合のみ記載をお願いします。') +
   '</div>'
   );
 }
@@ -2322,7 +2322,7 @@ function buildCompanyPage3() {
       fieldT('f-dismissForeign','外国人 人数','number',false,'例: 0','','','') +
     '</div>' +
     '<div class="sub-label">【行方不明者数（特定技能）前1年間】</div>' +
-    fieldT('f-missing1y','行方不明者数','number',false,'0','','','特定技能外国人が行方不明になった人数。') +
+    fieldT('f-missing1y','行方不明者数','number',false,'0','','','過去受け入れ実施した特定技能外国人が行方不明になった人数。') +
   '</div>' +
 
   // 住居
