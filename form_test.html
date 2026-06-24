@@ -253,16 +253,13 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <div class="btn-wrap" id="btnWrap" style="display:none;">
-  <div style="display:flex;gap:8px;margin-bottom:8px;">
-    <button type="button" id="co-reset-float" onclick="resetCurrentPageAuto()" style="flex:0 0 auto;padding:14px 16px;background:#fff0f0;color:#dc2626;border:1.5px solid #fca5a5;border-radius:12px;font-size:12px;font-weight:800;cursor:pointer;display:inline-flex;white-space:nowrap;align-items:center;">🗑️ リセット</button>
-    <button class="btn-draft" onclick="saveDraft()" id="btn-draft" style="flex:1;margin-bottom:0;width:auto;">💾 途中保存する</button>
-  </div>
+  <button class="btn-draft" onclick="saveDraft()" id="btn-draft">💾 途中保存する</button>
   <button class="btn-submit" onclick="submitForm()" id="btn-submit">送信する</button>
   <div class="draft-saved-msg" id="draftSavedMsg">✅ 途中保存しました</div>
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20260624.test.32';
+var FORM_VERSION = 'ver.20260624.test.33';
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -1950,14 +1947,19 @@ function buildCompanyForm() {
       '<button id="co-tab3" type="button" onclick="switchCoPage(3)" style="flex:1;padding:12px 4px;background:#e5e7eb;color:#6b7280;border:none;font-size:11px;font-weight:800;cursor:pointer;line-height:1.4;text-align:center;">📋<br>その他情報<br><span style=\"font-size:9px;opacity:.7;\">3/3</span></button>' +
     '</div>' +
     '<div id="co-page1">' + page1Html + '</div>' +
-    '<div id="co-next-btn" style="margin-bottom:12px;"><button type="button" onclick="switchCoPage(2)" style="width:100%;padding:15px;background:#2563eb;color:white;border:none;border-radius:12px;font-size:15px;font-weight:800;cursor:pointer;">次へ → 雇用条件を入力 →</button></div>' +
+    '<div id="co-next-btn" style="margin-bottom:60px;">' +
+      '<button type="button" onclick="resetCurrentPage(1)" style="width:100%;padding:10px;background:white;color:#dc2626;border:1.5px solid #fca5a5;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;margin-bottom:8px;">🗑️ このページの入力内容をリセット</button>' +
+      '<button type="button" onclick="switchCoPage(2)" style="width:100%;padding:15px;background:#2563eb;color:white;border:none;border-radius:12px;font-size:15px;font-weight:800;cursor:pointer;">次へ → 雇用条件を入力 →</button>' +
+    '</div>' +
     '<div id="co-page2" style="display:none;">' + page2Html + '</div>' +
-    '<div id="co-mid-btns" style="display:none;margin-bottom:12px;">' +
+    '<div id="co-mid-btns" style="display:none;margin-bottom:60px;">' +
+      '<button type="button" onclick="resetCurrentPage(2)" style="width:100%;padding:10px;background:white;color:#dc2626;border:1.5px solid #fca5a5;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;margin-bottom:8px;">🗑️ このページの入力内容をリセット</button>' +
       '<button type="button" onclick="switchCoPage(3)" style="width:100%;padding:15px;background:#ea580c;color:white;border:none;border-radius:12px;font-size:14px;font-weight:800;cursor:pointer;margin-bottom:8px;">次へ → その他必要情報を入力 →</button>' +
       '<button type="button" onclick="switchCoPage(1)" style="width:100%;padding:12px;background:white;color:#2563eb;border:2px solid #2563eb;border-radius:12px;font-size:13px;font-weight:800;cursor:pointer;">← 企業情報に戻る</button>' +
     '</div>' +
     '<div id="co-page3" style="display:none;">' + page3Html + '</div>' +
-    '<div id="co-back-btn" style="display:none;margin-bottom:12px;">' +
+    '<div id="co-back-btn" style="display:none;margin-bottom:60px;">' +
+      '<button type="button" onclick="resetCurrentPage(3)" style="width:100%;padding:10px;background:white;color:#dc2626;border:1.5px solid #fca5a5;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;margin-bottom:8px;">🗑️ このページの入力内容をリセット</button>' +
       '<button type="button" onclick="switchCoPage(2)" style="width:100%;padding:13px;background:white;color:#ea580c;border:2px solid #ea580c;border-radius:12px;font-size:14px;font-weight:800;cursor:pointer;">← 雇用条件に戻る</button>' +
     '</div>'
   );
