@@ -259,7 +259,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20260624.test.12';
+var FORM_VERSION = 'ver.20260624.test.13';
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -2242,15 +2242,11 @@ function buildCompanyPage2() {
     fieldT('f-otherLeavePaid','その他休暇（有給）内容','text',false,'例: 慶弔休暇3日、誕生日休暇1日','','','') +
     fieldT('f-otherLeaveUnpaid','その他休暇（無給）内容','text',false,'例: 産前産後休業、育児休業','','','') +
     fieldT('f-tempReturnLeave','一時帰国休暇の対応','select',false,'',null,['','年次有給休暇の範囲内で取得可','会社独自の帰国休暇制度あり'],'支援計画書に記載します。') +
-  '</div>'
-  );
-}
+  '</div>' +
 
-function buildCompanyPage3() {
-  return (
   // 退職
   '<div class="card" data-section="retire">' +
-    '<div class="section-title"><span class="section-step" style="background:#dc2626;">1</span>🚪 退職に関する事項</div>' +
+    '<div class="section-title"><span class="section-step" style="background:#dc2626;">4</span>🚪 退職に関する事項</div>' +
     '<div style="font-size:11px;color:#6b7280;background:#f9fafb;border-radius:8px;padding:10px;margin-bottom:12px;">雇用条件書Ⅷに記載します。</div>' +
     '<div class="grid2">' +
       fieldT('f-resignNoticeDays','自己都合退職 届出日数（何日前）','number',false,'例: 14','','','退職希望日の何日前に申し出る必要があるか。一般的には14〜30日前。') +
@@ -2258,11 +2254,15 @@ function buildCompanyPage3() {
     '</div>' +
     fieldT('f-dismissalReason','解雇の事由及び手続','textarea',false,'例: やむを得ない事由がある場合に限り、30日前予告または30日分以上の平均賃金を支払い解雇する。','','','') +
     fieldT('f-returnFare','帰国旅費の負担','select',false,'',null,['','会社が負担する','本人が負担する（会社は支援する）'],'雇用条件書Ⅸ-5に記載します。') +
-  '</div>' +
+  '</div>'
+  );
+}
 
+function buildCompanyPage3() {
+  return (
   // 離職者
   '<div class="card" data-section="resign">' +
-    '<div class="section-title"><span class="section-step" style="background:#64748b;">2</span>📊 離職者・行方不明者情報</div>' +
+    '<div class="section-title"><span class="section-step" style="background:#64748b;">1</span>📊 離職者・行方不明者情報</div>' +
     '<div class="sub-label">【自己都合離職者（直近1年以内）】</div>' +
     '<div class="grid2">' +
       fieldT('f-resignJp','日本人 人数','number',false,'例: 1','','','') +
@@ -2279,7 +2279,7 @@ function buildCompanyPage3() {
 
   // 住居
   '<div class="card" data-section="housing">' +
-    '<div class="section-title"><span class="section-step" style="background:#16a34a;">3</span>🏠 住居（支援計画書用）</div>' +
+    '<div class="section-title"><span class="section-step" style="background:#16a34a;">2</span>🏠 住居（支援計画書用）</div>' +
     '<div style="font-size:11px;color:#6b7280;background:#f9fafb;border-radius:8px;padding:10px;margin-bottom:12px;">会社が外国人の住居を提供する場合に記入してください。本人が自分で探す場合は空欄でOKです。</div>' +
     fieldT('f-housingOwnership','住居形態','select',false,'',null,['','自己所有（会社所有の社員寮等）','借上（会社が借り上げた物件）','提供なし（本人が自分で探す）'],'') +
     fieldT('f-cohabitants','同居人数（外国人含む）','number',false,'例: 3','','','') +
@@ -2288,7 +2288,7 @@ function buildCompanyPage3() {
 
   // 比較対象日本人
   '<div class="card" data-section="jpcomp">' +
-    '<div class="section-title"><span class="section-step" style="background:#b45309;">4</span>⚖️ 比較対象日本人</div>' +
+    '<div class="section-title"><span class="section-step" style="background:#b45309;">3</span>⚖️ 比較対象日本人</div>' +
     '<div style="font-size:11px;color:#6b7280;background:#fffbeb;border-radius:8px;padding:10px;margin-bottom:12px;border-left:3px solid #f59e0b;">同等の業務に従事する日本人従業員と「同等以上の報酬」であることを証明するために必要な情報です。' + tip('tip_jpcomp','同等の業務に従事する日本人がいない場合は、類似職種の外部データ（厚労省の賃金構造基本統計調査等）を参照することもできます。') + '</div>' +
     '<div class="grid2">' +
       fieldT('f-jpCompAge','年齢','number',false,'例: 35','','','') +
