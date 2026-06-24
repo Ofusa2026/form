@@ -254,7 +254,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 
 <div class="btn-wrap" id="btnWrap" style="display:none;">
   <div style="display:flex;gap:8px;margin-bottom:8px;">
-    <button type="button" id="co-reset-float" onclick="resetCurrentPageAuto()" style="flex:0 0 auto;padding:14px 16px;background:#fff0f0;color:#dc2626;border:1.5px solid #fca5a5;border-radius:12px;font-size:12px;font-weight:800;cursor:pointer;display:none;white-space:nowrap;align-items:center;">🗑️ リセット</button>
+    <button type="button" id="co-reset-float" onclick="resetCurrentPageAuto()" style="flex:0 0 auto;padding:14px 16px;background:#fff0f0;color:#dc2626;border:1.5px solid #fca5a5;border-radius:12px;font-size:12px;font-weight:800;cursor:pointer;display:inline-flex;white-space:nowrap;align-items:center;">🗑️ リセット</button>
     <button class="btn-draft" onclick="saveDraft()" id="btn-draft" style="flex:1;margin-bottom:0;">💾 途中保存する</button>
   </div>
   <button class="btn-submit" onclick="submitForm()" id="btn-submit">送信する</button>
@@ -262,7 +262,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20260624.test.30';
+var FORM_VERSION = 'ver.20260624.test.31';
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -3673,7 +3673,13 @@ function _initFormBody(){
     document.getElementById('btnWrap').style.display = 'block';
     var _pg = document.getElementById('wizProgress'); if (_pg) _pg.style.display = 'none';
     var _rn = document.querySelector('.req-note'); if (_rn) _rn.style.display = 'block';
+    // 企業フォーム以外ではリセットボタンを非表示
+    if (type !== 'company') {
+      var _rb = document.getElementById('co-reset-float'); if (_rb) _rb.style.display = 'none';
+    }
   } else {
+    // 外国人フォームではリセットボタンを非表示
+    var _rb = document.getElementById('co-reset-float'); if (_rb) _rb.style.display = 'none';
     goWizardStep(2);
   }
 }
