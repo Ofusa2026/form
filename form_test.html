@@ -259,7 +259,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20260624.test.24';
+var FORM_VERSION = 'ver.20260624.test.25';
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -1948,7 +1948,7 @@ function buildCompanyForm() {
     '</div>' +
     '<div id="co-page1">' + page1Html + '</div>' +
     '<div id="co-next-btn" style="margin-bottom:12px;"><button type="button" onclick="switchCoPage(2)" style="width:100%;padding:15px;background:#2563eb;color:white;border:none;border-radius:12px;font-size:15px;font-weight:800;cursor:pointer;">次へ → 雇用条件を入力 →</button></div>' +
-    '<div style="margin-bottom:16px;"><button type="button" onclick="resetCurrentPage(1)" style="width:100%;padding:11px;background:white;color:#dc2626;border:1.5px solid #fca5a5;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;">🗑️ このページの入力内容をリセット</button></div>' +
+    '<div id="co-reset1" style="margin-bottom:16px;"><button type="button" onclick="resetCurrentPage(1)" style="width:100%;padding:11px;background:white;color:#dc2626;border:1.5px solid #fca5a5;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;">🗑️ このページの入力内容をリセット</button></div>' +
     '<div id="co-page2" style="display:none;">' + page2Html + '</div>' +
     '<div id="co-mid-btns" style="display:none;margin-bottom:12px;">' +
       '<button type="button" onclick="switchCoPage(3)" style="width:100%;padding:15px;background:#ea580c;color:white;border:none;border-radius:12px;font-size:14px;font-weight:800;cursor:pointer;margin-bottom:8px;">次へ → その他必要情報を入力 →</button>' +
@@ -1967,12 +1967,15 @@ function switchCoPage(page) {
   var p1=document.getElementById('co-page1'), p2=document.getElementById('co-page2'), p3=document.getElementById('co-page3');
   var t1=document.getElementById('co-tab1'), t2=document.getElementById('co-tab2'), t3=document.getElementById('co-tab3');
   var next=document.getElementById('co-next-btn'), mid=document.getElementById('co-mid-btns'), back=document.getElementById('co-back-btn');
+  var reset1=document.getElementById('co-reset1');
   if (!p1) return;
   [p1,p2,p3].forEach(function(p){if(p)p.style.display='none';});
   [next,mid,back].forEach(function(b){if(b)b.style.display='none';});
+  if(reset1) reset1.style.display='none';
   [t1,t2,t3].forEach(function(t){if(t){t.style.background='#e5e7eb';t.style.color='#6b7280';}});
   if (page===1) {
     p1.style.display=''; next.style.display='';
+    if(reset1) reset1.style.display='';
     t1.style.background='#2563eb'; t1.style.color='white';
   } else if (page===2) {
     p2.style.display=''; mid.style.display='';
