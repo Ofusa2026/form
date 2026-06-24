@@ -259,7 +259,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20260624.test.22';
+var FORM_VERSION = 'ver.20260624.test.23';
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -1922,6 +1922,7 @@ function fieldT(id, label, type, req, placeholder, transKey, opts, tipText) {
       id === 'f-insKenpo'        ? ' onchange="toggleNationalHealthIns(this.value)"' :
       id === 'f-insPension'      ? ' onchange="toggleNationalPensionIns(this.value)"' :
       id === 'f-housingOwnership'? ' onchange="toggleHousingOwnership(this.value)"' :
+      id === 'f-renewalLimit'    ? ' onchange="toggleRenewalLimitMemo(this.value)"' :
       '';
     h += '<select id="' + id + '"' + _onchange + '>';
     (opts||[]).forEach(function(o){ h += '<option value="' + o + '">' + (o||'選択してください') + '</option>'; });
@@ -2119,6 +2120,9 @@ function buildCompanyPage2() {
     '</div>' +
     fieldT('f-contractRenewal','契約更新の有無','select',false,'',null,['','更新する場合があり得る','更新しない','自動更新'],'') +
     fieldT('f-renewalLimit','更新上限','select',false,'',null,['','なし','あり（回数・期間を備考に記入）'],'更新回数や通算契約期間の上限がある場合は「あり」を選択してください。') +
+    '<div id="renewalLimitMemoWrap" style="display:none;">' +
+      fieldT('f-renewalLimitMemo','更新上限の詳細（回数・通算期間）','text',false,'例: 更新3回まで／通算4年まで','','','') +
+    '</div>' +
 
     '<div class="sub-label" style="margin-top:16px;">【給与】</div>' +
     '<div class="grid2">' +
@@ -2694,6 +2698,10 @@ function toggleNationalPensionIns(val) {
   var el = document.getElementById('f-insNationalPension');
   if (el && el.closest('.field')) el.closest('.field').style.display = val.indexOf('未加入') >= 0 ? 'block' : 'none';
 }
+function toggleRenewalLimitMemo(val) {
+  var el = document.getElementById('renewalLimitMemoWrap');
+  if (el) el.style.display = val && val !== 'なし' ? 'block' : 'none';
+}
 function toggleHousingOwnership(val) {
   var ids = ['f-cohabitants','f-actualCostDesc'];
   var show = val && val !== '提供なし（本人が自分で探す）';
@@ -2910,6 +2918,7 @@ function _initAutoCalc() {
     ['f-insKenpo', toggleNationalHealthIns],
     ['f-insPension', toggleNationalPensionIns],
     ['f-housingOwnership', toggleHousingOwnership],
+    ['f-renewalLimit', toggleRenewalLimitMemo],
   ];
   hideInits.forEach(function(pair) {
     var el = document.getElementById(pair[0]);
