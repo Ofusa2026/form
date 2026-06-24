@@ -259,7 +259,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20260624.test.08';
+var FORM_VERSION = 'ver.20260624.test.09';
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -2014,20 +2014,6 @@ function buildCompanyPage1() {
     fieldT('f-coTel','電話番号','text',false,'例: 03-1234-5678','','','') +
   '</div>' +
 
-  // 就業場所
-  '<div class="card" data-section="office">' +
-    '<div class="section-title"><span class="section-step" style="background:#0d9488;">3</span>🏭 就業場所（事業所）</div>' +
-    '<div style="font-size:11px;color:#6b7280;background:#f0f9ff;border-radius:8px;padding:10px;margin-bottom:12px;border-left:3px solid #0ea5e9;">本社と就業場所が同じ場合も記入してください。</div>' +
-    fieldT('f-officeName','事業所名','text',false,'例: 株式会社〇〇 板橋工場','','','雇用条件書Ⅱ（就業の場所）に記載します。') +
-    fieldT('f-officeNameEn','事業所名（英語）','text',false,'例: OO Co., Ltd. Itabashi Factory','','','英語版雇用条件書に記載します。') +
-    fieldT('f-officeAddress','事業所住所','text',false,'例: 東京都板橋区板橋1丁目2番3号','','','') +
-    fieldT('f-officeTel','事業所電話番号','text',false,'例: 03-9876-5432','','','') +
-    fieldT('f-contractType','契約の形態','select',false,'',null,['','直接雇用','派遣（農業・漁業のみ可）'],'ラセンズ（在留資格申請システム）への入力に必要です。特定技能は原則直接雇用です。') +
-    fieldT('f-jobCategory','業務内容（特定技能分野・区分）','text',false,'例: 飲食料品製造業 / 飲食料品製造','','','分野と業務区分を「/」で区切って記入してください。') +
-    fieldT('f-jobDescription','受け入れる外国人の職務内容','textarea',false,'例: 食品製造ラインにおいて加工品の仕上げ・品質判別等に従事','','','雇用条件書Ⅲ（従事すべき業務の内容）に記載します。具体的な作業内容を記入してください。') +
-    fieldT('f-foreignerJobTitle','職務上の地位・役職名','text',false,'例: 製造スタッフ（一般）','','','ラセンズへの入力項目です。「一般」「班長」等、職務上の地位を入力してください。') +
-  '</div>' +
-
   // 代表者・作成責任者・相談窓口・役員（1枚に統合）
   '<div class="card" data-section="rep">' +
     '<div class="section-title"><span class="section-step" style="background:#7c3aed;">4</span>👥 代表者・担当者・役員</div>' +
@@ -2069,9 +2055,23 @@ function buildCompanyPage1() {
 
 function buildCompanyPage2() {
   return (
+  // 就業場所
+  '<div class="card" data-section="office">' +
+    '<div class="section-title"><span class="section-step" style="background:#0d9488;">1</span>🏭 就業場所（事業所）</div>' +
+    '<div style="font-size:11px;color:#6b7280;background:#f0f9ff;border-radius:8px;padding:10px;margin-bottom:12px;border-left:3px solid #0ea5e9;">本社と就業場所が同じ場合も記入してください。</div>' +
+    fieldT('f-officeName','事業所名','text',false,'例: 株式会社〇〇 板橋工場','','','雇用条件書Ⅱ（就業の場所）に記載します。') +
+    fieldT('f-officeNameEn','事業所名（英語）','text',false,'例: OO Co., Ltd. Itabashi Factory','','','英語版雇用条件書に記載します。') +
+    fieldT('f-officeAddress','事業所住所','text',false,'例: 東京都板橋区板橋1丁目2番3号','','','') +
+    fieldT('f-officeTel','事業所電話番号','text',false,'例: 03-9876-5432','','','') +
+    fieldT('f-contractType','契約の形態','select',false,'',null,['','直接雇用','派遣（農業・漁業のみ可）'],'ラセンズ（在留資格申請システム）への入力に必要です。特定技能は原則直接雇用です。') +
+    fieldT('f-jobCategory','業務内容（特定技能分野・区分）','text',false,'例: 飲食料品製造業 / 飲食料品製造','','','分野と業務区分を「/」で区切って記入してください。') +
+    fieldT('f-jobDescription','受け入れる外国人の職務内容','textarea',false,'例: 食品製造ラインにおいて加工品の仕上げ・品質判別等に従事','','','雇用条件書Ⅲ（従事すべき業務の内容）に記載します。具体的な作業内容を記入してください。') +
+    fieldT('f-foreignerJobTitle','職務上の地位・役職名','text',false,'例: 製造スタッフ（一般）','','','ラセンズへの入力項目です。「一般」「班長」等、職務上の地位を入力してください。') +
+  '</div>' +
+
   // ── 雇用条件 ──
   '<div class="card" data-section="employment">' +
-    '<div class="section-title"><span class="section-step" style="background:#ea580c;">1</span>💴 雇用条件</div>' +
+    '<div class="section-title"><span class="section-step" style="background:#ea580c;">2</span>💴 雇用条件</div>' +
 
     '<div class="sub-label">【契約期間】</div>' +
     '<div style="font-size:11px;color:#6b7280;margin-bottom:10px;">雇用条件書Ⅰに記載します。' + tip('tip_contract','特定技能は1年以内の有期契約が一般的です。在留期間内の契約となるようにしてください。') + '</div>' +
@@ -2184,7 +2184,7 @@ function buildCompanyPage2() {
 
   // 労働時間
   '<div class="card" data-section="labor">' +
-    '<div class="section-title"><span class="section-step" style="background:#d97706;">2</span>⏰ 労働時間・休日・休暇</div>' +
+    '<div class="section-title"><span class="section-step" style="background:#d97706;">3</span>⏰ 労働時間・休日・休暇</div>' +
     '<div class="sub-label">【所定労働時間】</div>' +
     '<div class="grid2">' +
       fieldT('f-startTime','始業時刻','time',false,'','','','雇用条件書Ⅳ-1(1)に記載します。') +
@@ -2255,7 +2255,7 @@ function buildCompanyPage2() {
 
   // 退職
   '<div class="card" data-section="retire">' +
-    '<div class="section-title"><span class="section-step" style="background:#dc2626;">3</span>🚪 退職に関する事項</div>' +
+    '<div class="section-title"><span class="section-step" style="background:#dc2626;">4</span>🚪 退職に関する事項</div>' +
     '<div style="font-size:11px;color:#6b7280;background:#f9fafb;border-radius:8px;padding:10px;margin-bottom:12px;">雇用条件書Ⅷに記載します。</div>' +
     '<div class="grid2">' +
       fieldT('f-resignNoticeDays','自己都合退職 届出日数（何日前）','number',false,'例: 14','','','退職希望日の何日前に申し出る必要があるか。一般的には14〜30日前。') +
@@ -2267,7 +2267,7 @@ function buildCompanyPage2() {
 
   // 離職者
   '<div class="card" data-section="resign">' +
-    '<div class="section-title"><span class="section-step" style="background:#64748b;">4</span>📊 離職者・行方不明者情報</div>' +
+    '<div class="section-title"><span class="section-step" style="background:#64748b;">5</span>📊 離職者・行方不明者情報</div>' +
     '<div class="sub-label">【自己都合離職者（直近1年以内）】</div>' +
     '<div class="grid2">' +
       fieldT('f-resignJp','日本人 人数','number',false,'例: 1','','','') +
@@ -2284,7 +2284,7 @@ function buildCompanyPage2() {
 
   // 住居
   '<div class="card" data-section="housing">' +
-    '<div class="section-title"><span class="section-step" style="background:#16a34a;">5</span>🏠 住居（支援計画書用）</div>' +
+    '<div class="section-title"><span class="section-step" style="background:#16a34a;">6</span>🏠 住居（支援計画書用）</div>' +
     '<div style="font-size:11px;color:#6b7280;background:#f9fafb;border-radius:8px;padding:10px;margin-bottom:12px;">会社が外国人の住居を提供する場合に記入してください。本人が自分で探す場合は空欄でOKです。</div>' +
     fieldT('f-housingOwnership','住居形態','select',false,'',null,['','自己所有（会社所有の社員寮等）','借上（会社が借り上げた物件）','提供なし（本人が自分で探す）'],'') +
     fieldT('f-cohabitants','同居人数（外国人含む）','number',false,'例: 3','','','') +
@@ -2293,7 +2293,7 @@ function buildCompanyPage2() {
 
   // 比較対象日本人
   '<div class="card" data-section="jpcomp">' +
-    '<div class="section-title"><span class="section-step" style="background:#b45309;">6</span>⚖️ 比較対象日本人</div>' +
+    '<div class="section-title"><span class="section-step" style="background:#b45309;">7</span>⚖️ 比較対象日本人</div>' +
     '<div style="font-size:11px;color:#6b7280;background:#fffbeb;border-radius:8px;padding:10px;margin-bottom:12px;border-left:3px solid #f59e0b;">同等の業務に従事する日本人従業員と「同等以上の報酬」であることを証明するために必要な情報です。' + tip('tip_jpcomp','同等の業務に従事する日本人がいない場合は、類似職種の外部データ（厚労省の賃金構造基本統計調査等）を参照することもできます。') + '</div>' +
     '<div class="grid2">' +
       fieldT('f-jpCompAge','年齢','number',false,'例: 35','','','') +
