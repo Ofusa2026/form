@@ -259,7 +259,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20260624.test.14';
+var FORM_VERSION = 'ver.20260624.test.15';
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -1908,7 +1908,15 @@ function fieldT(id, label, type, req, placeholder, transKey, opts, tipText) {
   var h = '<div class="field"><label>' + labelHtml + '</label>';
   if (transKey) h += '<div class="trans" data-key="' + transKey + '"></div>';
   if (type === 'select') {
-    h += '<select id="' + id + '">';
+    var _onchange =
+      id === 'f-holidayType' ? ' onchange="toggleHolidayType(this.value)"' :
+      id === 'f-flexFlg'     ? ' onchange="toggleFlexType(this.value)"' :
+      id === 'f-nationality' ? ' onchange="toggleNationalityOther(this.value)"' :
+      id === 'f-housingProvided' ? ' onchange="toggleHousingDetail(this.value)"' :
+      id === 'f-foodProvided'    ? ' onchange="toggleFoodDetail(this.value)"' :
+      id === 'f-shiftFlg'        ? ' onchange="toggleShiftDetail(this.value)"' :
+      '';
+    h += '<select id="' + id + '"' + _onchange + '>';
     (opts||[]).forEach(function(o){ h += '<option value="' + o + '">' + (o||'選択してください') + '</option>'; });
     h += '</select>';
   } else if (type === 'textarea') {
