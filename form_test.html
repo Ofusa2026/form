@@ -115,9 +115,30 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 .type-unknown { text-align: center; padding: 60px 20px; }
 .type-unknown h2 { font-size: 18px; color: #dc2626; margin-bottom: 8px; }
 .type-unknown p { font-size: 13px; color: #6b7280; }
+
+/* ?マーク ツールチップ */
+.tip-btn { display: inline-flex; align-items: center; justify-content: center; width: 16px; height: 16px; background: #e0e7ff; color: #4f46e5; border-radius: 50%; font-size: 10px; font-weight: 800; cursor: pointer; border: none; padding: 0; margin-left: 5px; line-height: 1; flex-shrink: 0; vertical-align: middle; }
+.tip-btn:hover { background: #4f46e5; color: white; }
+.tip-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 8000; display: none; }
+.tip-overlay.show { display: block; }
+.tip-popup { position: fixed; z-index: 8001; background: #1e3a5f; color: white; border-radius: 10px; padding: 12px 14px; font-size: 12px; line-height: 1.6; max-width: 280px; box-shadow: 0 8px 24px rgba(0,0,0,.3); display: none; pointer-events: none; }
+.tip-popup.show { display: block; }
+.tip-popup::before { content: ''; position: absolute; width: 8px; height: 8px; background: #1e3a5f; transform: rotate(45deg); top: -4px; left: 16px; }
+
+/* 新規追加バッジ */
+.new-badge { display: inline-block; font-size: 9px; font-weight: 700; background: #dcfce7; color: #15803d; border-radius: 3px; padding: 1px 5px; margin-left: 4px; vertical-align: middle; }
+
+/* セクション区切り */
+.section-divider { display: flex; align-items: center; gap: 8px; margin: 16px 0 12px; }
+.section-divider span { font-size: 11px; font-weight: 700; color: #6b7280; white-space: nowrap; }
+.section-divider::before, .section-divider::after { content: ''; flex: 1; height: 1px; background: #e5e7eb; }
 </style>
 </head>
 <body>
+
+<!-- ?マーク ツールチップ -->
+<div class="tip-overlay" id="tipOverlay" onclick="hideTip()"></div>
+<div class="tip-popup" id="tipPopup"></div>
 
 <!-- 翻訳バー -->
 <div class="lang-bar">
@@ -188,7 +209,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20260616.test.03';
+var FORM_VERSION = 'ver.20260624.test.01';
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -1784,272 +1805,399 @@ function applyFieldsFilter(fields) {
   }
 }
 
+// ?マーク ツールチップ
+function tip(id, text) {
+  return '<button type="button" class="tip-btn" onclick="showTip(event,\'' + id + '\')" data-tip="' + text.replace(/'/g,"&#39;").replace(/"/g,"&quot;") + '">?</button>';
+}
+function showTip(e, id) {
+  e.stopPropagation();
+  var btn = e.currentTarget;
+  var text = btn.getAttribute('data-tip');
+  var popup = document.getElementById('tipPopup');
+  var overlay = document.getElementById('tipOverlay');
+  popup.textContent = text;
+  var rect = btn.getBoundingClientRect();
+  popup.style.display = 'block';
+  var pw = popup.offsetWidth;
+  var ph = popup.offsetHeight;
+  var left = Math.min(rect.left, window.innerWidth - pw - 12);
+  left = Math.max(left, 8);
+  var top = rect.bottom + 8;
+  if (top + ph > window.innerHeight - 12) top = rect.top - ph - 8;
+  popup.style.left = left + 'px';
+  popup.style.top = top + 'px';
+  popup.classList.add('show');
+  overlay.classList.add('show');
+}
+function hideTip() {
+  document.getElementById('tipPopup').classList.remove('show');
+  document.getElementById('tipOverlay').classList.remove('show');
+}
+
+// ラベル+?マーク付きフィールド
+function fieldT(id, label, type, req, placeholder, transKey, opts, tipText) {
+  var labelHtml = label + (req ? '<span class="req">*</span>' : '') + (tipText ? tip(id+'_tip', tipText) : '');
+  var h = '<div class="field"><label>' + labelHtml + '</label>';
+  if (transKey) h += '<div class="trans" data-key="' + transKey + '"></div>';
+  if (type === 'select') {
+    h += '<select id="' + id + '">';
+    (opts||[]).forEach(function(o){ h += '<option value="' + o + '">' + (o||'選択してください') + '</option>'; });
+    h += '</select>';
+  } else if (type === 'textarea') {
+    h += '<textarea id="' + id + '" placeholder="' + (placeholder||'') + '"></textarea>';
+  } else {
+    h += '<input type="' + type + '" id="' + id + '" placeholder="' + (placeholder||'') + '"' + (type==='number'?' min="0"':'') + '>';
+  }
+  h += '</div>';
+  return h;
+}
+
 function buildCompanyForm() {
   return (
-  '<div class="card"><div class="section-title">企業基本情報</div>' +
-    field('f-coName','会社名','text',true,'例: 株式会社〇〇食品') +
-    field('f-coNameKana','会社名（ひらがな）','text',false,'例: かぶしきかいしゃ〇〇しょくひん') +
-    field('f-coNameEn','会社名（英語）','text',false,'例: OO Foods Co., Ltd.') +
+  // ① 企業基本情報
+  '<div class="card"><div class="section-title">① 企業基本情報</div>' +
+    fieldT('f-coName','会社名','text',true,'例: 株式会社〇〇食品','','','雇用条件書・支援計画書等の全書類に記載する正式名称を入力してください。') +
+    fieldT('f-coNameKana','会社名（ひらがな）','text',false,'例: かぶしきかいしゃ〇〇しょくひん','','','支援計画書の読み仮名欄に使用します。') +
+    fieldT('f-coNameEn','会社名（英語）','text',false,'例: OO Foods Co., Ltd.','','','英語版書類（雇用条件書）に記載します。') +
     '<div class="grid2">' +
-      field('f-coCorpNo','法人番号（13桁）','text',false,'例: 1234567890123') +
-      field('f-coEmpInsNo','雇用保険適用事業所番号','text',false,'例: 12-345678-9') +
+      fieldT('f-coCorpNo','法人番号（13桁）','text',false,'例: 1234567890123','','','国税庁が指定した13桁の番号。国税庁法人番号公表サイトで確認できます。') +
+      fieldT('f-coEmpInsNo','雇用保険適用事業所番号','text',false,'例: 12-345678-9','','','ハローワークへの届出で付与される番号。離職票などに記載されています。') +
     '</div>' +
-    field('f-coLaborInsNo','労働保険番号','text',false,'例: 12-3456-789012-000') +
+    fieldT('f-coLaborInsNo','労働保険番号','text',false,'例: 12-3456-789012-000','','','労働保険の保険関係成立届を提出した際に付与される番号です。') +
     '<div class="grid2">' +
-      field('f-coEmployees','常勤職員数','number',false,'例: 25') +
-      field('f-coForeignEmployees','うち外国人職員数','number',false,'例: 3') +
+      fieldT('f-coEmployees','常勤職員数','number',false,'例: 25','','','フルタイムで雇用している従業員の総数（役員含む）を記入してください。') +
+      fieldT('f-coForeignEmployees','うち外国人職員数','number',false,'例: 3','','','常勤職員のうち、外国籍の方の人数を記入してください。') +
     '</div>' +
     '<div class="grid2">' +
-      field('f-coTrainees','技能実習生数','number',false,'例: 2') +
-      field('f-coCapital','資本金（円）','number',false,'例: 10000000') +
+      fieldT('f-coTrainees','技能実習生数','number',false,'例: 2','','','現在受け入れ中の技能実習生の人数。特定技能の受け入れ可能人数の算定に使用します。') +
+      fieldT('f-coCapital','資本金（円）','number',false,'例: 10000000','','','登記上の資本金額を入力してください。') +
     '</div>' +
-    field('f-coAnnualSales','年間売上金額（円）','number',false,'例: 500000000') +
+    fieldT('f-coAnnualSales','年間売上金額（円）','number',false,'例: 500000000','','','直近決算期の年間売上高を入力してください。') +
+    '<div class="grid2">' +
+      fieldT('f-coReceivedLast1y','過去1年の中長期在留者受入人数','number',false,'例: 5','','','直近1年以内に受け入れた中長期在留者（特定技能・技人国等）の総数。') +
+      fieldT('f-coReceivedLast2y','過去2年前の中長期在留者受入人数','number',false,'例: 3','','','2年前（1年以上前〜2年以内）に受け入れた中長期在留者の総数。') +
+    '</div>' +
   '</div>' +
 
-  '<div class="card"><div class="section-title">所在地</div>' +
+  // ② 所在地
+  '<div class="card"><div class="section-title">② 所在地</div>' +
     '<div class="grid2">' +
-      field('f-coZip','郵便番号','text',false,'例: 160-0022') +
-      field('f-coPref','都道府県','text',false,'例: 東京都') +
+      fieldT('f-coZip','郵便番号','text',false,'例: 160-0022','','','ハイフンあり・なしどちらでも可です。') +
+      fieldT('f-coPref','都道府県','text',false,'例: 東京都','','','') +
     '</div>' +
-    field('f-coCity','市区町村','text',false,'例: 新宿区') +
-    field('f-coAddress','町名番地','text',false,'例: 新宿2丁目1番1号 〇〇ビル3F') +
-    field('f-coAddressEn','住所（英語）','text',false,'例: 3F OO Bldg., 2-1-1 Shinjuku, Shinjuku-ku, Tokyo') +
-    field('f-coTel','電話番号','text',false,'例: 03-1234-5678') +
+    fieldT('f-coCity','市区町村','text',false,'例: 新宿区','','','') +
+    fieldT('f-coAddress','町名番地・建物名','text',false,'例: 新宿2丁目1番1号 〇〇ビル3F','','','') +
+    fieldT('f-coAddressEn','住所（英語）','text',false,'例: 3F OO Bldg., 2-1-1 Shinjuku, Shinjuku-ku, Tokyo','','','雇用条件書英語版・支援計画書英語版に記載します。') +
+    fieldT('f-coTel','電話番号','text',false,'例: 03-1234-5678','','','') +
   '</div>' +
 
-  '<div class="card"><div class="section-title">就業場所（事業所）</div>' +
-    field('f-officeName','事業所名','text',false,'例: 株式会社〇〇 板橋工場') +
-    field('f-officeNameEn','事業所名（英語）','text',false,'例: OO Co., Ltd. Itabashi Factory') +
-    field('f-officeAddress','事業所住所','text',false,'例: 東京都板橋区板橋1丁目2番3号') +
-    field('f-officeTel','事業所電話番号','text',false,'例: 03-9876-5432') +
-    field('f-jobCategory','業務内容（特定技能分野・区分）','text',false,'例: 飲食料品製造業 / 飲食料品製造') +
-    field('f-jobDescription','受け入れる外国人の職務内容','textarea',false,'例: 食品製造ラインにおいて加工品の仕上げ・品質判別等に従事') +
+  // ③ 就業場所（事業所）
+  '<div class="card"><div class="section-title">③ 就業場所（事業所）</div>' +
+    '<div style="font-size:11px;color:#6b7280;background:#f0f9ff;border-radius:8px;padding:10px;margin-bottom:12px;border-left:3px solid #0ea5e9;">本社所在地と就業場所が同じ場合も記入してください。複数拠点がある場合はメインの就業場所を記入してください。</div>' +
+    fieldT('f-officeName','事業所名','text',false,'例: 株式会社〇〇 板橋工場','','','雇用条件書Ⅱ（就業の場所）に記載します。本社と同じ場合も記入してください。') +
+    fieldT('f-officeNameEn','事業所名（英語）','text',false,'例: OO Co., Ltd. Itabashi Factory','','','英語版雇用条件書に記載します。') +
+    fieldT('f-officeAddress','事業所住所','text',false,'例: 東京都板橋区板橋1丁目2番3号','','','') +
+    fieldT('f-officeTel','事業所電話番号','text',false,'例: 03-9876-5432','','','') +
+    fieldT('f-contractType','契約の形態','select',false,'',null,['','直接雇用','派遣（農業・漁業のみ可）'],'ラセンズ（在留資格申請システム）への入力に必要です。特定技能は原則直接雇用です。') +
+    fieldT('f-jobCategory','業務内容（特定技能分野・区分）','text',false,'例: 飲食料品製造業 / 飲食料品製造','','','分野と業務区分を「/」で区切って記入してください。') +
+    fieldT('f-jobDescription','受け入れる外国人の職務内容','textarea',false,'例: 食品製造ラインにおいて加工品の仕上げ・品質判別等に従事','','','雇用条件書Ⅲ（従事すべき業務の内容）に記載します。具体的な作業内容を記入してください。') +
+    fieldT('f-foreignerJobTitle','職務上の地位・役職名','text',false,'例: 製造スタッフ（一般）','','','ラセンズへの入力項目です。「一般」「班長」等、職務上の地位を入力してください。') +
   '</div>' +
 
-  '<div class="card"><div class="section-title">代表者・作成責任者</div>' +
+  // ④ 代表者・作成責任者
+  '<div class="card"><div class="section-title">④ 代表者・作成責任者</div>' +
+    '<div class="sub-label">【代表者】</div>' +
     '<div class="grid2">' +
-      field('f-coRepName','代表者氏名','text',false,'例: 山田 太郎') +
-      field('f-coRepTitle','代表者役職','text',false,'例: 代表取締役') +
+      fieldT('f-coRepName','氏名','text',false,'例: 山田 太郎','','','雇用条件書に記名捺印する方の氏名です。') +
+      fieldT('f-coRepTitle','役職','text',false,'例: 代表取締役','','','') +
     '</div>' +
     '<div class="grid2">' +
-      field('f-coRepNameEn','代表者氏名（英語）','text',false,'例: YAMADA TARO') +
-      field('f-coRepTitleEn','代表者役職（英語）','text',false,'例: President') +
+      fieldT('f-coRepNameEn','氏名（英語）','text',false,'例: YAMADA TARO','','','英語版雇用条件書に記載します。パスポート表記に準じてください。') +
+      fieldT('f-coRepTitleEn','役職（英語）','text',false,'例: President','','','') +
     '</div>' +
+    '<div class="sub-label">【作成責任者】</div>' +
     '<div class="grid2">' +
-      field('f-coAuthorName','作成責任者氏名','text',false,'例: 佐藤 花子') +
-      field('f-coAuthorTitle','作成責任者役職','text',false,'例: 人事部長') +
+      fieldT('f-coAuthorName','氏名','text',false,'例: 佐藤 花子','','','書類の作成を担当した責任者の氏名です。代表者と同じ場合も記入してください。') +
+      fieldT('f-coAuthorTitle','役職','text',false,'例: 人事部長','','','') +
     '</div>' +
-    field('f-coAuthorNameEn','作成責任者氏名（英語）','text',false,'例: SATO HANAKO') +
+    fieldT('f-coAuthorNameEn','作成責任者氏名（英語）','text',false,'例: SATO HANAKO','','','') +
   '</div>' +
 
-  '<div class="card"><div class="section-title">雇用管理相談窓口</div>' +
-    '<div style="font-size:11px;color:#9ca3af;margin-bottom:10px;">申請人の雇用条件の相談等に対応する窓口</div>' +
-    field('f-consultDept','部署名','text',false,'例: 人事部') +
+  // ⑤ 雇用管理相談窓口
+  '<div class="card"><div class="section-title">⑤ 雇用管理相談窓口</div>' +
+    '<div style="font-size:11px;color:#6b7280;background:#f9fafb;border-radius:8px;padding:10px;margin-bottom:12px;">特定技能外国人からの雇用条件・支援に関する相談を受け付ける担当者の情報です。雇用条件書Ⅸ-4に記載します。</div>' +
+    fieldT('f-consultDept','部署名','text',false,'例: 人事部','','','') +
     '<div class="grid2">' +
-      field('f-consultName','担当者名','text',false,'例: 田中 一郎') +
-      field('f-consultNameEn','担当者名（英語）','text',false,'例: TANAKA ICHIRO') +
+      fieldT('f-consultName','担当者名','text',false,'例: 田中 一郎','','','') +
+      fieldT('f-consultNameEn','担当者名（英語）','text',false,'例: TANAKA ICHIRO','','','') +
     '</div>' +
-    field('f-consultTel','電話番号','text',false,'例: 03-1234-5678') +
+    fieldT('f-consultTel','電話番号','text',false,'例: 03-1234-5678','','','') +
   '</div>' +
 
-  '<div class="card"><div class="section-title">役員情報</div>' +
-    '<div style="font-size:11px;color:#9ca3af;margin-bottom:10px;">代表者を含む全役員を記入してください</div>' +
+  // ⑥ 役員情報
+  '<div class="card"><div class="section-title">⑥ 役員情報</div>' +
+    '<div style="font-size:11px;color:#6b7280;background:#f9fafb;border-radius:8px;padding:10px;margin-bottom:12px;">代表者を含む全役員を記入してください。役員が5名を超える場合は「＋ 役員を追加」で追加できます。' + tip('tip_officer','申請書類（役員名簿等）に記載する役員の情報です。履歴事項全部証明書（謄本）に記載の役員を全員記入してください。') + '</div>' +
     '<div id="officers-container">' +
       officerRow(1) + officerRow(2) + officerRow(3) +
     '</div>' +
     '<button type="button" onclick="addOfficer()" style="font-size:11px;padding:5px 14px;background:white;border:1.5px dashed #c7d2fe;border-radius:6px;color:#6366f1;cursor:pointer;font-weight:700;">＋ 役員を追加</button>' +
   '</div>' +
 
-  '<div class="card"><div class="section-title">雇用条件</div>' +
-    '<div class="sub-label">【給与】</div>' +
+  // ⑦ 雇用条件（給与・控除・社会保険・契約期間をここに集約）
+  '<div class="card"><div class="section-title">⑦ 雇用条件</div>' +
+
+    '<div class="sub-label">【契約期間】</div>' +
+    '<div style="font-size:11px;color:#6b7280;margin-bottom:10px;">雇用条件書Ⅰに記載します。' + tip('tip_contract','特定技能は1年以内の有期契約が一般的です。在留期間内の契約となるようにしてください。') + '</div>' +
     '<div class="grid2">' +
-      field('f-salaryType','給与形態','select',false,'',null,['','月給','時給','日給']) +
-      field('f-salaryMonthly','基本給（円）','number',false,'例: 200000') +
+      fieldT('f-contractStart','契約開始日','date',false,'','','','雇用開始予定日（入国日の翌日または入社日）を記入してください。') +
+      fieldT('f-contractEnd','契約終了日','date',false,'','','','在留期間の満了日以内で設定してください。') +
     '</div>' +
+    fieldT('f-entryDate','入国予定日','date',false,'','','','新規入国の場合のみ記入。すでに日本にいる場合は空欄でOKです。') +
+    fieldT('f-contractRenewal','契約更新の有無','select',false,'',null,['','更新する場合があり得る','更新しない','自動更新'],'雇用条件書Ⅰ-2に記載します。更新する予定がある場合は「更新する場合があり得る」を選択してください。') +
+    '<div id="renewalCondWrap">' +
+      fieldT('f-renewalCriteria','更新の判断基準','select',false,'',null,['','契約期間満了時の業務量','労働者の勤務成績・態度','業務を遂行する能力','会社の経営状況','従事している業務の進捗状況','その他'],'更新の有無が「更新する場合があり得る」の場合に選択してください。') +
+      fieldT('f-renewalLimit','更新上限','select',false,'',null,['','なし','あり（回数・期間を備考に記入）'],'更新回数や通算契約期間の上限がある場合は「あり」を選択してください。') +
+    '</div>' +
+
+    '<div class="sub-label" style="margin-top:16px;">【給与】</div>' +
+    '<div class="grid2">' +
+      fieldT('f-salaryType','給与形態','select',false,'',null,['','月給','時給','日給'],'雇用条件書Ⅶ-1に記載します。特定技能は月給制が一般的です。') +
+      fieldT('f-salaryMonthly','基本給（円）','number',false,'例: 200000','','','固定残業代・手当を含まない基本的な給与額を記入してください。') +
+    '</div>' +
+    fieldT('f-totalMonthly','月額支払概算額（税引き前）','number',false,'例: 228350','','','基本給＋固定残業代＋手当の合計（支払総額）。ラセンズ入力に使用します。') +
 
     '<div class="sub-label">【手当】</div>' +
     '<div id="allowanceRows">' + allowanceRow(1) + '</div>' +
-    '<button type="button" id="addAllowanceBtn" onclick="addAllowanceRow()" style="font-size:11px;padding:4px 14px;background:white;border:1.5px dashed #c7d2fe;border-radius:6px;color:#6366f1;cursor:pointer;font-weight:700;margin-bottom:10px;">＋ 手当を追加</button>' +
+    '<button type="button" id="addAllowanceBtn" onclick="addAllowanceRow()" style="font-size:11px;padding:4px 14px;background:white;border:1.5px dashed #c7d2fe;border-radius:6px;color:#6366f1;cursor:pointer;font-weight:700;margin-bottom:10px;">＋ 手当を追加（最大4つ）</button>' +
 
     '<div class="sub-label">【固定残業代】</div>' +
-    field('f-fixedOTName','固定残業代 名称','text',false,'例: 固定残業手当') +
+    '<div style="font-size:11px;color:#6b7280;margin-bottom:8px;">固定残業代がある場合のみ記入。' + tip('tip_fixedot','固定残業代（みなし残業代）がある場合、①名称 ②金額 ③何時間分かを明示する必要があります。超過分は追加支給が必要です。') + '</div>' +
+    fieldT('f-fixedOTName','固定残業代 名称','text',false,'例: 固定残業手当','','','') +
     '<div class="grid2">' +
-      field('f-fixedOTAmount','固定残業代 金額（円）','number',false,'例: 30000') +
-      field('f-fixedOTHours','何時間分','number',false,'例: 20') +
+      fieldT('f-fixedOTAmount','金額（円）','number',false,'例: 30000','','','') +
+      fieldT('f-fixedOTHours','何時間分','number',false,'例: 20','','','この時間を超えた残業には追加の割増賃金が発生します。') +
+    '</div>' +
+
+    '<div class="sub-label">【割増賃金率】</div>' +
+    '<div style="font-size:11px;color:#6b7280;margin-bottom:8px;">雇用条件書Ⅶ-3に記載します。' + tip('tip_overtime','法定の割増率：時間外（月60h以内）25%以上、月60h超50%以上、休日（法定）35%以上、深夜25%以上。') + '</div>' +
+    '<div class="grid2">' +
+      fieldT('f-otRate1','時間外（法定超月60h以内）','number',false,'例: 25','','','%単位で入力してください。最低25%。') +
+      fieldT('f-otRate2','時間外（法定超月60h超）','number',false,'例: 50','','','%単位で入力してください。最低50%。') +
+    '</div>' +
+    '<div class="grid2">' +
+      fieldT('f-otRateSo','所定超','number',false,'例: 25','','','所定労働時間を超えるが法定内の残業に適用される率（%）。') +
+      fieldT('f-otRateHolLegal','休日（法定休日）','number',false,'例: 35','','','%単位で入力。法定休日（週1回）の労働に適用。最低35%。') +
+    '</div>' +
+    '<div class="grid2">' +
+      fieldT('f-otRateHolOther','休日（法定外休日）','number',false,'例: 25','','','法定外休日（会社が定める休日）の労働に適用される率（%）。') +
+      fieldT('f-otRateNight','深夜（22時〜5時）','number',false,'例: 25','','','%単位で入力。最低25%。') +
     '</div>' +
 
     '<div class="sub-label">【控除】</div>' +
+    '<div style="font-size:11px;color:#6b7280;margin-bottom:8px;">雇用条件書別紙１-4に記載する控除項目です。' + tip('tip_deduct','外国人に対して「何がいくら引かれるか」を明示する義務があります。概算額でOKです。') + '</div>' +
     '<div class="grid2">' +
-      field('f-deductTax','税金 概算額（円）','number',false,'例: 15000') +
-      field('f-deductSocial','社会保険料 概算額（円）','number',false,'例: 30000') +
+      fieldT('f-deductTax','税金 概算額（円）','number',false,'例: 15000','','','所得税（源泉徴収）＋住民税の概算額。') +
+      fieldT('f-deductSocial','社会保険料 概算額（円）','number',false,'例: 30000','','','健康保険料＋厚生年金保険料の本人負担分の概算。') +
     '</div>' +
-    field('f-deductEmployment','雇用保険料 概算額（円）','number',false,'例: 1000') +
+    fieldT('f-deductEmployment','雇用保険料 概算額（円）','number',false,'例: 1000','','','給与×0.6%（労働者負担分）の概算額。') +
 
-    '<div class="sub-label">【居住費】</div>' +
-    field('f-housingProvided','居住費徴収の有無','select',false,'',null,['','有','無']) +
-    field('f-deductHousing','居住費控除 月額（円）','number',false,'なければ 0') +
-    field('f-housingDetail','居住費 適正額の説明','textarea',false,'例: 月額13万円で借上の物件。居住人数10名のため1万3千円は適正。') +
-
-    '<div class="sub-label">【食費】</div>' +
-    field('f-foodProvided','食費徴収の有無','select',false,'',null,['','有','無']) +
-    field('f-deductFood','食費控除 月額（円）','number',false,'なければ 0') +
-    field('f-foodDetail','食費 適正額の説明・食事内容','textarea',false,'例: 社員食堂で昼食1食500円。月20日×500円=10,000円は適正。') +
-
-    '<div class="sub-label">【水道光熱費・その他控除】</div>' +
+    '<div class="sub-label">【居住費・食費・その他控除】</div>' +
+    fieldT('f-housingProvided','居住費徴収の有無','select',false,'',null,['','有','無'],'会社が社員寮等を提供し家賃を控除する場合は「有」を選択してください。') +
+    '<div id="housingDetailWrap">' +
+      fieldT('f-deductHousing','居住費控除 月額（円）','number',false,'例: 13000','','','') +
+      fieldT('f-housingDetail','居住費 適正額の説明','textarea',false,'例: 月額13万円で借上の物件。居住人数10名のため1万3千円は適正。','','','近隣相場と比較して適正であることを説明してください。') +
+    '</div>' +
+    fieldT('f-foodProvided','食費徴収の有無','select',false,'',null,['','有','無'],'社員食堂等の食事代を控除する場合は「有」を選択してください。') +
+    '<div id="foodDetailWrap">' +
+      fieldT('f-deductFood','食費控除 月額（円）','number',false,'例: 10000','','','') +
+      fieldT('f-foodDetail','食費 適正額の説明・食事内容','textarea',false,'例: 社員食堂で昼食1食500円。月20日×500円=10,000円は適正。','','','') +
+    '</div>' +
     '<div class="grid2">' +
-      field('f-deductUtility','水道光熱費 月額（円）','number',false,'なければ 0') +
-      field('f-deductOther1Name','その他控除① 名目','text',false,'例: 〇〇費') +
+      fieldT('f-deductUtility','水道光熱費 月額（円）','number',false,'なければ 0','','','') +
+      fieldT('f-deductOther1Name','その他控除① 名目','text',false,'例: 通信費','','','') +
     '</div>' +
-    field('f-deductOther1Amount','その他控除① 金額（円）','number',false,'なければ 0') +
+    '<div class="grid2">' +
+      fieldT('f-deductOther1Amount','その他控除① 金額（円）','number',false,'なければ 0','','','') +
+      fieldT('f-deductOther2Name','その他控除② 名目','text',false,'例: 制服費','','','') +
+    '</div>' +
+    fieldT('f-deductOther2Amount','その他控除② 金額（円）','number',false,'なければ 0','','','') +
 
     '<div class="sub-label">【社会保険・雇用保険】</div>' +
+    '<div style="font-size:11px;color:#6b7280;margin-bottom:8px;">雇用条件書Ⅸ-1に記載します。' + tip('tip_insurance','特定技能外国人も日本の社会保険・雇用保険の加入対象です。常勤職員が5人未満の個人事業主の場合は国民健康保険・国民年金になる場合があります。') + '</div>' +
     '<div class="grid2">' +
-      field('f-insKenpo','健康保険 加入','select',false,'',null,['','加入','未加入']) +
-      field('f-insPension','厚生年金 加入','select',false,'',null,['','加入','未加入']) +
+      fieldT('f-insKenpo','健康保険','select',false,'',null,['','加入','未加入（国民健康保険）'],'') +
+      fieldT('f-insPension','厚生年金','select',false,'',null,['','加入','未加入（国民年金）'],'') +
     '</div>' +
     '<div class="grid2">' +
-      field('f-insEmp','雇用保険 加入','select',false,'',null,['','加入','未加入']) +
-      field('f-insLabor','労災保険 加入','select',false,'',null,['','加入','未加入']) +
+      fieldT('f-insEmp','雇用保険','select',false,'',null,['','加入','未加入'],'') +
+      fieldT('f-insLabor','労災保険','select',false,'',null,['','加入','未加入'],'') +
     '</div>' +
-    field('f-healthCheck','定期健康診断','select',false,'',null,['','年1回（毎年実施）','年2回（半年ごと）','その他']) +
+    '<div class="grid2">' +
+      fieldT('f-insNationalHealth','国民健康保険','select',false,'',null,['','加入','非該当'],'健康保険が「未加入」の場合に記入してください。') +
+      fieldT('f-insNationalPension','国民年金','select',false,'',null,['','加入','非該当'],'厚生年金が「未加入」の場合に記入してください。') +
+    '</div>' +
+    fieldT('f-healthCheck','定期健康診断','select',false,'',null,['','年1回（毎年実施）','年2回（半年ごと）','その他'],'') +
+    fieldT('f-healthCheckDate','雇入れ時健康診断 実施予定時期','text',false,'例: 2025年9月','','','雇用開始後できるだけ早い時期に実施してください。') +
 
-    '<div class="sub-label">【昇給・賞与・退職金】</div>' +
+    '<div class="sub-label">【昇給・賞与・退職金・休業手当】</div>' +
     '<div class="grid2">' +
-      field('f-salaryRaise','昇給','select',false,'',null,['','有','無']) +
-      field('f-salaryRaiseCond','昇給 条件・時期','text',false,'例: 毎年4月（査定による）') +
+      fieldT('f-salaryRaise','昇給','select',false,'',null,['','有','無'],'雇用条件書Ⅶ-8に記載します。') +
+      fieldT('f-salaryRaiseCond','昇給 条件・時期','text',false,'例: 毎年4月（査定による）','','','') +
     '</div>' +
     '<div class="grid2">' +
-      field('f-bonus','賞与','select',false,'',null,['','有','無']) +
-      field('f-bonusCond','賞与 条件・時期','text',false,'例: 年2回（6月・12月）') +
+      fieldT('f-bonus','賞与','select',false,'',null,['','有','無'],'雇用条件書Ⅶ-9に記載します。') +
+      fieldT('f-bonusCond','賞与 条件・時期','text',false,'例: 年2回（6月・12月）','','','') +
     '</div>' +
     '<div class="grid2">' +
-      field('f-retirement','退職金','select',false,'',null,['','有','無']) +
-      field('f-retirementDetail','退職金 制度内容','text',false,'例: 勤続3年以上') +
+      fieldT('f-retirement','退職金','select',false,'',null,['','有','無'],'雇用条件書Ⅶ-10に記載します。') +
+      fieldT('f-retirementDetail','退職金 制度内容','text',false,'例: 勤続3年以上','','','') +
+    '</div>' +
+    '<div class="grid2">' +
+      fieldT('f-severancePay','休業手当','select',false,'',null,['','有','無'],'会社都合で休業した場合に支払う手当。雇用条件書Ⅶ-11に記載します。') +
+      fieldT('f-severancePayRate','休業手当 率（%）','number',false,'例: 60','','','労働基準法上、平均賃金の60%以上が必要です。') +
     '</div>' +
 
     '<div class="sub-label">【支払方法・締め日】</div>' +
-    field('f-payMethod','支払方法','select',false,'',null,['','口座振込','現金','その他']) +
+    fieldT('f-payMethod','支払方法','select',false,'',null,['','口座振込','現金','その他'],'') +
     buildPayDateFields() +
   '</div>' +
 
-  '<div class="card"><div class="section-title">労働時間・休日</div>' +
+  // ⑧ 労働時間・休日・休暇
+  '<div class="card"><div class="section-title">⑧ 労働時間・休日・休暇</div>' +
     '<div class="sub-label">【所定労働時間】</div>' +
     '<div class="grid2">' +
-      field('f-startTime','始業時刻','time',false,'') +
-      field('f-endTime','終業時刻','time',false,'') +
+      fieldT('f-startTime','始業時刻','time',false,'','','','雇用条件書Ⅳ-1(1)に記載します。') +
+      fieldT('f-endTime','終業時刻','time',false,'','','','') +
     '</div>' +
     '<div class="grid2">' +
-      field('f-breakTime','休憩時間（分）','number',false,'例: 60') +
-      field('f-dailyHours','1日所定労働時間（時間）','number',false,'例: 8') +
+      fieldT('f-breakTime','休憩時間（分）','number',false,'例: 60','','','労働時間が6時間超は45分以上、8時間超は60分以上の休憩が必要です。') +
+      fieldT('f-dailyHours','1日所定労働時間（時間）','number',false,'例: 8','','','始業〜終業から休憩を引いた時間を記入してください。') +
     '</div>' +
     '<div class="grid2">' +
-      field('f-weeklyDays','週所定労働日数','number',false,'例: 5') +
-      field('f-weeklyH','週所定労働時間','number',false,'例: 40') +
+      fieldT('f-weeklyDays','週所定労働日数','number',false,'例: 5','','','') +
+      fieldT('f-weeklyH','週所定労働時間','number',false,'例: 40','','','法定労働時間は週40時間（特例44時間）以内です。') +
     '</div>' +
     '<div class="grid2">' +
-      field('f-monthlyDays','月所定労働日数','number',false,'例: 21') +
-      field('f-monthlyH','月所定労働時間','number',false,'例: 170') +
+      fieldT('f-monthlyDays','月所定労働日数','number',false,'例: 21','','','') +
+      fieldT('f-monthlyH','月所定労働時間','number',false,'例: 170','','','') +
     '</div>' +
     '<div class="grid2">' +
-      field('f-yearlyDays','年所定労働日数','number',false,'例: 261') +
-      field('f-yearlyH','年所定労働時間','number',false,'例: 2080') +
+      fieldT('f-yearlyDays','年所定労働日数','number',false,'例: 261','','','') +
+      fieldT('f-yearlyH','年所定労働時間','number',false,'例: 2080','','','') +
     '</div>' +
-    field('f-overtimeFlg','所定労働時間外労働の有無','select',false,'',null,['','有','無']) +
+    fieldT('f-overtimeFlg','所定労働時間外労働の有無','select',false,'',null,['','有','無'],'残業が発生する場合は「有」を選択してください。') +
 
-    '<div class="sub-label">【交代制（シフト制）】</div>' +
-    field('f-shiftFlg','交代制（シフト制）の採用','select',false,'',null,['','あり','なし']) +
-    field('f-shiftDetail','シフトパターン詳細','textarea',false,'例: 早番 7:00-16:00 / 遅番 13:00-22:00（週ごとに交代）') +
-
-    field('f-flexFlg','変形時間労働制の適用','select',false,'',null,['','適用あり','適用なし']) +
+    '<div class="sub-label">【交代制・変形労働時間制】</div>' +
+    fieldT('f-shiftFlg','交代制（シフト制）の採用','select',false,'',null,['','あり','なし'],'早番・遅番等のシフト制がある場合は「あり」を選択してください。') +
+    fieldT('f-shiftDetail','シフトパターン詳細','textarea',false,'例: 早番 7:00-16:00 / 遅番 13:00-22:00（週ごとに交代）','','','') +
+    fieldT('f-flexFlg','変形時間労働制の適用','select',false,'',null,['','適用あり','適用なし'],'1年単位・1ヶ月単位の変形労働時間制を採用している場合は「適用あり」を選択してください。') +
     '<div id="flexTypeWrap" style="display:none;">' +
-      field('f-flexType','変形労働時間制の種類','select',false,'',null,['','1年単位','1ヶ月単位']) +
+      fieldT('f-flexType','変形労働時間制の種類','select',false,'',null,['','1年単位','1ヶ月単位'],'') +
     '</div>' +
-    field('f-flexDetail','変形労働時間制の詳細','text',false,'例: 1年単位の変形労働時間制（単位：月、最大週平均40時間）') +
+    fieldT('f-flexDetail','変形労働時間制の詳細','text',false,'例: 1年単位の変形労働時間制（単位：月、最大週平均40時間）','','','') +
 
     '<div class="sub-label">【休日】</div>' +
-    field('f-holidayType','休日の種類','select',false,'',null,['','定例日','非定例日','定例日＋非定例日']) +
+    fieldT('f-holidayType','休日の種類','select',false,'',null,['','定例日','非定例日','定例日＋非定例日'],'定例日＝毎週特定の曜日が休み。非定例日＝シフトで変動する休日。') +
     '<div id="holiday-fixed-area" style="display:none;">' +
     '<div class="grid2">' +
-      field('f-fixedHolidayMon','月曜日','select',false,'',null,['','休み','出勤']) +
-      field('f-fixedHolidayTue','火曜日','select',false,'',null,['','休み','出勤']) +
+      fieldT('f-fixedHolidayMon','月曜日','select',false,'',null,['','休み','出勤'],'') +
+      fieldT('f-fixedHolidayTue','火曜日','select',false,'',null,['','休み','出勤'],'') +
     '</div>' +
     '<div class="grid2">' +
-      field('f-fixedHolidayWed','水曜日','select',false,'',null,['','休み','出勤']) +
-      field('f-fixedHolidayThu','木曜日','select',false,'',null,['','休み','出勤']) +
+      fieldT('f-fixedHolidayWed','水曜日','select',false,'',null,['','休み','出勤'],'') +
+      fieldT('f-fixedHolidayThu','木曜日','select',false,'',null,['','休み','出勤'],'') +
     '</div>' +
     '<div class="grid2">' +
-      field('f-fixedHolidayFri','金曜日','select',false,'',null,['','休み','出勤']) +
-      field('f-fixedHolidaySat','土曜日','select',false,'',null,['','休み','出勤']) +
+      fieldT('f-fixedHolidayFri','金曜日','select',false,'',null,['','休み','出勤'],'') +
+      fieldT('f-fixedHolidaySat','土曜日','select',false,'',null,['','休み','出勤'],'') +
     '</div>' +
     '<div class="grid2">' +
-      field('f-fixedHolidaySun','日曜日','select',false,'',null,['','休み','出勤']) +
-      field('f-fixedHolidayHol','祝日','select',false,'',null,['','休み','出勤']) +
+      fieldT('f-fixedHolidaySun','日曜日','select',false,'',null,['','休み','出勤'],'') +
+      fieldT('f-fixedHolidayHol','祝日','select',false,'',null,['','休み','出勤'],'') +
     '</div>' +
     '</div>' +
     '<div id="holiday-nonreg-area" style="display:none;">' +
     '<div class="grid2">' +
-      field('f-nonRegWeeklyDays','週あたりの休日日数','number',false,'例: 2') +
-      field('f-nonRegMonthlyDays','月あたりの休日日数','number',false,'例: 8') +
+      fieldT('f-nonRegWeeklyDays','週あたりの休日日数','number',false,'例: 2','','','') +
+      fieldT('f-nonRegMonthlyDays','月あたりの休日日数','number',false,'例: 8','','','') +
     '</div>' +
     '</div>' +
-    field('f-otherHoliday','その他休日（非定例日等）','text',false,'例: GW・夏季・年末年始') +
-    field('f-annualHolidays','年間休日数','number',false,'例: 120') +
-  '</div>' +
+    fieldT('f-otherHoliday','その他休日（GW・夏季・年末年始等）','text',false,'例: GW5日・夏季3日・年末年始5日','','','') +
+    fieldT('f-annualHolidays','年間休日数','number',false,'例: 120','','','') +
 
-  '<div class="card"><div class="section-title">契約期間</div>' +
+    '<div class="sub-label">【休暇】</div>' +
+    '<div style="font-size:11px;color:#6b7280;margin-bottom:8px;">雇用条件書Ⅵに記載します。' + tip('tip_leave','年次有給休暇は6ヶ月継続勤務・全労働日の8割以上出勤で10日付与されます（法定）。') + '</div>' +
     '<div class="grid2">' +
-      field('f-contractStart','契約開始日','date',false,'') +
-      field('f-contractEnd','契約終了日','date',false,'') +
+      fieldT('f-paidLeaveCount','年次有給休暇 付与日数（6か月後）','number',false,'例: 10','','','6か月継続勤務後の付与日数。法定では10日。') +
+      fieldT('f-paidLeaveEarly','6か月未満の有給休暇の有無','select',false,'',null,['','有','無'],'法定義務はありませんが、会社独自で付与している場合は「有」を選択。') +
     '</div>' +
-    field('f-contractRenewal','契約更新の有無','select',false,'',null,['','更新する場合があり得る','更新しない','自動更新']) +
+    fieldT('f-otherLeavePaid','その他休暇（有給）内容','text',false,'例: 慶弔休暇3日、誕生日休暇1日','','','') +
+    fieldT('f-otherLeaveUnpaid','その他休暇（無給）内容','text',false,'例: 産前産後休業、育児休業','','','') +
+    fieldT('f-tempReturnLeave','一時帰国休暇の対応','select',false,'',null,['','年次有給休暇の範囲内で取得可','会社独自の帰国休暇制度あり'],'支援計画書に記載します。外国人が一時帰国を希望した場合の休暇対応方法を選択してください。') +
   '</div>' +
 
-  '<div class="card"><div class="section-title">離職者・行方不明者情報</div>' +
+  // ⑨ 退職
+  '<div class="card"><div class="section-title">⑨ 退職に関する事項</div>' +
+    '<div style="font-size:11px;color:#6b7280;background:#f9fafb;border-radius:8px;padding:10px;margin-bottom:12px;">雇用条件書Ⅷに記載します。</div>' +
+    '<div class="grid2">' +
+      fieldT('f-resignNoticeDays','自己都合退職 届出日数（何日前）','number',false,'例: 14','','','退職希望日の何日前に申し出る必要があるかを記入してください。一般的には14〜30日前。') +
+      fieldT('f-resignNoticeTo','届出先','text',false,'例: 社長・工場長等','','','退職の申し出先を記入してください。') +
+    '</div>' +
+    fieldT('f-dismissalReason','解雇の事由及び手続','textarea',false,'例: やむを得ない事由がある場合に限り、30日前予告または30日分以上の平均賃金を支払い解雇する。','','','雇用条件書Ⅷ-2に記載します。就業規則の条番号も併せて記入するとより明確です。') +
+    fieldT('f-returnFare','帰国旅費の負担','select',false,'',null,['','会社が負担する','本人が負担する（会社は支援する）'],'雇用条件書Ⅸ-5に記載します。本人が旅費を負担できない場合、会社が負担することが求められます。') +
+  '</div>' +
+
+  // ⑩ 離職者・行方不明者情報
+  '<div class="card"><div class="section-title">⑩ 離職者・行方不明者情報</div>' +
+    '<div style="font-size:11px;color:#6b7280;background:#f9fafb;border-radius:8px;padding:10px;margin-bottom:12px;">過去1年以内の離職者数です。これが基準を超えると特定技能の受け入れができなくなる場合があります。' + tip('tip_resign','特定技能の受入れ可能人数や適合性審査に影響します。正確に記入してください。') + '</div>' +
     '<div class="sub-label">【自己都合離職者（直近1年以内）】</div>' +
     '<div class="grid2">' +
-      field('f-resignJp','日本人 人数','number',false,'例: 1') +
-      field('f-resignForeign','外国人 人数','number',false,'例: 0') +
+      fieldT('f-resignJp','日本人 人数','number',false,'例: 1','','','') +
+      fieldT('f-resignForeign','外国人 人数','number',false,'例: 0','','','') +
     '</div>' +
     '<div class="sub-label">【会社都合離職者（直近1年以内）】</div>' +
     '<div class="grid2">' +
-      field('f-dismissJp','日本人 人数','number',false,'例: 0') +
-      field('f-dismissForeign','外国人 人数','number',false,'例: 0') +
+      fieldT('f-dismissJp','日本人 人数','number',false,'例: 0','','','') +
+      fieldT('f-dismissForeign','外国人 人数','number',false,'例: 0','','','') +
     '</div>' +
     '<div class="sub-label">【行方不明者数（特定技能）前1年間】</div>' +
-    field('f-missing1y','行方不明者数','number',false,'0') +
+    fieldT('f-missing1y','行方不明者数','number',false,'0','','','特定技能外国人が行方不明になった人数。1名でもいる場合は受入れ停止になる場合があります。') +
   '</div>' +
 
-  '<div class="card"><div class="section-title">住居（支援計画書用）</div>' +
-    '<div style="font-size:11px;color:#9ca3af;margin-bottom:10px;">支援計画書に記載する住居情報</div>' +
-    field('f-housingOwnership','住居形態（自己所有/借上）','select',false,'',null,['','自己所有','借上']) +
-    field('f-cohabitants','同居人数','number',false,'例: 3') +
-    field('f-actualCostDesc','実費相当の説明','textarea',false,'例: 月額13万円で借上の物件。居住人数10名のため1人当たり1万3千円は適正。') +
+  // ⑪ 住居（支援計画書用）
+  '<div class="card"><div class="section-title">⑪ 住居（支援計画書用）</div>' +
+    '<div style="font-size:11px;color:#6b7280;background:#f9fafb;border-radius:8px;padding:10px;margin-bottom:12px;">会社が外国人の住居を提供する場合に記入してください。本人が自分で住居を探す場合は空欄でOKです。' + tip('tip_housing','支援計画書に記載する住居情報です。控除額が近隣相場と比較して適正であることを説明する必要があります。') + '</div>' +
+    fieldT('f-housingOwnership','住居形態','select',false,'',null,['','自己所有（会社所有の社員寮等）','借上（会社が借り上げた物件）','提供なし（本人が自分で探す）'],'') +
+    fieldT('f-cohabitants','同居人数（外国人含む）','number',false,'例: 3','','','その住居に住む全員の人数（外国人本人を含む）。') +
+    fieldT('f-actualCostDesc','実費相当の説明','textarea',false,'例: 月額13万円で借上の物件。居住人数10名のため1人当たり1万3千円は適正。','','','') +
   '</div>' +
 
-  '<div class="card"><div class="section-title">比較対象日本人</div>' +
-    '<div style="font-size:11px;color:#9ca3af;margin-bottom:10px;">外国人と同等業務に従事する日本人の情報</div>' +
+  // ⑫ 比較対象日本人
+  '<div class="card"><div class="section-title">⑫ 比較対象日本人</div>' +
+    '<div style="font-size:11px;color:#6b7280;background:#fffbeb;border-radius:8px;padding:10px;margin-bottom:12px;border-left:3px solid #f59e0b;">同等の業務に従事する日本人従業員と「同等以上の報酬」であることを証明するために必要な情報です。' + tip('tip_jpcomp','同等の業務に従事する日本人がいない場合は、類似職種の外部データ（厚労省の賃金構造基本統計調査等）を参照することもできます。') + '</div>' +
     '<div class="grid2">' +
-      field('f-jpCompAge','年齢','number',false,'例: 35') +
-      field('f-jpCompGender','性別','select',false,'',null,['','男','女']) +
+      fieldT('f-jpCompAge','年齢','number',false,'例: 35','','','') +
+      fieldT('f-jpCompGender','性別','select',false,'',null,['','男','女'],'') +
     '</div>' +
-    field('f-jpCompExp','経験年数','text',false,'例: 5年') +
-    field('f-jpCompJobDesc','職務内容','text',false,'例: 食品製造ライン作業（盛付・包装）') +
-    field('f-jpCompSalary','月額報酬（円）','number',false,'例: 210000') +
+    fieldT('f-jpCompExp','経験年数','text',false,'例: 5年','','','') +
+    fieldT('f-jpCompJobDesc','職務内容','text',false,'例: 食品製造ライン作業（盛付・包装）','','','外国人が従事する職務と同等の業務内容を記入してください。') +
+    fieldT('f-jpCompJobTitle','職務上の地位・役職名','text',false,'例: 製造スタッフ（一般）','','','') +
+    fieldT('f-jpCompSalary','月額報酬（基本給）（円）','number',false,'例: 210000','','','') +
     '<div class="grid2">' +
-      field('f-jpCompAllow1Name','手当①名称','text',false,'例: 通勤手当') +
-      field('f-jpCompAllow1Amt','手当①金額（円）','number',false,'例: 10000') +
-    '</div>' +
-    '<div class="grid2">' +
-      field('f-jpCompAllow2Name','手当②名称','text',false,'例: 住宅手当') +
-      field('f-jpCompAllow2Amt','手当②金額（円）','number',false,'例: 20000') +
+      fieldT('f-jpCompAllow1Name','手当①名称','text',false,'例: 通勤手当','','','') +
+      fieldT('f-jpCompAllow1Amt','手当①金額（円）','number',false,'例: 10000','','','') +
     '</div>' +
     '<div class="grid2">' +
-      field('f-jpCompAllow3Name','手当③名称','text',false,'') +
-      field('f-jpCompAllow3Amt','手当③金額（円）','number',false,'') +
+      fieldT('f-jpCompAllow2Name','手当②名称','text',false,'例: 住宅手当','','','') +
+      fieldT('f-jpCompAllow2Amt','手当②金額（円）','number',false,'例: 20000','','','') +
     '</div>' +
-    field('f-salaryRuleFlg','賃金規定の有無','select',false,'',null,['','有','無']) +
-
-    field('f-jpCompReason','同等以上の理由','textarea',false,'例: 同一ラインで同等業務に従事しており、経験年数・職務内容が同等であるため') +
+    '<div class="grid2">' +
+      fieldT('f-jpCompAllow3Name','手当③名称','text',false,'','','','') +
+      fieldT('f-jpCompAllow3Amt','手当③金額（円）','number',false,'','','','') +
+    '</div>' +
+    fieldT('f-salaryRuleFlg','賃金規定の有無','select',false,'',null,['','有','無'],'賃金規定がある場合は「有」を選択し、その規定に基づく同等報酬額も記入してください。') +
+    fieldT('f-jpCompSalaryRule','賃金規定に基づく同等報酬額（円）','number',false,'例: 220000','','','賃金規定がある場合、規定に基づいて算出した報酬額を記入してください。') +
+    fieldT('f-jpCompReason','同等以上の理由','textarea',false,'例: 同一ラインで同等業務に従事しており、経験年数・職務内容が同等であるため','','','なぜ同等以上といえるかを具体的に記入してください。') +
   '</div>'
   );
 }
