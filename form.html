@@ -188,7 +188,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20260701.02';
+var FORM_VERSION = 'ver.20260701.03';
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -196,6 +196,12 @@ function callRpc(fn, body){ return fetch(SUPABASE_URL + '/rest/v1/rpc/' + fn, { 
 
 var params = new URLSearchParams(location.search);
 var caseId  = params.get('case') || '';
+// ver.20260701.03: JAIM等は company=<会社ID> でIDを渡すため、case が無ければ co_<会社ID> をcaseIdにする
+// （caseId空だと form_save が bad_request で拒否＝成功表示なのに未保存、になる不具合の修正）
+if (!caseId) {
+  var _companyParam = params.get('company') || '';
+  if (_companyParam) caseId = (_companyParam.indexOf('co_') === 0) ? _companyParam : ('co_' + _companyParam);
+}
 var type    = params.get('type') || '';   // tokutei_nintei / tokutei_koushin / tokutei_henkou / gijinkoku_nintei / gijinkoku_koushin / gijinkoku_henkou / company
 var caseName = params.get('name') ? decodeURIComponent(params.get('name')) : '';
 var currentLang = params.get('lang') || '';
@@ -2070,7 +2076,11 @@ async function submitForm() {
     // ver.20260605.01: 送信後も入力内容を画面に残す（mainContentを置き換えない）。完了バナーを上部に表示。
     // 送信したレコードIDを確定（新規POST時はレスポンスから取得）→ 「修正を再送信」で同じ行をPATCHし重複を防ぐ
     var _doneId = _submitId;
-    try { var _obj = await res.json(); if (_obj && _obj.id) _doneId = _obj.id; } catch(_) {}
+    var _saveObj = null;
+    try { _saveObj = await res.json(); } catch(_) {}
+    // ver.20260701.03: form_saveが{error:...}を返したら成功扱いにしない（caseId空等でbad_requestのまま完了表示になる不具合の修正）
+    if (_saveObj && _saveObj.error) { throw new Error('SAVE_REJECTED:' + _saveObj.error); }
+    if (_saveObj && _saveObj.id) _doneId = _saveObj.id;
     if (_doneId) _draftResponseId = _doneId;
     var _mc = document.getElementById('mainContent');
     var okBanner = document.getElementById('submitOkBanner');
@@ -2094,6 +2104,10 @@ async function submitForm() {
       el.innerHTML = '⚠️ サーバー側で入力内容に不備が検出されました。<br>'
         + '<strong>ページを再読み込み(Ctrl+Shift+R / Cmd+Shift+R / iPhoneは閉じて開き直す)してから、もう一度入力してください。</strong><br>'
         + 'それでも解決しない場合は担当者までご連絡ください。';
+    } else if (e.message && e.message.indexOf('SAVE_REJECTED') === 0) {
+      el.innerHTML = '⚠️ 送信を受け付けられませんでした（保存に必要な情報が不足しています）。<br>'
+        + '<strong>お手数ですが、担当者から届いたフォームURLから開き直してから、もう一度お試しください。</strong><br>'
+        + '解決しない場合は担当者までご連絡ください。';
     } else {
       el.textContent = '送信に失敗しました。(' + e.message + ')';
     }
