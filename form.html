@@ -1409,7 +1409,28 @@ function buildCompanyForm() {
   addCard('📦 JAIM（製造業協議会）加入質問票',
     '<div class="form-card-inner">' +
     '<p style="font-size:13px;color:#6b7280;margin-bottom:16px;">JAIM（一般社団法人 工業製品製造技能人材機構）への協議会加入申請に必要な情報をお聞かせください。すべて任意項目です。</p>' +
-    field('f-jaimIndustryCode','日本標準産業分類番号','text',false,'例: 3121（金属プレス製品製造業）') +
+
+    // 産業分類番号フィールド（URLをセットで表示）
+    '<div class="field">' +
+    '<label>日本標準産業分類番号</label>' +
+    '<div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:12px 14px;margin-bottom:10px;font-size:13px;line-height:1.7;">' +
+    '下記URLから業種の分類番号をご確認ください（JAIM対象業種かどうかも確認できます）：<br>' +
+    '<a href="https://www.jaim-skill.or.jp/entry/classification/?stt_lang=ja" target="_blank" rel="noopener" style="color:#1d4ed8;font-weight:700;word-break:break-all;">https://www.jaim-skill.or.jp/entry/classification/?stt_lang=ja</a>' +
+    '</div>' +
+    '<input type="text" id="f-jaimIndustryCode" placeholder="例: 3121（金属プレス製品製造業）">' +
+    '</div>' +
+
+    // 該当性確認チェックボックス
+    '<div class="field">' +
+    '<label>JAIMへの該当性確認<span class="req">*</span></label>' +
+    '<div style="background:#f0fdf4;border:1.5px solid #86efac;border-radius:10px;padding:14px 16px;margin-top:4px;">' +
+    '<label style="display:flex;align-items:flex-start;gap:12px;cursor:pointer;font-size:14px;line-height:1.6;font-weight:normal;">' +
+    '<input type="checkbox" id="f-jaimAgreement" style="width:20px;height:20px;margin-top:2px;flex-shrink:0;accent-color:#059669;cursor:pointer;">' +
+    '<span style="color:#065f46;">上記の産業分類表を確認し、自社の製造品・業種がJAIMの対象に<strong>該当すること</strong>を確認しました。</span>' +
+    '</label>' +
+    '</div>' +
+    '</div>' +
+
     field('f-jaimProductName','製造品の説明','textarea',false,'例: 自動車用プレス部品（ブラケット、ステー等）') +
     field('f-jaimProductPurpose','製造品の用途・機能','textarea',false,'例: 自動車の車体フレームを固定・補強するための部品') +
     field('f-jaimFinalProductName','完成品の名称','text',false,'例: 乗用自動車') +
@@ -1762,7 +1783,7 @@ function collectData() {
       salaryRuleFlg: val('f-salaryRuleFlg'),
       jpCompReason: val('f-jpCompReason'),
       // ver.20260701: JAIM（製造業協議会）加入質問票
-      jaimIndustryCode: val('f-jaimIndustryCode'), jaimProductName: val('f-jaimProductName'), jaimProductPurpose: val('f-jaimProductPurpose'), jaimFinalProductName: val('f-jaimFinalProductName'), jaimFinalProductDesc: val('f-jaimFinalProductDesc'), jaimEquipmentPurpose: val('f-jaimEquipmentPurpose'), jaimEquipmentEffect: val('f-jaimEquipmentEffect'), jaimBranchOfficeFlag: val('f-jaimBranchOfficeFlag'), jaimBranchOfficeName: val('f-jaimBranchOfficeName'), jaimBranchOfficeZip: val('f-jaimBranchOfficeZip'), jaimBranchOfficeAddress: val('f-jaimBranchOfficeAddress'), jaimBranchOfficeContact: val('f-jaimBranchOfficeContact'), jaimBranchOfficeTel: val('f-jaimBranchOfficeTel')
+      jaimIndustryCode: val('f-jaimIndustryCode'), jaimAgreement: (document.getElementById('f-jaimAgreement') && document.getElementById('f-jaimAgreement').checked) ? '確認済み' : '', jaimProductName: val('f-jaimProductName'), jaimProductPurpose: val('f-jaimProductPurpose'), jaimFinalProductName: val('f-jaimFinalProductName'), jaimFinalProductDesc: val('f-jaimFinalProductDesc'), jaimEquipmentPurpose: val('f-jaimEquipmentPurpose'), jaimEquipmentEffect: val('f-jaimEquipmentEffect'), jaimBranchOfficeFlag: val('f-jaimBranchOfficeFlag'), jaimBranchOfficeName: val('f-jaimBranchOfficeName'), jaimBranchOfficeZip: val('f-jaimBranchOfficeZip'), jaimBranchOfficeAddress: val('f-jaimBranchOfficeAddress'), jaimBranchOfficeContact: val('f-jaimBranchOfficeContact'), jaimBranchOfficeTel: val('f-jaimBranchOfficeTel')
     };
     Object.assign(d, officers);
     return d;
@@ -2382,6 +2403,14 @@ function prefillForm(resp) {
   } catch(e) { console.error('tempReturnInTBD restore error (ignored):', e); }
 
   try { prefillPayDate(resp); } catch(e) { console.error('prefillPayDate error (ignored):', e); }
+
+  // ver.20260701: JAIM該当性確認チェックボックスの復元
+  try {
+    var _jaimAgrEl = document.getElementById('f-jaimAgreement');
+    if (_jaimAgrEl && resp.jaimAgreement === '確認済み') {
+      _jaimAgrEl.checked = true;
+    }
+  } catch(e) { console.error('jaimAgreement restore error (ignored):', e); }
 
   var maxAllow = 1;
   for (var ai = 2; ai <= 4; ai++) {
