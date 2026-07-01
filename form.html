@@ -188,7 +188,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20260609.01';
+var FORM_VERSION = 'ver.20260701.01';
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -1908,6 +1908,11 @@ function collectData() {
 function validate() {
   if (type === 'company') {
     if (!val('f-coName')) return '会社名は必須です。';
+    return null;
+  }
+  if (type === 'jaim') {
+    var _jaimAgr = document.getElementById('f-jaimAgreement');
+    if (!_jaimAgr || !_jaimAgr.checked) return 'JAIMへの該当性確認にチェックしてください。';
     return null;
   }
   if (!val('f-name')) return '氏名（パスポート表記）は必須です。';
