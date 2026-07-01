@@ -188,7 +188,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20260701.01';
+var FORM_VERSION = 'ver.20260701.02';
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -1793,6 +1793,26 @@ function collectData() {
     return d;
   }
 
+  // ver.20260701: type=jaim は申請人フォームがないのでJAIM項目だけ返す
+  if (t === 'jaim') {
+    return {
+      jaimIndustryCode: val('f-jaimIndustryCode'),
+      jaimAgreement: (document.getElementById('f-jaimAgreement') && document.getElementById('f-jaimAgreement').checked) ? '確認済み' : '',
+      jaimProductName: val('f-jaimProductName'),
+      jaimProductPurpose: val('f-jaimProductPurpose'),
+      jaimFinalProductName: val('f-jaimFinalProductName'),
+      jaimFinalProductDesc: val('f-jaimFinalProductDesc'),
+      jaimEquipmentPurpose: val('f-jaimEquipmentPurpose'),
+      jaimEquipmentEffect: val('f-jaimEquipmentEffect'),
+      jaimBranchOfficeFlag: val('f-jaimBranchOfficeFlag'),
+      jaimBranchOfficeName: val('f-jaimBranchOfficeName'),
+      jaimBranchOfficeZip: val('f-jaimBranchOfficeZip'),
+      jaimBranchOfficeAddress: val('f-jaimBranchOfficeAddress'),
+      jaimBranchOfficeContact: val('f-jaimBranchOfficeContact'),
+      jaimBranchOfficeTel: val('f-jaimBranchOfficeTel')
+    };
+  }
+
   var d = {
     applicantNameEn: val('f-name'), birthdate: val('f-birth'), nationality: (val('f-nationality') === 'その他' ? (val('f-nationalityOther') || 'その他') : val('f-nationality')),
     birthPlace: val('f-birthPlace'),
@@ -1987,6 +2007,7 @@ function validate() {
 // Supabase側トリガーと同じ閾値を使用（二重防御）
 function _minKeysForType(t) {
   if (t === 'company') return 1;
+  if (t === 'jaim') return 1;  // JAIM: 該当性確認のみ必須（他は任意）
   return 6;
 }
 
@@ -2014,8 +2035,8 @@ async function submitForm() {
     return;
   }
 
-  // 🛡️ 必須項目チェック（非company）: 氏名・生年月日・国籍・メールが揃っていることを確認
-  if (type !== 'company') {
+  // 🛡️ 必須項目チェック（非company・非jaim）: 氏名・生年月日・国籍・メールが揃っていることを確認
+  if (type !== 'company' && type !== 'jaim') {
     var requiredKeys = ['applicantNameEn', 'birthdate', 'nationality', 'email'];
     var missingKeys = requiredKeys.filter(function(k){
       return !response[k] || String(response[k]).trim() === '';
