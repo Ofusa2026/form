@@ -204,6 +204,9 @@ var editMode = !!responseId;
 var srcParam = params.get('src') || '';  // ver.20260531.02: 流入元（aidem 等）。本人不一致時の連絡先案内の出し分けに使用
 var fieldsFilter = params.get('fields') ? params.get('fields').split(',').map(function(s){return s.trim();}) : null;
 
+// typeなしでco_始まりのcaseId（所属機関）またはsrc=jaimの場合はcompanyをデフォルト
+if (!type && (caseId.indexOf('co_') === 0 || srcParam === 'jaim')) { type = 'company'; }
+
 // 特定技能フラグ（type=tokutei_* のとき true）
 var isTokutei = (type === 'tokutei_nintei' || type === 'tokutei_koushin' || type === 'tokutei_henkou');
 
