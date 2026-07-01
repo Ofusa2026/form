@@ -1404,16 +1404,13 @@ function buildCompanyForm() {
 
     field('f-jpCompReason','同等以上の理由','textarea',false,'例: 同一ラインで同等業務に従事しており、経験年数・職務内容が同等であるため') +
 
-    // ver.20260701: JAIM（製造業協議会）加入申請用質問票
     '</div>' +
-  '</div>'
-  );
+  '</div>' +
+
   // JAIM カード①: 質問票
-  addCard('📦 JAIM（製造業協議会）加入質問票',
-    '<div class="form-card-inner">' +
+  '<div class="card"><div class="section-title">📦 JAIM（製造業協議会）加入質問票</div>' +
     '<p style="font-size:13px;color:#6b7280;margin-bottom:16px;">JAIM（一般社団法人 工業製品製造技能人材機構）への協議会加入申請に必要な情報をお聞かせください。すべて任意項目です。</p>' +
 
-    // 産業分類番号フィールド（URLをセットで表示）
     '<div class="field">' +
     '<label>日本標準産業分類番号</label>' +
     '<div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:12px 14px;margin-bottom:10px;font-size:13px;line-height:1.7;">' +
@@ -1423,7 +1420,6 @@ function buildCompanyForm() {
     '<input type="text" id="f-jaimIndustryCode" placeholder="例: 3121（金属プレス製品製造業）">' +
     '</div>' +
 
-    // 該当性確認チェックボックス
     '<div class="field">' +
     '<label>JAIMへの該当性確認<span class="req">*</span></label>' +
     '<div style="background:#f0fdf4;border:1.5px solid #86efac;border-radius:10px;padding:14px 16px;margin-top:4px;">' +
@@ -1440,11 +1436,10 @@ function buildCompanyForm() {
     field('f-jaimFinalProductDesc','完成品の説明','textarea',false,'例: 一般消費者向け5ドアセダン型乗用自動車') +
     field('f-jaimEquipmentPurpose','設備の用途・機能','textarea',false,'例: 金属板をプレス加工し、所定の形状に成形する') +
     field('f-jaimEquipmentEffect','設備の製造品への効果','textarea',false,'例: 高精度・高速のプレス成形により、寸法精度の高い部品を安定して製造できる') +
-    '</div>'
-  );
+  '</div>' +
+
   // JAIM カード②: 受け入れ事業所
-  addCard('📦 JAIM：受け入れ事業所（本社以外の場合）',
-    '<div class="form-card-inner">' +
+  '<div class="card"><div class="section-title">📦 JAIM：受け入れ事業所（本社以外の場合）</div>' +
     '<p style="font-size:13px;color:#6b7280;margin-bottom:16px;">外国人材が本社以外の事業所で働く場合はご記入ください。</p>' +
     field('f-jaimBranchOfficeFlag','本社以外の事業所に受け入れる','select',false,'',null,['','あり','なし']) +
     field('f-jaimBranchOfficeName','事業所名称','text',false,'例: ○○工場') +
@@ -1452,11 +1447,10 @@ function buildCompanyForm() {
     field('f-jaimBranchOfficeAddress','住所','textarea',false,'例: 愛知県名古屋市○○区○○町1-2-3') +
     field('f-jaimBranchOfficeContact','担当者名','text',false,'例: 山田 太郎') +
     field('f-jaimBranchOfficeTel','電話番号','tel',false,'例: 052-000-0000') +
-    '</div>'
-  );
+  '</div>' +
+
   // JAIM カード③: 書類案内
-  addCard('📦 JAIM：証明書類のご準備について',
-    '<div class="form-card-inner">' +
+  '<div class="card"><div class="section-title">📦 JAIM：証明書類のご準備について</div>' +
     '<p style="font-size:14px;color:#374151;line-height:1.7;margin-bottom:12px;">JAIMへの加入申請には、以下の書類画像のご提出が必要です。<br>別途ご案内するアップロード専用URLからご提出ください。</p>' +
     '<ol style="font-size:13px;color:#374151;line-height:2;padding-left:1.5em;margin:0;">' +
     '<li>製造部品の写真（複数枚・接写・明瞭なもの）</li>' +
@@ -1464,7 +1458,7 @@ function buildCompanyForm() {
     '<li>製造品を生産するために用いた設備の写真</li>' +
     '<li>製造部品の直近1年以内の納品書（出荷額記載のもの）</li>' +
     '</ol>' +
-    '</div>'
+  '</div>'
   );
 }
 
