@@ -204,8 +204,8 @@ var editMode = !!responseId;
 var srcParam = params.get('src') || '';  // ver.20260531.02: 流入元（aidem 等）。本人不一致時の連絡先案内の出し分けに使用
 var fieldsFilter = params.get('fields') ? params.get('fields').split(',').map(function(s){return s.trim();}) : null;
 
-// typeなしでco_始まりのcaseId（所属機関）またはsrc=jaimの場合はcompanyをデフォルト
-if (!type && (caseId.indexOf('co_') === 0 || srcParam === 'jaim')) { type = 'company'; }
+// typeなしでco_始まりのcaseId（所属機関）またはsrc=jaimの場合はjaimをデフォルト
+if (!type && (caseId.indexOf('co_') === 0 || srcParam === 'jaim')) { type = 'jaim'; }
 
 // 特定技能フラグ（type=tokutei_* のとき true）
 var isTokutei = (type === 'tokutei_nintei' || type === 'tokutei_koushin' || type === 'tokutei_henkou');
@@ -1024,6 +1024,8 @@ function buildForm(t) {
       return blockBasic() + blockMarried() + blockEducation() + blockGijinkokuExtra() + blockContact(false, true);
     case 'company':
       return buildCompanyForm();
+    case 'jaim':
+      return buildJaimOnlyForm();
     default:
       return '<div class="type-unknown"><h2>❌ フォームが指定されていません</h2><p>URLに ?type=... パラメータが必要です。</p></div>';
   }
@@ -1405,11 +1407,16 @@ function buildCompanyForm() {
     field('f-jpCompReason','同等以上の理由','textarea',false,'例: 同一ラインで同等業務に従事しており、経験年数・職務内容が同等であるため') +
 
     '</div>' +
-  '</div>' +
+  '</div>'
+  );
+}
 
+// JAIM専用ヒアリングフォーム（type=jaim）
+function buildJaimOnlyForm() {
+  return (
   // JAIM カード①: 質問票
   '<div class="card"><div class="section-title">📦 JAIM（製造業協議会）加入質問票</div>' +
-    '<p style="font-size:13px;color:#6b7280;margin-bottom:16px;">JAIM（一般社団法人 工業製品製造技能人材機構）への協議会加入申請に必要な情報をお聞かせください。すべて任意項目です。</p>' +
+    '<p style="font-size:13px;color:#6b7280;margin-bottom:16px;">JAIM（一般社団法人 工業製品製造技能人材機構）への協議会加入申請に必要な情報をお聞かせください。</p>' +
 
     '<div class="field">' +
     '<label>日本標準産業分類番号</label>' +
