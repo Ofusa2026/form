@@ -188,7 +188,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20260702.04';
+var FORM_VERSION = 'ver.20260702.05';
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -1064,6 +1064,30 @@ function _soFormAddStaff(){
   var c = document.getElementById('so-staff-container');
   if (c) c.insertAdjacentHTML('beforeend', _soFormStaffRow(_soStaffCount));
 }
+var _soOfficeCount = 0;
+function _soOfficePrefSelect(i){
+  var h='<select id="f-so_office'+i+'_pref" style="flex:1 1 30%;min-width:120px;padding:8px;border:1.5px solid #e5e7eb;border-radius:8px;font-size:15px;min-height:44px;background:#fff;">';
+  _SO_PREF_LIST.forEach(function(p){ h+='<option value="'+p+'">'+(p===''?'都道府県':p)+'</option>'; });
+  h+='</select>';
+  return h;
+}
+function _soFormOfficeRow(i){
+  var st='padding:8px;border:1.5px solid #e5e7eb;border-radius:8px;font-size:15px;min-height:44px;';
+  return '<div class="so-office-row" data-sooidx="'+i+'" style="border:1px solid #e5e7eb;border-radius:10px;padding:10px;margin-bottom:10px;background:#fafafa;"><div style="display:flex;flex-wrap:wrap;gap:6px;">'
+    + '<input type="text" id="f-so_office'+i+'_name" placeholder="事業所名" style="flex:1 1 100%;'+st+'">'
+    + '<input type="text" id="f-so_office'+i+'_zip" placeholder="郵便番号" style="flex:1 1 30%;min-width:110px;'+st+'">'
+    + _soOfficePrefSelect(i)
+    + '<input type="text" id="f-so_office'+i+'_city" placeholder="市区町村" style="flex:1 1 30%;min-width:110px;'+st+'">'
+    + '<input type="text" id="f-so_office'+i+'_addr" placeholder="町名丁目番地号等" style="flex:1 1 100%;'+st+'">'
+    + '<input type="text" id="f-so_office'+i+'_addrEn" placeholder="英語住所（任意）" style="flex:1 1 100%;'+st+'">'
+    + '<input type="text" id="f-so_office'+i+'_tel" placeholder="電話番号" style="flex:1 1 45%;min-width:140px;'+st+'">'
+    + '</div></div>';
+}
+function _soFormAddOffice(){
+  _soOfficeCount++;
+  var c = document.getElementById('so-office-container');
+  if (c) c.insertAdjacentHTML('beforeend', _soFormOfficeRow(_soOfficeCount));
+}
 var _SO_STEP_LABELS = ['基本情報','支援体制','担当者・その他'];
 function _soStepBarHtml(active){
   var h='<div id="so-stepbar" style="display:flex;gap:6px;margin-bottom:14px;">';
@@ -1100,7 +1124,6 @@ function buildSupportOrgForm() {
   h += field('f-so_empInsNo','雇用保険適用事業所番号','text',false,'例：01-234567-8','');
   h += field('f-so_regNo','登録番号','text',false,'例：１９登－000001','');
   h += field('f-so_regDate','登録年月日','text',false,'例：20190927','');
-  h += field('f-so_supportStartDate','支援業務開始予定日','date',false,'','');
   h += '</div>';
   h += '<div class="card"><div class="section-title">所在地・連絡先</div>';
   h += field('f-so_zip','郵便番号','text',false,'例：100-0001','');
@@ -1141,6 +1164,11 @@ function buildSupportOrgForm() {
   h += '<div id="so-staff-container">' + _soFormStaffRow(0) + '</div>';
   h += '<button type="button" onclick="_soFormAddStaff()" style="margin-top:8px;padding:10px 16px;background:#eff6ff;color:#2563eb;border:1.5px solid #2563eb;border-radius:8px;font-weight:700;cursor:pointer;font-size:14px;">＋ 支援担当者を追加</button>';
   h += '</div>';
+  h += '<div class="card"><div class="section-title">支援を行う事業所（本店以外にあれば）</div>';
+  h += '<div style="font-size:13px;color:#6b7280;margin-bottom:8px;">本店以外に支援業務を行う事業所がある場合は「＋ 事業所を追加」で入力してください。無ければ空のままで構いません。</div>';
+  h += '<div id="so-office-container"></div>';
+  h += '<button type="button" onclick="_soFormAddOffice()" style="margin-top:4px;padding:10px 16px;background:#eff6ff;color:#2563eb;border:1.5px solid #2563eb;border-radius:8px;font-weight:700;cursor:pointer;font-size:14px;">＋ 事業所を追加</button>';
+  h += '</div>';
   h += '<div class="card"><div class="section-title">職業紹介事業者（該当する場合のみ）</div>';
   h += field('f-so_jjName','名称','text',false,'','');
   h += field('f-so_jjCorpNo','法人番号','text',false,'','');
@@ -1171,6 +1199,12 @@ function _soFormCollect(){
     var nm=v('f-so_staff'+i+'_name'),ti=v('f-so_staff'+i+'_title'),ne=v('f-so_staff'+i+'_nameEn'),te=v('f-so_staff'+i+'_titleEn');
     if(nm||ti||ne||te) staff.push({name:nm,title:ti,nameEn:ne,titleEn:te});
   });
+  var offices=[];
+  document.querySelectorAll('#so-office-container .so-office-row').forEach(function(row){
+    var i=row.getAttribute('data-sooidx');
+    var nm=v('f-so_office'+i+'_name'),zip=v('f-so_office'+i+'_zip'),pf=v('f-so_office'+i+'_pref'),ci=v('f-so_office'+i+'_city'),ad=v('f-so_office'+i+'_addr'),ae=v('f-so_office'+i+'_addrEn'),te=v('f-so_office'+i+'_tel');
+    if(nm||zip||pf||ci||ad||ae||te) offices.push({officeName:nm,officeZip:zip,officePref:pf,officeCity:ci,officeAddressDetail:ad,officeAddressEn:ae,officeTel:te});
+  });
   return {
     name:v('f-so_name'), nameKana:v('f-so_nameKana'), nameEn:v('f-so_nameEn'),
     corpNo:v('f-so_corpNo'), empInsNo:v('f-so_empInsNo'), regNo:v('f-so_regNo'), regDate:v('f-so_regDate'),
@@ -1181,15 +1215,14 @@ function _soFormCollect(){
     jjName:v('f-so_jjName'), jjCorpNo:v('f-so_jjCorpNo'), jjEmpInsNo:v('f-so_jjEmpInsNo'),
     jjZip:v('f-so_jjZip'), jjPref:v('f-so_jjPref'), jjCity:v('f-so_jjCity'), jjAddressDetail:v('f-so_jjAddressDetail'),
     jjTel:v('f-so_jjTel'), jjPermitNo:v('f-so_jjPermitNo'), jjPermitDate:v('f-so_jjPermitDate'),
-    supportStartDate:v('f-so_supportStartDate'),
     supportHours:hours, consultMethods:meth('consult'), emergencyContact:meth('emg'),
-    supportStaffList:staff
+    supportStaffList:staff, offices:offices
   };
 }
 function _soFormValidate(){ if(!val('f-so_name')) return '登録支援機関名は必須です。'; return null; }
 function _soFormPrefill(resp){
   resp = resp || {};
-  var map={ name:'f-so_name', nameKana:'f-so_nameKana', nameEn:'f-so_nameEn', corpNo:'f-so_corpNo', empInsNo:'f-so_empInsNo', regNo:'f-so_regNo', regDate:'f-so_regDate', zip:'f-so_zip', pref:'f-so_pref', city:'f-so_city', addressDetail:'f-so_addressDetail', addressEn:'f-so_addressEn', tel:'f-so_tel', repName:'f-so_repName', repNameEn:'f-so_repNameEn', languages:'f-so_languages', supportManagerName:'f-so_supportManagerName', supportManagerTitle:'f-so_supportManagerTitle', supporterCount:'f-so_supporterCount', supportStaffCount:'f-so_supportStaffCount', jjName:'f-so_jjName', jjCorpNo:'f-so_jjCorpNo', jjEmpInsNo:'f-so_jjEmpInsNo', jjZip:'f-so_jjZip', jjPref:'f-so_jjPref', jjCity:'f-so_jjCity', jjAddressDetail:'f-so_jjAddressDetail', jjTel:'f-so_jjTel', jjPermitNo:'f-so_jjPermitNo', jjPermitDate:'f-so_jjPermitDate', supportStartDate:'f-so_supportStartDate' };
+  var map={ name:'f-so_name', nameKana:'f-so_nameKana', nameEn:'f-so_nameEn', corpNo:'f-so_corpNo', empInsNo:'f-so_empInsNo', regNo:'f-so_regNo', regDate:'f-so_regDate', zip:'f-so_zip', pref:'f-so_pref', city:'f-so_city', addressDetail:'f-so_addressDetail', addressEn:'f-so_addressEn', tel:'f-so_tel', repName:'f-so_repName', repNameEn:'f-so_repNameEn', languages:'f-so_languages', supportManagerName:'f-so_supportManagerName', supportManagerTitle:'f-so_supportManagerTitle', supporterCount:'f-so_supporterCount', supportStaffCount:'f-so_supportStaffCount', jjName:'f-so_jjName', jjCorpNo:'f-so_jjCorpNo', jjEmpInsNo:'f-so_jjEmpInsNo', jjZip:'f-so_jjZip', jjPref:'f-so_jjPref', jjCity:'f-so_jjCity', jjAddressDetail:'f-so_jjAddressDetail', jjTel:'f-so_jjTel', jjPermitNo:'f-so_jjPermitNo', jjPermitDate:'f-so_jjPermitDate' };
   Object.keys(map).forEach(function(k){ var el=document.getElementById(map[k]); if(el && resp[k]!=null && resp[k]!=='') el.value=resp[k]; });
   if(resp.supportHours && typeof resp.supportHours==='object'){ _SO_DAYS.forEach(function(d){ var hv=resp.supportHours[d[0]]||{}; var f=document.getElementById('f-so_hours_'+d[0]+'_from'),t=document.getElementById('f-so_hours_'+d[0]+'_to'); if(f&&hv.from)f.value=hv.from; if(t&&hv.to)t.value=hv.to; }); }
   function setMeth(pfx,mv){ mv=mv||{}; var g=function(id){return document.getElementById(id);}; if(g('f-so_'+pfx+'_f2f'))g('f-so_'+pfx+'_f2f').checked=!!mv.f2f; if(g('f-so_'+pfx+'_tel'))g('f-so_'+pfx+'_tel').checked=!!mv.tel; if(g('f-so_'+pfx+'_mail'))g('f-so_'+pfx+'_mail').checked=!!mv.mail; if(g('f-so_'+pfx+'_other'))g('f-so_'+pfx+'_other').value=mv.other||''; }
@@ -1200,6 +1233,15 @@ function _soFormPrefill(resp){
       resp.supportStaffList.forEach(function(s,idx){ c.insertAdjacentHTML('beforeend', _soFormStaffRow(idx)); _soStaffCount=idx; s=s||{};
         var g=function(k){return document.getElementById('f-so_staff'+idx+'_'+k);};
         if(g('name'))g('name').value=s.name||''; if(g('title'))g('title').value=s.title||''; if(g('nameEn'))g('nameEn').value=s.nameEn||''; if(g('titleEn'))g('titleEn').value=s.titleEn||'';
+      });
+    }
+  }
+  if(Array.isArray(resp.offices) && resp.offices.length){
+    var oc=document.getElementById('so-office-container');
+    if(oc){ oc.innerHTML=''; _soOfficeCount=0;
+      resp.offices.forEach(function(of,idx){ oc.insertAdjacentHTML('beforeend', _soFormOfficeRow(idx)); _soOfficeCount=idx; of=of||{};
+        var g=function(k){return document.getElementById('f-so_office'+idx+'_'+k);};
+        if(g('name'))g('name').value=of.officeName||''; if(g('zip'))g('zip').value=of.officeZip||''; if(g('pref'))g('pref').value=of.officePref||''; if(g('city'))g('city').value=of.officeCity||''; if(g('addr'))g('addr').value=of.officeAddressDetail||''; if(g('addrEn'))g('addrEn').value=of.officeAddressEn||''; if(g('tel'))g('tel').value=of.officeTel||'';
       });
     }
   }
