@@ -188,7 +188,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20260702.03';
+var FORM_VERSION = 'ver.20260702.04';
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -1064,8 +1064,34 @@ function _soFormAddStaff(){
   var c = document.getElementById('so-staff-container');
   if (c) c.insertAdjacentHTML('beforeend', _soFormStaffRow(_soStaffCount));
 }
+var _SO_STEP_LABELS = ['基本情報','支援体制','担当者・その他'];
+function _soStepBarHtml(active){
+  var h='<div id="so-stepbar" style="display:flex;gap:6px;margin-bottom:14px;">';
+  _SO_STEP_LABELS.forEach(function(lbl,i){
+    var on=(i===active);
+    h+='<button type="button" onclick="_soGoStep('+i+')" style="flex:1;padding:10px 6px;border:none;border-radius:10px;cursor:pointer;font-weight:800;font-size:13px;line-height:1.3;background:'+(on?'#2563eb':'#eef2f7')+';color:'+(on?'#fff':'#64748b')+';">'+lbl+'<div style="font-size:10px;font-weight:600;opacity:.85;">'+(i+1)+'/3</div></button>';
+  });
+  h+='</div>';
+  return h;
+}
+function _soGoStep(n){
+  var steps=document.querySelectorAll('.so-step');
+  if(!steps.length) return;
+  if(n<0)n=0; if(n>steps.length-1)n=steps.length-1;
+  window._soStep=n;
+  steps.forEach(function(el){ el.style.display=(String(el.getAttribute('data-sostep'))===String(n))?'block':'none'; });
+  var bar=document.getElementById('so-stepbar');
+  if(bar){ var tmp=document.createElement('div'); tmp.innerHTML=_soStepBarHtml(n); if(tmp.firstChild) bar.parentNode.replaceChild(tmp.firstChild, bar); }
+  var prev=document.getElementById('so-prev'), next=document.getElementById('so-next');
+  if(prev) prev.style.visibility=(n>0)?'visible':'hidden';
+  if(next) next.style.visibility=(n<steps.length-1)?'visible':'hidden';
+  try{ window.scrollTo({top:0,behavior:'smooth'}); }catch(e){ try{window.scrollTo(0,0);}catch(_){} }
+}
 function buildSupportOrgForm() {
-  var h = '';
+  window._soStep=0;
+  var h = _soStepBarHtml(0);
+  // ステップ①基本情報
+  h += '<div class="so-step" data-sostep="0">';
   h += '<div class="card"><div class="section-title">基本情報</div>';
   h += field('f-so_name','登録支援機関名','text',true,'例：○○協同組合','');
   h += field('f-so_nameKana','ふりがな','text',false,'例：まるまるきょうどうくみあい','');
@@ -1089,6 +1115,9 @@ function buildSupportOrgForm() {
   h += field('f-so_repNameEn','英語代表者名','text',false,'例：Taro Yamada','');
   h += field('f-so_languages','対応可能言語','text',false,'例：ベトナム語、英語','');
   h += '</div>';
+  h += '</div>';
+  // ステップ②支援体制
+  h += '<div class="so-step" data-sostep="1" style="display:none;">';
   h += '<div class="card"><div class="section-title">支援体制</div>';
   h += field('f-so_supportManagerName','支援責任者 氏名','text',false,'例：山田 太郎','');
   h += field('f-so_supportManagerTitle','支援責任者 役職','text',false,'例：代表理事','');
@@ -1104,6 +1133,9 @@ function buildSupportOrgForm() {
   h += '</div></div>';
   h += '<div class="card"><div class="section-title">相談方法</div>' + _soFormMethodHtml('consult') + '</div>';
   h += '<div class="card"><div class="section-title">緊急時対応</div>' + _soFormMethodHtml('emg') + '</div>';
+  h += '</div>';
+  // ステップ③担当者・その他
+  h += '<div class="so-step" data-sostep="2" style="display:none;">';
   h += '<div class="card"><div class="section-title">支援担当者一覧</div>';
   h += '<div style="font-size:13px;color:#6b7280;margin-bottom:8px;">氏名・役職・英語表記をご入力ください。人数分「＋ 追加」で増やせます。</div>';
   h += '<div id="so-staff-container">' + _soFormStaffRow(0) + '</div>';
@@ -1120,6 +1152,12 @@ function buildSupportOrgForm() {
   h += field('f-so_jjTel','電話番号','text',false,'','');
   h += field('f-so_jjPermitNo','許可届出番号','text',false,'','');
   h += field('f-so_jjPermitDate','受理年月日','text',false,'例：20190912','');
+  h += '</div>';
+  h += '</div>';
+  // ステップ移動ボタン（送信ボタンはフッター共通のものを使用）
+  h += '<div style="display:flex;justify-content:space-between;gap:8px;margin-top:4px;">';
+  h += '<button type="button" id="so-prev" onclick="_soGoStep(window._soStep-1)" style="visibility:hidden;padding:11px 20px;background:#fff;color:#2563eb;border:1.5px solid #2563eb;border-radius:10px;font-weight:800;font-size:15px;cursor:pointer;">← 戻る</button>';
+  h += '<button type="button" id="so-next" onclick="_soGoStep(window._soStep+1)" style="padding:11px 20px;background:#2563eb;color:#fff;border:none;border-radius:10px;font-weight:800;font-size:15px;cursor:pointer;">次へ →</button>';
   h += '</div>';
   return h;
 }
