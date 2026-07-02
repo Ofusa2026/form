@@ -188,7 +188,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20260701.03';
+var FORM_VERSION = 'ver.20260702.03';
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -1032,8 +1032,138 @@ function buildForm(t) {
       return buildCompanyForm();
     case 'jaim':
       return buildJaimOnlyForm();
+    case 'support_org':
+      return buildSupportOrgForm();
     default:
       return '<div class="type-unknown"><h2>❌ フォームが指定されていません</h2><p>URLに ?type=... パラメータが必要です。</p></div>';
+  }
+}
+
+// ===== 登録支援機関フォーム（type=support_org）=====
+var _SO_PREF_LIST = ['','北海道','青森県','岩手県','宮城県','秋田県','山形県','福島県','茨城県','栃木県','群馬県','埼玉県','千葉県','東京都','神奈川県','新潟県','富山県','石川県','福井県','山梨県','長野県','岐阜県','静岡県','愛知県','三重県','滋賀県','京都府','大阪府','兵庫県','奈良県','和歌山県','鳥取県','島根県','岡山県','広島県','山口県','徳島県','香川県','愛媛県','高知県','福岡県','佐賀県','長崎県','熊本県','大分県','宮崎県','鹿児島県','沖縄県'];
+var _SO_DAYS = [['mon','月'],['tue','火'],['wed','水'],['thu','木'],['fri','金'],['sat','土'],['sun','日'],['hol','祝']];
+var _soStaffCount = 0;
+function _soFormMethodHtml(pfx){
+  return '<div style="display:flex;flex-wrap:wrap;gap:12px 18px;align-items:center;">'
+    + '<label style="display:flex;align-items:center;gap:6px;font-size:15px;"><input type="checkbox" id="f-so_'+pfx+'_f2f" style="width:20px;height:20px;">直接面談</label>'
+    + '<label style="display:flex;align-items:center;gap:6px;font-size:15px;"><input type="checkbox" id="f-so_'+pfx+'_tel" style="width:20px;height:20px;">電話</label>'
+    + '<label style="display:flex;align-items:center;gap:6px;font-size:15px;"><input type="checkbox" id="f-so_'+pfx+'_mail" style="width:20px;height:20px;">メール</label>'
+    + '<div style="display:flex;align-items:center;gap:6px;">その他<input type="text" id="f-so_'+pfx+'_other" placeholder="例：LINE" style="padding:8px;border:1.5px solid #e5e7eb;border-radius:8px;font-size:15px;min-height:44px;"></div>'
+    + '</div>';
+}
+function _soFormStaffRow(i){
+  return '<div class="so-staff-row" data-soidx="'+i+'" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;padding:8px;border:1px solid #eef2f7;border-radius:8px;">'
+    + '<input type="text" id="f-so_staff'+i+'_name" placeholder="氏名" style="flex:1 1 45%;padding:8px;border:1.5px solid #e5e7eb;border-radius:8px;font-size:15px;min-height:44px;">'
+    + '<input type="text" id="f-so_staff'+i+'_title" placeholder="役職（なし可）" style="flex:1 1 45%;padding:8px;border:1.5px solid #e5e7eb;border-radius:8px;font-size:15px;min-height:44px;">'
+    + '<input type="text" id="f-so_staff'+i+'_nameEn" placeholder="氏名（英語）" style="flex:1 1 45%;padding:8px;border:1.5px solid #e5e7eb;border-radius:8px;font-size:15px;min-height:44px;">'
+    + '<input type="text" id="f-so_staff'+i+'_titleEn" placeholder="役職（英語）" style="flex:1 1 45%;padding:8px;border:1.5px solid #e5e7eb;border-radius:8px;font-size:15px;min-height:44px;">'
+    + '</div>';
+}
+function _soFormAddStaff(){
+  _soStaffCount++;
+  var c = document.getElementById('so-staff-container');
+  if (c) c.insertAdjacentHTML('beforeend', _soFormStaffRow(_soStaffCount));
+}
+function buildSupportOrgForm() {
+  var h = '';
+  h += '<div class="card"><div class="section-title">基本情報</div>';
+  h += field('f-so_name','登録支援機関名','text',true,'例：○○協同組合','');
+  h += field('f-so_nameKana','ふりがな','text',false,'例：まるまるきょうどうくみあい','');
+  h += field('f-so_nameEn','英語名','text',false,'例：XX Cooperative','');
+  h += field('f-so_corpNo','法人番号','text',false,'例：1234567890123','');
+  h += field('f-so_empInsNo','雇用保険適用事業所番号','text',false,'例：01-234567-8','');
+  h += field('f-so_regNo','登録番号','text',false,'例：１９登－000001','');
+  h += field('f-so_regDate','登録年月日','text',false,'例：20190927','');
+  h += field('f-so_supportStartDate','支援業務開始予定日','date',false,'','');
+  h += '</div>';
+  h += '<div class="card"><div class="section-title">所在地・連絡先</div>';
+  h += field('f-so_zip','郵便番号','text',false,'例：100-0001','');
+  h += field('f-so_pref','都道府県','select',false,'','',_SO_PREF_LIST);
+  h += field('f-so_city','市区町村','text',false,'例：新宿区','');
+  h += field('f-so_addressDetail','町名丁目番地号等','text',false,'例：西新宿1-1-1','');
+  h += field('f-so_addressEn','英語住所','text',false,'','');
+  h += field('f-so_tel','電話番号','text',false,'例：03-1234-5678','');
+  h += '</div>';
+  h += '<div class="card"><div class="section-title">代表者・言語</div>';
+  h += field('f-so_repName','代表者氏名','text',false,'例：山田 太郎','');
+  h += field('f-so_repNameEn','英語代表者名','text',false,'例：Taro Yamada','');
+  h += field('f-so_languages','対応可能言語','text',false,'例：ベトナム語、英語','');
+  h += '</div>';
+  h += '<div class="card"><div class="section-title">支援体制</div>';
+  h += field('f-so_supportManagerName','支援責任者 氏名','text',false,'例：山田 太郎','');
+  h += field('f-so_supportManagerTitle','支援責任者 役職','text',false,'例：代表理事','');
+  h += field('f-so_supporterCount','支援中の1号特定技能外国人数','number',false,'例：50','');
+  h += field('f-so_supportStaffCount','支援担当者数','number',false,'例：10','');
+  h += '</div>';
+  h += '<div class="card"><div class="section-title">対応時間（曜日別）</div><div style="display:flex;flex-direction:column;gap:8px;">';
+  _SO_DAYS.forEach(function(d){
+    h += '<div style="display:flex;align-items:center;gap:8px;"><span style="width:2.5em;font-weight:700;">'+d[1]+'</span>'
+      + '<input type="time" id="f-so_hours_'+d[0]+'_from" style="flex:1;padding:8px;border:1.5px solid #e5e7eb;border-radius:8px;font-size:15px;min-height:44px;"><span>〜</span>'
+      + '<input type="time" id="f-so_hours_'+d[0]+'_to" style="flex:1;padding:8px;border:1.5px solid #e5e7eb;border-radius:8px;font-size:15px;min-height:44px;"></div>';
+  });
+  h += '</div></div>';
+  h += '<div class="card"><div class="section-title">相談方法</div>' + _soFormMethodHtml('consult') + '</div>';
+  h += '<div class="card"><div class="section-title">緊急時対応</div>' + _soFormMethodHtml('emg') + '</div>';
+  h += '<div class="card"><div class="section-title">支援担当者一覧</div>';
+  h += '<div style="font-size:13px;color:#6b7280;margin-bottom:8px;">氏名・役職・英語表記をご入力ください。人数分「＋ 追加」で増やせます。</div>';
+  h += '<div id="so-staff-container">' + _soFormStaffRow(0) + '</div>';
+  h += '<button type="button" onclick="_soFormAddStaff()" style="margin-top:8px;padding:10px 16px;background:#eff6ff;color:#2563eb;border:1.5px solid #2563eb;border-radius:8px;font-weight:700;cursor:pointer;font-size:14px;">＋ 支援担当者を追加</button>';
+  h += '</div>';
+  h += '<div class="card"><div class="section-title">職業紹介事業者（該当する場合のみ）</div>';
+  h += field('f-so_jjName','名称','text',false,'','');
+  h += field('f-so_jjCorpNo','法人番号','text',false,'','');
+  h += field('f-so_jjEmpInsNo','雇用保険適用事業所番号','text',false,'','');
+  h += field('f-so_jjZip','郵便番号','text',false,'','');
+  h += field('f-so_jjPref','都道府県','select',false,'','',_SO_PREF_LIST);
+  h += field('f-so_jjCity','市区町村','text',false,'','');
+  h += field('f-so_jjAddressDetail','町名丁目番地号等','text',false,'','');
+  h += field('f-so_jjTel','電話番号','text',false,'','');
+  h += field('f-so_jjPermitNo','許可届出番号','text',false,'','');
+  h += field('f-so_jjPermitDate','受理年月日','text',false,'例：20190912','');
+  h += '</div>';
+  return h;
+}
+function _soFormCollect(){
+  function v(id){ return val(id); }
+  var hours={}; _SO_DAYS.forEach(function(d){ hours[d[0]]={from:v('f-so_hours_'+d[0]+'_from'),to:v('f-so_hours_'+d[0]+'_to')}; });
+  function meth(pfx){ var g=function(id){var e=document.getElementById(id);return !!(e&&e.checked);}; return {f2f:g('f-so_'+pfx+'_f2f'),tel:g('f-so_'+pfx+'_tel'),mail:g('f-so_'+pfx+'_mail'),other:v('f-so_'+pfx+'_other')}; }
+  var staff=[];
+  document.querySelectorAll('#so-staff-container .so-staff-row').forEach(function(row){
+    var i=row.getAttribute('data-soidx');
+    var nm=v('f-so_staff'+i+'_name'),ti=v('f-so_staff'+i+'_title'),ne=v('f-so_staff'+i+'_nameEn'),te=v('f-so_staff'+i+'_titleEn');
+    if(nm||ti||ne||te) staff.push({name:nm,title:ti,nameEn:ne,titleEn:te});
+  });
+  return {
+    name:v('f-so_name'), nameKana:v('f-so_nameKana'), nameEn:v('f-so_nameEn'),
+    corpNo:v('f-so_corpNo'), empInsNo:v('f-so_empInsNo'), regNo:v('f-so_regNo'), regDate:v('f-so_regDate'),
+    zip:v('f-so_zip'), pref:v('f-so_pref'), city:v('f-so_city'), addressDetail:v('f-so_addressDetail'), addressEn:v('f-so_addressEn'), tel:v('f-so_tel'),
+    repName:v('f-so_repName'), repNameEn:v('f-so_repNameEn'), languages:v('f-so_languages'),
+    supportManagerName:v('f-so_supportManagerName'), supportManagerTitle:v('f-so_supportManagerTitle'),
+    supporterCount:v('f-so_supporterCount'), supportStaffCount:v('f-so_supportStaffCount'),
+    jjName:v('f-so_jjName'), jjCorpNo:v('f-so_jjCorpNo'), jjEmpInsNo:v('f-so_jjEmpInsNo'),
+    jjZip:v('f-so_jjZip'), jjPref:v('f-so_jjPref'), jjCity:v('f-so_jjCity'), jjAddressDetail:v('f-so_jjAddressDetail'),
+    jjTel:v('f-so_jjTel'), jjPermitNo:v('f-so_jjPermitNo'), jjPermitDate:v('f-so_jjPermitDate'),
+    supportStartDate:v('f-so_supportStartDate'),
+    supportHours:hours, consultMethods:meth('consult'), emergencyContact:meth('emg'),
+    supportStaffList:staff
+  };
+}
+function _soFormValidate(){ if(!val('f-so_name')) return '登録支援機関名は必須です。'; return null; }
+function _soFormPrefill(resp){
+  resp = resp || {};
+  var map={ name:'f-so_name', nameKana:'f-so_nameKana', nameEn:'f-so_nameEn', corpNo:'f-so_corpNo', empInsNo:'f-so_empInsNo', regNo:'f-so_regNo', regDate:'f-so_regDate', zip:'f-so_zip', pref:'f-so_pref', city:'f-so_city', addressDetail:'f-so_addressDetail', addressEn:'f-so_addressEn', tel:'f-so_tel', repName:'f-so_repName', repNameEn:'f-so_repNameEn', languages:'f-so_languages', supportManagerName:'f-so_supportManagerName', supportManagerTitle:'f-so_supportManagerTitle', supporterCount:'f-so_supporterCount', supportStaffCount:'f-so_supportStaffCount', jjName:'f-so_jjName', jjCorpNo:'f-so_jjCorpNo', jjEmpInsNo:'f-so_jjEmpInsNo', jjZip:'f-so_jjZip', jjPref:'f-so_jjPref', jjCity:'f-so_jjCity', jjAddressDetail:'f-so_jjAddressDetail', jjTel:'f-so_jjTel', jjPermitNo:'f-so_jjPermitNo', jjPermitDate:'f-so_jjPermitDate', supportStartDate:'f-so_supportStartDate' };
+  Object.keys(map).forEach(function(k){ var el=document.getElementById(map[k]); if(el && resp[k]!=null && resp[k]!=='') el.value=resp[k]; });
+  if(resp.supportHours && typeof resp.supportHours==='object'){ _SO_DAYS.forEach(function(d){ var hv=resp.supportHours[d[0]]||{}; var f=document.getElementById('f-so_hours_'+d[0]+'_from'),t=document.getElementById('f-so_hours_'+d[0]+'_to'); if(f&&hv.from)f.value=hv.from; if(t&&hv.to)t.value=hv.to; }); }
+  function setMeth(pfx,mv){ mv=mv||{}; var g=function(id){return document.getElementById(id);}; if(g('f-so_'+pfx+'_f2f'))g('f-so_'+pfx+'_f2f').checked=!!mv.f2f; if(g('f-so_'+pfx+'_tel'))g('f-so_'+pfx+'_tel').checked=!!mv.tel; if(g('f-so_'+pfx+'_mail'))g('f-so_'+pfx+'_mail').checked=!!mv.mail; if(g('f-so_'+pfx+'_other'))g('f-so_'+pfx+'_other').value=mv.other||''; }
+  setMeth('consult', resp.consultMethods); setMeth('emg', resp.emergencyContact);
+  if(Array.isArray(resp.supportStaffList) && resp.supportStaffList.length){
+    var c=document.getElementById('so-staff-container');
+    if(c){ c.innerHTML=''; _soStaffCount=0;
+      resp.supportStaffList.forEach(function(s,idx){ c.insertAdjacentHTML('beforeend', _soFormStaffRow(idx)); _soStaffCount=idx; s=s||{};
+        var g=function(k){return document.getElementById('f-so_staff'+idx+'_'+k);};
+        if(g('name'))g('name').value=s.name||''; if(g('title'))g('title').value=s.title||''; if(g('nameEn'))g('nameEn').value=s.nameEn||''; if(g('titleEn'))g('titleEn').value=s.titleEn||'';
+      });
+    }
   }
 }
 
@@ -1420,17 +1550,59 @@ function buildCompanyForm() {
 // JAIM専用ヒアリングフォーム（type=jaim）
 function buildJaimOnlyForm() {
   return (
-  // JAIM カード①: 質問票
+  // JAIM カード①: 基本情報（企業規模・年会費）
+  '<div class="card"><div class="section-title">📦 JAIM：基本情報</div>' +
+    '<p style="font-size:13px;color:#6b7280;margin-bottom:14px;line-height:1.7;">JAIMの年会費（令和8年度以降）は、企業規模と正会員団体への所属で異なります。<br>基本は<strong>大企業カテゴリー</strong>となり、下記いずれかを証明できる場合のみ<strong>中小企業カテゴリー（割引）</strong>を選択できます。</p>' +
+
+    '<div class="field">' +
+    '<label>企業規模カテゴリー<span class="req">*</span></label>' +
+    '<select id="f-jaimCompanySize" onchange="updateJaimFee()">' +
+      '<option value="">---</option>' +
+      '<option value="大企業">大企業（基本）</option>' +
+      '<option value="中小企業">中小企業（割引）</option>' +
+    '</select>' +
+    '</div>' +
+
+    // 中小企業の要件・必要書類の案内（中小選択時のみ表示）
+    '<div id="jaimSmeNote" style="display:none;background:#fffbeb;border:1.5px solid #fcd34d;border-radius:10px;padding:14px 16px;margin-bottom:12px;font-size:13px;line-height:1.8;color:#92400e;">' +
+      '<div style="font-weight:800;margin-bottom:6px;">中小企業カテゴリーの要件</div>' +
+      '下記の<strong>いずれか</strong>を満たす場合に中小企業として申請できます：' +
+      '<ol style="padding-left:1.4em;margin:8px 0;">' +
+        '<li>資本金の額又は出資の総額が <strong>3億円以下</strong> の会社</li>' +
+        '<li>常時使用する従業員の数が <strong>300人以下</strong> の会社及び個人</li>' +
+      '</ol>' +
+      '<div style="margin-top:8px;padding-top:8px;border-top:1px dashed #fcd34d;">📄 中小企業として申請する場合は、上記を証明するため <strong>履歴事項全部証明書</strong> のご提出が必要です。別途ご案内するアップロード専用URLからご提出ください。</div>' +
+    '</div>' +
+
+    '<div class="field">' +
+    '<label>正会員団体への所属<span class="req">*</span></label>' +
+    '<select id="f-jaimMemberOrg" onchange="updateJaimFee()">' +
+      '<option value="">---</option>' +
+      '<option value="正会員団体に所属">正会員団体に所属している</option>' +
+      '<option value="正会員団体に未所属">正会員団体に所属していない</option>' +
+    '</select>' +
+    '</div>' +
+
+    // 年会費表示（企業規模・所属の両方が選ばれたら表示）
+    '<div id="jaimFeeDisplay" style="display:none;background:#eff6ff;border:1.5px solid #bfdbfe;border-radius:10px;padding:14px 16px;">' +
+      '<span style="font-size:12px;color:#3b82f6;font-weight:700;">令和8年度以降の年会費（目安）</span>' +
+      '<div id="jaimFeeAmount" style="font-size:22px;font-weight:800;color:#1e3a8a;margin-top:4px;">—</div>' +
+      '<div id="jaimFeeBreak" style="font-size:12px;color:#3b82f6;margin-top:4px;"></div>' +
+    '</div>' +
+  '</div>' +
+
+  // JAIM カード②: 質問票
   '<div class="card"><div class="section-title">📦 JAIM（製造業協議会）加入質問票</div>' +
     '<p style="font-size:13px;color:#6b7280;margin-bottom:16px;">JAIM（一般社団法人 工業製品製造技能人材機構）への協議会加入申請に必要な情報をお聞かせください。</p>' +
 
     '<div class="field">' +
-    '<label>日本標準産業分類番号</label>' +
+    '<label>日本標準産業分類番号（4桁）<span class="req">*</span></label>' +
     '<div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:12px 14px;margin-bottom:10px;font-size:13px;line-height:1.7;">' +
     '下記URLから業種の分類番号をご確認ください（JAIM対象業種かどうかも確認できます）：<br>' +
     '<a href="https://www.jaim-skill.or.jp/entry/classification/?stt_lang=ja" target="_blank" rel="noopener" style="color:#1d4ed8;font-weight:700;word-break:break-all;">https://www.jaim-skill.or.jp/entry/classification/?stt_lang=ja</a>' +
+    '<div style="margin-top:6px;color:#1e3a8a;font-weight:700;">※ 4桁の数字でご入力ください。</div>' +
     '</div>' +
-    '<input type="text" id="f-jaimIndustryCode" placeholder="例: 3121（金属プレス製品製造業）">' +
+    '<input type="text" id="f-jaimIndustryCode" inputmode="numeric" maxlength="4" placeholder="例: 3121">' +
     '</div>' +
 
     '<div class="field">' +
@@ -1451,7 +1623,7 @@ function buildJaimOnlyForm() {
     field('f-jaimEquipmentEffect','設備の製造品への効果','textarea',false,'例: 高精度・高速のプレス成形により、寸法精度の高い部品を安定して製造できる') +
   '</div>' +
 
-  // JAIM カード②: 受け入れ事業所
+  // JAIM カード③: 受け入れ事業所
   '<div class="card"><div class="section-title">📦 JAIM：受け入れ事業所（本社以外の場合）</div>' +
     '<p style="font-size:13px;color:#6b7280;margin-bottom:16px;">外国人材が本社以外の事業所で働く場合はご記入ください。</p>' +
     field('f-jaimBranchOfficeFlag','本社以外の事業所に受け入れる','select',false,'',null,['','あり','なし']) +
@@ -1462,7 +1634,7 @@ function buildJaimOnlyForm() {
     field('f-jaimBranchOfficeTel','電話番号','tel',false,'例: 052-000-0000') +
   '</div>' +
 
-  // JAIM カード③: 書類案内
+  // JAIM カード④: 書類案内
   '<div class="card"><div class="section-title">📦 JAIM：証明書類のご準備について</div>' +
     '<p style="font-size:14px;color:#374151;line-height:1.7;margin-bottom:12px;">JAIMへの加入申請には、以下の書類画像のご提出が必要です。<br>別途ご案内するアップロード専用URLからご提出ください。</p>' +
     '<ol style="font-size:13px;color:#374151;line-height:2;padding-left:1.5em;margin:0;">' +
@@ -1473,6 +1645,38 @@ function buildJaimOnlyForm() {
     '</ol>' +
   '</div>'
   );
+}
+
+// JAIM年会費テーブル（令和8年度以降）
+var JAIM_FEE_TABLE = {
+  '中小企業': { '正会員団体に所属': 60000, '正会員団体に未所属': 63000 },
+  '大企業':   { '正会員団体に所属': 80000, '正会員団体に未所属': 83000 }
+};
+
+// 企業規模・所属の選択に応じて中小要件の案内と年会費表示を更新
+function updateJaimFee() {
+  var size = val('f-jaimCompanySize');
+  var org  = val('f-jaimMemberOrg');
+  var note = document.getElementById('jaimSmeNote');
+  if (note) note.style.display = (size === '中小企業') ? 'block' : 'none';
+  var disp = document.getElementById('jaimFeeDisplay');
+  var amt  = document.getElementById('jaimFeeAmount');
+  var brk  = document.getElementById('jaimFeeBreak');
+  if (size && org && JAIM_FEE_TABLE[size] && JAIM_FEE_TABLE[size][org] != null) {
+    var yen = JAIM_FEE_TABLE[size][org];
+    if (amt) amt.textContent = yen.toLocaleString('ja-JP') + '円';
+    if (brk) brk.textContent = size + ' × ' + org;
+    if (disp) disp.style.display = 'block';
+  } else {
+    if (disp) disp.style.display = 'none';
+  }
+}
+
+// 保存用：年会費の文字列を返す（未確定なら空文字）
+function _jaimFeeValue() {
+  var size = val('f-jaimCompanySize'), org = val('f-jaimMemberOrg');
+  return (size && org && JAIM_FEE_TABLE[size] && JAIM_FEE_TABLE[size][org] != null)
+    ? (JAIM_FEE_TABLE[size][org] + '円') : '';
 }
 
 function _dayOptions(includeEnd) {
@@ -1793,7 +1997,7 @@ function collectData() {
       salaryRuleFlg: val('f-salaryRuleFlg'),
       jpCompReason: val('f-jpCompReason'),
       // ver.20260701: JAIM（製造業協議会）加入質問票
-      jaimIndustryCode: val('f-jaimIndustryCode'), jaimAgreement: (document.getElementById('f-jaimAgreement') && document.getElementById('f-jaimAgreement').checked) ? '確認済み' : '', jaimProductName: val('f-jaimProductName'), jaimProductPurpose: val('f-jaimProductPurpose'), jaimFinalProductName: val('f-jaimFinalProductName'), jaimFinalProductDesc: val('f-jaimFinalProductDesc'), jaimEquipmentPurpose: val('f-jaimEquipmentPurpose'), jaimEquipmentEffect: val('f-jaimEquipmentEffect'), jaimBranchOfficeFlag: val('f-jaimBranchOfficeFlag'), jaimBranchOfficeName: val('f-jaimBranchOfficeName'), jaimBranchOfficeZip: val('f-jaimBranchOfficeZip'), jaimBranchOfficeAddress: val('f-jaimBranchOfficeAddress'), jaimBranchOfficeContact: val('f-jaimBranchOfficeContact'), jaimBranchOfficeTel: val('f-jaimBranchOfficeTel')
+      jaimIndustryCode: val('f-jaimIndustryCode'), jaimAgreement: (document.getElementById('f-jaimAgreement') && document.getElementById('f-jaimAgreement').checked) ? '確認済み' : '', jaimProductName: val('f-jaimProductName'), jaimProductPurpose: val('f-jaimProductPurpose'), jaimFinalProductName: val('f-jaimFinalProductName'), jaimFinalProductDesc: val('f-jaimFinalProductDesc'), jaimEquipmentPurpose: val('f-jaimEquipmentPurpose'), jaimEquipmentEffect: val('f-jaimEquipmentEffect'), jaimBranchOfficeFlag: val('f-jaimBranchOfficeFlag'), jaimBranchOfficeName: val('f-jaimBranchOfficeName'), jaimBranchOfficeZip: val('f-jaimBranchOfficeZip'), jaimBranchOfficeAddress: val('f-jaimBranchOfficeAddress'), jaimBranchOfficeContact: val('f-jaimBranchOfficeContact'), jaimBranchOfficeTel: val('f-jaimBranchOfficeTel'), jaimCompanySize: val('f-jaimCompanySize'), jaimMemberOrg: val('f-jaimMemberOrg'), jaimAnnualFee: _jaimFeeValue()
     };
     Object.assign(d, officers);
     return d;
@@ -1815,8 +2019,15 @@ function collectData() {
       jaimBranchOfficeZip: val('f-jaimBranchOfficeZip'),
       jaimBranchOfficeAddress: val('f-jaimBranchOfficeAddress'),
       jaimBranchOfficeContact: val('f-jaimBranchOfficeContact'),
-      jaimBranchOfficeTel: val('f-jaimBranchOfficeTel')
+      jaimBranchOfficeTel: val('f-jaimBranchOfficeTel'),
+      jaimCompanySize: val('f-jaimCompanySize'),
+      jaimMemberOrg: val('f-jaimMemberOrg'),
+      jaimAnnualFee: _jaimFeeValue()
     };
+  }
+
+  if (t === 'support_org') {
+    return _soFormCollect();
   }
 
   var d = {
@@ -1939,7 +2150,13 @@ function validate() {
   if (type === 'jaim') {
     var _jaimAgr = document.getElementById('f-jaimAgreement');
     if (!_jaimAgr || !_jaimAgr.checked) return 'JAIMへの該当性確認にチェックしてください。';
+    if (!/^\d{4}$/.test(val('f-jaimIndustryCode'))) return '日本標準産業分類番号は4桁の数字で入力してください。';
+    if (!val('f-jaimCompanySize')) return '企業規模カテゴリーを選択してください。';
+    if (!val('f-jaimMemberOrg')) return '正会員団体への所属を選択してください。';
     return null;
+  }
+  if (type === 'support_org') {
+    return _soFormValidate();
   }
   if (!val('f-name')) return '氏名（パスポート表記）は必須です。';
   if (!val('f-birth')) return '生年月日は必須です。';
@@ -2237,7 +2454,8 @@ var TYPE_LABELS = {
   gijinkoku_nintei: { cat:'技人国', kind:'認定', catClass:'badge-gijinkoku', kindClass:'badge-nintei' },
   gijinkoku_koushin:{ cat:'技人国', kind:'更新', catClass:'badge-gijinkoku', kindClass:'badge-koushin' },
   gijinkoku_henkou: { cat:'技人国', kind:'変更', catClass:'badge-gijinkoku', kindClass:'badge-koushin' },
-  company:          { cat:'企業情報', kind:'', catClass:'badge-company', kindClass:'' }
+  company:          { cat:'企業情報', kind:'', catClass:'badge-company', kindClass:'' },
+  support_org:      { cat:'登録支援機関', kind:'', catClass:'badge-company', kindClass:'' }
 };
 
 // 名前確認モーダル: caseNameがあれば最初に表示し、確認後にフォーム表示
@@ -2292,7 +2510,7 @@ function confirmName(isMatch){
   // 名前確認モーダル: caseNameがあって、未確認の場合のみ表示
   var _alreadyConfirmed = false;
   try { _alreadyConfirmed = !!localStorage.getItem('ofusa_name_confirmed_' + caseId + '_' + type); } catch(e){}
-  if (caseName && !_alreadyConfirmed) {
+  if (caseName && !_alreadyConfirmed && type !== 'support_org') {
     document.getElementById('nameConfirmOverlay').style.display = 'flex';
   } else {
     _initFormBody();
@@ -2353,6 +2571,7 @@ function confirmName(isMatch){
 })();
 
 function prefillForm(resp) {
+  if (type === 'support_org') { _soFormPrefill(resp); return; }
   var keyToId = {
     applicantNameEn: 'f-name', birthdate: 'f-birth',
     nationality: 'f-nationality', passport: 'f-passport', passportExpiry: 'f-passExpiry',
@@ -2387,7 +2606,7 @@ function prefillForm(resp) {
     jpCompAge: 'f-jpCompAge', jpCompExp: 'f-jpCompExp',
     jpCompJobDesc: 'f-jpCompJobDesc', jpCompSalary: 'f-jpCompSalary', jpCompReason: 'f-jpCompReason',
     // ver.20260701: JAIM（製造業協議会）加入質問票
-    jaimIndustryCode: 'f-jaimIndustryCode', jaimProductName: 'f-jaimProductName', jaimProductPurpose: 'f-jaimProductPurpose', jaimFinalProductName: 'f-jaimFinalProductName', jaimFinalProductDesc: 'f-jaimFinalProductDesc', jaimEquipmentPurpose: 'f-jaimEquipmentPurpose', jaimEquipmentEffect: 'f-jaimEquipmentEffect', jaimBranchOfficeFlag: 'f-jaimBranchOfficeFlag', jaimBranchOfficeName: 'f-jaimBranchOfficeName', jaimBranchOfficeZip: 'f-jaimBranchOfficeZip', jaimBranchOfficeAddress: 'f-jaimBranchOfficeAddress', jaimBranchOfficeContact: 'f-jaimBranchOfficeContact', jaimBranchOfficeTel: 'f-jaimBranchOfficeTel',
+    jaimIndustryCode: 'f-jaimIndustryCode', jaimProductName: 'f-jaimProductName', jaimProductPurpose: 'f-jaimProductPurpose', jaimFinalProductName: 'f-jaimFinalProductName', jaimFinalProductDesc: 'f-jaimFinalProductDesc', jaimEquipmentPurpose: 'f-jaimEquipmentPurpose', jaimEquipmentEffect: 'f-jaimEquipmentEffect', jaimBranchOfficeFlag: 'f-jaimBranchOfficeFlag', jaimBranchOfficeName: 'f-jaimBranchOfficeName', jaimBranchOfficeZip: 'f-jaimBranchOfficeZip', jaimBranchOfficeAddress: 'f-jaimBranchOfficeAddress', jaimBranchOfficeContact: 'f-jaimBranchOfficeContact', jaimBranchOfficeTel: 'f-jaimBranchOfficeTel', jaimCompanySize: 'f-jaimCompanySize', jaimMemberOrg: 'f-jaimMemberOrg',
     // 特定技能の追加項目
     residenceCardStatus: 'f-residenceCardStatus',
     addressStatus: 'f-addressStatus',
