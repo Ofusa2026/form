@@ -188,7 +188,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20260702.05';
+var FORM_VERSION = 'ver.20260703.06';
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -1632,14 +1632,14 @@ function buildJaimOnlyForm() {
   return (
   // JAIM カード①: 基本情報（企業規模・年会費）
   '<div class="card"><div class="section-title">📦 JAIM：基本情報</div>' +
-    '<p style="font-size:13px;color:#6b7280;margin-bottom:14px;line-height:1.7;">JAIMの年会費（令和8年度以降）は、企業規模と正会員団体への所属で異なります。<br>基本は<strong>大企業カテゴリー</strong>となり、下記いずれかを証明できる場合のみ<strong>中小企業カテゴリー（割引）</strong>を選択できます。</p>' +
+    '<p style="font-size:13px;color:#6b7280;margin-bottom:14px;line-height:1.7;">企業規模カテゴリーをお選びください。<br>基本は<strong>大企業カテゴリー</strong>となり、下記いずれかを証明できる場合のみ<strong>中小企業カテゴリー</strong>を選択できます。</p>' +
 
     '<div class="field">' +
     '<label>企業規模カテゴリー<span class="req">*</span></label>' +
     '<select id="f-jaimCompanySize" onchange="updateJaimFee()">' +
       '<option value="">---</option>' +
-      '<option value="大企業">大企業（基本）</option>' +
-      '<option value="中小企業">中小企業（割引）</option>' +
+      '<option value="大企業">大企業</option>' +
+      '<option value="中小企業">中小企業</option>' +
     '</select>' +
     '</div>' +
 
@@ -1654,21 +1654,6 @@ function buildJaimOnlyForm() {
       '<div style="margin-top:8px;padding-top:8px;border-top:1px dashed #fcd34d;">📄 中小企業として申請する場合は、上記を証明するため <strong>履歴事項全部証明書</strong> のご提出が必要です。別途ご案内するアップロード専用URLからご提出ください。</div>' +
     '</div>' +
 
-    '<div class="field">' +
-    '<label>正会員団体への所属<span class="req">*</span></label>' +
-    '<select id="f-jaimMemberOrg" onchange="updateJaimFee()">' +
-      '<option value="">---</option>' +
-      '<option value="正会員団体に所属">正会員団体に所属している</option>' +
-      '<option value="正会員団体に未所属">正会員団体に所属していない</option>' +
-    '</select>' +
-    '</div>' +
-
-    // 年会費表示（企業規模・所属の両方が選ばれたら表示）
-    '<div id="jaimFeeDisplay" style="display:none;background:#eff6ff;border:1.5px solid #bfdbfe;border-radius:10px;padding:14px 16px;">' +
-      '<span style="font-size:12px;color:#3b82f6;font-weight:700;">令和8年度以降の年会費（目安）</span>' +
-      '<div id="jaimFeeAmount" style="font-size:22px;font-weight:800;color:#1e3a8a;margin-top:4px;">—</div>' +
-      '<div id="jaimFeeBreak" style="font-size:12px;color:#3b82f6;margin-top:4px;"></div>' +
-    '</div>' +
   '</div>' +
 
   // JAIM カード②: 質問票
@@ -1727,36 +1712,16 @@ function buildJaimOnlyForm() {
   );
 }
 
-// JAIM年会費テーブル（令和8年度以降）
-var JAIM_FEE_TABLE = {
-  '中小企業': { '正会員団体に所属': 60000, '正会員団体に未所属': 63000 },
-  '大企業':   { '正会員団体に所属': 80000, '正会員団体に未所属': 83000 }
-};
-
-// 企業規模・所属の選択に応じて中小要件の案内と年会費表示を更新
+// 企業規模の選択に応じて中小要件の案内を更新（年会費表示は廃止）
 function updateJaimFee() {
   var size = val('f-jaimCompanySize');
-  var org  = val('f-jaimMemberOrg');
   var note = document.getElementById('jaimSmeNote');
   if (note) note.style.display = (size === '中小企業') ? 'block' : 'none';
-  var disp = document.getElementById('jaimFeeDisplay');
-  var amt  = document.getElementById('jaimFeeAmount');
-  var brk  = document.getElementById('jaimFeeBreak');
-  if (size && org && JAIM_FEE_TABLE[size] && JAIM_FEE_TABLE[size][org] != null) {
-    var yen = JAIM_FEE_TABLE[size][org];
-    if (amt) amt.textContent = yen.toLocaleString('ja-JP') + '円';
-    if (brk) brk.textContent = size + ' × ' + org;
-    if (disp) disp.style.display = 'block';
-  } else {
-    if (disp) disp.style.display = 'none';
-  }
 }
 
-// 保存用：年会費の文字列を返す（未確定なら空文字）
+// 保存用：年会費は廃止のため常に空文字
 function _jaimFeeValue() {
-  var size = val('f-jaimCompanySize'), org = val('f-jaimMemberOrg');
-  return (size && org && JAIM_FEE_TABLE[size] && JAIM_FEE_TABLE[size][org] != null)
-    ? (JAIM_FEE_TABLE[size][org] + '円') : '';
+  return '';
 }
 
 function _dayOptions(includeEnd) {
@@ -2232,7 +2197,6 @@ function validate() {
     if (!_jaimAgr || !_jaimAgr.checked) return 'JAIMへの該当性確認にチェックしてください。';
     if (!/^\d{4}$/.test(val('f-jaimIndustryCode'))) return '日本標準産業分類番号は4桁の数字で入力してください。';
     if (!val('f-jaimCompanySize')) return '企業規模カテゴリーを選択してください。';
-    if (!val('f-jaimMemberOrg')) return '正会員団体への所属を選択してください。';
     return null;
   }
   if (type === 'support_org') {
