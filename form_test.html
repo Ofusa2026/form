@@ -31,56 +31,8 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 .container { max-width: 680px; margin: 0 auto; padding: 16px 12px 160px; }
 
 /* カード */
-/* セクション色分け */
-.card { background: white; border-radius: 12px; padding: 16px; margin-bottom: 12px; box-shadow: 0 1px 4px rgba(0,0,0,.08); border-top: 4px solid #e5e7eb; }
-.card[data-section="basic"]    { border-top-color: #2563eb; }
-.card[data-section="address"]  { border-top-color: #0891b2; }
-.card[data-section="office"]   { border-top-color: #0d9488; }
-.card[data-section="rep"]      { border-top-color: #7c3aed; }
-.card[data-section="consult"]  { border-top-color: #db2777; }
-.card[data-section="officer"]  { border-top-color: #9333ea; }
-.card[data-section="employment"]{ border-top-color: #ea580c; }
-.card[data-section="labor"]    { border-top-color: #d97706; }
-.card[data-section="retire"]   { border-top-color: #dc2626; }
-.card[data-section="resign"]   { border-top-color: #64748b; }
-.card[data-section="housing"]  { border-top-color: #16a34a; }
-.card[data-section="jpcomp"]   { border-top-color: #b45309; }
-
-.section-title { font-size: 13px; font-weight: 800; color: #0f2040; border-left: 3px solid #2563eb; padding-left: 10px; margin-bottom: 14px; display: flex; align-items: center; gap: 6px; }
-.card[data-section="basic"]     .section-title { border-left-color: #2563eb; color: #1e3a8a; }
-.card[data-section="address"]   .section-title { border-left-color: #0891b2; color: #0e7490; }
-.card[data-section="office"]    .section-title { border-left-color: #0d9488; color: #0f766e; }
-.card[data-section="rep"]       .section-title { border-left-color: #7c3aed; color: #6d28d9; }
-.card[data-section="consult"]   .section-title { border-left-color: #db2777; color: #be185d; }
-.card[data-section="officer"]   .section-title { border-left-color: #9333ea; color: #7e22ce; }
-.card[data-section="employment"].section-title { border-left-color: #ea580c; color: #c2410c; }
-.card[data-section="labor"]     .section-title { border-left-color: #d97706; color: #b45309; }
-.card[data-section="retire"]    .section-title { border-left-color: #dc2626; color: #b91c1c; }
-.card[data-section="resign"]    .section-title { border-left-color: #64748b; color: #475569; }
-.card[data-section="housing"]   .section-title { border-left-color: #16a34a; color: #15803d; }
-.card[data-section="jpcomp"]    .section-title { border-left-color: #b45309; color: #92400e; }
-
-.section-icon { font-size: 16px; }
-.section-step { display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; border-radius: 50%; font-size: 10px; font-weight: 800; color: white; flex-shrink: 0; }
-.card[data-section="basic"]     .section-step { background: #2563eb; }
-.card[data-section="address"]   .section-step { background: #0891b2; }
-.card[data-section="office"]    .section-step { background: #0d9488; }
-.card[data-section="rep"]       .section-step { background: #7c3aed; }
-.card[data-section="consult"]   .section-step { background: #db2777; }
-.card[data-section="officer"]   .section-step { background: #9333ea; }
-.card[data-section="employment"].section-step { background: #ea580c; }
-.card[data-section="labor"]     .section-step { background: #d97706; }
-.card[data-section="retire"]    .section-step { background: #dc2626; }
-.card[data-section="resign"]    .section-step { background: #64748b; }
-.card[data-section="housing"]   .section-step { background: #16a34a; }
-.card[data-section="jpcomp"]    .section-step { background: #b45309; }
-
-/* ページ上部の進捗バー */
-.form-progress { background: white; border-radius: 10px; padding: 12px 14px; margin-bottom: 12px; box-shadow: 0 1px 4px rgba(0,0,0,.08); }
-.form-progress-label { font-size: 11px; color: #6b7280; margin-bottom: 8px; font-weight: 600; }
-.form-progress-steps { display: flex; gap: 3px; flex-wrap: wrap; }
-.form-progress-step { flex: 1; min-width: 40px; height: 28px; border-radius: 6px; font-size: 9px; font-weight: 700; display: flex; align-items: center; justify-content: center; color: white; opacity: .85; cursor: pointer; transition: opacity .15s, transform .15s; text-align: center; line-height: 1.2; padding: 2px; }
-.form-progress-step:hover { opacity: 1; transform: translateY(-1px); }
+.card { background: white; border-radius: 12px; padding: 16px; margin-bottom: 12px; box-shadow: 0 1px 4px rgba(0,0,0,.08); }
+.section-title { font-size: 13px; font-weight: 800; color: #0f2040; border-left: 3px solid #2563eb; padding-left: 10px; margin-bottom: 14px; }
 
 /* フィールド */
 .field { margin-bottom: 16px; }
@@ -90,16 +42,14 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 .trans.show { display: block; }
 .field input, .field select, .field textarea {
   width: 100%; padding: 13px 14px; border: 1.5px solid #e5e7eb; border-radius: 10px;
-  font-size: 16px; outline: none; transition: border .15s, background .2s; background: #fff7ed;
+  font-size: 16px; outline: none; transition: border .15s; background: white;
   -webkit-appearance: none; appearance: none; min-height: 50px;
 }
-.field input.filled, .field select.filled, .field textarea.filled { background: white; border-color: #d1fae5; }
 .field select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b7280' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; padding-right: 36px; }
-.field select.filled { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b7280' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; padding-right: 36px; }
-.field input:focus, .field select:focus, .field textarea:focus { border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,.1); background: white; }
+.field input:focus, .field select:focus, .field textarea:focus { border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,.1); }
 .field textarea { min-height: 80px; resize: vertical; font-size: 16px; }
 .field input[type="date"] { font-size: 15px; }
-.field input[type="time"] { font-size: 15px; }
+.field input[type="checkbox"] { -webkit-appearance: auto; appearance: auto; width: 18px; height: 18px; min-height: 0; padding: 0; border-radius: 4px; flex: none; }
 
 /* グリッド */
 .grid2 { display: grid; grid-template-columns: 1fr; gap: 0; }
@@ -166,29 +116,9 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 .type-unknown { text-align: center; padding: 60px 20px; }
 .type-unknown h2 { font-size: 18px; color: #dc2626; margin-bottom: 8px; }
 .type-unknown p { font-size: 13px; color: #6b7280; }
-
-/* ?マーク ツールチップ */
-.tip-btn { display: inline-flex; align-items: center; justify-content: center; width: 17px; height: 17px; background: #e0e7ff; color: #4f46e5; border-radius: 50%; font-size: 10px; font-weight: 800; cursor: pointer; border: none; padding: 0; margin-left: 5px; line-height: 1; flex-shrink: 0; vertical-align: middle; transition: background .15s; }
-.tip-btn:hover, .tip-btn.active { background: #4f46e5; color: white; }
-.tip-btn { display: inline-flex; align-items: center; justify-content: center; width: 17px; height: 17px; background: #e0e7ff; color: #4f46e5; border-radius: 50%; font-size: 10px; font-weight: 800; cursor: pointer; border: none; padding: 0; margin-left: 5px; line-height: 1; flex-shrink: 0; vertical-align: middle; transition: background .15s; }
-.tip-btn:hover, .tip-btn.active { background: #4f46e5; color: white; }
-.tip-popup { position: fixed; z-index: 9999; background: #1e293b; color: white; border-radius: 10px; padding: 12px 14px; font-size: 12px; line-height: 1.7; max-width: 280px; box-shadow: 0 8px 24px rgba(0,0,0,.35); display: none; pointer-events: none; }
-.tip-popup.show { display: block; }
-.tip-popup::before { content: ''; position: absolute; width: 8px; height: 8px; background: #1e293b; transform: rotate(45deg); top: -4px; left: 16px; }
-
-/* 新規追加バッジ */
-.new-badge { display: inline-block; font-size: 9px; font-weight: 700; background: #dcfce7; color: #15803d; border-radius: 3px; padding: 1px 5px; margin-left: 4px; vertical-align: middle; }
-
-/* セクション区切り */
-.section-divider { display: flex; align-items: center; gap: 8px; margin: 16px 0 12px; }
-.section-divider span { font-size: 11px; font-weight: 700; color: #6b7280; white-space: nowrap; }
-.section-divider::before, .section-divider::after { content: ''; flex: 1; height: 1px; background: #e5e7eb; }
 </style>
 </head>
 <body>
-
-<!-- ?マーク ツールチップ -->
-<div class="tip-popup" id="tipPopup"></div>
 
 <!-- 翻訳バー -->
 <div class="lang-bar">
@@ -232,7 +162,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 
 <!-- 名前が違う場合の画面 -->
 <div id="nameMismatchScreen" style="display:none;padding:20px;max-width:600px;margin:20px auto;">
-  <div class="name-mismatch-box">
+  <div class="name-mismatch-box" id="nameMismatchBox">
     <div class="title">⚠️ お名前にご相違があります</div>
     <div class="desc">恐れ入りますが、フォームへのご入力は控えていただき、お手数ですが下記までご連絡をお願いいたします。</div>
     <div class="contact">
@@ -246,7 +176,6 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 
 <div class="container" id="mainContent" style="display:none;">
   <div class="info-box" id="infoBox">大房行政書士法人よりご依頼の情報をご入力ください。</div>
-  <div id="wizProgress" style="font-size:12px;font-weight:700;color:#2f5d50;background:#e7efe9;border-radius:8px;padding:7px 12px;margin-bottom:10px;text-align:center;">ステップ（手順 てじゅん） 2 / 4</div>
   <div class="req-note"><span style="color:#dc2626;font-weight:800;">*</span> は必須項目です。</div>
   <div id="errorMsg" class="error-msg"></div>
   <div id="formBody"></div>
@@ -259,24 +188,30 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20260624.test.44';
+var FORM_VERSION = 'ver.20260707.04-test';
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
 function callRpc(fn, body){ return fetch(SUPABASE_URL + '/rest/v1/rpc/' + fn, { method:'POST', headers:{'Content-Type':'application/json','apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY}, body: JSON.stringify(body||{}) }); }
-// ver.20260608.test.01: 在留カード/パスポート撮影→項目自動入力（OCR）。送信先は案件管理GAS(anken) v4.0 の ocrResidenceCard アクション。
-var GAS_OCR_URL = 'https://script.google.com/macros/s/AKfycbxxBta5g1jXVzTf-s4EgaIbMc3No42aaH8guMOorQQ8HZl2SlNu-8vpu0fCFj_rjKsalQ/exec';
-// 住所→郵便番号 推定（Gmail取込GAS v2.24+ の addr2zip アクション）
-var GAS_GEO_URL = 'https://script.google.com/macros/s/AKfycbwOcaCf_Q_m6NMIYEOc-smyY_9pho_2cqZq4fhJB_YC9LtSY2EwPekmXSrMKWY4pDAA2A/exec';
 
 var params = new URLSearchParams(location.search);
 var caseId  = params.get('case') || '';
+// ver.20260701.03: JAIM等は company=<会社ID> でIDを渡すため、case が無ければ co_<会社ID> をcaseIdにする
+// （caseId空だと form_save が bad_request で拒否＝成功表示なのに未保存、になる不具合の修正）
+if (!caseId) {
+  var _companyParam = params.get('company') || '';
+  if (_companyParam) caseId = (_companyParam.indexOf('co_') === 0) ? _companyParam : ('co_' + _companyParam);
+}
 var type    = params.get('type') || '';   // tokutei_nintei / tokutei_koushin / tokutei_henkou / gijinkoku_nintei / gijinkoku_koushin / gijinkoku_henkou / company
 var caseName = params.get('name') ? decodeURIComponent(params.get('name')) : '';
 var currentLang = params.get('lang') || '';
 var responseId = params.get('response_id') || '';  // 編集モード: 既存回答のID
 var editMode = !!responseId;
+var srcParam = params.get('src') || '';  // ver.20260531.02: 流入元（aidem 等）。本人不一致時の連絡先案内の出し分けに使用
 var fieldsFilter = params.get('fields') ? params.get('fields').split(',').map(function(s){return s.trim();}) : null;
+
+// typeなしでco_始まりのcaseId（所属機関）またはsrc=jaimの場合はjaimをデフォルト
+if (!type && (caseId.indexOf('co_') === 0 || srcParam === 'jaim')) { type = 'jaim'; }
 
 // 特定技能フラグ（type=tokutei_* のとき true）
 var isTokutei = (type === 'tokutei_nintei' || type === 'tokutei_koushin' || type === 'tokutei_henkou');
@@ -287,6 +222,7 @@ var isGijinkoku = (type === 'gijinkoku_nintei' || type === 'gijinkoku_koushin' |
 // ===== 翻訳辞書 =====
 var TRANS = {
   en: {
+    skillField1:'Field ①', skillField2:'Field ②', jpField1:'Field ①', jpField2:'Field ②',
     name:'Full Name (as in passport)', birth:'Date of Birth', nationality:'Nationality',
     passport:'Passport Number', passExpiry:'Passport Expiry Date',
     married:'Are you married?', email:'Email Address',
@@ -323,6 +259,7 @@ var TRANS = {
     tenshutsuDate:'Date of submitting change of address notification',tenshutsuTitle:'/ Change of Address',tenshutsuNote:'※ Only if you have a planned move'
   },
   vi: {
+    skillField1:'Lĩnh vực ①', skillField2:'Lĩnh vực ②', jpField1:'Lĩnh vực ①', jpField2:'Lĩnh vực ②',
     name:'Họ và tên (theo hộ chiếu)', birth:'Ngày sinh', nationality:'Quốc tịch',
     passport:'Số hộ chiếu', passExpiry:'Ngày hết hạn hộ chiếu',
     married:'Bạn đã kết hôn chưa?', email:'Địa chỉ email',
@@ -359,6 +296,7 @@ var TRANS = {
     tenshutsuDate:'Ngày nộp thông báo thay đổi địa chỉ',tenshutsuTitle:'/ Thay đổi địa chỉ',tenshutsuNote:'※ Chỉ khi có kế hoạch chuyển nhà'
   },
   id: {
+    skillField1:'Bidang ①', skillField2:'Bidang ②', jpField1:'Bidang ①', jpField2:'Bidang ②',
     name:'Nama Lengkap (sesuai paspor)', birth:'Tanggal Lahir', nationality:'Kewarganegaraan',
     passport:'Nomor Paspor', passExpiry:'Masa Berlaku Paspor',
     married:'Apakah Anda sudah menikah?', email:'Alamat Email',
@@ -394,6 +332,7 @@ var TRANS = {
     tenshutsuDate:'Tanggal pelaporan pindah alamat',tenshutsuTitle:'/ Pindah Alamat',tenshutsuNote:'※ Hanya jika ada rencana pindah'
   },
   my: {
+    skillField1:'နယ်ပယ် ①', skillField2:'နယ်ပယ် ②', jpField1:'နယ်ပယ် ①', jpField2:'နယ်ပယ် ②',
     name:'အမည် (နိုင်ငံကူးလက်မှတ်)', birth:'မွေးသက္ကရာဇ်', nationality:'နိုင်ငံသား',
     passport:'ပတ်စ်ပို့ နံပါတ်', passExpiry:'သက်တမ်းကုန်ဆုံးရက်',
     married:'အိမ်ထောင်ရှိပါသလား？', email:'အီးမေးလ်',
@@ -428,6 +367,7 @@ var TRANS = {
     tenshutsuDate:'နေရပ်ပြောင်းရွှေ့ကြောင်း အကြောင်းကြားစာ တင်သွင်းမည့်ရက်',tenshutsuTitle:'/ နေရာပြောင်းရွှေ့မှု',tenshutsuNote:'※ ပြောင်းရွှေ့ရန် စီစဉ်ထားပါက သာ'
   },
   km: {
+    skillField1:'វិស័យ ①', skillField2:'វិស័យ ②', jpField1:'វិស័យ ①', jpField2:'វិស័យ ②',
     name:'ឈ្មោះ (តាមលិខិតឆ្លងដែន)', birth:'ថ្ងៃខែឆ្នាំកំណើត', nationality:'សញ្ជាតិ',
     passport:'លេខលិខិតឆ្លងដែន', passExpiry:'ថ្ងៃផុតសុពលភាព',
     married:'តើអ្នកបានរៀបការហើយឬ？', email:'អ៊ីមែល',
@@ -462,6 +402,7 @@ var TRANS = {
     tenshutsuDate:'ថ្ងៃដាក់លិខិតជូនដំណឹងផ្លាស់ប្តូរអាសយដ្ឋាន',tenshutsuTitle:'/ ផ្លាស់ប្តូរអាសយដ្ឋាន',tenshutsuNote:'※ តែក្នុងករណីមានផែនការ引越しប៉ុណ្ណោះ'
   },
   ne: {
+    skillField1:'क्षेत्र ①', skillField2:'क्षेत्र ②', jpField1:'क्षेत्र ①', jpField2:'क्षेत्र ②',
     name:'पूरा नाम (राहदानी अनुसार)', birth:'जन्म मिति', nationality:'राष्ट्रियता',
     passport:'राहदानी नम्बर', passExpiry:'राहदानी म्याद सकिने मिति',
     married:'के तपाईं विवाहित हुनुहुन्छ？', email:'इमेल ठेगाना',
@@ -496,6 +437,7 @@ var TRANS = {
     tenshutsuDate:'ठेगाना परिवर्तन सूचना दिने मिति',tenshutsuTitle:'/ ठेगाना परिवर्तन',tenshutsuNote:'※ सर्ने योजना भएमा मात्र'
   },
   zh: {
+    skillField1:'领域①', skillField2:'领域②', jpField1:'领域①', jpField2:'领域②',
     name:'姓名（护照记载）', birth:'出生日期', nationality:'国籍',
     passport:'护照号码', passExpiry:'护照有效期',
     married:'您结婚了吗？', email:'电子邮件地址',
@@ -533,100 +475,6 @@ var TRANS = {
 
 // ===== フォームHTML定義 =====
 
-// ============================================================
-// ver.20260608.test.06: 4ステップ・ウィザード
-//   ①本人確認(既存overlay) → ②MRZ → ③写真(スキップ可/認定は在留カードなし) → ④入力
-//   ※フィールドは全てDOMに置いたまま表示/非表示で切替（翻訳・下書き・送信を壊さない）
-// ============================================================
-function buildWizard(t) {
-  var fieldsHtml = buildForm(t); // ④の入力項目（撮影ブロックは外済み）
-  var isNinteiLocal = (t === 'tokutei_nintei' || t === 'gijinkoku_nintei');
-  var isTokuteiLocal = (String(t).indexOf('tokutei') === 0);
-  var h = '';
-  h += '<div class="wiz-step" data-step="2">' + blockStepMrz() + wizNav(2) + '</div>';
-  h += '<div class="wiz-step" data-step="3" style="display:none;">' + blockStepPhotos(isNinteiLocal, isTokuteiLocal) + wizNav(3) + '</div>';
-  h += '<div class="wiz-step" data-step="4" style="display:none;">' + fieldsHtml + wizNav(4) + '</div>';
-  return h;
-}
-
-function blockStepMrz() {
-  var h = '<div class="card">';
-  h += '<div class="section-title">① パスポートをかざして読（よ）み取（と）り（MRZ）<div class="trans" data-key="wizMrzTitle"></div></div>';
-  h += '<div style="font-size:13px;color:#475569;margin-bottom:6px;line-height:1.7;">パスポートをカメラにかざすと、氏名（しめい）・旅券番号（りょけんばんごう）・国籍（こくせき）・生年月日（せいねんがっぴ）・有効期限（ゆうこうきげん）を自動（じどう）で入力（にゅうりょく）します。</div>';
-  h += '<div class="trans show" data-key="wizMrzDesc" style="font-size:12px;color:#6366f1;margin-bottom:10px;"></div>';
-  h += '<div style="background:#0f2030;border-radius:10px;padding:10px;margin-bottom:12px;">' + _mrzSampleSvg() + '<div style="text-align:center;color:#34d399;font-size:11px;margin-top:4px;">緑（みどり）の2行（ぎょう）（MRZ）を読（よ）み取（と）ります</div></div>';
-  h += '<button type="button" onclick="startMrzScan()" style="width:100%;padding:14px;border:none;border-radius:10px;background:#2f5d50;color:#fff;font-weight:700;font-size:15px;cursor:pointer;">📸 かざして読（よ）み取（と）りスタート / Scan</button>';
-  h += '<div id="mrzResult" style="font-size:13px;color:#2f5d50;margin-top:10px;display:none;line-height:1.5;font-weight:700;"></div>';
-  h += '<div style="font-size:11px;color:#94a3b8;margin-top:10px;line-height:1.6;">読（よ）めないときは「次（つぎ）へ」でスキップできます。/ You can skip with Next.</div>';
-  h += '</div>';
-  return h;
-}
-
-function blockStepPhotos(isNintei, isTokutei) {
-  var slots = [{id:'ocrPassport', label:'パスポート / Passport', sample:true}];
-  if (!isNintei) {
-    slots.push({id:'ocrCardFront', label:'在留（ざいりゅう）カード 表（おもて） / Card front', sample:true});
-    slots.push({id:'ocrCardBack',  label:'在留（ざいりゅう）カード 裏（うら） / Card back', sample:true});
-  }
-  if (isTokutei) {
-    slots.push({id:'ocrSkillCert',  label:'技能合格証（ぎのうごうかくしょう） / Skill cert', sample:false, tkey:'certSkillDesc', desc:'特定技能（とくていぎのう）評価試験（ひょうかしけん）の合格証（ごうかくしょう）。試験（しけん）に合格（ごうかく）したときにもらった紙（かみ）です（分野（ぶんや）ごとに発行団体（はっこうだんたい）が異（こと）なります）。'});
-    slots.push({id:'ocrJpCert',     label:'日本語合格証（にほんごごうかくしょう） / Japanese cert', sample:false, tkey:'certJpDesc', desc:'日本語能力試験（にほんごのうりょくしけん）／JFT・JLPTなどの合格証（ごうかくしょう）。なくした場合（ばあい）は試験団体（しけんだんたい）に再発行（さいはっこう）を依頼（いらい）してください。'});
-    slots.push({id:'ocrSenmonkyu',  label:'専門級（せんもんきゅう）・技能実習評価 / Senmonkyu', sample:false, tkey:'certSenmonDesc', desc:'技能実習（ぎのうじっしゅう）の専門級（せんもんきゅう）・3級（きゅう）の合格証（ごうかくしょう）。不合格（ふごうかく）だった場合（ばあい）は評価調書（ひょうかちょうしょ）を提出（ていしゅつ）してください。'});
-  }
-  var h = '<div class="card">';
-  h += '<div class="section-title">② 写真（しゃしん）を撮影（さつえい）／選択（せんたく）<div class="trans" data-key="wizPhotoTitle"></div></div>';
-  h += '<div style="font-size:13px;color:#475569;margin-bottom:6px;line-height:1.7;">' +
-       (isNintei ? 'パスポートを撮影（さつえい）または選択（せんたく）してください。' : 'パスポートと在留（ざいりゅう）カードを撮影（さつえい）または選択（せんたく）してください。') +
-       (isTokutei ? '<br>合格証（ごうかくしょう）があれば一緒（いっしょ）に選（えら）んでください。' : '') +
-       '<br>選（えら）ぶと自動（じどう）で読（よ）み取（と）ります。出生地（しゅっせいち）・住所（じゅうしょ）などMRZにない項目（こうもく）も取得（しゅとく）します。<br><span style="color:#94a3b8;">この手順（てじゅん）はスキップできます。</span></div>';
-  h += '<div class="trans show" data-key="wizPhotoDesc" style="font-size:12px;color:#6366f1;margin-bottom:10px;"></div>';
-  var pick = 'display:inline-flex;align-items:center;gap:4px;padding:7px 10px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;';
-  slots.forEach(function(s){
-    h += '<div style="margin-bottom:12px;padding:10px;border:1px solid #e5e7eb;border-radius:10px;background:#fff;">';
-    h += '<div style="display:flex;align-items:flex-start;gap:10px;">';
-    h += '<div id="'+s.id+'_thumb" style="width:54px;height:36px;flex:none;border-radius:6px;background:#e2e8f0;background-size:cover;background-position:center;display:flex;align-items:center;justify-content:center;font-size:15px;color:#94a3b8;">📷</div>';
-    h += '<div style="flex:1;min-width:0;">';
-    h += '<div style="font-size:12px;font-weight:600;margin-bottom:5px;">'+s.label+'</div>';
-    h += '<div style="display:flex;gap:6px;flex-wrap:wrap;">';
-    h += '<label style="'+pick+'background:#2f5d50;color:#fff;">📷 撮影（さつえい）<input type="file" accept="image/*" capture="environment" style="display:none;" onchange="ocrPickFile(\''+s.id+'\',this)"></label>';
-    h += '<label style="'+pick+'background:#eef2f7;color:#334155;">📁 フォルダ/選択（せんたく）<input type="file" accept="image/*" style="display:none;" onchange="ocrPickFile(\''+s.id+'\',this)"></label>';
-    if (s.sample) h += '<button type="button" onclick="toggleSample(\''+s.id+'\')" style="'+pick+'background:#fff;color:#2f5d50;border:1px solid #cbd5e1;">📖 見本（みほん）</button>';
-    h += '</div>';
-    if (s.desc) h += '<div style="font-size:11px;color:#64748b;margin-top:6px;line-height:1.6;">'+s.desc+'<div class="trans" data-key="'+(s.tkey||'')+'" style="color:#6366f1;margin-top:2px;"></div></div>';
-    h += '</div></div>';
-    if (s.sample) h += '<div id="'+s.id+'_sample" style="display:none;margin-top:10px;padding:8px;background:#f8fafc;border-radius:8px;">'+_sampleSvg(s.id)+'</div>';
-    h += '</div>';
-  });
-  h += '<button type="button" id="ocrRunBtn" onclick="runCardOcr()" style="width:100%;margin-top:4px;padding:12px;border:none;border-radius:10px;background:#2f5d50;color:#fff;font-weight:700;font-size:14px;cursor:pointer;">読（よ）み取（と）って入力（にゅうりょく） / Scan</button>';
-  h += '<div id="ocrStatus" style="font-size:12px;color:#2f5d50;margin-top:8px;display:none;line-height:1.5;"></div>';
-  h += '<div style="font-size:11px;color:#94a3b8;margin-top:8px;line-height:1.6;">写真（しゃしん）を選（えら）ぶと自動（じどう）で読（よ）み取（と）ります。読（よ）み取（と）り後（ご）は④で内容（ないよう）を必（かなら）ず確認（かくにん）してください。</div>';
-  h += '</div>';
-  return h;
-}
-
-function wizNav(step) {
-  var ghost = 'flex:1;padding:12px;border:1.5px solid #cbd5e1;border-radius:10px;background:#fff;color:#475569;font-weight:700;font-size:14px;cursor:pointer;';
-  var primary = 'flex:2;padding:12px;border:none;border-radius:10px;background:#2f5d50;color:#fff;font-weight:700;font-size:14px;cursor:pointer;';
-  var h = '<div style="display:flex;gap:10px;margin:10px 0 4px;">';
-  if (step === 3) h += '<button type="button" onclick="goWizardStep(2)" style="'+ghost+'">← 戻る（もどる）</button>';
-  if (step === 4) h += '<button type="button" onclick="goWizardStep(3)" style="'+ghost+'">← 戻る（もどる）</button>';
-  if (step === 2) h += '<button type="button" onclick="goWizardStep(3)" style="'+primary+'">次（つぎ）へ / Next →</button>';
-  if (step === 3) h += '<button type="button" id="wizNext3" onclick="nextFromPhotos()" style="'+primary+'">次（つぎ）へ / Next →</button>';
-  h += '</div>';
-  return h;
-}
-
-function goWizardStep(n) {
-  var steps = document.querySelectorAll('.wiz-step');
-  for (var i = 0; i < steps.length; i++) {
-    steps[i].style.display = (parseInt(steps[i].getAttribute('data-step'), 10) === n) ? 'block' : 'none';
-  }
-  var bw = document.getElementById('btnWrap'); if (bw) bw.style.display = (n === 4) ? 'block' : 'none';
-  var rn = document.querySelector('.req-note'); if (rn) rn.style.display = (n === 4) ? 'block' : 'none';
-  var pg = document.getElementById('wizProgress'); if (pg) pg.textContent = 'ステップ（手順 てじゅん） ' + n + ' / 4';
-  try { window.scrollTo(0, 0); } catch(e){}
-}
-
 function blockBasic() {
   return '<div class="card">' +
     '<div class="section-title">基本情報（きほんじょうほう）</div>' +
@@ -642,501 +490,6 @@ function blockBasic() {
       field('f-passExpiry', 'パスポート有効期限（ゆうこうきげん）', 'date', false, '', 'passExpiry') +
     '</div>' +
   '</div>';
-}
-
-// ===== ver.20260608.test.01: 在留カード/パスポート撮影→自動入力（OCR） =====
-var _ocrImages = {}; // slotId -> {tag, base64, mimeType}
-var _ocrDirty = false, _ocrRunning = null, _ocrAutoTimer = null;
-var OCR_SLOT_TAGS = { ocrCardFront:'在留カード（表）', ocrCardBack:'在留カード（裏）', ocrPassport:'パスポート', ocrJpCert:'合格証（日本語）', ocrSkillCert:'合格証（技能）', ocrSenmonkyu:'専門級' };
-
-// 端末側で長辺〜1024pxに縮小しJPEG化（GASサイズ制限回避＋トークン節約）
-function ocrCompress(file, maxDim, quality) {
-  return new Promise(function(resolve, reject){
-    var reader = new FileReader();
-    reader.onload = function(e){
-      var img = new Image();
-      img.onload = function(){
-        var scale = Math.min(1, maxDim / Math.max(img.width, img.height));
-        var cw = Math.round(img.width * scale), ch = Math.round(img.height * scale);
-        var canvas = document.createElement('canvas');
-        canvas.width = cw; canvas.height = ch;
-        canvas.getContext('2d').drawImage(img, 0, 0, cw, ch);
-        var dataUrl = canvas.toDataURL('image/jpeg', quality);
-        resolve({ base64: dataUrl.split(',')[1], mimeType:'image/jpeg', preview: dataUrl });
-      };
-      img.onerror = reject;
-      img.src = e.target.result;
-    };
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
-  });
-}
-
-function ocrPickFile(slotId, input) {
-  var file = input.files && input.files[0];
-  if (!file) return;
-  ocrCompress(file, 1024, 0.7).then(function(r){
-    _ocrImages[slotId] = { tag: OCR_SLOT_TAGS[slotId] || slotId, base64: r.base64, mimeType: r.mimeType };
-    var thumb = document.getElementById(slotId + '_thumb');
-    if (thumb) { thumb.style.backgroundImage = 'url(' + r.preview + ')'; thumb.textContent = ''; }
-    _ocrDirty = true;
-    if (_ocrAutoTimer) clearTimeout(_ocrAutoTimer);
-    _ocrAutoTimer = setTimeout(function(){ if (Object.keys(_ocrImages).length) runCardOcr(); }, 1000);
-  }).catch(function(){ alert('画像の読み込みに失敗しました。もう一度お試しください。'); });
-}
-
-function runCardOcr() {
-  var keys = Object.keys(_ocrImages);
-  if (keys.length === 0) { alert('先にカードまたはパスポートを撮影／選択してください。'); return Promise.resolve(); }
-  if (_ocrRunning) return _ocrRunning;
-  var btn = document.getElementById('ocrRunBtn');
-  var status = document.getElementById('ocrStatus');
-  if (btn) { btn.disabled = true; btn.textContent = '読み取り中… / Scanning…'; }
-  var nb = document.getElementById('wizNext3'); if (nb) { nb.disabled = true; nb.style.opacity = '0.45'; nb.style.pointerEvents = 'none'; }
-  if (status) { status.style.display = 'block'; status.style.color = '#2f5d50'; status.textContent = 'AIが読み取っています…（数秒〜十数秒）'; }
-
-  var images = keys.map(function(k){ return _ocrImages[k]; });
-  var folderId = new URLSearchParams(location.search).get('folder') || '';
-  var payload = { action:'ocrResidenceCard', data:{ images: images, folderId: folderId, filePrefix: (caseName || caseId || 'card'), caseId: caseId } };
-
-  _ocrRunning = fetch(GAS_OCR_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // preflight回避
-    body: JSON.stringify(payload)
-  })
-  .then(function(r){ return r.json(); })
-  .then(function(res){
-    if (!res || res.status !== 'ok') { throw new Error(res && res.msg ? res.msg : '読み取りに失敗しました'); }
-    applyOcrFields(res.fields || {});
-    _ocrDirty = false;
-    var saved = (res.savedFiles || []).filter(function(f){ return f && f.url; }).length;
-    if (status) { status.style.color = '#2f5d50'; status.textContent = '\u2705 読み取り完了。内容を確認・修正してください。' + (saved ? '（画像' + saved + '件を保存しました）' : ''); }
-  })
-  .catch(function(e){
-    if (status) { status.style.color = '#b4541f'; status.textContent = '\u274C 読み取りに失敗しました（' + e.message + '）。明るい場所でカード全体が入るように撮り直してください。'; }
-  })
-  .then(function(){
-    if (btn) { btn.disabled = false; btn.textContent = '読（よ）み取（と）って入力（にゅうりょく） / Scan'; }
-    var nb2 = document.getElementById('wizNext3'); if (nb2) { nb2.disabled = false; nb2.style.opacity = '1'; nb2.style.pointerEvents = 'auto'; }
-    _ocrRunning = null;
-  });
-  return _ocrRunning;
-}
-
-function nextFromPhotos() {
-  var has = Object.keys(_ocrImages).length > 0;
-  if (has && _ocrDirty) { runCardOcr().then(function(){ goWizardStep(4); }); }
-  else { goWizardStep(4); }
-}
-
-function toggleSample(slotId) {
-  var el = document.getElementById(slotId + '_sample');
-  if (el) el.style.display = (el.style.display === 'none' || !el.style.display) ? 'block' : 'none';
-}
-function _sampleSvg(slotId) {
-  if (slotId === 'ocrPassport') return _sampleSvgPassport();
-  if (slotId === 'ocrCardFront') return _sampleSvgCardFront();
-  if (slotId === 'ocrCardBack') return _sampleSvgCardBack();
-  return '';
-}
-function _sampleSvgPassport() {
-  return '<svg viewBox="0 0 210 130" width="150" style="display:block;">' +
-    '<rect x="4" y="4" width="202" height="122" rx="8" fill="#eef2f7" stroke="#b9c2cf" stroke-width="2"/>' +
-    '<rect x="14" y="16" width="52" height="64" rx="3" fill="#cfd6df"/><circle cx="40" cy="40" r="13" fill="#aab3bd"/><path d="M24 74 q16 -17 32 0 z" fill="#aab3bd"/>' +
-    '<rect x="78" y="20" width="120" height="7" rx="3" fill="#c4ccd5"/><rect x="78" y="33" width="96" height="7" rx="3" fill="#c4ccd5"/><rect x="78" y="46" width="112" height="7" rx="3" fill="#c4ccd5"/><rect x="78" y="59" width="80" height="7" rx="3" fill="#c4ccd5"/>' +
-    '<rect x="10" y="92" width="190" height="28" rx="4" fill="#064e3b" stroke="#34d399" stroke-width="2"/>' +
-    '<text x="16" y="104" font-family="monospace" font-size="8" font-weight="bold" fill="#34d399">P&lt;JPNYAMADA&lt;&lt;TARO&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;</text>' +
-    '<text x="16" y="115" font-family="monospace" font-size="8" font-weight="bold" fill="#34d399">TR12345679JPN9001011M3001011&lt;&lt;</text>' +
-  '</svg><div style="font-size:11px;color:#64748b;margin-top:4px;">顔写真ページ全体（下の2行＝MRZまで）を写す</div>';
-}
-function _sampleSvgCardFront() {
-  return '<svg viewBox="0 0 210 130" width="150" style="display:block;">' +
-    '<rect x="4" y="4" width="202" height="122" rx="8" fill="#f7fbff" stroke="#9db8d6" stroke-width="2"/>' +
-    '<rect x="4" y="4" width="202" height="16" rx="8" fill="#1d4ed8"/><text x="10" y="16" font-size="8" font-weight="bold" fill="#fff">在留カード RESIDENCE CARD</text>' +
-    '<rect x="150" y="28" width="48" height="60" rx="3" fill="#cfd6df"/><circle cx="174" cy="50" r="13" fill="#aab3bd"/><path d="M158 82 q16 -16 32 0 z" fill="#aab3bd"/>' +
-    '<text x="12" y="38" font-size="7" fill="#64748b">氏名 NAME</text><rect x="12" y="41" width="120" height="7" rx="2" fill="#c4ccd5"/>' +
-    '<text x="12" y="58" font-size="7" fill="#64748b">生年月日／国籍</text><rect x="12" y="61" width="110" height="7" rx="2" fill="#c4ccd5"/>' +
-    '<text x="12" y="78" font-size="7" fill="#64748b">在留資格／在留期間</text><rect x="12" y="81" width="120" height="7" rx="2" fill="#c4ccd5"/>' +
-    '<rect x="12" y="100" width="186" height="18" rx="3" fill="#fff7e6" stroke="#e0a23a" stroke-width="1.5"/><text x="18" y="112" font-size="8" font-weight="bold" fill="#b4541f">番号 AB12345678CD</text>' +
-  '</svg><div style="font-size:11px;color:#64748b;margin-top:4px;">表面：氏名・在留資格・在留期間・カード番号</div>';
-}
-function _sampleSvgCardBack() {
-  return '<svg viewBox="0 0 210 130" width="150" style="display:block;">' +
-    '<rect x="4" y="4" width="202" height="122" rx="8" fill="#f7fbff" stroke="#9db8d6" stroke-width="2"/>' +
-    '<rect x="10" y="12" width="190" height="34" rx="4" fill="#e7efe9" stroke="#34d399" stroke-width="2"/>' +
-    '<text x="16" y="24" font-size="8" font-weight="bold" fill="#2f5d50">住居地 ADDRESS（最新をここに記載）</text>' +
-    '<rect x="16" y="29" width="170" height="6" rx="2" fill="#9fc3b2"/><rect x="16" y="38" width="120" height="6" rx="2" fill="#9fc3b2"/>' +
-    '<text x="12" y="60" font-size="7" fill="#64748b">資格外活動許可欄</text><rect x="12" y="63" width="186" height="14" rx="2" fill="#eef2f7"/>' +
-    '<text x="12" y="90" font-size="7" fill="#64748b">在留期間更新等</text><rect x="12" y="93" width="186" height="14" rx="2" fill="#eef2f7"/>' +
-  '</svg><div style="font-size:11px;color:#2f5d50;margin-top:4px;font-weight:700;">裏面：最新の住居地（住所）。表より裏を優先します</div>';
-}
-
-function _ocrSetVal(id, v) {
-  if (v == null || v === '') return;
-  var el = document.getElementById(id);
-  if (el) el.value = v;
-}
-
-// ローマ字/英字の国名 → 日本語セレクト値へ正規化（一致しなければ '' を返す）
-var OCR_NATIONALITY_MAP = {
-  'VIET NAM':'ベトナム','VIETNAM':'ベトナム','VNM':'ベトナム',
-  'INDONESIA':'インドネシア','IDN':'インドネシア',
-  'MYANMAR':'ミャンマー','BURMA':'ミャンマー','MMR':'ミャンマー',
-  'CAMBODIA':'カンボジア','KHM':'カンボジア',
-  'NEPAL':'ネパール','NPL':'ネパール',
-  'PHILIPPINES':'フィリピン','PHL':'フィリピン','PHILIPPINE':'フィリピン',
-  'CHINA':'中国','CHN':'中国',"PEOPLE'S REPUBLIC OF CHINA":'中国',
-  'THAILAND':'タイ','THA':'タイ',
-  'MONGOLIA':'モンゴル','MNG':'モンゴル'
-};
-function ocrMapNationality(raw, sel) {
-  if (!raw) return '';
-  var s = String(raw).trim();
-  var up = s.toUpperCase();
-  // 1) 完全一致（ローマ字表）
-  if (OCR_NATIONALITY_MAP[up]) return OCR_NATIONALITY_MAP[up];
-  // 2) 日本語セレクト値が含まれる（「ベトナム」等）
-  for (var i = 0; i < sel.options.length; i++) {
-    var ov = sel.options[i].value;
-    if (ov && ov !== 'その他' && s.indexOf(ov) >= 0) return ov;
-  }
-  // 3) ローマ字表のキーが部分的に含まれる（「VIET NAM ...」「Socialist Republic of VIET NAM」等）
-  for (var key in OCR_NATIONALITY_MAP) {
-    if (up.indexOf(key) >= 0) return OCR_NATIONALITY_MAP[key];
-  }
-  return '';
-}
-
-function applyOcrFields(f) {
-  f = f || {};
-  _ocrSetVal('f-name', f.name_roman);
-  _ocrSetVal('f-birth', f.birth_date);
-  _ocrSetVal('f-birthPlace', f.birth_place);
-
-  // 国籍：ローマ字国名（VIET NAM 等）も日本語セレクトに一致させる。一致したら「その他」に落とさない
-  if (f.nationality) {
-    var sel = document.getElementById('f-nationality');
-    if (sel) {
-      var target = ocrMapNationality(f.nationality, sel);
-      if (target) {
-        sel.value = target;
-        if (typeof toggleNationalityOther === 'function') toggleNationalityOther(target);
-      } else {
-        sel.value = 'その他';
-        if (typeof toggleNationalityOther === 'function') toggleNationalityOther('その他');
-        _ocrSetVal('f-nationalityOther', f.nationality);
-      }
-    }
-  }
-
-  _ocrSetVal('f-passport', f.passport_number);
-  _ocrSetVal('f-passExpiry', f.passport_expiry);
-
-  // 在留カード番号：あれば「あり」に切り替えて入力
-  if (f.card_number) {
-    var rcs = document.getElementById('f-residenceCardStatus');
-    if (rcs) { rcs.value = 'あり'; if (typeof toggleResidenceCardInput === 'function') toggleResidenceCardInput('あり'); }
-    _ocrSetVal('f-residenceCard', f.card_number);
-  }
-
-  // 住所：あれば「あり」に切り替えて入力
-  if (f.address) {
-    var as = document.getElementById('f-addressStatus');
-    if (as) { as.value = 'あり'; if (typeof toggleAddressInput === 'function') toggleAddressInput('あり'); }
-    _ocrSetVal('f-address', f.address);
-  }
-
-  // 証明書（合格証・専門級）→ 技能/日本語証明欄へ best-effort 反映（④で要確認）
-  try {
-    if (f.skill_exam_name) { applyCertSkill(f); }
-    else if (f.senmonkyu === 'true' || f.senmonkyu === true || f.ginou_shokushu) { applySenmonkyu(f); }
-    if (f.jp_exam_name) { applyCertJp(f); }
-  } catch (e) { /* 反映できないときは手動入力にまかせる */ }
-}
-
-// セレクトに該当optionがあれば選択（無ければ何もしない）
-function _selectIfOption(id, val) {
-  var el = document.getElementById(id);
-  if (!el || !val) return false;
-  for (var i = 0; i < el.options.length; i++) {
-    if (el.options[i].value === val) { el.value = val; return true; }
-  }
-  return false;
-}
-
-// 日本語合格証 → 日本語能力の証明
-function applyCertJp(f) {
-  var n = f.jp_exam_name || ''; if (!n) return;
-  var exam = '';
-  if (/基礎|JFT|kiso/i.test(n)) exam = '国際交流基金日本語基礎テスト';
-  else if (/能力|JLPT|N\s*[1-5]/i.test(n)) exam = '日本語能力試験';
-  else if (/介護/.test(n)) exam = '介護日本語評価試験';
-  if (!exam) return;
-  var ev = document.getElementById('f-jpEvalType'); if (!ev) return;
-  ev.value = '分野別運用方針に定める評価方法による証明';
-  if (typeof toggleJpProof === 'function') toggleJpProof(1, ev.value);
-  var field = '日本語試験（にほんごしけん）';
-  var ff = document.getElementById('f-jpField1');
-  if (ff) { ff.value = field; if (typeof onJpFieldChange === 'function') onJpFieldChange(1, field); }
-  _selectIfOption('f-jpExam1', exam);
-}
-
-// 技能合格証 → 技能水準の証明（試験合格）。試験名をリストに照合
-function applyCertSkill(f) {
-  var name = f.skill_exam_name || ''; if (!name) return;
-  var matched = '';
-  for (var i = 0; i < SKILL_EXAM_LIST.length; i++) { if (SKILL_EXAM_LIST[i] === name) { matched = SKILL_EXAM_LIST[i]; break; } }
-  if (!matched) {
-    for (var j = 0; j < SKILL_EXAM_LIST.length; j++) {
-      if (name.indexOf(SKILL_EXAM_LIST[j]) >= 0 || SKILL_EXAM_LIST[j].indexOf(name) >= 0) { matched = SKILL_EXAM_LIST[j]; break; }
-    }
-  }
-  if (!matched) return;
-  var field = _findFieldForExam(SKILL_FIELD_GROUPS, matched);
-  var ev = document.getElementById('f-skillEvalType'); if (!ev) return;
-  ev.value = '分野別運用方針に定める評価方法による証明';
-  if (typeof toggleSkillProof === 'function') toggleSkillProof(1, ev.value);
-  var ff = document.getElementById('f-skillField1');
-  if (ff && field) { ff.value = field; if (typeof onSkillFieldChange === 'function') onSkillFieldChange(1, field); }
-  _selectIfOption('f-skillExam1', matched);
-}
-
-// 専門級・技能実習評価 → 技能実習2号を良好に修了
-function applySenmonkyu(f) {
-  var ev = document.getElementById('f-skillEvalType'); if (!ev) return;
-  ev.value = '技能実習２号を良好に修了';
-  if (typeof toggleSkillProof === 'function') toggleSkillProof(1, ev.value);
-  _selectIfOption('f-gijutsuProof', '３級の技能検定又はこれに相当する技能実習評価試験の実技試験の合格による証明');
-  if (f.ginou_shokushu) {
-    var preset = document.getElementById('f-gijutsuTypePreset');
-    if (preset) {
-      var hit = false;
-      for (var i = 0; i < preset.options.length; i++) {
-        if (preset.options[i].value === f.ginou_shokushu) { preset.value = f.ginou_shokushu; hit = true; break; }
-      }
-      if (hit) { if (typeof onGijutsuTypePresetChange === 'function') onGijutsuTypePresetChange(f.ginou_shokushu); }
-      else {
-        preset.value = '__other__';
-        if (typeof onGijutsuTypePresetChange === 'function') onGijutsuTypePresetChange('__other__');
-        var ti = document.getElementById('f-gijutsuType'); if (ti) ti.value = f.ginou_shokushu;
-      }
-    }
-  }
-  if (f.ginou_sagyou) { var w = document.getElementById('f-gijutsuWork'); if (w) w.value = f.ginou_sagyou; }
-}
-
-// ============================================================
-// パスポート MRZ リアルタイム読取（端末内・AI不使用）
-// 下部2行(TD3, 各44桁)をカメラから読み、チェックデジットが合った時だけ確定
-// ============================================================
-var _mrz = { stream:null, worker:null, raf:null, busy:false, active:false, video:null, canvas:null, overlay:null };
-
-function _mrzLoadTesseract() {
-  return new Promise(function(resolve, reject){
-    if (window.Tesseract) { resolve(); return; }
-    var sc = document.createElement('script');
-    sc.src = 'https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js';
-    sc.onload = function(){ resolve(); };
-    sc.onerror = function(){ reject(new Error('OCRライブラリの読込に失敗')); };
-    document.head.appendChild(sc);
-  });
-}
-
-function _mrzStatus(msg, color) {
-  var el = document.getElementById('mrzStatusText');
-  if (el) { el.textContent = msg; if (color) el.style.color = color; }
-}
-
-// パスポートのどこにMRZ（緑の2行）があるかを示す図解（SVG・実画像不要）
-function _mrzSampleSvg() {
-  return '' +
-  '<svg viewBox="0 0 260 150" width="172" style="max-width:62%;height:auto;display:block;margin:0 auto;">' +
-    '<rect x="6" y="6" width="248" height="138" rx="10" fill="#fbf7ee" stroke="#cbb994" stroke-width="2"/>' +
-    '<rect x="18" y="22" width="58" height="72" rx="4" fill="#d6dae0"/>' +
-    '<circle cx="47" cy="46" r="15" fill="#aab3bd"/>' +
-    '<path d="M28 88 q19 -20 38 0 z" fill="#aab3bd"/>' +
-    '<rect x="90" y="26" width="150" height="7" rx="3" fill="#c9cfd6"/>' +
-    '<rect x="90" y="40" width="120" height="7" rx="3" fill="#c9cfd6"/>' +
-    '<rect x="90" y="54" width="142" height="7" rx="3" fill="#c9cfd6"/>' +
-    '<rect x="90" y="68" width="104" height="7" rx="3" fill="#c9cfd6"/>' +
-    '<rect x="90" y="82" width="130" height="7" rx="3" fill="#c9cfd6"/>' +
-    '<rect x="12" y="104" width="236" height="34" rx="5" fill="#064e3b" stroke="#34d399" stroke-width="2.5"/>' +
-    '<text x="19" y="119" font-family="monospace" font-size="9" font-weight="bold" fill="#34d399">P&lt;JPNYAMADA&lt;&lt;TARO&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;</text>' +
-    '<text x="19" y="132" font-family="monospace" font-size="9" font-weight="bold" fill="#34d399">TR12345679JPN9001011M30010110&lt;&lt;</text>' +
-  '</svg>';
-}
-
-function startMrzScan() {
-  if (_mrz.active) return;
-  _mrz.active = true;
-  // オーバーレイ生成
-  var ov = document.createElement('div');
-  ov.id = 'mrzOverlay';
-  ov.style.cssText = 'position:fixed;inset:0;z-index:99999;background:#000;display:flex;flex-direction:column;align-items:center;justify-content:center;';
-  ov.innerHTML =
-    '<video id="mrzVideo" playsinline autoplay muted style="max-width:100%;max-height:70vh;"></video>' +
-    '<div style="position:absolute;top:0;left:0;right:0;padding:10px 12px 14px;color:#fff;text-align:center;background:linear-gradient(#000c,#000a,transparent);">' +
-      '<div style="font-size:13px;font-weight:700;margin-bottom:6px;">パスポートの<span style="color:#34d399;">緑色の2行</span>を、下の緑枠に合わせてください</div>' +
-      _mrzSampleSvg() +
-      '<div style="font-size:11px;color:#cbd5e1;margin-top:4px;">Align the green 2 lines (MRZ) at the bottom of your passport</div>' +
-    '</div>' +
-    '<div style="position:absolute;left:6%;right:6%;bottom:24%;height:74px;border:2px solid #34d399;border-radius:8px;box-shadow:0 0 0 9999px #0006;"></div>' +
-    '<div id="mrzStatusText" style="position:absolute;bottom:13%;left:0;right:0;text-align:center;color:#34d399;font-size:13px;font-weight:700;">カメラを起動しています…</div>' +
-    '<button type="button" onclick="stopMrzScan()" style="position:absolute;bottom:5%;padding:11px 26px;border:none;border-radius:10px;background:#fff;color:#111;font-weight:700;font-size:14px;">キャンセル / Cancel</button>';
-  document.body.appendChild(ov);
-  _mrz.overlay = ov;
-
-  _mrzLoadTesseract()
-    .then(function(){
-      return navigator.mediaDevices.getUserMedia({ video: { facingMode:{ ideal:'environment' }, width:{ ideal:1920 }, height:{ ideal:1080 } }, audio:false });
-    })
-    .then(function(stream){
-      _mrz.stream = stream;
-      var v = document.getElementById('mrzVideo');
-      _mrz.video = v;
-      v.srcObject = stream;
-      return v.play();
-    })
-    .then(function(){
-      return Tesseract.createWorker('eng');
-    })
-    .then(function(worker){
-      _mrz.worker = worker;
-      return worker.setParameters({
-        tessedit_char_whitelist: '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ<',
-        tessedit_pageseg_mode: '6'
-      }).then(function(){ return worker; });
-    })
-    .then(function(){
-      _mrzStatus('かざしてください…（明るい場所が成功しやすいです）', '#34d399');
-      _mrz.canvas = document.createElement('canvas');
-      _mrzTick();
-    })
-    .catch(function(e){
-      _mrzStatus('❌ ' + e.message + '（撮影→AIをお使いください）', '#f87171');
-    });
-}
-
-function stopMrzScan() {
-  _mrz.active = false;
-  if (_mrz.raf) { clearTimeout(_mrz.raf); _mrz.raf = null; }
-  if (_mrz.stream) { _mrz.stream.getTracks().forEach(function(t){ t.stop(); }); _mrz.stream = null; }
-  if (_mrz.worker) { try { _mrz.worker.terminate(); } catch(e){} _mrz.worker = null; }
-  if (_mrz.overlay && _mrz.overlay.parentNode) _mrz.overlay.parentNode.removeChild(_mrz.overlay);
-  _mrz.overlay = null; _mrz.video = null; _mrz.busy = false;
-}
-
-function _mrzTick() {
-  if (!_mrz.active) return;
-  if (_mrz.busy) { _mrz.raf = setTimeout(_mrzTick, 300); return; }
-  var v = _mrz.video;
-  if (!v || !v.videoWidth) { _mrz.raf = setTimeout(_mrzTick, 300); return; }
-  _mrz.busy = true;
-
-  // 下部35%（MRZ帯）を切り出し、2倍に拡大してグレースケール化
-  var vw = v.videoWidth, vh = v.videoHeight;
-  var cropY = Math.floor(vh * 0.62), cropH = vh - cropY;
-  var scale = 2;
-  var cv = _mrz.canvas;
-  cv.width = vw * scale; cv.height = cropH * scale;
-  var ctx = cv.getContext('2d');
-  ctx.drawImage(v, 0, cropY, vw, cropH, 0, 0, cv.width, cv.height);
-  // 簡易グレースケール＋コントラスト
-  try {
-    var img = ctx.getImageData(0, 0, cv.width, cv.height);
-    var dt = img.data;
-    for (var i = 0; i < dt.length; i += 4) {
-      var g = (dt[i]*0.3 + dt[i+1]*0.59 + dt[i+2]*0.11);
-      g = g < 110 ? 0 : 255;
-      dt[i] = dt[i+1] = dt[i+2] = g;
-    }
-    ctx.putImageData(img, 0, 0);
-  } catch(e){}
-
-  _mrz.worker.recognize(cv).then(function(r){
-    var parsed = _mrzParse(r.data.text || '');
-    if (parsed) {
-      _mrzStatus('✅ 読み取りました', '#34d399');
-      applyOcrFields(parsed);
-      var st = document.getElementById('mrzResult');
-      if (st) { st.style.display='block'; st.style.color='#2f5d50'; st.textContent='✅ MRZを読み取りました（氏名・旅券番号・国籍・生年月日・有効期限）。「次へ」で進んでください。'; }
-      stopMrzScan();
-      return;
-    }
-    _mrz.busy = false;
-    if (_mrz.active) _mrz.raf = setTimeout(_mrzTick, 250);
-  }).catch(function(){
-    _mrz.busy = false;
-    if (_mrz.active) _mrz.raf = setTimeout(_mrzTick, 400);
-  });
-}
-
-// MRZ チェックデジット（重み 7,3,1）
-function _mrzCheck(str) {
-  var w = [7,3,1], sum = 0;
-  for (var i = 0; i < str.length; i++) {
-    var c = str.charCodeAt(i), v;
-    if (c >= 48 && c <= 57) v = c - 48;        // 0-9
-    else if (c >= 65 && c <= 90) v = c - 55;   // A-Z = 10..35
-    else v = 0;                                 // '<'
-    sum += v * w[i % 3];
-  }
-  return sum % 10;
-}
-
-function _mrzDate(s, isExpiry) {
-  if (!/^\d{6}$/.test(s)) return '';
-  var yy = parseInt(s.slice(0,2), 10), mm = s.slice(2,4), dd = s.slice(4,6);
-  var cur = new Date().getFullYear();
-  var year = 2000 + yy;
-  if (!isExpiry && year > cur) year = 1900 + yy; // 生年月日は未来にならない
-  return year + '-' + mm + '-' + dd;
-}
-
-// TD3パスポートMRZ（2行×44桁）をパース。主要チェックデジットが合えば確定
-function _mrzParse(text) {
-  var lines = String(text).toUpperCase().split(/\r?\n/)
-    .map(function(l){ return l.replace(/[^A-Z0-9<]/g, ''); })
-    .filter(function(l){ return l.length >= 30; });
-  // 44桁前後の行ペアを探す（line1は'P'始まり、line2は数値構造）
-  for (var a = 0; a < lines.length; a++) {
-    for (var b = 0; b < lines.length; b++) {
-      if (a === b) continue;
-      var l1 = lines[a], l2 = lines[b];
-      if (l1.charAt(0) !== 'P') continue;
-      // 44桁に正規化（長すぎ→先頭44、短すぎ→'<'埋め）
-      l1 = (l1 + '<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<').slice(0,44);
-      l2 = (l2 + '<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<').slice(0,44);
-
-      var passNo = l2.slice(0,9), cdPass = l2.charAt(9);
-      var nat = l2.slice(10,13);
-      var dob = l2.slice(13,19), cdDob = l2.charAt(19);
-      var sex = l2.charAt(20);
-      var exp = l2.slice(21,27), cdExp = l2.charAt(27);
-
-      var okPass = (String(_mrzCheck(passNo)) === cdPass);
-      var okDob  = (String(_mrzCheck(dob)) === cdDob);
-      var okExp  = (String(_mrzCheck(exp)) === cdExp);
-      if (!(okPass && okDob && okExp)) continue; // 3つ全て合致時のみ確定（誤読を弾く）
-
-      // 氏名（line1 5桁目以降：SURNAME<<GIVEN）
-      var nameRaw = l1.slice(5);
-      var np = nameRaw.split('<<');
-      var surname = (np[0] || '').replace(/</g, ' ').trim();
-      var given = (np[1] || '').replace(/</g, ' ').trim().replace(/\s+/g, ' ');
-      var fullName = (surname + ' ' + given).replace(/\s+/g, ' ').trim();
-
-      return {
-        name_roman: fullName,
-        passport_number: passNo.replace(/</g, ''),
-        nationality: nat.replace(/</g, ''),       // 3文字コード(VNM等)→applyで日本語化
-        birth_date: _mrzDate(dob, false),
-        sex: (sex === 'M' ? '男 / Male' : sex === 'F' ? '女 / Female' : ''),
-        passport_expiry: _mrzDate(exp, true)
-      };
-    }
-  }
-  return null;
 }
 
 // ===== 在留カード番号（あり/なし切替） =====
@@ -1339,7 +692,7 @@ function blockEducation() {
     '</div>' +
     field('f-schoolName', '学校名（がっこうめい）', 'text', false, '例: ハノイ工科大学', 'schoolName') +
     '<div class="grid2">' +
-      field('f-completionDate', '卒業年月（そつぎょうねんげつ）', 'month', false, '', 'completionDate') +
+      field('f-completionDate', '卒業年月日（そつぎょうねんがっぴ）', 'date', true, '', 'completionDate') +
       field('f-major', '専攻（せんこう）', 'text', false, '例: 機械工学', 'major') +
     '</div>' +
   '</div>';
@@ -1396,6 +749,7 @@ var SKILL_FIELD_GROUPS = [
   {field:'建設分野（けんせつぶんや）', exams:['建設分野特定技能１号評価試験（土木）','建設分野特定技能２号評価試験（土木）','建設分野特定技能１号評価試験（建築）','建設分野特定技能２号評価試験（建築）','建設分野特定技能１号評価試験（ライフライン・設備）','建設分野特定技能２号評価試験（ライフライン・設備）']},
   {field:'造船・舶用工業（ぞうせん・はくようこうぎょう）', exams:['造船・舶用工業分野特定技能１号試験（溶接）','造船・舶用工業分野特定技能２号試験（溶接）','造船・舶用工業分野特定技能１号試験（塗装）','造船・舶用工業分野特定技能２号試験（塗装）','造船・舶用工業分野特定技能１号試験（鉄工）','造船・舶用工業分野特定技能２号試験（鉄工）','造船・舶用工業分野特定技能１号試験（仕上げ）','造船・舶用工業分野特定技能２号試験（仕上げ）','造船・舶用工業分野特定技能１号試験（機械加工）','造船・舶用工業分野特定技能２号試験（機械加工）','造船・舶用工業分野特定技能１号試験（電気機器組立て）','造船・舶用工業分野特定技能２号試験（電気機器組立て）']},
   {field:'自動車整備（じどうしゃせいび）', exams:['自動車整備分野特定技能１号評価試験','自動車整備分野特定技能２号評価試験']},
+  {field:'自動車運送業（じどうしゃうんそうぎょう）', exams:['自動車運送業分野特定技能１号評価試験（トラック）','自動車運送業分野特定技能１号評価試験（タクシー）','自動車運送業分野特定技能１号評価試験（バス）']},
   {field:'航空（こうくう）', exams:['航空分野特定技能１号評価試験（空港グランドハンドリング）','航空分野特定技能２号評価試験（空港グランドハンドリング）','航空分野特定技能１号評価試験（航空機整備）','航空分野特定技能２号評価試験（航空機整備）']},
   {field:'宿泊（しゅくはく）', exams:['宿泊分野特定技能１号評価試験','宿泊分野特定技能２号評価試験']},
   {field:'農業（のうぎょう）', exams:['１号農業技能測定試験（耕種農業全般）','２号農業技能測定試験（耕種農業全般）','１号農業技能測定試験（畜産農業全般）','２号農業技能測定試験（畜産農業全般）']},
@@ -1427,52 +781,19 @@ function _findFieldForExam(groups, examName){
 
 var COUNTRY_LIST_ONLINE = ['日本 Japan','中国 People\'s Republic of China','ベトナム Viet Nam','韓国 Republic of Korea','フィリピン Philippines','ブラジル Brazil','ネパール Nepal','インドネシア Indonesia','ミャンマー Myanmar','台湾 Taiwan','米国 United States of America','カンボジア Cambodia','タイ Thailand','モンゴル Mongolia','バングラデシュ Bangladesh','スリランカ Sri Lanka','パキスタン Pakistan','インド India','ウズベキスタン Uzbekistan'];
 var GINOJISSHU_PROOF_LIST = ['３級の技能検定又はこれに相当する技能実習評価試験の実技試験の合格による証明','実習状況に関する書面による証明'];
-
-// ver.20260526.test.01: 技能実習2号 修了職種プリセット（主要なものを分野別にグルーピング）
-// 出典：外国人技能実習機構の移行対象職種（特定技能に多い職種を優先）
-var JISSHU_SHOKUSHU_GROUPS = [
-  {label: '建設 / Construction', items: ['とび','建築大工','鉄筋施工','建設機械施工','左官','配管','塗装','防水施工','タイル張り','内装仕上げ施工','コンクリート圧送施工','建築板金','型枠施工','石材施工','屋根ふき']},
-  {label: '食品 / Food', items: ['食品製造業（缶詰巻締）','加熱性水産加工食品製造業','非加熱性水産加工食品製造業','水産練り製品製造','牛豚食肉処理加工業','ハム・ソーセージ・ベーコン製造','パン製造','そう菜製造業','農産物漬物製造業','医療・福祉施設給食製造']},
-  {label: '介護 / Care', items: ['介護']},
-  {label: '農業 / Agriculture', items: ['耕種農業','畜産農業']},
-  {label: '漁業 / Fishery', items: ['漁船漁業','養殖業']},
-  {label: '機械・金属 / Machinery & Metal', items: ['機械加工','金属プレス加工','鉄工','工場板金','めっき','アルミニウム陽極酸化処理','仕上げ','機械検査','機械保全','電子機器組立て','電気機器組立て','プリント配線板製造','工業包装']},
-  {label: '繊維・衣服 / Textile', items: ['婦人子供服製造','紳士服製造','下着類製造','寝具製作','カーペット製造','帆布製品製造']},
-  {label: '溶接・塗装 / Welding & Coating', items: ['溶接','塗装']},
-  {label: '建設機械・船舶 / Construction Machinery & Shipbuilding', items: ['建設機械施工','造船','舶用機関','舶用電気電子機器']},
-  {label: 'プラスチック・ゴム / Plastics & Rubber', items: ['プラスチック成形','強化プラスチック成形','ゴム製品製造']},
-  {label: '木工・家具 / Woodwork & Furniture', items: ['家具製作','建具製作','木工']},
-  {label: '宿泊 / Accommodation', items: ['宿泊']},
-  {label: '自動車整備 / Auto Maintenance', items: ['自動車整備']},
-  {label: '印刷 / Printing', items: ['印刷','製本']}
-];
-
-function makeJisshuShokushuOptions() {
-  return JISSHU_SHOKUSHU_GROUPS.map(function(g){
-    var opts = g.items.map(function(item){ return '<option value="' + item + '">' + item + '</option>'; }).join('');
-    return '<optgroup label="' + g.label + '">' + opts + '</optgroup>';
-  }).join('');
-}
-
-// プリセット選択時の挙動
-function onGijutsuTypePresetChange(val) {
-  var otherWrap = document.getElementById('gijutsuTypeOtherWrap');
-  var unknownNote = document.getElementById('gijutsuUnknownNote');
-  var typeInput = document.getElementById('f-gijutsuType');
-  
-  if (val === '__other__') {
-    if (otherWrap) otherWrap.style.display = '';
-    if (unknownNote) unknownNote.style.display = 'none';
-    if (typeInput) typeInput.value = '';
-  } else if (val === '__unknown__') {
-    if (otherWrap) otherWrap.style.display = 'none';
-    if (unknownNote) unknownNote.style.display = '';
-    if (typeInput) typeInput.value = '__unknown__';
-  } else {
-    if (otherWrap) otherWrap.style.display = 'none';
-    if (unknownNote) unknownNote.style.display = 'none';
-    if (typeInput) typeInput.value = val;
-  }
+// ver.20260603.01: 技能実習2号 職種・作業マスター（index.html と完全一致）
+var GINOJISSHU_TYPE_LIST=['耕種農業','畜産農業','林業','漁船漁業','養殖業','さく井','建築板金','冷凍空気調和機器施工','建具製作','建築大工','型枠施工','鉄筋施工','とび','石材施エ','タイル張り','かわらぶき','左官','配管','熱絶縁施工','内装仕上げ施工','サッシ施工','防水施工','コンクリート圧送施工','ウェルポイント施工','表装','建設機械施工','築炉','缶詰巻締','食鳥処理加工業','加熱性水産加工　食品製造業','非加熱性水産加工　食品製造業','水産練り製品製造','牛豚食肉処理加工業','ハム・ソーセージ・ベーコン製造','パン製造','そう菜製造業','農産物漬物製造業','医療・福祉施設給食製造','紡績運転','織布運転','染色','ニット製品製造','たて編ニット生地製造','婦人子供服製造','紳士服製造','下着類製造','寝具製作','カーペット製造','帆布製品製造','布はく縫製','座席シート縫製','鋳造','鍛造','ダイカスト','機械加工','金属プレス加工','鉄工','工場板金','めっき','アルミニウム陽極酸化処理','仕上げ','機械検査','機械保全','電子機器組立て','電気機器組立て','プリント配線板製造','アルミニウム圧延・押出製品製造','金属熱処理業','家具製作','印刷','製本','プラスチック成形','強化プラスチック成形','塗装','溶接','工業包装','紙器・段ボール箱製造','陶磁器工業製品製造','自動車整備','ビルクリーニング','介護','クリーニング','リネンサプライ','コンクリート製品製造','宿泊','ＲＰＦ製造職種','鉄道施設保守整備','ゴム製品製造','鉄道車両整備','木材加工','空港グランドハンドリング','ボイラーメンテナンス'];
+var GINOJISSHU_WORK_MAP={'耕種農業':['施設園芸','畑作・野菜','果樹'],'畜産農業':['養豚','養鶏','酪農','養牛'],'林業':['育林','素材生産'],'漁船漁業':['かつお一本釣り漁業','延縄漁業','いか釣り漁業','まき網漁業','ひき網漁業','刺し網漁業','定置網漁業','かに・えびかご漁業','棒受け網漁業'],'養殖業':['ほたてがい・まがき養殖'],'さく井':['パーカッション式さく井工事','ロータリー式さく井工事'],'建築板金':['ダクト板金','内外装板金'],'冷凍空気調和機器施工':['冷凍空気調和機器施工'],'建具製作':['木製建具手加工','木製建具機械加工'],'建築大工':['大工工事'],'型枠施工':['型枠工事'],'鉄筋施工':['鉄筋組立て'],'とび':['とび'],'石材施エ':['石材施工','石張り'],'タイル張り':['タイル張り'],'かわらぶき':['かわらぶき'],'左官':['左官'],'配管':['建築配管','プラント配管'],'熱絶縁施工':['保温保冷工事'],'内装仕上げ施工':['プラスチック系床仕上げ工事','カーペット系床仕上げ工事','銘木フローリング工事','硬質床仕上げ工事','石張り工事','タイル張り工事','畳工事','ボード仕上げ工事','壁紙張り工事'],'サッシ施工':['ビル用サッシ施工'],'防水施工':['シーリング防水工事'],'コンクリート圧送施工':['コンクリート圧送工事'],'ウェルポイント施工':['ウェルポイント工事'],'表装':['壁装'],'建設機械施工':['押土・整地','積込み','掘削','締固め'],'築炉':['築炉'],'缶詰巻締':['缶詰巻締'],'食鳥処理加工業':['食鳥処理加工業'],'加熱性水産加工　食品製造業':['節類製造','加熱乾製品製造','調味加工品製造','くん製品製造','容器詰製品製造','かまぼこ製品製造'],'非加熱性水産加工　食品製造業':['塩蔵品製造','乾製品製造','発酵食品製造','調理加工品製造','生食用加工品製造'],'水産練り製品製造':['かまぼこ製品製造'],'牛豚食肉処理加工業':['牛豚部分肉製造'],'ハム・ソーセージ・ベーコン製造':['ハム・ソーセージ・ベーコン製造'],'パン製造':['パン製造'],'そう菜製造業':['そう菜加工'],'農産物漬物製造業':['農産物漬物製造'],'医療・福祉施設給食製造':['医療・福祉施設給食製造'],'紡績運転':['前紡工程','精紡工程','巻糸工程','合撚糸工程'],'織布運転':['準備工程','製織工程','仕上工程'],'染色':['糸染色','織物・ニット染色','染色仕上'],'ニット製品製造':['靴下製造','丸編みニット製造'],'たて編ニット生地製造':['たて編ニット生地製造'],'婦人子供服製造':['婦人子供既製服縫製'],'紳士服製造':['紳士既製服製造'],'下着類製造':['下着類製造'],'寝具製作':['寝具製作'],'カーペット製造':['織じゅうたん製造','タフテッドカーペット製造','ニードルパンチカーペット製造'],'帆布製品製造':['帆布製品製造'],'布はく縫製':['ワイシャツ製造'],'座席シート縫製':['自動車シート縫製'],'鋳造':['鋳鉄鋳物鋳造','非鉄金属鋳物鋳造'],'鍛造':['ハンマ型鍛造','プレス型鍛造'],'ダイカスト':['ホットチャンバダイカスト','コールドチャンバダイカスト'],'機械加工':['普通旋盤','フライス盤','数値制御旋盤','マシニングセンタ'],'金属プレス加工':['金属プレス'],'鉄工':['構造物鉄工','製缶'],'工場板金':['機械板金'],'めっき':['電気めっき','溶融亜鉛めっき'],'アルミニウム陽極酸化処理':['陽極酸化処理'],'仕上げ':['治工具仕上げ','金型仕上げ','機械組立て仕上げ'],'機械検査':['機械検査'],'機械保全':['機械系保全','電気系保全'],'電子機器組立て':['電子機器組立て'],'電気機器組立て':['回転電機組立て','変圧器組立て','配電盤・制御盤組立て','開閉制御器具組立て','回転電機巻線製造'],'プリント配線板製造':['プリント配線板設計','プリント配線板製造'],'アルミニウム圧延・押出製品製造':['アルミニウム圧延製品製造','アルミニウム押出製品製造'],'金属熱処理業':['熱処理'],'家具製作':['家具手加工','家具機械加工'],'印刷':['オフセット印刷','グラビア印刷'],'製本':['製本'],'プラスチック成形':['圧縮成形','射出成形','インフレーション成形','ブロー成形'],'強化プラスチック成形':['手積み積層成形'],'塗装':['建築塗装','金属塗装','鋼橋塗装','噴霧塗装'],'溶接':['手溶接','半自動溶接'],'工業包装':['工業包装'],'紙器・段ボール箱製造':['印刷箱打抜き','印刷箱製箱','貼箱製造','段ボール箱製造'],'陶磁器工業製品製造':['機械ろくろ成形','圧力鋳込み成形','パッド印刷'],'自動車整備':['自動車整備'],'ビルクリーニング':['ビルクリーニング'],'介護':['介護'],'クリーニング':['クリーニング'],'リネンサプライ':['リネンサプライ仕上げ'],'コンクリート製品製造':['コンクリート製品製造'],'宿泊':['接客・衛生管理'],'ＲＰＦ製造職種':['ＲＰＦ製造'],'鉄道施設保守整備':['軌道保守整備','電気設備保守整備'],'ゴム製品製造':['成形加工','仕上・検査'],'鉄道車両整備':['鉄道車両整備'],'木材加工':['製材','木材チップ製造'],'空港グランドハンドリング':['航空機地上支援','航空貨物取扱'],'ボイラーメンテナンス':['ボイラーメンテナンス']};
+// 職種選択時に作業の選択肢を切り替える
+function _updateGijutsuWorkSelect(selectedType){
+  var sel = document.getElementById('f-gijutsuWork');
+  if(!sel) return;
+  var prevVal = sel.value;
+  var opts = GINOJISSHU_WORK_MAP[selectedType] || [];
+  var html = '<option value="">---</option>';
+  opts.forEach(function(o){ html += '<option value="' + o + '">' + o + '</option>'; });
+  sel.innerHTML = html;
+  if(prevVal && opts.indexOf(prevVal) >= 0) sel.value = prevVal;
 }
 
 function makeOptions(list, labelMap) {
@@ -1544,7 +865,7 @@ function blockSkillProof() {
 
   h += '<div class="sub-label" style="background:#eff6ff;color:#1d4ed8;border-radius:6px;padding:6px 10px;margin-bottom:8px;font-size:12px;font-weight:700;">【証明①（しょうめい①）】</div>';
   h += '<div class="field">';
-  h += '<label>技能水準 評価区分（ぎのうすいじゅん ひょうかくぶん）<span class="req">*</span></label>';
+  h += '<label>技能水準 評価区分（ぎのうすいじゅん ひょうかくぶん）<span class="req">*</span><div class="trans" data-key="skillProof1Type"></div></label>';
   h += '<select id="f-skillEvalType" onchange="toggleSkillProof(1, this.value)">';
   h += '<option value="">---</option>';
   h += makeOptions(SKILL_EVAL_TYPES, SKILL_EVAL_LABELS);
@@ -1552,47 +873,33 @@ function blockSkillProof() {
 
   h += '<div id="skillProof1Exam" style="display:none;">';
   // ver.20260523.03: 分野→試験名の2段階セレクト
-  h += '<div class="field"><label>分野（ぶんや）①<span class="req">*</span></label>';
+  h += '<div class="field"><label>分野（ぶんや）①<span class="req">*</span><div class="trans" data-key="skillField1"></div></label>';
   h += '<select id="f-skillField1" onchange="onSkillFieldChange(1, this.value)"><option value="">---</option>' + makeFieldOptions(SKILL_FIELD_GROUPS) + '</select></div>';
-  h += '<div class="field"><label>技能試験名①（ぎのうしけんめい①）<span class="req">*</span></label>';
+  h += '<div class="field"><label>技能試験名①（ぎのうしけんめい①）<span class="req">*</span><div class="trans" data-key="skillProof1Field"></div></label>';
   h += '<select id="f-skillExam1"><option value="">---</option></select></div>';
-  h += '<div class="field"><label>技能試験 受験地①（ぎのうしけん じゅけんち①）<span class="req">*</span></label>';
+  h += '<div class="field"><label>技能試験 受験地①（ぎのうしけん じゅけんち①）<span class="req">*</span><div class="trans" data-key="skillProof1Place"></div></label>';
   h += '<select id="f-skillExamLoc1"><option value="">---</option>' + makeOptions(COUNTRY_LIST_ONLINE) + '</select></div>';
   h += '</div>';
 
   h += '<div id="skillProof1Jisshu" style="display:none;">';
-  // ver.20260526.test.01: 職種をプリセット選択リスト化、「その他」で自由入力可能
-  h += '<div class="field"><label>職種（しょくしゅ・技能実習2号）<span class="req">*</span> / Job Category</label>';
-  h += '<select id="f-gijutsuTypePreset" onchange="onGijutsuTypePresetChange(this.value)" style="width:100%;padding:13px 14px;border:1.5px solid #e5e7eb;border-radius:10px;font-size:16px;background:white;-webkit-appearance:none;min-height:50px;">';
-  h += '<option value="">--- 選択してください / Select ---</option>';
-  h += makeJisshuShokushuOptions();
-  h += '<option value="__other__">▼ その他（手入力）/ Other (manual input)</option>';
-  h += '<option value="__unknown__">⚠️ 分からない（担当者が確認します）/ I don\'t know</option>';
-  h += '</select></div>';
-  // 「その他」を選んだ時の手入力欄
-  h += '<div class="field" id="gijutsuTypeOtherWrap" style="display:none;"><label>職種を入力 / Enter job category</label>';
-  h += '<input type="text" id="f-gijutsuType" placeholder="例: 食品製造"></div>';
-  // 作業欄
-  h += '<div class="field" id="gijutsuWorkWrap"><label>作業（さぎょう）<span class="req">*</span> / Work</label>';
-  h += '<input type="text" id="f-gijutsuWork" placeholder="例: 惣菜製造"></div>';
-  // 「分からない」を選んだ時の補足メッセージ
-  h += '<div id="gijutsuUnknownNote" style="display:none;background:#fef3c7;border-left:4px solid #f59e0b;border-radius:6px;padding:10px 12px;margin:8px 0;font-size:12px;color:#92400e;">';
-  h += '⚠️ <strong>「技能実習修了証明書」</strong>に職種と作業が書かれています。<br>';
-  h += '⚠️ <strong>Job category and work are written on your "Technical Intern Training Completion Certificate"</strong>.<br>';
-  h += '担当者に修了証の写真を送ってください。/ Please send a photo of the certificate to the staff.';
+  h += '<div class="grid2">';
+  h += '<div class="field"><label>職種（しょくしゅ・技能実習2号）<span class="req">*</span><div class="trans" data-key="skillProof1Job"></div></label>';
+  h += '<select id="f-gijutsuType" onchange="_updateGijutsuWorkSelect(this.value)"><option value="">---</option>' + makeOptions(GINOJISSHU_TYPE_LIST) + '</select></div>';
+  h += '<div class="field"><label>作業（さぎょう）<span class="req">*</span><div class="trans" data-key="skillProof1Task"></div></label>';
+  h += '<select id="f-gijutsuWork"><option value="">---</option></select></div>';
   h += '</div>';
-  h += '<div class="field"><label>修了証明（しゅうりょうしょうめい）<span class="req">*</span></label>';
-  h += '<select id="f-gijutsuProof"><option value="">---</option>' + makeOptions(GINOJISSHU_PROOF_LIST) + '<option value="__unknown__">⚠️ 分からない / I don\'t know</option></select></div>';
+  h += '<div class="field"><label>修了証明（しゅうりょうしょうめい）<span class="req">*</span><div class="trans" data-key="skillProof1Doc"></div></label>';
+  h += '<select id="f-gijutsuProof"><option value="">---</option>' + makeOptions(GINOJISSHU_PROOF_LIST) + '</select></div>';
   h += '</div>';
 
   h += '<div class="sub-label" style="background:#eff6ff;color:#1d4ed8;border-radius:6px;padding:6px 10px;margin:12px 0 8px;font-size:12px;font-weight:700;">【技能試験②（ぎのうしけん②・2つ合格している場合）】</div>';
   // ver.20260523.03: ②も分野→試験名の2段階セレクト
-  h += '<div class="field"><label>分野（ぶんや）②</label>';
+  h += '<div class="field"><label>分野（ぶんや）②<div class="trans" data-key="skillField2"></div></label>';
   h += '<select id="f-skillField2" onchange="onSkillFieldChange(2, this.value)"><option value="">なし / 該当しない</option>' + makeFieldOptions(SKILL_FIELD_GROUPS) + '</select></div>';
-  h += '<div class="field"><label>技能試験名②（ぎのうしけんめい②）</label>';
+  h += '<div class="field"><label>技能試験名②（ぎのうしけんめい②）<div class="trans" data-key="skillProof2Field"></div></label>';
   h += '<select id="f-skillExam2" onchange="toggleSkillExam2Loc(this.value)"><option value="">---</option></select></div>';
   h += '<div id="skillExam2LocWrap" style="display:none;">';
-  h += '<div class="field"><label>技能試験 受験地②（ぎのうしけん じゅけんち②）</label>';
+  h += '<div class="field"><label>技能試験 受験地②（ぎのうしけん じゅけんち②）<div class="trans" data-key="skillProof2Place"></div></label>';
   h += '<select id="f-skillExamLoc2"><option value="">---</option>' + makeOptions(COUNTRY_LIST_ONLINE) + '</select></div>';
   h += '</div>';
 
@@ -1606,7 +913,7 @@ function blockJapaneseProof() {
 
   h += '<div class="sub-label" style="background:#f0fdf4;color:#15803d;border-radius:6px;padding:6px 10px;margin-bottom:8px;font-size:12px;font-weight:700;">【証明①（しょうめい①）】</div>';
   h += '<div class="field">';
-  h += '<label>日本語能力 評価区分（にほんごのうりょく ひょうかくぶん）<span class="req">*</span></label>';
+  h += '<label>日本語能力 評価区分（にほんごのうりょく ひょうかくぶん）<span class="req">*</span><div class="trans" data-key="jpProof1Type"></div></label>';
   h += '<select id="f-jpEvalType" onchange="toggleJpProof(1, this.value)">';
   h += '<option value="">---</option>';
   h += makeOptions(SKILL_EVAL_TYPES, SKILL_EVAL_LABELS);
@@ -1614,11 +921,11 @@ function blockJapaneseProof() {
 
   h += '<div id="jpProof1Exam" style="display:none;">';
   // ver.20260523.03: 分野→試験名の2段階セレクト
-  h += '<div class="field"><label>分野（ぶんや）①<span class="req">*</span></label>';
+  h += '<div class="field"><label>分野（ぶんや）①<span class="req">*</span><div class="trans" data-key="jpField1"></div></label>';
   h += '<select id="f-jpField1" onchange="onJpFieldChange(1, this.value)"><option value="">---</option>' + makeFieldOptions(JP_FIELD_GROUPS) + '</select></div>';
-  h += '<div class="field"><label>日本語試験名①（にほんごしけんめい①）<span class="req">*</span></label>';
+  h += '<div class="field"><label>日本語試験名①（にほんごしけんめい①）<span class="req">*</span><div class="trans" data-key="jpProof1ExamType"></div></label>';
   h += '<select id="f-jpExam1"><option value="">---</option></select></div>';
-  h += '<div class="field"><label>日本語試験 受験地①（にほんごしけん じゅけんち①）<span class="req">*</span></label>';
+  h += '<div class="field"><label>日本語試験 受験地①（にほんごしけん じゅけんち①）<span class="req">*</span><div class="trans" data-key="jpProof1Place"></div></label>';
   h += '<select id="f-jpExamLoc1"><option value="">---</option>' + makeOptions(COUNTRY_LIST_ONLINE) + '</select></div>';
   h += '</div>';
 
@@ -1628,12 +935,12 @@ function blockJapaneseProof() {
 
   h += '<div class="sub-label" style="background:#f0fdf4;color:#15803d;border-radius:6px;padding:6px 10px;margin:12px 0 8px;font-size:12px;font-weight:700;">【日本語試験②（にほんごしけん②・2つ合格している場合）】</div>';
   // ver.20260523.03: ②も分野→試験名の2段階セレクト
-  h += '<div class="field"><label>分野（ぶんや）②</label>';
+  h += '<div class="field"><label>分野（ぶんや）②<div class="trans" data-key="jpField2"></div></label>';
   h += '<select id="f-jpField2" onchange="onJpFieldChange(2, this.value)"><option value="">なし / 該当しない</option>' + makeFieldOptions(JP_FIELD_GROUPS) + '</select></div>';
-  h += '<div class="field"><label>日本語試験名②（にほんごしけんめい②）</label>';
+  h += '<div class="field"><label>日本語試験名②（にほんごしけんめい②）<div class="trans" data-key="jpProof2ExamType"></div></label>';
   h += '<select id="f-jpExam2" onchange="toggleJpExam2Loc(this.value)"><option value="">---</option></select></div>';
   h += '<div id="jpExam2LocWrap" style="display:none;">';
-  h += '<div class="field"><label>日本語試験 受験地②（にほんごしけん じゅけんち②）</label>';
+  h += '<div class="field"><label>日本語試験 受験地②（にほんごしけん じゅけんち②）<div class="trans" data-key="jpProof2Place"></div></label>';
   h += '<select id="f-jpExamLoc2"><option value="">---</option>' + makeOptions(COUNTRY_LIST_ONLINE) + '</select></div>';
   h += '</div>';
 
@@ -1717,34 +1024,227 @@ function buildForm(t) {
     case 'tokutei_henkou':
       return blockBasic() + blockMarried() + blockTokuteiKoushin() + blockSkillProof() + blockJapaneseProof() + blockContact(false, true);
     case 'gijinkoku_nintei':
-      return blockBasic() + blockMarried() + blockTokuteiNintei() + blockEducation() + blockGijinkokuExtra() + blockContact(false, false);
+      return blockBasic() + blockMarried() + blockEducation() + blockGijinkokuExtra() + blockContact(false, false);
     case 'gijinkoku_koushin':
     case 'gijinkoku_henkou':
       return blockBasic() + blockMarried() + blockEducation() + blockGijinkokuExtra() + blockContact(false, true);
     case 'company':
       return buildCompanyForm();
-    case 'card_delivery':
-      return buildCardDeliveryForm();
+    case 'jaim':
+      return buildJaimOnlyForm();
+    case 'support_org':
+      return buildSupportOrgForm();
     default:
       return '<div class="type-unknown"><h2>❌ フォームが指定されていません</h2><p>URLに ?type=... パラメータが必要です。</p></div>';
   }
 }
 
-// ===== 新在留カードの送付先フォーム（card_delivery） =====
-function buildCardDeliveryForm() {
-  var h = '<div class="card">';
-  h += '<div class="section-title">新しい在留カードの送付先 / Delivery address for your new residence card</div>';
-  h += '<p style="font-size:13px;color:#475569;line-height:1.6;margin:0 0 14px;">在留資格の許可が下りました。新しい在留カードをお送りします。<b>お名前とご住所はあらかじめ入力されています</b>ので、変更があれば直してご確認ください。<br>Your name and address are pre-filled. Please correct them if needed.</p>';
-  h += field('f-cdName', 'お名前（受取人）/ Recipient name', 'text', true, '例: NGUYEN VAN A');
-  h += field('f-cdAddress', 'ご住所 / Address（都道府県・市区町村・番地・建物名・部屋番号）', 'text', true, '例: 東京都港区台場2-3-4 ○○ハイツ201');
-  h += field('f-cdZip', '郵便番号 / Postal code（住所から自動で入ります）', 'text', true, '例: 135-0091');
-  h += '<div style="margin:-6px 0 12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">';
-  h += '<button type="button" onclick="estimateZipFromAddress(true)" style="font-size:13px;padding:7px 12px;border:1.5px solid #cbd5e1;border-radius:8px;background:#f8fafc;color:#0f2040;cursor:pointer;">🔍 住所から郵便番号を取得</button>';
-  h += '<span id="cdZipHint" style="font-size:12px;color:#64748b;"></span>';
+// ===== 登録支援機関フォーム（type=support_org）=====
+var _SO_PREF_LIST = ['','北海道','青森県','岩手県','宮城県','秋田県','山形県','福島県','茨城県','栃木県','群馬県','埼玉県','千葉県','東京都','神奈川県','新潟県','富山県','石川県','福井県','山梨県','長野県','岐阜県','静岡県','愛知県','三重県','滋賀県','京都府','大阪府','兵庫県','奈良県','和歌山県','鳥取県','島根県','岡山県','広島県','山口県','徳島県','香川県','愛媛県','高知県','福岡県','佐賀県','長崎県','熊本県','大分県','宮崎県','鹿児島県','沖縄県'];
+var _SO_DAYS = [['mon','月'],['tue','火'],['wed','水'],['thu','木'],['fri','金'],['sat','土'],['sun','日'],['hol','祝']];
+var _soStaffCount = 0;
+function _soFormMethodHtml(pfx){
+  return '<div style="display:flex;flex-wrap:wrap;gap:12px 18px;align-items:center;">'
+    + '<label style="display:flex;align-items:center;gap:6px;font-size:15px;"><input type="checkbox" id="f-so_'+pfx+'_f2f" style="width:20px;height:20px;">直接面談</label>'
+    + '<label style="display:flex;align-items:center;gap:6px;font-size:15px;"><input type="checkbox" id="f-so_'+pfx+'_tel" style="width:20px;height:20px;">電話</label>'
+    + '<label style="display:flex;align-items:center;gap:6px;font-size:15px;"><input type="checkbox" id="f-so_'+pfx+'_mail" style="width:20px;height:20px;">メール</label>'
+    + '<div style="display:flex;align-items:center;gap:6px;">その他<input type="text" id="f-so_'+pfx+'_other" placeholder="例：LINE" style="padding:8px;border:1.5px solid #e5e7eb;border-radius:8px;font-size:15px;min-height:44px;"></div>'
+    + '</div>';
+}
+function _soFormStaffRow(i){
+  return '<div class="so-staff-row" data-soidx="'+i+'" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;padding:8px;border:1px solid #eef2f7;border-radius:8px;">'
+    + '<input type="text" id="f-so_staff'+i+'_name" placeholder="氏名" style="flex:1 1 45%;padding:8px;border:1.5px solid #e5e7eb;border-radius:8px;font-size:15px;min-height:44px;">'
+    + '<input type="text" id="f-so_staff'+i+'_title" placeholder="役職（なし可）" style="flex:1 1 45%;padding:8px;border:1.5px solid #e5e7eb;border-radius:8px;font-size:15px;min-height:44px;">'
+    + '<input type="text" id="f-so_staff'+i+'_nameEn" placeholder="氏名（英語）" style="flex:1 1 45%;padding:8px;border:1.5px solid #e5e7eb;border-radius:8px;font-size:15px;min-height:44px;">'
+    + '<input type="text" id="f-so_staff'+i+'_titleEn" placeholder="役職（英語）" style="flex:1 1 45%;padding:8px;border:1.5px solid #e5e7eb;border-radius:8px;font-size:15px;min-height:44px;">'
+    + '</div>';
+}
+function _soFormAddStaff(){
+  _soStaffCount++;
+  var c = document.getElementById('so-staff-container');
+  if (c) c.insertAdjacentHTML('beforeend', _soFormStaffRow(_soStaffCount));
+}
+var _soOfficeCount = 0;
+function _soOfficePrefSelect(i){
+  var h='<select id="f-so_office'+i+'_pref" style="flex:1 1 30%;min-width:120px;padding:8px;border:1.5px solid #e5e7eb;border-radius:8px;font-size:15px;min-height:44px;background:#fff;">';
+  _SO_PREF_LIST.forEach(function(p){ h+='<option value="'+p+'">'+(p===''?'都道府県':p)+'</option>'; });
+  h+='</select>';
+  return h;
+}
+function _soFormOfficeRow(i){
+  var st='padding:8px;border:1.5px solid #e5e7eb;border-radius:8px;font-size:15px;min-height:44px;';
+  return '<div class="so-office-row" data-sooidx="'+i+'" style="border:1px solid #e5e7eb;border-radius:10px;padding:10px;margin-bottom:10px;background:#fafafa;"><div style="display:flex;flex-wrap:wrap;gap:6px;">'
+    + '<input type="text" id="f-so_office'+i+'_name" placeholder="事業所名" style="flex:1 1 100%;'+st+'">'
+    + '<input type="text" id="f-so_office'+i+'_zip" placeholder="郵便番号" style="flex:1 1 30%;min-width:110px;'+st+'">'
+    + _soOfficePrefSelect(i)
+    + '<input type="text" id="f-so_office'+i+'_city" placeholder="市区町村" style="flex:1 1 30%;min-width:110px;'+st+'">'
+    + '<input type="text" id="f-so_office'+i+'_addr" placeholder="町名丁目番地号等" style="flex:1 1 100%;'+st+'">'
+    + '<input type="text" id="f-so_office'+i+'_addrEn" placeholder="英語住所（任意）" style="flex:1 1 100%;'+st+'">'
+    + '<input type="text" id="f-so_office'+i+'_tel" placeholder="電話番号" style="flex:1 1 45%;min-width:140px;'+st+'">'
+    + '</div></div>';
+}
+function _soFormAddOffice(){
+  _soOfficeCount++;
+  var c = document.getElementById('so-office-container');
+  if (c) c.insertAdjacentHTML('beforeend', _soFormOfficeRow(_soOfficeCount));
+}
+var _SO_STEP_LABELS = ['基本情報','支援体制','担当者・その他'];
+function _soStepBarHtml(active){
+  var h='<div id="so-stepbar" style="display:flex;gap:6px;margin-bottom:14px;">';
+  _SO_STEP_LABELS.forEach(function(lbl,i){
+    var on=(i===active);
+    h+='<button type="button" onclick="_soGoStep('+i+')" style="flex:1;padding:10px 6px;border:none;border-radius:10px;cursor:pointer;font-weight:800;font-size:13px;line-height:1.3;background:'+(on?'#2563eb':'#eef2f7')+';color:'+(on?'#fff':'#64748b')+';">'+lbl+'<div style="font-size:10px;font-weight:600;opacity:.85;">'+(i+1)+'/3</div></button>';
+  });
+  h+='</div>';
+  return h;
+}
+function _soGoStep(n){
+  var steps=document.querySelectorAll('.so-step');
+  if(!steps.length) return;
+  if(n<0)n=0; if(n>steps.length-1)n=steps.length-1;
+  window._soStep=n;
+  steps.forEach(function(el){ el.style.display=(String(el.getAttribute('data-sostep'))===String(n))?'block':'none'; });
+  var bar=document.getElementById('so-stepbar');
+  if(bar){ var tmp=document.createElement('div'); tmp.innerHTML=_soStepBarHtml(n); if(tmp.firstChild) bar.parentNode.replaceChild(tmp.firstChild, bar); }
+  var prev=document.getElementById('so-prev'), next=document.getElementById('so-next');
+  if(prev) prev.style.visibility=(n>0)?'visible':'hidden';
+  if(next) next.style.visibility=(n<steps.length-1)?'visible':'hidden';
+  try{ window.scrollTo({top:0,behavior:'smooth'}); }catch(e){ try{window.scrollTo(0,0);}catch(_){} }
+}
+function buildSupportOrgForm() {
+  window._soStep=0;
+  var h = _soStepBarHtml(0);
+  // ステップ①基本情報
+  h += '<div class="so-step" data-sostep="0">';
+  h += '<div class="card"><div class="section-title">基本情報</div>';
+  h += field('f-so_name','登録支援機関名','text',true,'例：○○協同組合','');
+  h += field('f-so_nameKana','ふりがな','text',false,'例：まるまるきょうどうくみあい','');
+  h += field('f-so_nameEn','英語名','text',false,'例：XX Cooperative','');
+  h += field('f-so_corpNo','法人番号','text',false,'例：1234567890123','');
+  h += field('f-so_empInsNo','雇用保険適用事業所番号','text',false,'例：01-234567-8','');
+  h += field('f-so_regNo','登録番号','text',false,'例：１９登－000001','');
+  h += field('f-so_regDate','登録年月日','text',false,'例：20190927','');
   h += '</div>';
-  h += field('f-cdPhone', '電話番号 / Phone（あれば／空欄でもOK）', 'text', false, '例: 090-1234-5678');
+  h += '<div class="card"><div class="section-title">所在地・連絡先</div>';
+  h += field('f-so_zip','郵便番号','text',false,'例：100-0001','');
+  h += field('f-so_pref','都道府県','select',false,'','',_SO_PREF_LIST);
+  h += field('f-so_city','市区町村','text',false,'例：新宿区','');
+  h += field('f-so_addressDetail','町名丁目番地号等','text',false,'例：西新宿1-1-1','');
+  h += field('f-so_addressEn','英語住所','text',false,'','');
+  h += field('f-so_tel','電話番号','text',false,'例：03-1234-5678','');
+  h += '</div>';
+  h += '<div class="card"><div class="section-title">代表者・言語</div>';
+  h += field('f-so_repName','代表者氏名','text',false,'例：山田 太郎','');
+  h += field('f-so_repNameEn','英語代表者名','text',false,'例：Taro Yamada','');
+  h += field('f-so_languages','対応可能言語','text',false,'例：ベトナム語、英語','');
+  h += '</div>';
+  h += '</div>';
+  // ステップ②支援体制
+  h += '<div class="so-step" data-sostep="1" style="display:none;">';
+  h += '<div class="card"><div class="section-title">支援体制</div>';
+  h += field('f-so_supportManagerName','支援責任者 氏名','text',false,'例：山田 太郎','');
+  h += field('f-so_supportManagerTitle','支援責任者 役職','text',false,'例：代表理事','');
+  h += field('f-so_supporterCount','支援中の1号特定技能外国人数','number',false,'例：50','');
+  h += field('f-so_supportStaffCount','支援担当者数','number',false,'例：10','');
+  h += '</div>';
+  h += '<div class="card"><div class="section-title">対応時間（曜日別）</div><div style="display:flex;flex-direction:column;gap:8px;">';
+  _SO_DAYS.forEach(function(d){
+    h += '<div style="display:flex;align-items:center;gap:8px;"><span style="width:2.5em;font-weight:700;">'+d[1]+'</span>'
+      + '<input type="time" id="f-so_hours_'+d[0]+'_from" style="flex:1;padding:8px;border:1.5px solid #e5e7eb;border-radius:8px;font-size:15px;min-height:44px;"><span>〜</span>'
+      + '<input type="time" id="f-so_hours_'+d[0]+'_to" style="flex:1;padding:8px;border:1.5px solid #e5e7eb;border-radius:8px;font-size:15px;min-height:44px;"></div>';
+  });
+  h += '</div></div>';
+  h += '<div class="card"><div class="section-title">相談方法</div>' + _soFormMethodHtml('consult') + '</div>';
+  h += '<div class="card"><div class="section-title">緊急時対応</div>' + _soFormMethodHtml('emg') + '</div>';
+  h += '</div>';
+  // ステップ③担当者・その他
+  h += '<div class="so-step" data-sostep="2" style="display:none;">';
+  h += '<div class="card"><div class="section-title">支援担当者一覧</div>';
+  h += '<div style="font-size:13px;color:#6b7280;margin-bottom:8px;">氏名・役職・英語表記をご入力ください。人数分「＋ 追加」で増やせます。</div>';
+  h += '<div id="so-staff-container">' + _soFormStaffRow(0) + '</div>';
+  h += '<button type="button" onclick="_soFormAddStaff()" style="margin-top:8px;padding:10px 16px;background:#eff6ff;color:#2563eb;border:1.5px solid #2563eb;border-radius:8px;font-weight:700;cursor:pointer;font-size:14px;">＋ 支援担当者を追加</button>';
+  h += '</div>';
+  h += '<div class="card"><div class="section-title">支援を行う事業所（本店以外にあれば）</div>';
+  h += '<div style="font-size:13px;color:#6b7280;margin-bottom:8px;">本店以外に支援業務を行う事業所がある場合は「＋ 事業所を追加」で入力してください。無ければ空のままで構いません。</div>';
+  h += '<div id="so-office-container"></div>';
+  h += '<button type="button" onclick="_soFormAddOffice()" style="margin-top:4px;padding:10px 16px;background:#eff6ff;color:#2563eb;border:1.5px solid #2563eb;border-radius:8px;font-weight:700;cursor:pointer;font-size:14px;">＋ 事業所を追加</button>';
+  h += '</div>';
+  h += '<div class="card"><div class="section-title">職業紹介事業者（該当する場合のみ）</div>';
+  h += field('f-so_jjName','名称','text',false,'','');
+  h += field('f-so_jjCorpNo','法人番号','text',false,'','');
+  h += field('f-so_jjEmpInsNo','雇用保険適用事業所番号','text',false,'','');
+  h += field('f-so_jjZip','郵便番号','text',false,'','');
+  h += field('f-so_jjPref','都道府県','select',false,'','',_SO_PREF_LIST);
+  h += field('f-so_jjCity','市区町村','text',false,'','');
+  h += field('f-so_jjAddressDetail','町名丁目番地号等','text',false,'','');
+  h += field('f-so_jjTel','電話番号','text',false,'','');
+  h += field('f-so_jjPermitNo','許可届出番号','text',false,'','');
+  h += field('f-so_jjPermitDate','受理年月日','text',false,'例：20190912','');
+  h += '</div>';
+  h += '</div>';
+  // ステップ移動ボタン（送信ボタンはフッター共通のものを使用）
+  h += '<div style="display:flex;justify-content:space-between;gap:8px;margin-top:4px;">';
+  h += '<button type="button" id="so-prev" onclick="_soGoStep(window._soStep-1)" style="visibility:hidden;padding:11px 20px;background:#fff;color:#2563eb;border:1.5px solid #2563eb;border-radius:10px;font-weight:800;font-size:15px;cursor:pointer;">← 戻る</button>';
+  h += '<button type="button" id="so-next" onclick="_soGoStep(window._soStep+1)" style="padding:11px 20px;background:#2563eb;color:#fff;border:none;border-radius:10px;font-weight:800;font-size:15px;cursor:pointer;">次へ →</button>';
   h += '</div>';
   return h;
+}
+function _soFormCollect(){
+  function v(id){ return val(id); }
+  var hours={}; _SO_DAYS.forEach(function(d){ hours[d[0]]={from:v('f-so_hours_'+d[0]+'_from'),to:v('f-so_hours_'+d[0]+'_to')}; });
+  function meth(pfx){ var g=function(id){var e=document.getElementById(id);return !!(e&&e.checked);}; return {f2f:g('f-so_'+pfx+'_f2f'),tel:g('f-so_'+pfx+'_tel'),mail:g('f-so_'+pfx+'_mail'),other:v('f-so_'+pfx+'_other')}; }
+  var staff=[];
+  document.querySelectorAll('#so-staff-container .so-staff-row').forEach(function(row){
+    var i=row.getAttribute('data-soidx');
+    var nm=v('f-so_staff'+i+'_name'),ti=v('f-so_staff'+i+'_title'),ne=v('f-so_staff'+i+'_nameEn'),te=v('f-so_staff'+i+'_titleEn');
+    if(nm||ti||ne||te) staff.push({name:nm,title:ti,nameEn:ne,titleEn:te});
+  });
+  var offices=[];
+  document.querySelectorAll('#so-office-container .so-office-row').forEach(function(row){
+    var i=row.getAttribute('data-sooidx');
+    var nm=v('f-so_office'+i+'_name'),zip=v('f-so_office'+i+'_zip'),pf=v('f-so_office'+i+'_pref'),ci=v('f-so_office'+i+'_city'),ad=v('f-so_office'+i+'_addr'),ae=v('f-so_office'+i+'_addrEn'),te=v('f-so_office'+i+'_tel');
+    if(nm||zip||pf||ci||ad||ae||te) offices.push({officeName:nm,officeZip:zip,officePref:pf,officeCity:ci,officeAddressDetail:ad,officeAddressEn:ae,officeTel:te});
+  });
+  return {
+    name:v('f-so_name'), nameKana:v('f-so_nameKana'), nameEn:v('f-so_nameEn'),
+    corpNo:v('f-so_corpNo'), empInsNo:v('f-so_empInsNo'), regNo:v('f-so_regNo'), regDate:v('f-so_regDate'),
+    zip:v('f-so_zip'), pref:v('f-so_pref'), city:v('f-so_city'), addressDetail:v('f-so_addressDetail'), addressEn:v('f-so_addressEn'), tel:v('f-so_tel'),
+    repName:v('f-so_repName'), repNameEn:v('f-so_repNameEn'), languages:v('f-so_languages'),
+    supportManagerName:v('f-so_supportManagerName'), supportManagerTitle:v('f-so_supportManagerTitle'),
+    supporterCount:v('f-so_supporterCount'), supportStaffCount:v('f-so_supportStaffCount'),
+    jjName:v('f-so_jjName'), jjCorpNo:v('f-so_jjCorpNo'), jjEmpInsNo:v('f-so_jjEmpInsNo'),
+    jjZip:v('f-so_jjZip'), jjPref:v('f-so_jjPref'), jjCity:v('f-so_jjCity'), jjAddressDetail:v('f-so_jjAddressDetail'),
+    jjTel:v('f-so_jjTel'), jjPermitNo:v('f-so_jjPermitNo'), jjPermitDate:v('f-so_jjPermitDate'),
+    supportHours:hours, consultMethods:meth('consult'), emergencyContact:meth('emg'),
+    supportStaffList:staff, offices:offices
+  };
+}
+function _soFormValidate(){ if(!val('f-so_name')) return '登録支援機関名は必須です。'; return null; }
+function _soFormPrefill(resp){
+  resp = resp || {};
+  var map={ name:'f-so_name', nameKana:'f-so_nameKana', nameEn:'f-so_nameEn', corpNo:'f-so_corpNo', empInsNo:'f-so_empInsNo', regNo:'f-so_regNo', regDate:'f-so_regDate', zip:'f-so_zip', pref:'f-so_pref', city:'f-so_city', addressDetail:'f-so_addressDetail', addressEn:'f-so_addressEn', tel:'f-so_tel', repName:'f-so_repName', repNameEn:'f-so_repNameEn', languages:'f-so_languages', supportManagerName:'f-so_supportManagerName', supportManagerTitle:'f-so_supportManagerTitle', supporterCount:'f-so_supporterCount', supportStaffCount:'f-so_supportStaffCount', jjName:'f-so_jjName', jjCorpNo:'f-so_jjCorpNo', jjEmpInsNo:'f-so_jjEmpInsNo', jjZip:'f-so_jjZip', jjPref:'f-so_jjPref', jjCity:'f-so_jjCity', jjAddressDetail:'f-so_jjAddressDetail', jjTel:'f-so_jjTel', jjPermitNo:'f-so_jjPermitNo', jjPermitDate:'f-so_jjPermitDate' };
+  Object.keys(map).forEach(function(k){ var el=document.getElementById(map[k]); if(el && resp[k]!=null && resp[k]!=='') el.value=resp[k]; });
+  if(resp.supportHours && typeof resp.supportHours==='object'){ _SO_DAYS.forEach(function(d){ var hv=resp.supportHours[d[0]]||{}; var f=document.getElementById('f-so_hours_'+d[0]+'_from'),t=document.getElementById('f-so_hours_'+d[0]+'_to'); if(f&&hv.from)f.value=hv.from; if(t&&hv.to)t.value=hv.to; }); }
+  function setMeth(pfx,mv){ mv=mv||{}; var g=function(id){return document.getElementById(id);}; if(g('f-so_'+pfx+'_f2f'))g('f-so_'+pfx+'_f2f').checked=!!mv.f2f; if(g('f-so_'+pfx+'_tel'))g('f-so_'+pfx+'_tel').checked=!!mv.tel; if(g('f-so_'+pfx+'_mail'))g('f-so_'+pfx+'_mail').checked=!!mv.mail; if(g('f-so_'+pfx+'_other'))g('f-so_'+pfx+'_other').value=mv.other||''; }
+  setMeth('consult', resp.consultMethods); setMeth('emg', resp.emergencyContact);
+  if(Array.isArray(resp.supportStaffList) && resp.supportStaffList.length){
+    var c=document.getElementById('so-staff-container');
+    if(c){ c.innerHTML=''; _soStaffCount=0;
+      resp.supportStaffList.forEach(function(s,idx){ c.insertAdjacentHTML('beforeend', _soFormStaffRow(idx)); _soStaffCount=idx; s=s||{};
+        var g=function(k){return document.getElementById('f-so_staff'+idx+'_'+k);};
+        if(g('name'))g('name').value=s.name||''; if(g('title'))g('title').value=s.title||''; if(g('nameEn'))g('nameEn').value=s.nameEn||''; if(g('titleEn'))g('titleEn').value=s.titleEn||'';
+      });
+    }
+  }
+  if(Array.isArray(resp.offices) && resp.offices.length){
+    var oc=document.getElementById('so-office-container');
+    if(oc){ oc.innerHTML=''; _soOfficeCount=0;
+      resp.offices.forEach(function(of,idx){ oc.insertAdjacentHTML('beforeend', _soFormOfficeRow(idx)); _soOfficeCount=idx; of=of||{};
+        var g=function(k){return document.getElementById('f-so_office'+idx+'_'+k);};
+        if(g('name'))g('name').value=of.officeName||''; if(g('zip'))g('zip').value=of.officeZip||''; if(g('pref'))g('pref').value=of.officePref||''; if(g('city'))g('city').value=of.officeCity||''; if(g('addr'))g('addr').value=of.officeAddressDetail||''; if(g('addrEn'))g('addrEn').value=of.officeAddressEn||''; if(g('tel'))g('tel').value=of.officeTel||'';
+      });
+    }
+  }
 }
 
 // ===== フィールドHTML生成ヘルパー =====
@@ -1855,109 +1355,26 @@ function applyFieldsFilter(fields) {
   }
 }
 
-// 入力済み判定：未入力=薄オレンジ、入力済み=白
-function _initFilledState() {
-  function check(el) {
-    var filled = el.tagName === 'SELECT'
-      ? el.value !== '' && el.selectedIndex > 0
-      : el.value.trim() !== '';
-    el.classList.toggle('filled', filled);
-  }
-  document.querySelectorAll('.field input, .field select, .field textarea').forEach(function(el) {
-    check(el); // 初期状態（途中保存復元など）
-    el.addEventListener('input', function() { check(el); });
-    el.addEventListener('change', function() { check(el); });
-  });
-}
-
-// ?マーク ツールチップ ── addEventListener直接登録版
-function tip(id, text) {
-  return '<span class="tip-wrap"><button type="button" class="tip-btn" data-tip="' + text.replace(/'/g,"&#39;").replace(/"/g,"&quot;") + '">?</button></span>';
-}
-function _initTips() {
-  var popup = document.getElementById('tipPopup');
-  if (!popup) return;
-  var _cur = null;
-  function close() {
-    popup.classList.remove('show');
-    if (_cur) { _cur.classList.remove('active'); _cur = null; }
-  }
-  document.querySelectorAll('.tip-btn').forEach(function(btn) {
-    btn.addEventListener('click', function(e) {
-      e.stopPropagation();
-      if (_cur === btn && popup.classList.contains('show')) { close(); return; }
-      if (_cur) _cur.classList.remove('active');
-      _cur = btn;
-      btn.classList.add('active');
-      popup.textContent = btn.getAttribute('data-tip');
-      popup.classList.add('show');
-      var r = btn.getBoundingClientRect();
-      var left = Math.max(8, Math.min(r.left, window.innerWidth - 292));
-      var top = r.bottom + 10;
-      if (top + 80 > window.innerHeight) top = r.top - 90;
-      popup.style.left = left + 'px';
-      popup.style.top = top + 'px';
-    });
-  });
-  document.addEventListener('click', close);
-}
-
-// ラベル+?マーク付きフィールド
-function fieldT(id, label, type, req, placeholder, transKey, opts, tipText) {
-  var labelHtml = label + (req ? '<span class="req">*</span>' : '') + (tipText ? tip(id+'_tip', tipText) : '');
-  var h = '<div class="field"><label>' + labelHtml + '</label>';
-  if (transKey) h += '<div class="trans" data-key="' + transKey + '"></div>';
-  if (type === 'select') {
-    var _onchange =
-      id === 'f-holidayType' ? ' onchange="toggleHolidayType(this.value)"' :
-      id === 'f-flexFlg'     ? ' onchange="toggleFlexType(this.value)"' :
-      id === 'f-nationality' ? ' onchange="toggleNationalityOther(this.value)"' :
-      id === 'f-housingProvided' ? ' onchange="toggleHousingDetail(this.value)"' :
-      id === 'f-foodProvided'    ? ' onchange="toggleFoodDetail(this.value)"' :
-      id === 'f-shiftFlg'        ? ' onchange="toggleShiftDetail(this.value)"' :
-      id === 'f-salaryRaise'     ? ' onchange="toggleSalaryRaiseCond(this.value)"' :
-      id === 'f-bonus'           ? ' onchange="toggleBonusCond(this.value)"' :
-      id === 'f-retirement'      ? ' onchange="toggleRetirementDetail(this.value)"' :
-      id === 'f-severancePay'    ? ' onchange="toggleSeveranceRate(this.value)"' :
-      id === 'f-insKenpo'        ? ' onchange="toggleNationalHealthIns(this.value)"' :
-      id === 'f-insPension'      ? ' onchange="toggleNationalPensionIns(this.value)"' :
-      id === 'f-housingOwnership'? ' onchange="toggleHousingOwnership(this.value)"' :
-      id === 'f-renewalLimit'    ? ' onchange="toggleRenewalLimitMemo(this.value)"' :
-      '';
-    h += '<select id="' + id + '"' + _onchange + '>';
-    (opts||[]).forEach(function(o){ h += '<option value="' + o + '">' + (o||'選択してください') + '</option>'; });
-    h += '</select>';
-  } else if (type === 'textarea') {
-    h += '<textarea id="' + id + '" placeholder="' + (placeholder||'') + '"></textarea>';
-  } else {
-    h += '<input type="' + type + '" id="' + id + '" placeholder="' + (placeholder||'') + '"' + (type==='number'?' min="0"':'') + '>';
-  }
-  h += '</div>';
-  return h;
-}
-
+// ver.20260706.01: 企業フォームを3ページ（タブ）構成に分割（テスト版と同方式）
 function buildCompanyForm() {
-  var page1Html = buildCompanyPage1();
-  var page2Html = buildCompanyPage2();
-  var page3Html = buildCompanyPage3();
   return (
     '<div id="co-tabs" style="display:flex;gap:2px;margin-bottom:12px;border-radius:12px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.12);">' +
-      '<button id="co-tab1" type="button" onclick="switchCoPage(1)" style="flex:1;padding:12px 4px;background:#2563eb;color:white;border:none;font-size:11px;font-weight:800;cursor:pointer;line-height:1.4;text-align:center;">🏢<br>企業情報<br><span style=\"font-size:9px;opacity:.8;\">1/3</span></button>' +
-      '<button id="co-tab2" type="button" onclick="switchCoPage(2)" style="flex:1;padding:12px 4px;background:#e5e7eb;color:#6b7280;border:none;font-size:11px;font-weight:800;cursor:pointer;line-height:1.4;text-align:center;">💴<br>雇用条件<br><span style=\"font-size:9px;opacity:.7;\">2/3</span></button>' +
-      '<button id="co-tab3" type="button" onclick="switchCoPage(3)" style="flex:1;padding:12px 4px;background:#e5e7eb;color:#6b7280;border:none;font-size:11px;font-weight:800;cursor:pointer;line-height:1.4;text-align:center;">📋<br>その他情報<br><span style=\"font-size:9px;opacity:.7;\">3/3</span></button>' +
+      '<button id="co-tab1" type="button" onclick="switchCoPage(1)" style="flex:1;padding:12px 4px;background:#2563eb;color:white;border:none;font-size:11px;font-weight:800;cursor:pointer;line-height:1.4;text-align:center;">🏢<br>企業情報<br><span style="font-size:9px;opacity:.8;">1/3</span></button>' +
+      '<button id="co-tab2" type="button" onclick="switchCoPage(2)" style="flex:1;padding:12px 4px;background:#e5e7eb;color:#6b7280;border:none;font-size:11px;font-weight:800;cursor:pointer;line-height:1.4;text-align:center;">💴<br>雇用条件<br><span style="font-size:9px;opacity:.7;">2/3</span></button>' +
+      '<button id="co-tab3" type="button" onclick="switchCoPage(3)" style="flex:1;padding:12px 4px;background:#e5e7eb;color:#6b7280;border:none;font-size:11px;font-weight:800;cursor:pointer;line-height:1.4;text-align:center;">📋<br>その他情報<br><span style="font-size:9px;opacity:.7;">3/3</span></button>' +
     '</div>' +
-    '<div id="co-page1">' + page1Html + '</div>' +
+    '<div id="co-page1">' + buildCompanyPage1() + '</div>' +
     '<div id="co-next-btn" style="margin-bottom:60px;">' +
       '<button type="button" onclick="resetCurrentPage(1)" style="width:100%;padding:10px;background:white;color:#dc2626;border:1.5px solid #fca5a5;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;margin-bottom:8px;">このページの入力内容をリセット</button>' +
       '<button type="button" onclick="switchCoPage(2)" style="width:100%;padding:15px;background:#2563eb;color:white;border:none;border-radius:12px;font-size:15px;font-weight:800;cursor:pointer;">次へ → 雇用条件を入力 →</button>' +
     '</div>' +
-    '<div id="co-page2" style="display:none;">' + page2Html + '</div>' +
+    '<div id="co-page2" style="display:none;">' + buildCompanyPage2() + '</div>' +
     '<div id="co-mid-btns" style="display:none;margin-bottom:60px;">' +
       '<button type="button" onclick="resetCurrentPage(2)" style="width:100%;padding:10px;background:white;color:#dc2626;border:1.5px solid #fca5a5;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;margin-bottom:8px;">このページの入力内容をリセット</button>' +
       '<button type="button" onclick="switchCoPage(3)" style="width:100%;padding:15px;background:#ea580c;color:white;border:none;border-radius:12px;font-size:14px;font-weight:800;cursor:pointer;margin-bottom:8px;">次へ → その他必要情報を入力 →</button>' +
       '<button type="button" onclick="switchCoPage(1)" style="width:100%;padding:12px;background:white;color:#2563eb;border:2px solid #2563eb;border-radius:12px;font-size:13px;font-weight:800;cursor:pointer;">← 企業情報に戻る</button>' +
     '</div>' +
-    '<div id="co-page3" style="display:none;">' + page3Html + '</div>' +
+    '<div id="co-page3" style="display:none;">' + buildCompanyPage3() + '</div>' +
     '<div id="co-back-btn" style="display:none;margin-bottom:60px;">' +
       '<button type="button" onclick="resetCurrentPage(3)" style="width:100%;padding:10px;background:white;color:#dc2626;border:1.5px solid #fca5a5;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;margin-bottom:8px;">このページの入力内容をリセット</button>' +
       '<button type="button" onclick="switchCoPage(2)" style="width:100%;padding:13px;background:white;color:#ea580c;border:2px solid #ea580c;border-radius:12px;font-size:14px;font-weight:800;cursor:pointer;">← 雇用条件に戻る</button>' +
@@ -1965,6 +1382,7 @@ function buildCompanyForm() {
   );
 }
 
+var _currentCoPage = 1;
 function switchCoPage(page) {
   var p1=document.getElementById('co-page1'), p2=document.getElementById('co-page2'), p3=document.getElementById('co-page3');
   var t1=document.getElementById('co-tab1'), t2=document.getElementById('co-tab2'), t3=document.getElementById('co-tab3');
@@ -1974,99 +1392,204 @@ function switchCoPage(page) {
   [next,mid,back].forEach(function(b){if(b)b.style.display='none';});
   [t1,t2,t3].forEach(function(t){if(t){t.style.background='#e5e7eb';t.style.color='#6b7280';}});
   if (page===1) {
-    p1.style.display=''; next.style.display='';
-    t1.style.background='#2563eb'; t1.style.color='white';
+    p1.style.display=''; if(next)next.style.display='';
+    if(t1){t1.style.background='#2563eb'; t1.style.color='white';}
   } else if (page===2) {
-    p2.style.display=''; mid.style.display='';
-    t2.style.background='#ea580c'; t2.style.color='white';
+    p2.style.display=''; if(mid)mid.style.display='';
+    if(t2){t2.style.background='#ea580c'; t2.style.color='white';}
   } else {
-    p3.style.display=''; back.style.display='';
-    t3.style.background='#475569'; t3.style.color='white';
+    p3.style.display=''; if(back)back.style.display='';
+    if(t3){t3.style.background='#475569'; t3.style.color='white';}
   }
-  _initTips();
-  _initAutoCalc();
-  _initNameAutoFill();
-  // フロートリセットボタンの表示更新
   _currentCoPage = page;
-  var floatReset = document.getElementById('co-reset-float');
-  if (floatReset) floatReset.style.display = document.getElementById('co-page1') ? 'inline-flex' : 'none';
-  window.scrollTo({top:0, behavior:'smooth'});
+  try { window.scrollTo({top:0, behavior:'smooth'}); } catch(e){ window.scrollTo(0,0); }
+}
+
+// ページ単位リセット
+function resetCurrentPage(page) {
+  var pageNames = {1:'企業情報', 2:'雇用条件', 3:'その他情報'};
+  if (!confirm('【' + (pageNames[page]||'このページ') + '】の入力内容をすべてリセットします。よろしいですか？')) return;
+  var pageEl = document.getElementById('co-page' + page);
+  if (!pageEl) return;
+  pageEl.querySelectorAll('input, select, textarea').forEach(function(el) {
+    if (el.type === 'checkbox' || el.type === 'radio') { el.checked = false; }
+    else { el.value = ''; }
+    el.dispatchEvent(new Event('change'));
+  });
+  if (typeof _applyCompanyDefaults === 'function') _applyCompanyDefaults();  // ver.20260707.03: リセット後もデフォルト値を復元
+  window.scrollTo({top: 0, behavior: 'smooth'});
+}
+
+// 部分ヒアリング（fieldsFilter）時はタブを使わず全ページを縦に表示する
+function disableCoPaging() {
+  ['co-tabs','co-next-btn','co-mid-btns','co-back-btn'].forEach(function(id){
+    var el = document.getElementById(id); if (el) el.style.display = 'none';
+  });
+  ['co-page1','co-page2','co-page3'].forEach(function(id){
+    var el = document.getElementById(id); if (el) el.style.display = '';
+  });
+}
+
+// ver.20260707.01: 会社情報を就業場所へコピー
+function copyCompanyToOffice() {
+  function v(id){ var el=document.getElementById(id); return el ? el.value.trim() : ''; }
+  function set(id, val){
+    var el=document.getElementById(id); if(!el || !val) return;
+    el.value = val; el.dispatchEvent(new Event('change')); el.dispatchEvent(new Event('input'));
+  }
+  set('f-officeName', v('f-coName'));
+  set('f-officeNameEn', v('f-coNameEn'));
+  var addr = [v('f-coPref'), v('f-coCity'), v('f-coAddress')].filter(function(s){return s;}).join('');
+  set('f-officeAddress', addr);
+  set('f-officeTel', v('f-coTel'));
+  if (!v('f-coName') && !addr && !v('f-coTel')) {
+    alert('会社情報（1ページ目の「企業基本情報」「所在地」）がまだ入力されていません。先に1ページ目をご入力ください。');
+  }
+}
+
+// ver.20260707.01: 代表者情報を雇用管理相談窓口へコピー
+function copyRepToConsult() {
+  function v(id){ var el=document.getElementById(id); return el ? el.value.trim() : ''; }
+  function set(id, val){
+    var el=document.getElementById(id); if(!el || !val) return;
+    el.value = val; el.dispatchEvent(new Event('change')); el.dispatchEvent(new Event('input'));
+  }
+  set('f-consultName', v('f-coRepName'));
+  set('f-consultNameEn', v('f-coRepNameEn'));
+  set('f-consultTel', v('f-coTel'));
+  if (!v('f-coRepName')) {
+    alert('代表者情報（上の「代表者・作成責任者」）がまだ入力されていません。先に代表者氏名をご入力ください。');
+  }
+}
+
+// ver.20260707.02: 代表者情報を作成責任者へコピー
+function copyRepToAuthor() {
+  function v(id){ var el=document.getElementById(id); return el ? el.value.trim() : ''; }
+  function set(id, val){
+    var el=document.getElementById(id); if(!el || !val) return;
+    el.value = val; el.dispatchEvent(new Event('change')); el.dispatchEvent(new Event('input'));
+  }
+  set('f-coAuthorName', v('f-coRepName'));
+  set('f-coAuthorTitle', v('f-coRepTitle'));
+  set('f-coAuthorNameEn', v('f-coRepNameEn'));
+  if (!v('f-coRepName')) {
+    alert('代表者情報がまだ入力されていません。先に上の代表者氏名をご入力ください。');
+  }
+}
+
+// ver.20260707.02: 代表者情報を役員①へコピー
+function copyRepToOfficer1() {
+  function v(id){ var el=document.getElementById(id); return el ? el.value.trim() : ''; }
+  function set(id, val){
+    var el=document.getElementById(id); if(!el || !val) return;
+    el.value = val; el.dispatchEvent(new Event('change')); el.dispatchEvent(new Event('input'));
+  }
+  set('f-officer1Title', v('f-coRepTitle'));
+  set('f-officer1Name', v('f-coRepName'));
+  if (!v('f-coRepName')) {
+    alert('代表者情報がまだ入力されていません。先に上の代表者氏名をご入力ください。');
+  } else {
+    var kana = document.getElementById('f-officer1Kana');
+    if (kana && !kana.value) kana.focus();
+  }
+}
+
+// ver.20260707.03: 企業フォームのデフォルト値（離職者系=0、住居=ー）
+function _applyCompanyDefaults() {
+  function setDefault(id, val) {
+    var el = document.getElementById(id);
+    if (el && !el.value) el.value = val;
+  }
+  ['f-resignJp','f-resignForeign','f-dismissJp','f-dismissForeign','f-missing1y'].forEach(function(id){ setDefault(id, '0'); });
+  setDefault('f-cohabitants', 'ー');
+  setDefault('f-actualCostDesc', 'ー');
 }
 
 function buildCompanyPage1() {
   return (
-  // ── 企業情報 ──
-  '<div class="card" data-section="basic">' +
-    '<div class="section-title"><span class="section-step" style="background:#2563eb;">1</span>🏢 企業基本情報</div>' +
-    fieldT('f-coName','会社名','text',true,'例: 株式会社〇〇食品','','','') +
-    fieldT('f-coNameKana','会社名（ひらがな）','text',false,'例: かぶしきかいしゃ〇〇しょくひん','','','') +
-    fieldT('f-coNameEn','会社名（英語）','text',false,'例: OO Foods Co., Ltd.','','','') +
+  '<div class="card"><div class="section-title">企業基本情報</div>' +
+    field('f-coName','会社名','text',true,'例: 株式会社〇〇食品') +
+    field('f-coNameKana','会社名（ひらがな）','text',false,'例: かぶしきかいしゃ〇〇しょくひん') +
+    field('f-coNameEn','会社名（英語）','text',false,'例: OO Foods Co., Ltd.') +
     '<div class="grid2">' +
-      fieldT('f-coCorpNo','法人番号（13桁）','text',false,'例: 1234567890123','','','国税庁が指定した13桁の番号。 国税庁法人番号公表サイトでも確認可能です。 https://www.houjin-bangou.nta.go.jp/') +
-      fieldT('f-coEmpInsNo','雇用保険適用事業所番号','text',false,'例: 12-345678-9','','','ハローワークへの届出で付与される番号。離職票などに記載されています。') +
+      field('f-coCorpNo','法人番号（13桁）','text',false,'例: 1234567890123') +
+      field('f-coEmpInsNo','雇用保険適用事業所番号','text',false,'例: 12-345678-9') +
     '</div>' +
-    fieldT('f-coLaborInsNo','労働保険番号','text',false,'例: 12-3456-789012-000','','','労働保険の保険関係成立届を提出した際に付与される番号です。') +
+    field('f-coLaborInsNo','労働保険番号','text',false,'例: 12-3456-789012-000') +
     '<div class="grid2">' +
-      fieldT('f-coEmployees','常勤職員数','number',false,'例: 25','','','フルタイムで雇用している従業員の総数（役員含む）を記入してください。') +
-      fieldT('f-coForeignEmployees','うち外国人職員数','number',false,'例: 3','','','常勤職員のうち、外国籍の方の人数を記入してください。') +
+      field('f-coEmployees','常勤職員数','number',false,'例: 25') +
+      field('f-coForeignEmployees','うち外国人職員数','number',false,'例: 3') +
     '</div>' +
     '<div class="grid2">' +
-      fieldT('f-coTrainees','技能実習生数','number',false,'例: 2','','','現在受け入れ中の技能実習生の人数。特定技能の受け入れ可能人数の算定に使用します。') +
-      fieldT('f-coCapital','資本金（円）','number',false,'例: 10000000','','','登記上の資本金額を入力してください。') +
+      field('f-coTrainees','技能実習生数','number',false,'例: 2') +
+      field('f-coCapital','資本金（円）','number',false,'例: 10000000') +
     '</div>' +
-    fieldT('f-coAnnualSales','年間売上金額（円）','number',false,'例: 500000000','','','直近決算期の年間売上高を入力してください。') +
-    '<div class="grid2">' +
-      fieldT('f-coReceivedLast1y','過去1年の中長期在留者受入人数','number',false,'例: 5','','','直近1年以内に受け入れた中長期在留者（特定技能・技人国等）の総数。') +
-      fieldT('f-coReceivedLast2y','過去2年前の中長期在留者受入人数','number',false,'例: 3','','','') +
-    '</div>' +
+    field('f-coAnnualSales','年間売上金額（円）','number',false,'例: 500000000') +
   '</div>' +
 
-  // 所在地（企業情報カード内に統合）
-  '<div class="card" data-section="address">' +
-    '<div class="section-title"><span class="section-step" style="background:#0891b2;">2</span>📍 所在地</div>' +
+  '<div class="card"><div class="section-title">所在地</div>' +
     '<div class="grid2">' +
-      fieldT('f-coZip','郵便番号','text',false,'例: 160-0022','','','') +
-      fieldT('f-coPref','都道府県','text',false,'例: 東京都','','','') +
+      field('f-coZip','郵便番号','text',false,'例: 160-0022') +
+      field('f-coPref','都道府県','text',false,'例: 東京都') +
     '</div>' +
-    '<button type="button" onclick="zipToAddress()" style="font-size:11px;padding:6px 14px;background:white;border:1.5px solid #0891b2;color:#0891b2;border-radius:6px;cursor:pointer;font-weight:700;margin-top:-8px;margin-bottom:12px;">🔍 郵便番号から住所を自動入力</button>' +
-    fieldT('f-coCity','市区町村','text',false,'例: 新宿区','','','') +
-    fieldT('f-coAddress','町名番地・建物名','text',false,'例: 新宿2丁目1番1号 〇〇ビル3F','','','') +
-    fieldT('f-coAddressEn','住所（英語）','text',false,'例: 3F OO Bldg., 2-1-1 Shinjuku, Shinjuku-ku, Tokyo','','','') +
-    fieldT('f-coTel','電話番号','text',false,'例: 03-1234-5678','','','') +
+    field('f-coCity','市区町村','text',false,'例: 新宿区') +
+    field('f-coAddress','町名番地','text',false,'例: 新宿2丁目1番1号 〇〇ビル3F') +
+    field('f-coAddressEn','住所（英語）','text',false,'例: 3F OO Bldg., 2-1-1 Shinjuku, Shinjuku-ku, Tokyo') +
+    field('f-coTel','電話番号','text',false,'例: 03-1234-5678') +
+  '</div>' +
+  _coRepCards()
+  );
+}
+
+// 就業場所カード（ページ2の先頭に配置）
+function _coOfficeCard() {
+  return (
+  '<div class="card"><div class="section-title">就業場所（事業所）</div>' +
+    '<button type="button" onclick="copyCompanyToOffice()" style="font-size:12px;padding:7px 14px;background:#eff6ff;border:1.5px solid #93c5fd;border-radius:8px;color:#1d4ed8;cursor:pointer;font-weight:700;margin-bottom:12px;">🏢 会社と同じ情報を入れる</button>' +
+    field('f-officeName','事業所名','text',false,'例: 株式会社〇〇 板橋工場') +
+    field('f-officeNameEn','事業所名（英語）','text',false,'例: OO Co., Ltd. Itabashi Factory') +
+    field('f-officeAddress','事業所住所','text',false,'例: 東京都板橋区板橋1丁目2番3号') +
+    field('f-officeTel','事業所電話番号','text',false,'例: 03-9876-5432') +
+    field('f-jobCategory','業務内容（特定技能分野・区分）','text',false,'例: 飲食料品製造業 / 飲食料品製造') +
+    field('f-jobDescription','受け入れる外国人の職務内容','textarea',false,'例: 食品製造ラインにおいて加工品の仕上げ・品質判別等に従事') +
+  '</div>'
+  );
+}
+
+// 代表者・作成責任者／雇用管理相談窓口／役員情報（ページ1の後半）
+function _coRepCards() {
+  return (
+  '<div class="card"><div class="section-title">代表者・作成責任者</div>' +
+    '<div class="grid2">' +
+      field('f-coRepName','代表者氏名','text',false,'例: 山田 太郎') +
+      field('f-coRepTitle','代表者役職','text',false,'例: 代表取締役') +
+    '</div>' +
+    '<div class="grid2">' +
+      field('f-coRepNameEn','代表者氏名（英語）','text',false,'例: YAMADA TARO') +
+      field('f-coRepTitleEn','代表者役職（英語）','text',false,'例: President') +
+    '</div>' +
+    '<button type="button" onclick="copyRepToAuthor()" style="font-size:12px;padding:7px 14px;background:#eff6ff;border:1.5px solid #93c5fd;border-radius:8px;color:#1d4ed8;cursor:pointer;font-weight:700;margin-bottom:12px;">👤 作成責任者に代表者と同じ情報を入れる</button>' +
+    '<div class="grid2">' +
+      field('f-coAuthorName','作成責任者氏名','text',false,'例: 佐藤 花子') +
+      field('f-coAuthorTitle','作成責任者役職','text',false,'例: 人事部長') +
+    '</div>' +
+    field('f-coAuthorNameEn','作成責任者氏名（英語）','text',false,'例: SATO HANAKO') +
   '</div>' +
 
-  // 代表者・作成責任者・相談窓口・役員（1枚に統合）
-  '<div class="card" data-section="rep">' +
-    '<div class="section-title"><span class="section-step" style="background:#7c3aed;">4</span>👥 代表者・担当者・役員</div>' +
-
-    '<div class="sub-label">【代表者】</div>' +
+  '<div class="card"><div class="section-title">雇用管理相談窓口</div>' +
+    '<div style="font-size:11px;color:#9ca3af;margin-bottom:10px;">申請人の雇用条件の相談等に対応する窓口</div>' +
+    '<button type="button" onclick="copyRepToConsult()" style="font-size:12px;padding:7px 14px;background:#eff6ff;border:1.5px solid #93c5fd;border-radius:8px;color:#1d4ed8;cursor:pointer;font-weight:700;margin-bottom:12px;">👤 代表と同じ情報を入れる</button>' +
+    field('f-consultDept','部署名','text',false,'例: 人事部') +
     '<div class="grid2">' +
-      fieldT('f-coRepName','氏名','text',false,'例: 山田 太郎','','','雇用条件書に記名捺印する方の氏名です。') +
-      fieldT('f-coRepTitle','役職','text',false,'例: 代表取締役','','','') +
+      field('f-consultName','担当者名','text',false,'例: 田中 一郎') +
+      field('f-consultNameEn','担当者名（英語）','text',false,'例: TANAKA ICHIRO') +
     '</div>' +
-    '<div class="grid2">' +
-      fieldT('f-coRepNameEn','氏名（英語）','text',false,'例: YAMADA TARO','','','') +
-      fieldT('f-coRepTitleEn','役職（英語）','text',false,'例: President','','','') +
-    '</div>' +
+    field('f-consultTel','電話番号','text',false,'例: 03-1234-5678') +
+  '</div>' +
 
-    '<div class="sub-label">【作成責任者】</div>' +
-    '<div class="grid2">' +
-      fieldT('f-coAuthorName','氏名','text',false,'例: 佐藤 花子','','','各申請書類における作成責任者（担当者）のお名前をお願いします。') +
-      fieldT('f-coAuthorTitle','役職','text',false,'例: 人事部長','','','') +
-    '</div>' +
-    fieldT('f-coAuthorNameEn','作成責任者氏名（英語）','text',false,'例: SATO HANAKO','','','') +
-
-    '<div class="sub-label">【雇用管理相談窓口】' + tip('tip_consult','特定技能外国人からの雇用条件・支援に関する相談を受け付ける担当者の情報。雇用条件書Ⅸ-4に記載します。') + '</div>' +
-    fieldT('f-consultDept','部署名','text',false,'例: 人事部','','','') +
-    '<div class="grid2">' +
-      fieldT('f-consultName','担当者名','text',false,'例: 田中 一郎','','','') +
-      fieldT('f-consultNameEn','担当者名（英語）','text',false,'例: TANAKA ICHIRO','','','') +
-    '</div>' +
-    fieldT('f-consultTel','電話番号','text',false,'例: 03-1234-5678','','','') +
-    '<button type="button" onclick="copyCoTelToConsult()" style="font-size:11px;padding:6px 14px;background:white;border:1.5px solid #db2777;color:#db2777;border-radius:6px;cursor:pointer;font-weight:700;margin-top:-8px;margin-bottom:12px;">📋 本社電話番号をコピー</button>' +
-
-    '<div class="sub-label">【役員情報】' + tip('tip_officer','申請書類（役員名簿等）に記載する役員の情報。履歴事項全部証明書（謄本）に記載の役員を全員記入してください。') + '</div>' +
-    '<div style="font-size:11px;color:#6b7280;margin-bottom:8px;">代表者を含む全役員を記入してください</div>' +
+  '<div class="card"><div class="section-title">役員情報</div>' +
+    '<div style="font-size:11px;color:#9ca3af;margin-bottom:10px;">代表者を含む全役員を記入してください</div>' +
+    '<button type="button" onclick="copyRepToOfficer1()" style="font-size:12px;padding:7px 14px;background:#eff6ff;border:1.5px solid #93c5fd;border-radius:8px;color:#1d4ed8;cursor:pointer;font-weight:700;margin-bottom:12px;">👤 代表者を役員①に入れる</button>' +
     '<div id="officers-container">' +
       officerRow(1) + officerRow(2) + officerRow(3) +
     '</div>' +
@@ -2077,310 +1600,307 @@ function buildCompanyPage1() {
 
 function buildCompanyPage2() {
   return (
-  // 就業場所
-  '<div class="card" data-section="office">' +
-    '<div class="section-title"><span class="section-step" style="background:#0d9488;">1</span>🏭 就業場所（事業所）</div>' +
-    '<div style="font-size:11px;color:#6b7280;background:#f0f9ff;border-radius:8px;padding:10px;margin-bottom:12px;border-left:3px solid #0ea5e9;">本社と就業場所が同じ場合も記入してください。</div>' +
-    '<button type="button" onclick="copyCoToOffice()" style="width:100%;padding:10px;background:#0d9488;color:white;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;margin-bottom:12px;">📋 本社情報をコピー（名称・住所・電話）</button>' +
-    fieldT('f-officeName','事業所名','text',false,'例: 株式会社〇〇 板橋工場','','','') +
-    fieldT('f-officeNameEn','事業所名（英語）','text',false,'例: OO Co., Ltd. Itabashi Factory','','','') +
-    fieldT('f-officeAddress','事業所住所','text',false,'例: 東京都板橋区板橋1丁目2番3号','','','') +
-    fieldT('f-officeTel','事業所電話番号','text',false,'例: 03-9876-5432','','','') +
-    fieldT('f-contractType','契約の形態','select',false,'',null,['','直接雇用','派遣（農業・漁業のみ可）'],'特定技能は原則直接雇用です。') +
-    '<div class="field"><label>特定技能 分野' + tip('tip_bunya','特定技能の対象分野を選択してください。分野を選ぶと対応する業務区分が表示されます。') + '</label>' +
-    '<select id="f-jobBunya" onchange="onBunyaChange(this.value)">' +
-      '<option value="">選択してください</option>' +
-      '<option>介護</option>' +
-      '<option>ビルクリーニング</option>' +
-      '<option>素形材・産業機械・電気電子情報関連製造業</option>' +
-      '<option>建設</option>' +
-      '<option>造船・舶用工業</option>' +
-      '<option>自動車整備</option>' +
-      '<option>航空</option>' +
-      '<option>宿泊</option>' +
-      '<option>農業</option>' +
-      '<option>漁業</option>' +
-      '<option>飲食料品製造業</option>' +
-      '<option>外食業</option>' +
-      '<option>林業</option>' +
-      '<option>木材産業</option>' +
-      '<option>鉄道</option>' +
-      '<option>自動車運送業</option>' +
-    '</select></div>' +
-    '<div class="field"><label>業務区分' + tip('tip_kukun','上の分野を先に選択してください。') + '</label>' +
-    '<select id="f-jobKubun"><option value="">（分野を先に選択）</option></select>' +
-    '<input type="hidden" id="f-jobCategory">' +
-    '</div>' +
-    fieldT('f-jobDescription','受け入れる外国人の職務内容','textarea',false,'例: 食品製造ラインにおいて加工品の仕上げ・品質判別等に従事','','','具体的な作業予定内容を記入してください。') +
-    fieldT('f-foreignerJobTitle','職務上の地位・役職名','text',false,'例: 製造スタッフ（一般）','','','「一般」「班長」等、職務上の地位を入力してください。') +
-  '</div>' +
+  _coOfficeCard() +
 
-  // ── 雇用条件 ──
-  '<div class="card" data-section="employment">' +
-    '<div class="section-title"><span class="section-step" style="background:#ea580c;">2</span>💴 雇用条件</div>' +
-
-    '<div class="sub-label">【契約期間】</div>' +
-    '<div style="font-size:11px;color:#6b7280;margin-bottom:10px;">雇用条件書Ⅰに記載します。' + tip('tip_contract','特定技能は1年以内の有期契約が一般的です。在留期間内の契約となるようにしてください。') + '</div>' +
+  '<div class="card"><div class="section-title">雇用条件</div>' +
+    '<div class="sub-label">【給与】</div>' +
     '<div class="grid2">' +
-      fieldT('f-contractStart','契約開始日','date',false,'','','','雇用開始予定日を記入してください。') +
-      fieldT('f-contractEnd','契約終了日','date',false,'','','','在留期間の満了日以内で設定してください。') +
-    '</div>' +
-    '<div style="display:flex;gap:8px;margin-top:-8px;margin-bottom:12px;">' +
-      '<button type="button" onclick="setContractEnd(1)" style="flex:1;padding:8px;background:white;border:1.5px solid #2563eb;color:#2563eb;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;">📅 開始日の1年後をセット</button>' +
-      '<button type="button" onclick="setContractEnd(3)" style="flex:1;padding:8px;background:white;border:1.5px solid #7c3aed;color:#7c3aed;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;">📅 開始日の3年後をセット</button>' +
-    '</div>' +
-    fieldT('f-contractRenewal','契約更新の有無','select',false,'',null,['','更新する場合があり得る','更新しない','自動更新'],'') +
-    fieldT('f-renewalLimit','更新上限','select',false,'',null,['','なし','あり（回数・期間を備考に記入）'],'更新回数や通算契約期間の上限がある場合は「あり」を選択してください。') +
-    '<div id="renewalLimitMemoWrap" style="display:none;">' +
-      fieldT('f-renewalLimitMemo','更新上限の詳細（回数・通算期間）','text',false,'例: 更新3回まで／通算4年まで','','','') +
+      field('f-salaryType','給与形態','select',false,'',null,['','月給','時給','日給']) +
+      field('f-salaryMonthly','基本給（円）','number',false,'例: 200000') +
     '</div>' +
 
-    '<div class="sub-label" style="margin-top:16px;">【給与】</div>' +
-    '<div class="grid2">' +
-      fieldT('f-salaryType','給与形態','select',false,'',null,['','月給','時給','日給'],'') +
-      fieldT('f-salaryMonthly','基本給（円）','number',false,'例: 200000','','','固定残業代・手当を含まない基本的な給与額です。') +
-    '</div>' +
     '<div class="sub-label">【手当】</div>' +
     '<div id="allowanceRows">' + allowanceRow(1) + '</div>' +
-    '<button type="button" id="addAllowanceBtn" onclick="addAllowanceRow()" style="font-size:11px;padding:4px 14px;background:white;border:1.5px dashed #c7d2fe;border-radius:6px;color:#6366f1;cursor:pointer;font-weight:700;margin-bottom:10px;">＋ 手当を追加（最大4つ）</button>' +
+    '<button type="button" id="addAllowanceBtn" onclick="addAllowanceRow()" style="font-size:11px;padding:4px 14px;background:white;border:1.5px dashed #c7d2fe;border-radius:6px;color:#6366f1;cursor:pointer;font-weight:700;margin-bottom:10px;">＋ 手当を追加</button>' +
 
     '<div class="sub-label">【固定残業代】</div>' +
-    '<div style="font-size:11px;color:#6b7280;margin-bottom:8px;">固定残業代がある場合のみ記入。' + tip('tip_fixedot','固定残業代（みなし残業代）がある場合、①名称 ②金額 ③何時間分かを明示する必要があります。超過分は追加支給が必要です。') + '</div>' +
-    fieldT('f-fixedOTName','固定残業代 名称','text',false,'例: 固定残業手当','','','') +
+    field('f-fixedOTName','固定残業代 名称','text',false,'例: 固定残業手当') +
     '<div class="grid2">' +
-      fieldT('f-fixedOTAmount','金額（円）','number',false,'例: 30000','','','') +
-      fieldT('f-fixedOTHours','何時間分','number',false,'例: 20','','','この時間を超えた残業には追加の割増賃金が発生します。') +
-    '</div>' +
-
-    '<div class="sub-label">【割増賃金率】</div>' +
-    '<div style="font-size:11px;color:#6b7280;margin-bottom:8px;">雇用条件書Ⅶ-3に記載します。' + tip('tip_overtime','法定の割増率：時間外（月60h以内）25%以上、月60h超50%以上、休日（法定）35%以上、深夜25%以上。') + '</div>' +
-    '<div class="grid2">' +
-      fieldT('f-otRate1','時間外（法定超月60h以内）%','number',false,'例: 25','','','最低25%。') +
-      fieldT('f-otRate2','時間外（法定超月60h超）%','number',false,'例: 50','','','最低50%。') +
-    '</div>' +
-    '<div class="grid2">' +
-      fieldT('f-otRateSo','所定超 %','number',false,'例: 25','','','所定時間を超えるが法定内の残業に適用される率。') +
-      fieldT('f-otRateHolLegal','休日（法定休日）%','number',false,'例: 35','','','最低35%。') +
-    '</div>' +
-    '<div class="grid2">' +
-      fieldT('f-otRateHolOther','休日（法定外休日）%','number',false,'例: 25','','','法定外休日の労働に適用される率。') +
-      fieldT('f-otRateNight','深夜（22時〜5時）%','number',false,'例: 25','','','最低25%。') +
+      field('f-fixedOTAmount','固定残業代 金額（円）','number',false,'例: 30000') +
+      field('f-fixedOTHours','何時間分','number',false,'例: 20') +
     '</div>' +
 
     '<div class="sub-label">【控除】</div>' +
-    '<div style="font-size:11px;color:#6b7280;margin-bottom:8px;">雇用条件書別紙１-4に記載する控除項目です。' + tip('tip_deduct','外国人に対して「何がいくら引かれるか」を明示する義務があります。概算額でOKです。') + '</div>' +
     '<div class="grid2">' +
-      fieldT('f-deductTax','税金 概算額（円）','number',false,'例: 15000','','','所得税＋住民税の概算額。') +
-      fieldT('f-deductSocial','社会保険料 概算額（円）','number',false,'例: 30000','','','健康保険料＋厚生年金保険料の本人負担分の概算。') +
+      field('f-deductTax','税金 概算額（円）','number',false,'例: 15000') +
+      field('f-deductSocial','社会保険料 概算額（円）','number',false,'例: 30000') +
     '</div>' +
-    fieldT('f-deductEmployment','雇用保険料 概算額（円）','number',false,'例: 1000','','','給与×0.6%（労働者負担分）の概算額。') +
+    field('f-deductEmployment','雇用保険料 概算額（円）','number',false,'例: 1000') +
 
-    '<div class="sub-label">【居住費・食費・その他控除】</div>' +
-    fieldT('f-housingProvided','居住費徴収の有無','select',false,'',null,['','有','無'],'会社が社員寮等を提供し家賃を控除する場合は「有」を選択してください。') +
-    fieldT('f-deductHousing','居住費控除 月額（円）','number',false,'例: 13000','','','') +
-    fieldT('f-housingDetail','居住費 適正額の説明','textarea',false,'例: 月額13万円で借上の物件。居住人数10名のため1万3千円は適正。','','','近隣相場と比較して適正であることを説明してください。') +
-    '<button type="button" onclick="genHousingDetail()" style="font-size:11px;padding:6px 14px;background:white;border:1.5px solid #ea580c;color:#ea580c;border-radius:6px;cursor:pointer;font-weight:700;margin-top:-8px;margin-bottom:12px;">📝 適正額説明文を自動生成</button>' +
-    fieldT('f-foodProvided','食費徴収の有無','select',false,'',null,['','有','無'],'社員食堂等の食事代を控除する場合は「有」を選択してください。') +
-    fieldT('f-deductFood','食費控除 月額（円）','number',false,'例: 10000','','','') +
-    fieldT('f-foodDetail','食費 適正額の説明・食事内容','textarea',false,'例: 社員食堂で昼食1食500円。月20日×500円=10,000円は適正。','','','') +
-    '<button type="button" onclick="genFoodDetail()" style="font-size:11px;padding:6px 14px;background:white;border:1.5px solid #ea580c;color:#ea580c;border-radius:6px;cursor:pointer;font-weight:700;margin-top:-8px;margin-bottom:12px;">📝 適正額説明文を自動生成</button>' +
+    '<div class="sub-label">【居住費】</div>' +
+    field('f-housingProvided','居住費徴収の有無','select',false,'',null,['','有','無']) +
+    field('f-deductHousing','居住費控除 月額（円）','number',false,'なければ 0') +
+    field('f-housingDetail','居住費 適正額の説明','textarea',false,'例: 月額13万円で借上の物件。居住人数10名のため1万3千円は適正。') +
+
+    '<div class="sub-label">【食費】</div>' +
+    field('f-foodProvided','食費徴収の有無','select',false,'',null,['','有','無']) +
+    field('f-deductFood','食費控除 月額（円）','number',false,'なければ 0') +
+    field('f-foodDetail','食費 適正額の説明・食事内容','textarea',false,'例: 社員食堂で昼食1食500円。月20日×500円=10,000円は適正。') +
+
+    '<div class="sub-label">【水道光熱費・その他控除】</div>' +
     '<div class="grid2">' +
-      fieldT('f-deductUtility','水道光熱費 月額（円）','number',false,'なければ 0','','','') +
-      fieldT('f-deductOther1Name','その他控除① 名目','text',false,'例: 通信費','','','') +
+      field('f-deductUtility','水道光熱費 月額（円）','number',false,'なければ 0') +
+      field('f-deductOther1Name','その他控除① 名目','text',false,'例: 〇〇費') +
     '</div>' +
-    '<div class="grid2">' +
-      fieldT('f-deductOther1Amount','その他控除① 金額（円）','number',false,'なければ 0','','','') +
-      fieldT('f-deductOther2Name','その他控除② 名目','text',false,'例: 制服費','','','') +
-    '</div>' +
-    fieldT('f-deductOther2Amount','その他控除② 金額（円）','number',false,'なければ 0','','','') +
+    field('f-deductOther1Amount','その他控除① 金額（円）','number',false,'なければ 0') +
 
     '<div class="sub-label">【社会保険・雇用保険】</div>' +
     '<div class="grid2">' +
-      fieldT('f-insKenpo','健康保険','select',false,'',null,['','加入','未加入（国民健康保険）'],'') +
-      fieldT('f-insPension','厚生年金','select',false,'',null,['','加入','未加入（国民年金）'],'') +
+      field('f-insKenpo','健康保険 加入','select',false,'',null,['','加入','未加入']) +
+      field('f-insPension','厚生年金 加入','select',false,'',null,['','加入','未加入']) +
     '</div>' +
     '<div class="grid2">' +
-      fieldT('f-insEmp','雇用保険','select',false,'',null,['','加入','未加入'],'') +
-      fieldT('f-insLabor','労災保険','select',false,'',null,['','加入','未加入'],'') +
+      field('f-insEmp','雇用保険 加入','select',false,'',null,['','加入','未加入']) +
+      field('f-insLabor','労災保険 加入','select',false,'',null,['','加入','未加入']) +
     '</div>' +
-    '<div class="grid2">' +
-      fieldT('f-insNationalHealth','国民健康保険','select',false,'',null,['','加入','非該当'],'健康保険が「未加入」の場合に記入してください。') +
-      fieldT('f-insNationalPension','国民年金','select',false,'',null,['','加入','非該当'],'厚生年金が「未加入」の場合に記入してください。') +
-    '</div>' +
-    fieldT('f-healthCheck','定期健康診断','select',false,'',null,['','年1回（毎年実施）','年2回（半年ごと）','その他'],'') +
-    fieldT('f-healthCheckDate','雇入れ時健康診断 実施予定時期','text',false,'例: 2025年9月','','','雇用開始後できるだけ早い時期に実施してください。') +
+    field('f-healthCheck','定期健康診断','select',false,'',null,['','年1回（毎年実施）','年2回（半年ごと）','その他']) +
 
-    '<div class="sub-label">【昇給・賞与・退職金・休業手当】</div>' +
+    '<div class="sub-label">【昇給・賞与・退職金】</div>' +
     '<div class="grid2">' +
-      fieldT('f-salaryRaise','昇給','select',false,'',null,['','有','無'],'') +
-      fieldT('f-salaryRaiseCond','昇給 条件・時期','text',false,'例: 毎年4月（査定による）','','','') +
+      field('f-salaryRaise','昇給','select',false,'',null,['','有','無']) +
+      field('f-salaryRaiseCond','昇給 条件・時期','text',false,'例: 毎年4月（査定による）') +
     '</div>' +
     '<div class="grid2">' +
-      fieldT('f-bonus','賞与','select',false,'',null,['','有','無'],'') +
-      fieldT('f-bonusCond','賞与 条件・時期','text',false,'例: 年2回（6月・12月）','','','') +
+      field('f-bonus','賞与','select',false,'',null,['','有','無']) +
+      field('f-bonusCond','賞与 条件・時期','text',false,'例: 年2回（6月・12月）') +
     '</div>' +
     '<div class="grid2">' +
-      fieldT('f-retirement','退職金','select',false,'',null,['','有','無'],'') +
-      fieldT('f-retirementDetail','退職金 制度内容','text',false,'例: 勤続3年以上','','','') +
-    '</div>' +
-    '<div class="grid2">' +
-      fieldT('f-severancePay','休業手当','select',false,'',null,['','有','無'],'会社都合で休業した場合に支払う手当。雇用条件書Ⅶ-11に記載します。') +
-      fieldT('f-severancePayRate','休業手当 率（%）','number',false,'例: 60','','','労働基準法上、平均賃金の60%以上が必要です。') +
+      field('f-retirement','退職金','select',false,'',null,['','有','無']) +
+      field('f-retirementDetail','退職金 制度内容','text',false,'例: 勤続3年以上') +
     '</div>' +
 
     '<div class="sub-label">【支払方法・締め日】</div>' +
-    fieldT('f-payMethod','支払方法','select',false,'',null,['','口座振込','現金','その他'],'') +
+    field('f-payMethod','支払方法','select',false,'',null,['','口座振込','現金','その他']) +
     buildPayDateFields() +
   '</div>' +
 
-  // 労働時間
-  '<div class="card" data-section="labor">' +
-    '<div class="section-title"><span class="section-step" style="background:#d97706;">3</span>⏰ 労働時間・休日・休暇</div>' +
+  '<div class="card"><div class="section-title">労働時間・休日</div>' +
+    '<div class="sub-label">【所定労働時間】</div>' +
+    '<div class="grid2">' +
+      field('f-startTime','始業時刻','time',false,'') +
+      field('f-endTime','終業時刻','time',false,'') +
+    '</div>' +
+    '<div class="grid2">' +
+      field('f-breakTime','休憩時間（分）','number',false,'例: 60') +
+      field('f-dailyHours','1日所定労働時間（時間）','number',false,'例: 8') +
+    '</div>' +
+    '<div class="grid2">' +
+      field('f-weeklyDays','週所定労働日数','number',false,'例: 5') +
+      field('f-weeklyH','週所定労働時間','number',false,'例: 40') +
+    '</div>' +
+    '<div class="grid2">' +
+      field('f-monthlyDays','月所定労働日数','number',false,'例: 21') +
+      field('f-monthlyH','月所定労働時間','number',false,'例: 170') +
+    '</div>' +
+    '<div class="grid2">' +
+      field('f-yearlyDays','年所定労働日数','number',false,'例: 261') +
+      field('f-yearlyH','年所定労働時間','number',false,'例: 2080') +
+    '</div>' +
+    field('f-overtimeFlg','所定労働時間外労働の有無','select',false,'',null,['','有','無']) +
+
+    '<div class="sub-label">【交代制（シフト制）】</div>' +
+    field('f-shiftFlg','交代制（シフト制）の採用','select',false,'',null,['','あり','なし']) +
+    field('f-shiftDetail','シフトパターン詳細','textarea',false,'例: 早番 7:00-16:00 / 遅番 13:00-22:00（週ごとに交代）') +
+
+    field('f-flexFlg','変形時間労働制の適用','select',false,'',null,['','適用あり','適用なし']) +
+    '<div id="flexTypeWrap" style="display:none;">' +
+      field('f-flexType','変形労働時間制の種類','select',false,'',null,['','1年単位','1ヶ月単位']) +
+    '</div>' +
+    field('f-flexDetail','変形労働時間制の詳細','text',false,'例: 1年単位の変形労働時間制（単位：月、最大週平均40時間）') +
 
     '<div class="sub-label">【休日】</div>' +
-    fieldT('f-holidayType','休日の種類','select',false,'',null,['','定例日','非定例日','定例日＋非定例日'],'定例日＝毎週特定の曜日が休み。非定例日＝シフトで変動する休日。') +
+    field('f-holidayType','休日の種類','select',false,'',null,['','定例日','非定例日','定例日＋非定例日']) +
     '<div id="holiday-fixed-area" style="display:none;">' +
     '<div class="grid2">' +
-      fieldT('f-fixedHolidayMon','月曜日','select',false,'',null,['','休み','出勤'],'') +
-      fieldT('f-fixedHolidayTue','火曜日','select',false,'',null,['','休み','出勤'],'') +
+      field('f-fixedHolidayMon','月曜日','select',false,'',null,['','休み','出勤']) +
+      field('f-fixedHolidayTue','火曜日','select',false,'',null,['','休み','出勤']) +
     '</div>' +
     '<div class="grid2">' +
-      fieldT('f-fixedHolidayWed','水曜日','select',false,'',null,['','休み','出勤'],'') +
-      fieldT('f-fixedHolidayThu','木曜日','select',false,'',null,['','休み','出勤'],'') +
+      field('f-fixedHolidayWed','水曜日','select',false,'',null,['','休み','出勤']) +
+      field('f-fixedHolidayThu','木曜日','select',false,'',null,['','休み','出勤']) +
     '</div>' +
     '<div class="grid2">' +
-      fieldT('f-fixedHolidayFri','金曜日','select',false,'',null,['','休み','出勤'],'') +
-      fieldT('f-fixedHolidaySat','土曜日','select',false,'',null,['','休み','出勤'],'') +
+      field('f-fixedHolidayFri','金曜日','select',false,'',null,['','休み','出勤']) +
+      field('f-fixedHolidaySat','土曜日','select',false,'',null,['','休み','出勤']) +
     '</div>' +
     '<div class="grid2">' +
-      fieldT('f-fixedHolidaySun','日曜日','select',false,'',null,['','休み','出勤'],'') +
-      fieldT('f-fixedHolidayHol','祝日','select',false,'',null,['','休み','出勤'],'') +
+      field('f-fixedHolidaySun','日曜日','select',false,'',null,['','休み','出勤']) +
+      field('f-fixedHolidayHol','祝日','select',false,'',null,['','休み','出勤']) +
     '</div>' +
     '</div>' +
     '<div id="holiday-nonreg-area" style="display:none;">' +
     '<div class="grid2">' +
-      fieldT('f-nonRegWeeklyDays','週あたりの休日日数','number',false,'例: 2','','','') +
-      fieldT('f-nonRegMonthlyDays','月あたりの休日日数','number',false,'例: 8','','','') +
+      field('f-nonRegWeeklyDays','週あたりの休日日数','number',false,'例: 2') +
+      field('f-nonRegMonthlyDays','月あたりの休日日数','number',false,'例: 8') +
     '</div>' +
     '</div>' +
-    fieldT('f-otherHoliday','その他休日（GW・夏季・年末年始等）','text',false,'例: GW5日・夏季3日・年末年始5日','','','') +
-    fieldT('f-annualHolidays','年間休日数','number',false,'例: 120','','','') +
-
-    '<div class="sub-label">【所定労働時間】</div>' +
-    '<div style="font-size:11px;color:#6b7280;background:#fffbeb;border-radius:8px;padding:8px 12px;margin-bottom:10px;border-left:3px solid #d97706;">年間休日数を入力してから⚡ボタンで自動計算できます</div>' +
-    '<div class="grid2">' +
-      fieldT('f-startTime','始業時刻','time',false,'','','','') +
-      fieldT('f-endTime','終業時刻','time',false,'','','','') +
-    '</div>' +
-    '<div class="grid2">' +
-      fieldT('f-breakTime','休憩時間（分）','number',false,'例: 60','','','8時間超の労働には60分以上の休憩が必要です。') +
-      fieldT('f-dailyHours','1日所定労働時間（時間）','number',false,'例: 8','','','') +
-    '</div>' +
-    '<div class="grid2">' +
-      fieldT('f-weeklyDays','週所定労働日数','number',false,'例: 5','','','') +
-      fieldT('f-weeklyH','週所定労働時間','number',false,'例: 40','','','法定労働時間は週40時間以内です。') +
-    '</div>' +
-    '<div class="grid2">' +
-      fieldT('f-monthlyDays','月所定労働日数','number',false,'例: 21','','','') +
-      fieldT('f-monthlyH','月所定労働時間','number',false,'例: 170','','','') +
-    '</div>' +
-    '<div class="grid2">' +
-      fieldT('f-yearlyDays','年所定労働日数','number',false,'例: 261','','','') +
-      fieldT('f-yearlyH','年所定労働時間','number',false,'例: 2080','','','') +
-    '</div>' +
-    fieldT('f-overtimeFlg','所定労働時間外労働の有無','select',false,'',null,['','有','無'],'残業が発生する場合は「有」を選択してください。') +
-    '<button type="button" onclick="calcAllHours()" style="width:100%;padding:10px;background:#d97706;color:white;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;margin-bottom:12px;">⚡ 労働時間を自動計算（始業・終業・休憩・年間休日から算出）</button>' +
-
-    '<div class="sub-label">【交代制・変形労働時間制】</div>' +
-    fieldT('f-shiftFlg','交代制（シフト制）の採用','select',false,'',null,['','あり','なし'],'') +
-    fieldT('f-shiftDetail','シフトパターン詳細','textarea',false,'例: 早番 7:00-16:00 / 遅番 13:00-22:00（週ごとに交代）','','','') +
-    fieldT('f-flexFlg','変形時間労働制の適用','select',false,'',null,['','適用あり','適用なし'],'') +
-    '<div id="flexTypeWrap" style="display:none;">' +
-      fieldT('f-flexType','変形労働時間制の種類','select',false,'',null,['','1年単位','1ヶ月単位'],'') +
-    '</div>' +
-    fieldT('f-flexDetail','変形労働時間制の詳細','text',false,'例: 1年単位の変形労働時間制（単位：月、最大週平均40時間）','','','') +
-    '<div class="sub-label">【休暇】</div>' +
-    '<div class="grid2">' +
-      fieldT('f-paidLeaveCount','年次有給休暇 付与日数（6か月後）','number',false,'例: 10','','','6か月継続勤務後の付与日数。法定では10日。') +
-      fieldT('f-paidLeaveEarly','6か月未満の有給休暇の有無','select',false,'',null,['','有','無'],'会社独自で付与している場合は「有」を選択。') +
-    '</div>' +
-    fieldT('f-otherLeavePaid','その他休暇（有給）内容','text',false,'例: 慶弔休暇3日、誕生日休暇1日','','','') +
-    fieldT('f-otherLeaveUnpaid','その他休暇（無給）内容','text',false,'例: 産前産後休業、育児休業','','','') +
-    fieldT('f-tempReturnLeave','一時帰国休暇の対応','select',false,'',null,['','年次有給休暇の範囲内で取得可','会社独自の帰国休暇制度あり'],'わかる場合のみ記載をお願いします。') +
+    field('f-otherHoliday','その他休日（非定例日等）','text',false,'例: GW・夏季・年末年始') +
+    field('f-annualHolidays','年間休日数','number',false,'例: 120') +
   '</div>' +
 
-  // 退職
-  '<div class="card" data-section="retire">' +
-    '<div class="section-title"><span class="section-step" style="background:#dc2626;">4</span>🚪 退職に関する事項</div>' +
-    '<div style="font-size:11px;color:#6b7280;background:#f9fafb;border-radius:8px;padding:10px;margin-bottom:12px;">雇用条件書Ⅷに記載します。</div>' +
+  '<div class="card"><div class="section-title">契約期間</div>' +
     '<div class="grid2">' +
-      fieldT('f-resignNoticeDays','自己都合退職 届出日数（何日前）','number',false,'例: 14','','','退職希望日の何日前に申し出る必要があるか。一般的には14〜30日前。') +
-      fieldT('f-resignNoticeTo','届出先','text',false,'例: 社長・工場長等','','','') +
+      field('f-contractStart','契約開始日','date',false,'') +
+      field('f-contractEnd','契約終了日','date',false,'') +
     '</div>' +
-    fieldT('f-returnFare','帰国旅費の負担','select',false,'',null,['','会社が負担する','本人が負担する（会社は支援する）'],'わかる場合のみ記載をお願いします。') +
+    field('f-contractRenewal','契約更新の有無','select',false,'',null,['','更新する場合があり得る','更新しない','自動更新']) +
   '</div>'
   );
 }
 
 function buildCompanyPage3() {
   return (
-  // 離職者
-  '<div class="card" data-section="resign">' +
-    '<div class="section-title"><span class="section-step" style="background:#64748b;">1</span>📊 離職者・行方不明者情報</div>' +
+  '<div class="card"><div class="section-title">離職者・行方不明者情報</div>' +
+    '<div style="font-size:11px;color:#2563eb;background:#eff6ff;border-radius:8px;padding:8px 10px;margin-bottom:10px;">※ あらかじめ「0」を入力しています。該当者がいない場合はそのまま、異なる場合のみ数字を変更してください。</div>' +
     '<div class="sub-label">【自己都合離職者（直近1年以内）】</div>' +
     '<div class="grid2">' +
-      fieldT('f-resignJp','日本人 人数','number',false,'例: 1','','','') +
-      fieldT('f-resignForeign','外国人 人数','number',false,'例: 0','','','') +
+      field('f-resignJp','日本人 人数','number',false,'例: 1') +
+      field('f-resignForeign','外国人 人数','number',false,'例: 0') +
     '</div>' +
     '<div class="sub-label">【会社都合離職者（直近1年以内）】</div>' +
     '<div class="grid2">' +
-      fieldT('f-dismissJp','日本人 人数','number',false,'例: 0','','','') +
-      fieldT('f-dismissForeign','外国人 人数','number',false,'例: 0','','','') +
+      field('f-dismissJp','日本人 人数','number',false,'例: 0') +
+      field('f-dismissForeign','外国人 人数','number',false,'例: 0') +
     '</div>' +
     '<div class="sub-label">【行方不明者数（特定技能）前1年間】</div>' +
-    fieldT('f-missing1y','行方不明者数','number',false,'0','','','過去受け入れ実施した特定技能外国人が行方不明になった人数。') +
+    field('f-missing1y','行方不明者数','number',false,'0') +
   '</div>' +
 
-  // 住居
-  '<div class="card" data-section="housing">' +
-    '<div class="section-title"><span class="section-step" style="background:#16a34a;">2</span>🏠 住居（支援計画書用）</div>' +
-    '<div style="font-size:11px;color:#6b7280;background:#f9fafb;border-radius:8px;padding:10px;margin-bottom:12px;">会社が外国人の住居を提供する場合に記入してください。本人が自分で探す場合は空欄でOKです。</div>' +
-    fieldT('f-housingOwnership','住居形態','select',false,'',null,['','自己所有（会社所有の社員寮等）','借上（会社が借り上げた物件）','提供なし（本人が自分で探す）'],'') +
-    fieldT('f-cohabitants','同居人数（外国人含む）','number',false,'例: 3','','','') +
-    fieldT('f-actualCostDesc','実費相当の説明','textarea',false,'例: 月額13万円で借上の物件。居住人数10名のため1人当たり1万3千円は適正。','','','') +
+  '<div class="card"><div class="section-title">住居（支援計画書用）</div>' +
+    '<div style="font-size:11px;color:#9ca3af;margin-bottom:10px;">支援計画書に記載する住居情報</div>' +
+    '<div style="font-size:11px;color:#2563eb;background:#eff6ff;border-radius:8px;padding:8px 10px;margin-bottom:10px;">※ あらかじめ「ー」を入力しています。該当がない場合はそのまま、異なる場合のみ変更してください。</div>' +
+    field('f-housingOwnership','住居形態（自己所有/借上）','select',false,'',null,['','自己所有','借上']) +
+    field('f-cohabitants','同居人数','text',false,'例: 3') +
+    field('f-actualCostDesc','実費相当の説明','textarea',false,'例: 月額13万円で借上の物件。居住人数10名のため1人当たり1万3千円は適正。') +
   '</div>' +
-  '<div style="margin-bottom:12px;"><button type="button" onclick="genActualCostDesc()" style="display:block;width:100%;padding:11px;background:white;border:2px solid #16a34a;color:#16a34a;border-radius:10px;font-size:13px;font-weight:800;cursor:pointer;">定型文を自動生成（実費相当の説明）</button></div>' +
-  '<div class="card" data-section="jpcomp">' +
-    '<div class="section-title"><span class="section-step" style="background:#b45309;">3</span>⚖️ 比較対象日本人</div>' +
-    '<div style="font-size:11px;color:#6b7280;background:#fffbeb;border-radius:8px;padding:10px;margin-bottom:12px;border-left:3px solid #f59e0b;">同等の業務に従事する日本人従業員と「同等以上の報酬」であることを証明するために必要な情報です。' + tip('tip_jpcomp','同等の業務に従事する日本人がいない場合は、類似職種の外部データ（厚労省の賃金構造基本統計調査等）を参照することもできます。') + '</div>' +
+
+  '<div class="card"><div class="section-title">比較対象日本人</div>' +
+    '<div style="font-size:11px;color:#9ca3af;margin-bottom:10px;">外国人と同等業務に従事する日本人の情報</div>' +
     '<div class="grid2">' +
-      fieldT('f-jpCompAge','年齢','number',false,'例: 35','','','') +
-      fieldT('f-jpCompGender','性別','select',false,'',null,['','男','女'],'') +
+      field('f-jpCompAge','年齢','number',false,'例: 35') +
+      field('f-jpCompGender','性別','select',false,'',null,['','男','女']) +
     '</div>' +
-    fieldT('f-jpCompExp','経験年数','text',false,'例: 5年','','','') +
-    fieldT('f-jpCompJobDesc','職務内容','text',false,'例: 食品製造ライン作業（盛付・包装）','','','外国人が従事する職務と同等の業務内容を記入してください。') +
-    fieldT('f-jpCompJobTitle','職務上の地位・役職名','text',false,'例: 製造スタッフ（一般）','','','') +
-    fieldT('f-jpCompSalary','月額報酬（基本給）（円）','number',false,'例: 210000','','','') +
+    field('f-jpCompExp','経験年数','text',false,'例: 5年') +
+    field('f-jpCompJobDesc','職務内容','text',false,'例: 食品製造ライン作業（盛付・包装）') +
+    field('f-jpCompSalary','月額報酬（円）','number',false,'例: 210000') +
     '<div class="grid2">' +
-      fieldT('f-jpCompAllow1Name','手当①名称','text',false,'例: 通勤手当','','','') +
-      fieldT('f-jpCompAllow1Amt','手当①金額（円）','number',false,'例: 10000','','','') +
+      field('f-jpCompAllow1Name','手当①名称','text',false,'例: 通勤手当') +
+      field('f-jpCompAllow1Amt','手当①金額（円）','number',false,'例: 10000') +
     '</div>' +
     '<div class="grid2">' +
-      fieldT('f-jpCompAllow2Name','手当②名称','text',false,'例: 住宅手当','','','') +
-      fieldT('f-jpCompAllow2Amt','手当②金額（円）','number',false,'例: 20000','','','') +
+      field('f-jpCompAllow2Name','手当②名称','text',false,'例: 住宅手当') +
+      field('f-jpCompAllow2Amt','手当②金額（円）','number',false,'例: 20000') +
     '</div>' +
     '<div class="grid2">' +
-      fieldT('f-jpCompAllow3Name','手当③名称','text',false,'','','','') +
-      fieldT('f-jpCompAllow3Amt','手当③金額（円）','number',false,'','','','') +
+      field('f-jpCompAllow3Name','手当③名称','text',false,'') +
+      field('f-jpCompAllow3Amt','手当③金額（円）','number',false,'') +
     '</div>' +
-    fieldT('f-salaryRuleFlg','賃金規定の有無','select',false,'',null,['','有','無'],'') +
-    fieldT('f-jpCompSalaryRule','賃金規定に基づく同等報酬額（円）','number',false,'例: 220000','','','賃金規定がある場合、規定に基づいて算出した報酬額を記入してください。') +
-    fieldT('f-jpCompLicense','比較する日本人の保有資格（建設分野の場合は必ず記載）','textarea',false,'例: 一級技能士・基幹技能士など','','','建設分野の場合、同等技能の証明として保有資格の記載が必要です。他分野でも資格があれば記載してください。') +
-    fieldT('f-jpCompReason','同等以上の理由','textarea',false,'例: 同一ラインで同等業務に従事しており、経験年数・職務内容が同等であるため','','','') +
-    '<button type="button" onclick="genJpCompReason()" style="font-size:11px;padding:6px 14px;background:white;border:1.5px solid #b45309;color:#b45309;border-radius:6px;cursor:pointer;font-weight:700;margin-top:-8px;margin-bottom:12px;">📝 定型文を自動生成</button>' +
+    field('f-salaryRuleFlg','賃金規定の有無','select',false,'',null,['','有','無']) +
+
+    field('f-jpCompReason','同等以上の理由','textarea',false,'例: 同一ラインで同等業務に従事しており、経験年数・職務内容が同等であるため') +
+
+    '</div>' +
   '</div>'
   );
 }
+
+// JAIM専用ヒアリングフォーム（type=jaim）
+function buildJaimOnlyForm() {
+  return (
+  // JAIM カード①: 基本情報（企業規模・年会費）
+  '<div class="card"><div class="section-title">📦 JAIM：基本情報</div>' +
+    '<p style="font-size:13px;color:#6b7280;margin-bottom:14px;line-height:1.7;">企業規模カテゴリーをお選びください。<br>基本は<strong>大企業カテゴリー</strong>となり、下記いずれかを証明できる場合のみ<strong>中小企業カテゴリー</strong>を選択できます。</p>' +
+
+    '<div class="field">' +
+    '<label>企業規模カテゴリー<span class="req">*</span></label>' +
+    '<select id="f-jaimCompanySize" onchange="updateJaimFee()">' +
+      '<option value="">---</option>' +
+      '<option value="大企業">大企業</option>' +
+      '<option value="中小企業">中小企業</option>' +
+    '</select>' +
+    '</div>' +
+
+    // 中小企業の要件・必要書類の案内（中小選択時のみ表示）
+    '<div id="jaimSmeNote" style="display:none;background:#fffbeb;border:1.5px solid #fcd34d;border-radius:10px;padding:14px 16px;margin-bottom:12px;font-size:13px;line-height:1.8;color:#92400e;">' +
+      '<div style="font-weight:800;margin-bottom:6px;">中小企業カテゴリーの要件</div>' +
+      '下記の<strong>いずれか</strong>を満たす場合に中小企業として申請できます：' +
+      '<ol style="padding-left:1.4em;margin:8px 0;">' +
+        '<li>資本金の額又は出資の総額が <strong>3億円以下</strong> の会社</li>' +
+        '<li>常時使用する従業員の数が <strong>300人以下</strong> の会社及び個人</li>' +
+      '</ol>' +
+      '<div style="margin-top:8px;padding-top:8px;border-top:1px dashed #fcd34d;">📄 中小企業として申請する場合は、上記を証明するため <strong>履歴事項全部証明書</strong> のご提出が必要です。別途ご案内するアップロード専用URLからご提出ください。</div>' +
+    '</div>' +
+
+  '</div>' +
+
+  // JAIM カード②: 質問票
+  '<div class="card"><div class="section-title">📦 JAIM（製造業協議会）加入質問票</div>' +
+    '<p style="font-size:13px;color:#6b7280;margin-bottom:16px;">JAIM（一般社団法人 工業製品製造技能人材機構）への協議会加入申請に必要な情報をお聞かせください。</p>' +
+
+    '<div class="field">' +
+    '<label>日本標準産業分類番号（4桁）<span class="req">*</span></label>' +
+    '<div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:12px 14px;margin-bottom:10px;font-size:13px;line-height:1.7;">' +
+    '下記URLから業種の分類番号をご確認ください（JAIM対象業種かどうかも確認できます）：<br>' +
+    '<a href="https://www.jaim-skill.or.jp/entry/classification/?stt_lang=ja" target="_blank" rel="noopener" style="color:#1d4ed8;font-weight:700;word-break:break-all;">https://www.jaim-skill.or.jp/entry/classification/?stt_lang=ja</a>' +
+    '<div style="margin-top:6px;color:#1e3a8a;font-weight:700;">※ 4桁の数字でご入力ください。</div>' +
+    '</div>' +
+    '<input type="text" id="f-jaimIndustryCode" inputmode="numeric" maxlength="4" placeholder="例: 3121">' +
+    '</div>' +
+
+    '<div class="field">' +
+    '<label>JAIMへの該当性確認<span class="req">*</span></label>' +
+    '<div style="background:#f0fdf4;border:1.5px solid #86efac;border-radius:10px;padding:14px 16px;margin-top:4px;">' +
+    '<label style="display:flex;align-items:flex-start;gap:12px;cursor:pointer;font-size:14px;line-height:1.6;font-weight:normal;">' +
+    '<input type="checkbox" id="f-jaimAgreement" style="width:20px;height:20px;margin-top:2px;flex-shrink:0;accent-color:#059669;cursor:pointer;">' +
+    '<span style="color:#065f46;">上記の産業分類表を確認し、自社の製造品・業種がJAIMの対象に<strong>該当すること</strong>を確認しました。</span>' +
+    '</label>' +
+    '</div>' +
+    '</div>' +
+
+    field('f-jaimProductName','製造品の説明','textarea',false,'例: 自動車用プレス部品（ブラケット、ステー等）') +
+    field('f-jaimProductPurpose','製造品の用途・機能','textarea',false,'例: 自動車の車体フレームを固定・補強するための部品') +
+    field('f-jaimFinalProductName','完成品の名称','text',false,'例: 乗用自動車') +
+    field('f-jaimFinalProductDesc','完成品の説明','textarea',false,'例: 一般消費者向け5ドアセダン型乗用自動車') +
+    field('f-jaimEquipmentPurpose','設備の用途・機能','textarea',false,'例: 金属板をプレス加工し、所定の形状に成形する') +
+    field('f-jaimEquipmentEffect','設備の製造品への効果','textarea',false,'例: 高精度・高速のプレス成形により、寸法精度の高い部品を安定して製造できる') +
+  '</div>' +
+
+  // JAIM カード③: 受け入れ事業所
+  '<div class="card"><div class="section-title">📦 JAIM：受け入れ事業所（本社以外の場合）</div>' +
+    '<p style="font-size:13px;color:#6b7280;margin-bottom:16px;">外国人材が本社以外の事業所で働く場合はご記入ください。</p>' +
+    field('f-jaimBranchOfficeFlag','本社以外の事業所に受け入れる','select',false,'',null,['','あり','なし']) +
+    field('f-jaimBranchOfficeName','事業所名称','text',false,'例: ○○工場') +
+    field('f-jaimBranchOfficeZip','郵便番号','text',false,'例: 123-4567') +
+    field('f-jaimBranchOfficeAddress','住所','textarea',false,'例: 愛知県名古屋市○○区○○町1-2-3') +
+    field('f-jaimBranchOfficeContact','担当者名','text',false,'例: 山田 太郎') +
+    field('f-jaimBranchOfficeTel','電話番号','tel',false,'例: 052-000-0000') +
+  '</div>' +
+
+  // JAIM カード④: 書類案内
+  '<div class="card"><div class="section-title">📦 JAIM：証明書類のご準備について</div>' +
+    '<p style="font-size:14px;color:#374151;line-height:1.7;margin-bottom:12px;">JAIMへの加入申請には、以下の書類画像のご提出が必要です。<br>別途ご案内するアップロード専用URLからご提出ください。</p>' +
+    '<ol style="font-size:13px;color:#374151;line-height:2;padding-left:1.5em;margin:0;">' +
+    '<li>製造部品の写真（複数枚・接写・明瞭なもの）</li>' +
+    '<li>製造部品が利用される装置や機械の写真または図</li>' +
+    '<li>製造品を生産するために用いた設備の写真</li>' +
+    '<li>製造部品の直近1年以内の納品書（出荷額記載のもの）</li>' +
+    '</ol>' +
+  '</div>'
+  );
+}
+
+// 企業規模の選択に応じて中小要件の案内を更新（年会費表示は廃止）
+function updateJaimFee() {
+  var size = val('f-jaimCompanySize');
+  var note = document.getElementById('jaimSmeNote');
+  if (note) note.style.display = (size === '中小企業') ? 'block' : 'none';
+}
+
+// 保存用：年会費は廃止のため常に空文字
+function _jaimFeeValue() {
+  return '';
+}
+
 function _dayOptions(includeEnd) {
   var opts = includeEnd ? '<option value="末">末</option>' : '';
   for (var i = 1; i <= 31; i++) {
@@ -2498,16 +2018,6 @@ function toggleNationalityOther(val) {
   if (val !== 'その他') el.value = '';
 }
 
-function toggleTempReturnDate(val) {
-  var el = document.getElementById('tempReturnDateWrap');
-  if (el) el.style.display = val === '予定あり' ? 'block' : 'none';
-  if (val !== '予定あり') {
-    var di = document.getElementById('f-tempReturn'); if(di) di.value='';
-    var di2 = document.getElementById('f-tempReturnIn'); if(di2){ di2.value=''; di2.disabled=false; di2.style.background=''; }
-    var tbd = document.getElementById('f-tempReturnInTBD'); if(tbd) tbd.checked=false;
-  }
-}
-
 function toggleTempReturnInTBD(checked){
   var di = document.getElementById('f-tempReturnIn');
   if(di){
@@ -2516,13 +2026,14 @@ function toggleTempReturnInTBD(checked){
   }
 }
 
-function toggleHolidayType(val) {
-  var fixedArea = document.getElementById('holiday-fixed-area');
-  var nonRegArea = document.getElementById('holiday-nonreg-area');
-  var showFixed = (val === '定例日' || val === '定例日＋非定例日');
-  var showNonReg = (val === '非定例日' || val === '定例日＋非定例日');
-  if (fixedArea) fixedArea.style.display = showFixed ? 'block' : 'none';
-  if (nonRegArea) nonRegArea.style.display = showNonReg ? 'block' : 'none';
+function toggleTempReturnDate(val) {
+  var el = document.getElementById('tempReturnDateWrap');
+  if (el) el.style.display = val === '予定あり' ? 'block' : 'none';
+  if (val !== '予定あり') {
+    var di = document.getElementById('f-tempReturn'); if(di) di.value='';
+    var di2 = document.getElementById('f-tempReturnIn'); if(di2){ di2.value=''; di2.disabled=false; di2.style.background=''; }
+    var tbd = document.getElementById('f-tempReturnInTBD'); if(tbd) tbd.checked=false;
+  }
 }
 
 function toggleResidenceCardInput(val) {
@@ -2546,429 +2057,13 @@ function toggleFlexType(val) {
   if (el) el.style.display = val === '適用あり' ? 'block' : 'none';
 }
 
-// ===== 企業フォーム 自動化関数群 =====
-
-// --- コピーボタン ---
-function copyCoToOffice() {
-  var map = {
-    'f-officeName': document.getElementById('f-coName') ? document.getElementById('f-coName').value : '',
-    'f-officeAddress': [
-      document.getElementById('f-coPref') ? document.getElementById('f-coPref').value : '',
-      document.getElementById('f-coCity') ? document.getElementById('f-coCity').value : '',
-      document.getElementById('f-coAddress') ? document.getElementById('f-coAddress').value : ''
-    ].join(''),
-    'f-officeTel': document.getElementById('f-coTel') ? document.getElementById('f-coTel').value : ''
-  };
-  Object.keys(map).forEach(function(id) {
-    var el = document.getElementById(id);
-    if (el && map[id]) { el.value = map[id]; el.dispatchEvent(new Event('input')); }
-  });
-}
-function copyCoTelToConsult() {
-  var src = document.getElementById('f-coTel');
-  var dst = document.getElementById('f-consultTel');
-  if (src && dst) { dst.value = src.value; dst.dispatchEvent(new Event('input')); }
-}
-
-// --- 郵便番号→住所 ---
-function zipToAddress() {
-  var zip = (document.getElementById('f-coZip') || {}).value || '';
-  zip = zip.replace(/[^0-9]/g, '');
-  if (zip.length !== 7) return;
-  fetch('https://zipcloud.ibsnet.co.jp/api/search?zipcode=' + zip)
-    .then(function(r){ return r.json(); })
-    .then(function(d){
-      if (!d.results) return;
-      var r = d.results[0];
-      var pref = document.getElementById('f-coPref');
-      var city = document.getElementById('f-coCity');
-      var addr = document.getElementById('f-coAddress');
-      if (pref) { pref.value = r.address1; pref.dispatchEvent(new Event('input')); }
-      if (city) { city.value = r.address2 + r.address3; city.dispatchEvent(new Event('input')); }
-      if (addr && !addr.value) addr.focus();
-    }).catch(function(){});
-}
-
-// --- 労働時間 自動計算 ---
-function calcDailyHours() {
-  var st = document.getElementById('f-startTime');
-  var et = document.getElementById('f-endTime');
-  var br = document.getElementById('f-breakTime');
-  var dh = document.getElementById('f-dailyHours');
-  if (!st || !et || !br || !dh) return;
-  var sv = st.value, ev = et.value;
-  if (!sv || !ev) return;
-  var sm = parseInt(sv.split(':')[0])*60 + parseInt(sv.split(':')[1]);
-  var em = parseInt(ev.split(':')[0])*60 + parseInt(ev.split(':')[1]);
-  var brk = parseFloat(br.value) || 0;
-  var total = (em - sm - brk) / 60;
-  if (total > 0) { dh.value = Math.round(total * 100) / 100; dh.dispatchEvent(new Event('input')); calcAllHours(); }
-}
-function calcAllHours() {
-  var dh = parseFloat((document.getElementById('f-dailyHours')||{}).value) || 0;
-  var hol = parseFloat((document.getElementById('f-annualHolidays')||{}).value) || 0;
-  var yearlyDays = 365 - hol;
-  var yearlyH = Math.round(yearlyDays * dh * 10) / 10;
-  var weeklyH = Math.round(yearlyH / 52.14 * 10) / 10;
-  var monthlyH = Math.round(yearlyH / 12 * 10) / 10;
-  var monthlyDays = Math.round(yearlyDays / 12 * 10) / 10;
-  var set = function(id, val) {
-    var el = document.getElementById(id);
-    if (el && val > 0) { el.value = val; el.dispatchEvent(new Event('input')); }
-  };
-  set('f-yearlyDays', yearlyDays);
-  set('f-yearlyH', yearlyH);
-  set('f-weeklyH', weeklyH);
-  set('f-monthlyH', monthlyH);
-  set('f-monthlyDays', monthlyDays);
-}
-
-// --- 月額合計 自動計算 ---
-function calcTotalMonthly() {
-  var base = parseFloat((document.getElementById('f-salaryMonthly')||{}).value) || 0;
-  var fixed = parseFloat((document.getElementById('f-fixedOTAmount')||{}).value) || 0;
-  var allow = 0;
-  for (var i = 1; i <= 4; i++) {
-    allow += parseFloat((document.getElementById('f-allowance'+i+'Amount')||{}).value) || 0;
-  }
-  var total = base + fixed + allow;
-  var el = document.getElementById('f-totalMonthly');
-  if (el && total > 0) { el.value = total; el.dispatchEvent(new Event('input')); }
-}
-
-// --- 年間休日数 自動計算補助 ---
-function calcAnnualHolidays() {
-  var days = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun','Hol'];
-  var weeklyOff = 0;
-  days.forEach(function(d) {
-    var el = document.getElementById('f-fixedHoliday'+d);
-    if (el && el.value === '休み') weeklyOff++;
-  });
-  var weekly = parseInt((document.getElementById('f-nonRegWeeklyDays')||{}).value) || weeklyOff;
-  var other = 15; // GW+夏季+年末年始の概算
-  var total = Math.round(weekly * 52) + other;
-  var el = document.getElementById('f-annualHolidays');
-  if (el) { el.value = total; el.dispatchEvent(new Event('input')); calcAllHours(); }
-}
-
-// --- 契約終了日 自動セット ---
-function setContractEnd(years) {
-  var start = document.getElementById('f-contractStart');
-  var end = document.getElementById('f-contractEnd');
-  if (!start || !start.value || !end) return;
-  var d = new Date(start.value);
-  d.setFullYear(d.getFullYear() + years);
-  d.setDate(d.getDate() - 1);
-  end.value = d.toISOString().split('T')[0];
-  end.dispatchEvent(new Event('input'));
-}
-
-// --- show/hide 系 ---
-function toggleHousingDetail(val) {
-  var els = ['f-deductHousing','f-housingDetail'];
-  var show = val === '有';
-  els.forEach(function(id) {
-    var el = document.getElementById(id);
-    if (el && el.closest('.field')) el.closest('.field').style.display = show ? 'block' : 'none';
-  });
-}
-function toggleFoodDetail(val) {
-  var els = ['f-deductFood','f-foodDetail'];
-  var show = val === '有';
-  els.forEach(function(id) {
-    var el = document.getElementById(id);
-    if (el && el.closest('.field')) el.closest('.field').style.display = show ? 'block' : 'none';
-  });
-}
-function toggleShiftDetail(val) {
-  var el = document.getElementById('f-shiftDetail');
-  if (el && el.closest('.field')) el.closest('.field').style.display = val === 'あり' ? 'block' : 'none';
-}
-function toggleSalaryRaiseCond(val) {
-  var el = document.getElementById('f-salaryRaiseCond');
-  if (el && el.closest('.field')) el.closest('.field').style.display = val === '有' ? 'block' : 'none';
-}
-function toggleBonusCond(val) {
-  var el = document.getElementById('f-bonusCond');
-  if (el && el.closest('.field')) el.closest('.field').style.display = val === '有' ? 'block' : 'none';
-}
-function toggleRetirementDetail(val) {
-  var el = document.getElementById('f-retirementDetail');
-  if (el && el.closest('.field')) el.closest('.field').style.display = val === '有' ? 'block' : 'none';
-}
-function toggleSeveranceRate(val) {
-  var el = document.getElementById('f-severancePayRate');
-  if (el && el.closest('.field')) el.closest('.field').style.display = val === '有' ? 'block' : 'none';
-}
-function toggleNationalHealthIns(val) {
-  var el = document.getElementById('f-insNationalHealth');
-  if (el && el.closest('.field')) el.closest('.field').style.display = val.indexOf('未加入') >= 0 ? 'block' : 'none';
-}
-function toggleNationalPensionIns(val) {
-  var el = document.getElementById('f-insNationalPension');
-  if (el && el.closest('.field')) el.closest('.field').style.display = val.indexOf('未加入') >= 0 ? 'block' : 'none';
-}
-function toggleRenewalLimitMemo(val) {
-  var el = document.getElementById('renewalLimitMemoWrap');
-  if (el) el.style.display = val && val !== 'なし' ? 'block' : 'none';
-}
-function toggleHousingOwnership(val) {
-  var show = val && val !== '提供なし（本人が自分で探す）';
-  // f-cohabitantsはfieldで制御
-  var co = document.getElementById('f-cohabitants');
-  if (co && co.closest('.field')) co.closest('.field').style.display = show ? 'block' : 'none';
-  // wrap-actualCostDesc（ボタン含む）を制御
-  var wrap = document.getElementById('wrap-actualCostDesc');
-  if (wrap) wrap.style.display = show ? 'block' : 'none';
-}
-
-// --- 定型文挿入 ---
-function insertDismissalText() {
-  var el = document.getElementById('f-dismissalReason');
-  if (!el) return;
-  el.value = 'やむを得ない事由がある場合に限り、少なくとも30日前に予告をするか、又は30日分以上の平均賃金を支払って解雇する。特定技能外国人の責めに帰すべき事由に基づいて解雇する場合には、所轄労働基準監督署長の認定を受けることにより予告も平均賃金の支払も行わず即時解雇されることもあり得る。';
-  el.dispatchEvent(new Event('input'));
-}
-function genActualCostDesc() {
-  var ownership = (document.getElementById('f-housingOwnership')||{}).value || '';
-  var num = (document.getElementById('f-cohabitants')||{}).value || '○';
-  var deduct = (document.getElementById('f-deductHousing')||{}).value || '○○';
-  var el = document.getElementById('f-actualCostDesc');
-  if (!el) return;
-  var total = (parseInt(deduct)||0) * (parseInt(num)||0);
-  var totalStr = total > 0 ? total.toLocaleString() : '○○';
-  var ownershipStr = ownership.indexOf('自己所有') >= 0 ? '自社所有の社員寮' : '借上の物件';
-  el.value = '月額' + totalStr + '円で' + ownershipStr + '。居住人数' + num + '名のため1人当たり' + parseInt(deduct).toLocaleString() + '円は近隣相場と比較して適正額である。';
-  el.dispatchEvent(new Event('input'));
-}
-
-function genHousingDetail() {
-  var amt = (document.getElementById('f-deductHousing')||{}).value || '○○';
-  var num = (document.getElementById('f-cohabitants')||{}).value || '○';
-  var rent = (document.getElementById('f-deductHousing')||{}).value;
-  // 総家賃は控除額×人数を推定
-  var total = rent && num ? parseInt(rent) * parseInt(num) : null;
-  var el = document.getElementById('f-housingDetail');
-  if (!el) return;
-  var text = total
-    ? '月額' + total.toLocaleString() + '円で借上の物件。居住人数' + num + '名のため1人あたり' + parseInt(amt).toLocaleString() + '円は近隣相場と比較して適正額である。'
-    : '月額○○円で借上の物件。居住人数○名のため1人あたり' + amt + '円は近隣相場と比較して適正額である。';
-  el.value = text;
-  el.dispatchEvent(new Event('input'));
-}
-function genFoodDetail() {
-  var amt = (document.getElementById('f-deductFood')||{}).value || '○○';
-  var el = document.getElementById('f-foodDetail');
-  if (!el) return;
-  el.value = '社員食堂（または弁当支給）により食費として月額' + parseInt(amt).toLocaleString() + '円を控除する。実費相当額であり適正額である。';
-  el.dispatchEvent(new Event('input'));
-}
-function genJpCompReason() {
-  var job = (document.getElementById('f-jpCompJobDesc')||{}).value || '同等の業務';
-  var exp = (document.getElementById('f-jpCompExp')||{}).value || '同等';
-  var el = document.getElementById('f-jpCompReason');
-  if (!el) return;
-  el.value = '比較対象の日本人は、特定技能外国人と同一の就業場所において' + job + 'に従事しており、経験年数（' + exp + '）・職務内容・業務範囲が同等である。両者の報酬を比較した結果、特定技能外国人の報酬は同等以上であることを確認した。';
-  el.dispatchEvent(new Event('input'));
-}
-
-// ===== ひらがな→ヘボン式ローマ字変換 =====
-var HEPBURN = {
-  'あ':'A','い':'I','う':'U','え':'E','お':'O',
-  'か':'KA','き':'KI','く':'KU','け':'KE','こ':'KO',
-  'さ':'SA','し':'SHI','す':'SU','せ':'SE','そ':'SO',
-  'た':'TA','ち':'CHI','つ':'TSU','て':'TE','と':'TO',
-  'な':'NA','に':'NI','ぬ':'NU','ね':'NE','の':'NO',
-  'は':'HA','ひ':'HI','ふ':'FU','へ':'HE','ほ':'HO',
-  'ま':'MA','み':'MI','む':'MU','め':'ME','も':'MO',
-  'や':'YA','ゆ':'YU','よ':'YO',
-  'ら':'RA','り':'RI','る':'RU','れ':'RE','ろ':'RO',
-  'わ':'WA','を':'WO','ん':'N',
-  'が':'GA','ぎ':'GI','ぐ':'GU','げ':'GE','ご':'GO',
-  'ざ':'ZA','じ':'JI','ず':'ZU','ぜ':'ZE','ぞ':'ZO',
-  'だ':'DA','ぢ':'JI','づ':'ZU','で':'DE','ど':'DO',
-  'ば':'BA','び':'BI','ぶ':'BU','べ':'BE','ぼ':'BO',
-  'ぱ':'PA','ぴ':'PI','ぷ':'PU','ぺ':'PE','ぽ':'PO',
-  'きゃ':'KYA','きゅ':'KYU','きょ':'KYO',
-  'しゃ':'SHA','しゅ':'SHU','しょ':'SHO',
-  'ちゃ':'CHA','ちゅ':'CHU','ちょ':'CHO',
-  'にゃ':'NYA','にゅ':'NYU','にょ':'NYO',
-  'ひゃ':'HYA','ひゅ':'HYU','ひょ':'HYO',
-  'みゃ':'MYA','みゅ':'MYU','みょ':'MYO',
-  'りゃ':'RYA','りゅ':'RYU','りょ':'RYO',
-  'ぎゃ':'GYA','ぎゅ':'GYU','ぎょ':'GYO',
-  'じゃ':'JA','じゅ':'JU','じょ':'JO',
-  'びゃ':'BYA','びゅ':'BYU','びょ':'BYO',
-  'ぴゃ':'PYA','ぴゅ':'PYU','ぴょ':'PYO',
-  'っ':'', // 促音は次の子音を重ねる（簡易処理）
-  'ー':'-','　':' ',' ':' ',
-};
-function toHepburn(kana) {
-  if (!kana) return '';
-  // カタカナ→ひらがな変換
-  kana = kana.replace(/[\u30A1-\u30F6]/g, function(c){ return String.fromCharCode(c.charCodeAt(0)-0x60); });
-  var result = '';
-  var i = 0;
-  while (i < kana.length) {
-    // 2文字組み合わせ優先
-    var two = kana.slice(i, i+2);
-    if (HEPBURN[two]) { result += HEPBURN[two]; i += 2; continue; }
-    var one = kana[i];
-    if (HEPBURN[one] !== undefined) { result += HEPBURN[one]; }
-    else { result += one; } // 漢字等はそのまま
-    i++;
-  }
-  // 姓名の間のスペースで大文字化
-  return result.split(' ').map(function(w){ return w ? w[0].toUpperCase() + w.slice(1).toLowerCase() : ''; }).join(' ');
-}
-
-// ===== 役職→英語対応表 =====
-var TITLE_EN = {
-  '代表取締役':'CEO','代表取締役社長':'CEO','社長':'CEO',
-  '取締役':'Director','取締役副社長':'Vice President',
-  '専務取締役':'Executive Director','常務取締役':'Managing Director',
-  '会長':'Chairman','副会長':'Vice Chairman',
-  '専務':'Executive Managing Director','常務':'Managing Director',
-  '副社長':'Vice President','執行役員':'Executive Officer',
-  '人事部長':'HR Manager','人事部':'HR Department',
-  '総務部長':'General Affairs Manager','総務部':'General Affairs',
-  '経理部長':'Accounting Manager','営業部長':'Sales Manager',
-  '工場長':'Plant Manager','所長':'Director','支店長':'Branch Manager',
-  '部長':'General Manager','課長':'Section Manager','係長':'Supervisor',
-  '主任':'Chief','担当者':'Staff','担当':'Staff',
-  '理事長':'President','理事':'Director','事務局長':'Secretary General',
-  '施設長':'Facility Director','センター長':'Center Director',
-};
-function toTitleEn(title) {
-  if (!title) return '';
-  // 完全一致優先、次に部分一致
-  if (TITLE_EN[title]) return TITLE_EN[title];
-  for (var key in TITLE_EN) {
-    if (title.indexOf(key) >= 0) return TITLE_EN[key];
-  }
-  return '';
-}
-
-// ===== 氏名・役職の自動変換を登録 =====
-function _initNameAutoFill() {
-  var pairs = [
-    // [ひらがな入力元, 英語出力先, 種別]
-    ['f-coRepName',    'f-coRepNameEn',    'name'],
-    ['f-coRepTitle',   'f-coRepTitleEn',   'title'],
-    ['f-coAuthorName', 'f-coAuthorNameEn', 'name'],
-    ['f-consultName',  'f-consultNameEn',  'name'],
-  ];
-  pairs.forEach(function(pair) {
-    var src = document.getElementById(pair[0]);
-    var dst = document.getElementById(pair[1]);
-    if (!src || !dst) return;
-    src.addEventListener('input', function() {
-      if (dst.dataset.manualEdit) return; // 手動入力済みは上書きしない
-      var converted = pair[2] === 'name' ? toHepburn(src.value).toUpperCase() : toTitleEn(src.value);
-      if (converted) { dst.value = converted; dst.dispatchEvent(new Event('input')); }
-    });
-    // 英語欄を手動編集したらフラグを立てる
-    dst.addEventListener('input', function() { dst.dataset.manualEdit = '1'; });
-    // 英語欄を空にしたらフラグをリセット
-    dst.addEventListener('change', function() { if (!dst.value) delete dst.dataset.manualEdit; });
-  });
-}
-
-// 現在表示中のページを自動判定してリセット
-var _currentCoPage = 1;
-function resetCurrentPageAuto() {
-  resetCurrentPage(_currentCoPage);
-}
-// ページ単位リセット
-function resetCurrentPage(page) {
-  var pageNames = {1:'企業情報', 2:'雇用条件', 3:'その他情報'};
-  if (!confirm('【' + (pageNames[page]||'このページ') + '】の入力内容をすべてリセットします。よろしいですか？')) return;
-  var pageEl = document.getElementById('co-page' + page);
-  if (!pageEl) return;
-  pageEl.querySelectorAll('input, select, textarea').forEach(function(el) {
-    if (el.type === 'checkbox' || el.type === 'radio') { el.checked = false; }
-    else { el.value = ''; }
-    el.classList.remove('filled');
-    delete el.dataset.manualEdit;
-    el.dispatchEvent(new Event('change'));
-  });
-  window.scrollTo({top: 0, behavior: 'smooth'});
-}
-
-// 特定技能 分野→区分マッピング
-var BUNYA_KUBUN = {
-  '介護': ['介護'],
-  'ビルクリーニング': ['ビルクリーニング'],
-  '素形材・産業機械・電気電子情報関連製造業': ['機械金属加工','電気電子機器組立て','金属表面処理'],
-  '建設': ['土木','建築','ライフライン・設備'],
-  '造船・舶用工業': ['溶接','塗装','鉄工','仕上げ','機械加工','電気機器組み立て'],
-  '自動車整備': ['自動車整備'],
-  '航空': ['空港グランドハンドリング','航空機整備'],
-  '宿泊': ['宿泊'],
-  '農業': ['耕種農業全般','畜産農業全般'],
-  '漁業': ['漁業（底引き網・刺し網・まき網・ひき縄釣り・その他釣り・養殖除く）','養殖業'],
-  '飲食料品製造業': ['飲食料品製造業全般'],
-  '外食業': ['外食業全般'],
-  '林業': ['林業全般'],
-  '木材産業': ['木材産業全般'],
-  '鉄道': ['軌道整備','電気設備整備','車両整備','運輸係員'],
-  '自動車運送業': ['トラック','バス','タクシー'],
-};
-function onBunyaChange(bunya) {
-  var kubunSel = document.getElementById('f-jobKubun');
-  var hidden = document.getElementById('f-jobCategory');
-  if (!kubunSel) return;
-  kubunSel.innerHTML = '<option value="">選択してください</option>';
-  var list = BUNYA_KUBUN[bunya] || [];
-  list.forEach(function(k) {
-    var opt = document.createElement('option');
-    opt.value = k; opt.textContent = k;
-    kubunSel.appendChild(opt);
-  });
-  kubunSel.onchange = function() {
-    if (hidden) { hidden.value = bunya + ' / ' + kubunSel.value; hidden.dispatchEvent(new Event('input')); }
-    if (kubunSel.value) kubunSel.classList.add('filled'); else kubunSel.classList.remove('filled');
-  };
-  if (hidden) hidden.value = bunya;
-  var bunyaSel = document.getElementById('f-jobBunya');
-  if (bunyaSel) bunyaSel.classList.add('filled');
-}
-
-// --- 初期化：計算トリガーを登録 ---
-function _initAutoCalc() {
-  var triggers = {
-    'f-startTime':    calcDailyHours,
-    'f-endTime':      calcDailyHours,
-    'f-breakTime':    calcDailyHours,
-    'f-annualHolidays': calcAllHours,
-    'f-dailyHours':   calcAllHours,
-    'f-salaryMonthly':  calcTotalMonthly,
-    'f-fixedOTAmount':  calcTotalMonthly,
-    'f-coZip': function() { var z = (document.getElementById('f-coZip')||{}).value||''; if(z.replace(/[^0-9]/g,'').length===7) zipToAddress(); }
-  };
-  for(var i=1;i<=4;i++) triggers['f-allowance'+i+'Amount'] = calcTotalMonthly;
-  Object.keys(triggers).forEach(function(id) {
-    var el = document.getElementById(id);
-    if (el) { el.addEventListener('input', triggers[id]); el.addEventListener('change', triggers[id]); }
-  });
-  // 初期状態でhide系を適用
-  var hideInits = [
-    ['f-housingProvided', toggleHousingDetail],
-    ['f-foodProvided', toggleFoodDetail],
-    ['f-shiftFlg', toggleShiftDetail],
-    ['f-salaryRaise', toggleSalaryRaiseCond],
-    ['f-bonus', toggleBonusCond],
-    ['f-retirement', toggleRetirementDetail],
-    ['f-severancePay', toggleSeveranceRate],
-    ['f-insKenpo', toggleNationalHealthIns],
-    ['f-insPension', toggleNationalPensionIns],
-    ['f-housingOwnership', toggleHousingOwnership],
-    ['f-renewalLimit', toggleRenewalLimitMemo],
-  ];
-  hideInits.forEach(function(pair) {
-    var el = document.getElementById(pair[0]);
-    if (el) pair[1](el.value);
-  });
+function toggleHolidayType(val) {
+  var fixedArea = document.getElementById('holiday-fixed-area');
+  var nonRegArea = document.getElementById('holiday-nonreg-area');
+  var showFixed = (val === '定例日' || val === '定例日＋非定例日');
+  var showNonReg = (val === '非定例日' || val === '定例日＋非定例日');
+  if (fixedArea) fixedArea.style.display = showFixed ? 'block' : 'none';
+  if (nonRegArea) nonRegArea.style.display = showNonReg ? 'block' : 'none';
 }
 
 function toggleFamilyBlock(val) {
@@ -3053,14 +2148,6 @@ function val(id) { var el=document.getElementById(id); return el ? el.value.trim
 
 function collectData() {
   var t = type;
-  if (t === 'card_delivery') {
-    return {
-      recipientName: val('f-cdName'),
-      jpPostalCode: val('f-cdZip'),
-      jpAddress: val('f-cdAddress'),
-      phone: val('f-cdPhone')
-    };
-  }
   if (t === 'company') {
     var officers = {};
     document.querySelectorAll('.officer-row').forEach(function(row) {
@@ -3130,10 +2217,39 @@ function collectData() {
       jpCompAllow2Name: val('f-jpCompAllow2Name'), jpCompAllow2Amt: val('f-jpCompAllow2Amt'),
       jpCompAllow3Name: val('f-jpCompAllow3Name'), jpCompAllow3Amt: val('f-jpCompAllow3Amt'),
       salaryRuleFlg: val('f-salaryRuleFlg'),
-      jpCompReason: val('f-jpCompReason')
+      jpCompReason: val('f-jpCompReason'),
+      // ver.20260701: JAIM（製造業協議会）加入質問票
+      jaimIndustryCode: val('f-jaimIndustryCode'), jaimAgreement: (document.getElementById('f-jaimAgreement') && document.getElementById('f-jaimAgreement').checked) ? '確認済み' : '', jaimProductName: val('f-jaimProductName'), jaimProductPurpose: val('f-jaimProductPurpose'), jaimFinalProductName: val('f-jaimFinalProductName'), jaimFinalProductDesc: val('f-jaimFinalProductDesc'), jaimEquipmentPurpose: val('f-jaimEquipmentPurpose'), jaimEquipmentEffect: val('f-jaimEquipmentEffect'), jaimBranchOfficeFlag: val('f-jaimBranchOfficeFlag'), jaimBranchOfficeName: val('f-jaimBranchOfficeName'), jaimBranchOfficeZip: val('f-jaimBranchOfficeZip'), jaimBranchOfficeAddress: val('f-jaimBranchOfficeAddress'), jaimBranchOfficeContact: val('f-jaimBranchOfficeContact'), jaimBranchOfficeTel: val('f-jaimBranchOfficeTel'), jaimCompanySize: val('f-jaimCompanySize'), jaimMemberOrg: val('f-jaimMemberOrg'), jaimAnnualFee: _jaimFeeValue()
     };
     Object.assign(d, officers);
     return d;
+  }
+
+  // ver.20260701: type=jaim は申請人フォームがないのでJAIM項目だけ返す
+  if (t === 'jaim') {
+    return {
+      jaimIndustryCode: val('f-jaimIndustryCode'),
+      jaimAgreement: (document.getElementById('f-jaimAgreement') && document.getElementById('f-jaimAgreement').checked) ? '確認済み' : '',
+      jaimProductName: val('f-jaimProductName'),
+      jaimProductPurpose: val('f-jaimProductPurpose'),
+      jaimFinalProductName: val('f-jaimFinalProductName'),
+      jaimFinalProductDesc: val('f-jaimFinalProductDesc'),
+      jaimEquipmentPurpose: val('f-jaimEquipmentPurpose'),
+      jaimEquipmentEffect: val('f-jaimEquipmentEffect'),
+      jaimBranchOfficeFlag: val('f-jaimBranchOfficeFlag'),
+      jaimBranchOfficeName: val('f-jaimBranchOfficeName'),
+      jaimBranchOfficeZip: val('f-jaimBranchOfficeZip'),
+      jaimBranchOfficeAddress: val('f-jaimBranchOfficeAddress'),
+      jaimBranchOfficeContact: val('f-jaimBranchOfficeContact'),
+      jaimBranchOfficeTel: val('f-jaimBranchOfficeTel'),
+      jaimCompanySize: val('f-jaimCompanySize'),
+      jaimMemberOrg: val('f-jaimMemberOrg'),
+      jaimAnnualFee: _jaimFeeValue()
+    };
+  }
+
+  if (t === 'support_org') {
+    return _soFormCollect();
   }
 
   var d = {
@@ -3249,23 +2365,27 @@ function collectData() {
 }
 
 function validate() {
-  if (type === 'card_delivery') {
-    if (!val('f-cdName')) return 'お名前を入力してください。';
-    if (!val('f-cdZip')) return '郵便番号を入力してください。';
-    if (!val('f-cdAddress')) return 'ご住所を入力してください。';
-    return null;
-  }
   if (type === 'company') {
     if (!val('f-coName')) return '会社名は必須です。';
     return null;
+  }
+  if (type === 'jaim') {
+    var _jaimAgr = document.getElementById('f-jaimAgreement');
+    if (!_jaimAgr || !_jaimAgr.checked) return 'JAIMへの該当性確認にチェックしてください。';
+    if (!/^\d{4}$/.test(val('f-jaimIndustryCode'))) return '日本標準産業分類番号は4桁の数字で入力してください。';
+    if (!val('f-jaimCompanySize')) return '企業規模カテゴリーを選択してください。';
+    return null;
+  }
+  if (type === 'support_org') {
+    return _soFormValidate();
   }
   if (!val('f-name')) return '氏名（パスポート表記）は必須です。';
   if (!val('f-birth')) return '生年月日は必須です。';
   if (!val('f-nationality')) return '国籍は必須です。';
   if (!val('f-email')) return 'メールアドレスは必須です。';
   if (!val('f-married')) return '結婚しているかどうかを選択してください。';
-  if ((type==='tokutei_nintei'||type==='gijinkoku_nintei') && !val('f-entryCount')) return '来日回数を入力してください。';
-  if ((type==='tokutei_nintei'||type==='gijinkoku_nintei') && !val('f-coeCount')) return 'COE申請回数を入力してください。';
+  if (type==='tokutei_nintei' && !val('f-entryCount')) return '来日回数を入力してください。';
+  if (type==='tokutei_nintei' && !val('f-coeCount')) return 'COE申請回数を入力してください。';
 
   // 特定技能：在留カード・現住所・一時帰国の必須チェック
   if (isTokutei) {
@@ -3286,6 +2406,7 @@ function validate() {
 
   // 技人国：新3項目の必須チェック（技能水準・日本語能力チェックは行わない）
   if (isGijinkoku) {
+    if (!val('f-completionDate')) return '卒業年月日を入力してください。';
     if (!val('f-gijinkokuJpTest')) return '日本語能力（JLPT N2またはBJT 400点以上）の有無を選択してください。';
 
     var titleSt = val('f-gijinkokuTitleStatus');
@@ -3330,7 +2451,7 @@ function validate() {
 // Supabase側トリガーと同じ閾値を使用（二重防御）
 function _minKeysForType(t) {
   if (t === 'company') return 1;
-  if (t === 'card_delivery') return 2;
+  if (t === 'jaim') return 1;  // JAIM: 該当性確認のみ必須（他は任意）
   return 6;
 }
 
@@ -3358,8 +2479,10 @@ async function submitForm() {
     return;
   }
 
-  // 🛡️ 必須項目チェック（非company・非card_delivery）: 氏名・生年月日・国籍・メールが揃っていることを確認
-  if (type !== 'company' && type !== 'card_delivery') {
+  // 🛡️ 必須項目チェック（申請人フォームのみ）: 氏名・生年月日・国籍・メールが揃っていることを確認
+  // ver: company/jaim に加え support_org（登録支援機関）・card_delivery（在留カード送付先）も除外。
+  //      これらは applicantNameEn 等を持たないため、除外しないと送信が必ず弾かれる。
+  if (type !== 'company' && type !== 'jaim' && type !== 'support_org' && type !== 'card_delivery') {
     var requiredKeys = ['applicantNameEn', 'birthdate', 'nationality', 'email'];
     var missingKeys = requiredKeys.filter(function(k){
       return !response[k] || String(response[k]).trim() === '';
@@ -3390,10 +2513,30 @@ async function submitForm() {
       }
       throw new Error('HTTP ' + res.status);
     }
-    document.getElementById('mainContent').innerHTML =
-      '<div class="success"><div class="icon">✅</div><h2>送信完了</h2>' +
-      '<p>ご回答ありがとうございました。<br>担当者が内容を確認いたします。</p></div>';
-    document.getElementById('btnWrap').style.display = 'none';
+    // ver.20260605.01: 送信後も入力内容を画面に残す（mainContentを置き換えない）。完了バナーを上部に表示。
+    // 送信したレコードIDを確定（新規POST時はレスポンスから取得）→ 「修正を再送信」で同じ行をPATCHし重複を防ぐ
+    var _doneId = _submitId;
+    var _saveObj = null;
+    try { _saveObj = await res.json(); } catch(_) {}
+    // ver.20260701.03: form_saveが{error:...}を返したら成功扱いにしない（caseId空等でbad_requestのまま完了表示になる不具合の修正）
+    if (_saveObj && _saveObj.error) { throw new Error('SAVE_REJECTED:' + _saveObj.error); }
+    if (_saveObj && _saveObj.id) _doneId = _saveObj.id;
+    if (_doneId) _draftResponseId = _doneId;
+    var _mc = document.getElementById('mainContent');
+    var okBanner = document.getElementById('submitOkBanner');
+    if (!okBanner) {
+      okBanner = document.createElement('div');
+      okBanner.id = 'submitOkBanner';
+      okBanner.style.cssText = 'background:#dcfce7;border:1px solid #86efac;color:#166534;border-radius:12px;padding:16px;margin:0 0 16px;font-weight:800;text-align:center;font-size:15px;';
+      if (_mc) _mc.insertBefore(okBanner, _mc.firstChild);
+    }
+    okBanner.innerHTML = '✅ 送信が完了しました。ご回答ありがとうございました。<br>'
+      + '<span style="font-weight:400;font-size:13px;line-height:1.7;display:inline-block;margin-top:6px;">入力内容はこのまま表示されています。修正する場合は内容を直して、もう一度「修正を再送信する」を押してください。</span>';
+    try { okBanner.scrollIntoView({ behavior:'smooth', block:'start' }); } catch(_) {}
+    btn.disabled = false;
+    btn.textContent = '✏️ 修正を再送信する';
+    var _draftBtn0 = document.getElementById('btn-draft');
+    if (_draftBtn0) _draftBtn0.style.display = 'none';
   } catch(e) {
     btn.disabled = false; btn.textContent = '送信する';
     var el = document.getElementById('errorMsg');
@@ -3401,6 +2544,10 @@ async function submitForm() {
       el.innerHTML = '⚠️ サーバー側で入力内容に不備が検出されました。<br>'
         + '<strong>ページを再読み込み(Ctrl+Shift+R / Cmd+Shift+R / iPhoneは閉じて開き直す)してから、もう一度入力してください。</strong><br>'
         + 'それでも解決しない場合は担当者までご連絡ください。';
+    } else if (e.message && e.message.indexOf('SAVE_REJECTED') === 0) {
+      el.innerHTML = '⚠️ 送信を受け付けられませんでした（保存に必要な情報が不足しています）。<br>'
+        + '<strong>お手数ですが、担当者から届いたフォームURLから開き直してから、もう一度お試しください。</strong><br>'
+        + '解決しない場合は担当者までご連絡ください。';
     } else {
       el.textContent = '送信に失敗しました。(' + e.message + ')';
     }
@@ -3500,84 +2647,6 @@ setInterval(function(){
   }
 }, 60000);
 
-
-// ver.20260608.test.09: ウィザード（②MRZ・③写真）の見出し・説明を翻訳対象に追加
-(function(){
-  var W = {
-    en: {
-      wizMrzTitle:'Hold passport to scan (MRZ)',
-      wizMrzDesc:'Hold your passport to the camera to auto-fill name, passport no., nationality, date of birth and expiry. You can skip with Next.',
-      wizPhotoTitle:'Photo of passport / residence card',
-      wizPhotoDesc:'Choose or take a photo and it is read automatically. Items not in the MRZ (place of birth, address) are also captured. You can skip this step.'
-    },
-    vi: {
-      wizMrzTitle:'Đưa hộ chiếu vào để quét (MRZ)',
-      wizMrzDesc:'Đưa hộ chiếu vào camera để tự động điền họ tên, số hộ chiếu, quốc tịch, ngày sinh và ngày hết hạn. Có thể bỏ qua bằng "Tiếp theo".',
-      wizPhotoTitle:'Ảnh hộ chiếu / thẻ cư trú',
-      wizPhotoDesc:'Chọn hoặc chụp ảnh, hệ thống sẽ tự động đọc. Các mục không có trong MRZ (nơi sinh, địa chỉ) cũng được lấy. Có thể bỏ qua bước này.'
-    },
-    id: {
-      wizMrzTitle:'Arahkan paspor untuk dipindai (MRZ)',
-      wizMrzDesc:'Arahkan paspor ke kamera untuk mengisi otomatis nama, nomor paspor, kewarganegaraan, tanggal lahir, dan masa berlaku. Bisa dilewati dengan "Berikutnya".',
-      wizPhotoTitle:'Foto paspor / kartu izin tinggal',
-      wizPhotoDesc:'Pilih atau ambil foto, akan dibaca otomatis. Data yang tidak ada di MRZ (tempat lahir, alamat) juga diambil. Langkah ini bisa dilewati.'
-    },
-    my: {
-      wizMrzTitle:'ပတ်စ်ပို့ကို ကင်မရာရှေ့ထားပြီး ဖတ်ပါ (MRZ)',
-      wizMrzDesc:'ပတ်စ်ပို့ကို ကင်မရာရှေ့ထားလျှင် အမည်၊ ပတ်စ်ပို့နံပါတ်၊ နိုင်ငံသား၊ မွေးနေ့နှင့် သက်တမ်းကုန်ရက်ကို အလိုအလျောက်ဖြည့်ပါမည်။ "ရှေ့သို့" ဖြင့် ကျော်နိုင်သည်။',
-      wizPhotoTitle:'ပတ်စ်ပို့ / နေထိုင်ခွင့်ကတ် ဓာတ်ပုံ',
-      wizPhotoDesc:'ဓာတ်ပုံရွေး သို့မဟုတ် ရိုက်ပါ၊ အလိုအလျောက်ဖတ်ပါမည်။ MRZ တွင်မပါသော အချက် (မွေးဖွားရာ၊ နေရပ်လိပ်စာ) ကိုပါ ရယူပါမည်။ ဤအဆင့်ကို ကျော်နိုင်သည်။'
-    },
-    km: {
-      wizMrzTitle:'បញ្ជូនលិខិតឆ្លងដែនទៅម៉ាស៊ីនថត (MRZ)',
-      wizMrzDesc:'ដាក់លិខិតឆ្លងដែននៅមុខកាមេរ៉ា ដើម្បីបំពេញឈ្មោះ លេខលិខិតឆ្លងដែន សញ្ជាតិ ថ្ងៃខែឆ្នាំកំណើត និងថ្ងៃផុតកំណត់ដោយស្វ័យប្រវត្តិ។ អាចរំលងដោយ "បន្ទាប់"។',
-      wizPhotoTitle:'រូបថតលិខិតឆ្លងដែន / កាតស្នាក់នៅ',
-      wizPhotoDesc:'ជ្រើស ឬថតរូប នោះវានឹងអានដោយស្វ័យប្រវត្តិ។ ព័ត៌មានដែលគ្មានក្នុង MRZ (ទីកន្លែងកំណើត អាសយដ្ឋាន) ក៏ត្រូវបានយកដែរ។ អាចរំលងជំហាននេះបាន។'
-    },
-    ne: {
-      wizMrzTitle:'राहदानी क्यामेरामा देखाएर स्क्यान गर्नुहोस् (MRZ)',
-      wizMrzDesc:'राहदानीलाई क्यामेरामा देखाउनुहोस्, नाम, राहदानी नम्बर, राष्ट्रियता, जन्म मिति र म्याद स्वतः भरिन्छ। "अर्को" बाट छाड्न सकिन्छ।',
-      wizPhotoTitle:'राहदानी / बसोबास कार्डको फोटो',
-      wizPhotoDesc:'फोटो छान्नुहोस् वा खिच्नुहोस्, स्वतः पढिन्छ। MRZ मा नभएका कुरा (जन्मस्थान, ठेगाना) पनि लिइन्छ। यो चरण छाड्न सकिन्छ।'
-    },
-    zh: {
-      wizMrzTitle:'将护照对准摄像头识别（MRZ）',
-      wizMrzDesc:'将护照对准摄像头，自动填写姓名、护照号码、国籍、出生日期和有效期。可用「下一步」跳过。',
-      wizPhotoTitle:'护照／在留卡照片',
-      wizPhotoDesc:'选择或拍摄照片后会自动识别。MRZ 中没有的项目（出生地、住址）也会获取。此步骤可跳过。'
-    }
-  };
-  for (var l in W) { if (TRANS[l]) { for (var k in W[l]) TRANS[l][k] = W[l][k]; } }
-})();
-
-
-// ver.20260608.test.12: 合格証スロットの説明文（データアップ zinzai_dataup と同内容）
-(function(){
-  var W2 = {
-    en: {
-      certSkillDesc:'Certificate of the Specified Skills Evaluation Test. The certificate you received when you passed; the issuing organization differs by field.',
-      certJpDesc:'Certificate of a Japanese language proficiency test (JLPT / JFT, etc.). If lost, request a reissue from the test organizer.',
-      certSenmonDesc:'Technical Intern certificate (Specialist / Level 3). If you failed the test, submit an evaluation report (hyouka chousho) instead.'
-    },
-    vi: {
-      certSkillDesc:'Chứng chỉ kỳ thi đánh giá kỹ năng đặc định. Giấy bạn nhận khi đỗ; tổ chức cấp khác nhau theo lĩnh vực.',
-      certJpDesc:'Chứng chỉ kỳ thi năng lực tiếng Nhật (JLPT / JFT...). Nếu mất, yêu cầu cấp lại từ tổ chức thi.',
-      certSenmonDesc:'Chứng chỉ thực tập kỹ năng (Chuyên ngành / Cấp 3). Nếu không đỗ, vui lòng nộp bản đánh giá (hyouka chousho).'
-    },
-    id: {
-      certSkillDesc:'Sertifikat Ujian Evaluasi Keterampilan Khusus. Lembaga penerbit berbeda tergantung bidang.',
-      certJpDesc:'Sertifikat ujian kemampuan bahasa Jepang (JLPT / JFT, dll.). Jika hilang, minta penerbitan ulang ke penyelenggara.',
-      certSenmonDesc:'Sertifikat Pemagangan (Spesialis / Level 3). Jika tidak lulus, serahkan laporan evaluasi (hyouka chousho).'
-    },
-    zh: {
-      certSkillDesc:'特定技能评价测试合格证。通过考试时获得的证书；各领域发证机构不同。',
-      certJpDesc:'日语能力测试（JLPT／JFT等）合格证。遗失时请向考试机构申请补发。',
-      certSenmonDesc:'技能实习专项级·3级合格证。如未合格，请提交评价调书。'
-    }
-  };
-  for (var l in W2) { if (TRANS[l]) { for (var k in W2[l]) TRANS[l][k] = W2[l][k]; } }
-})();
-
 function setLang(l) {
   currentLang = l;
   document.querySelectorAll('.lang-btn').forEach(function(b) {
@@ -3609,71 +2678,8 @@ var TYPE_LABELS = {
   gijinkoku_koushin:{ cat:'技人国', kind:'更新', catClass:'badge-gijinkoku', kindClass:'badge-koushin' },
   gijinkoku_henkou: { cat:'技人国', kind:'変更', catClass:'badge-gijinkoku', kindClass:'badge-koushin' },
   company:          { cat:'企業情報', kind:'', catClass:'badge-company', kindClass:'' },
-  card_delivery:    { cat:'在留カード送付先', kind:'', catClass:'badge-company', kindClass:'' }
+  support_org:      { cat:'登録支援機関', kind:'', catClass:'badge-company', kindClass:'' }
 };
-
-// 新在留カード送付先フォーム: お名前・ご住所を自動入力（住所はRPCで取得しURLに載せない）
-// 住所 → 郵便番号 推定（GAS addr2zip をJSONPで呼ぶ）。推定できなければ何もしない（手入力のまま）
-var _zipEstimating = false;
-function estimateZipFromAddress(force){
-  var addrEl = document.getElementById('f-cdAddress');
-  var zipEl  = document.getElementById('f-cdZip');
-  var hintEl = document.getElementById('cdZipHint');
-  if (!addrEl || !zipEl) return;
-  var addr = (addrEl.value || '').trim();
-  if (!addr) { if (force && hintEl) hintEl.textContent = '先にご住所を入力してください。'; return; }
-  if (!force && zipEl.value.trim()) return;            // 既に郵便番号があれば自動では上書きしない
-  if (_zipEstimating) return;
-  if (typeof GAS_GEO_URL === 'undefined' || !GAS_GEO_URL) return;
-  _zipEstimating = true;
-  if (hintEl) hintEl.textContent = '住所から郵便番号を取得中…';
-  var cb = '_cdZipCb' + Date.now();
-  var done = false;
-  var cleanup = function(){ try { delete window[cb]; } catch(e){} var s = document.getElementById(cb); if (s && s.parentNode) s.parentNode.removeChild(s); };
-  var finish = function(){ if (done) return; done = true; _zipEstimating = false; clearTimeout(timer); cleanup(); };
-  var timer = setTimeout(function(){ if (done) return; finish(); if (hintEl) hintEl.textContent = ''; }, 8000);
-  window[cb] = function(res){
-    if (done) return; finish();
-    if (res && res.status === 'ok' && res.zip) {
-      zipEl.value = res.zip;
-      if (hintEl) hintEl.textContent = '住所から推定しました（違うときは直してください）';
-    } else {
-      if (hintEl) hintEl.textContent = '郵便番号を自動取得できませんでした。手入力してください。';
-    }
-  };
-  var s = document.createElement('script');
-  s.id = cb;
-  s.src = GAS_GEO_URL + '?action=addr2zip&addr=' + encodeURIComponent(addr) + '&callback=' + cb;
-  s.onerror = function(){ finish(); if (hintEl) hintEl.textContent = '郵便番号を自動取得できませんでした。手入力してください。'; };
-  document.body.appendChild(s);
-}
-
-function prefillCardDelivery(){
-  var nameEl = document.getElementById('f-cdName');
-  if (nameEl && caseName) nameEl.value = caseName;
-  // 住所欄を離れたら（変更されたら）郵便番号が空のとき自動推定
-  var addrEl = document.getElementById('f-cdAddress');
-  if (addrEl && !addrEl._cdZipBound) {
-    addrEl._cdZipBound = true;
-    addrEl.addEventListener('blur', function(){ estimateZipFromAddress(false); });
-  }
-  if (!caseId) return;
-  callRpc('form_prefill_card', { p_case_id: caseId })
-    .then(function(r){ return r.ok ? r.json() : null; })
-    .then(function(d){
-      if (!d || typeof d !== 'object') return;
-      var setVal = function(id, v){ var el = document.getElementById(id); if (el && v && !el.value) el.value = v; };
-      if (d.name) setVal('f-cdName', d.name);
-      setVal('f-cdZip', d.jpPostalCode);
-      setVal('f-cdAddress', d.jpAddress);
-      setVal('f-cdPhone', d.phone);
-      // 住所が入っていて郵便番号が空なら、住所から自動推定
-      var zEl = document.getElementById('f-cdZip');
-      var aEl = document.getElementById('f-cdAddress');
-      if (aEl && aEl.value.trim() && zEl && !zEl.value.trim()) estimateZipFromAddress(false);
-    })
-    .catch(function(){});
-}
 
 // 名前確認モーダル: caseNameがあれば最初に表示し、確認後にフォーム表示
 function _initFormBody(){
@@ -3684,19 +2690,7 @@ function _initFormBody(){
     document.getElementById('type-badges').innerHTML = b;
   }
   document.getElementById('mainContent').style.display = 'block';
-  if (type === 'company' || type === 'card_delivery') {
-    document.getElementById('btnWrap').style.display = 'block';
-    var _pg = document.getElementById('wizProgress'); if (_pg) _pg.style.display = 'none';
-    var _rn = document.querySelector('.req-note'); if (_rn) _rn.style.display = 'block';
-    // 企業フォーム以外ではリセットボタンを非表示
-    if (type !== 'company') {
-      var _rb = document.getElementById('co-reset-float'); if (_rb) _rb.style.display = 'none';
-    }
-  } else {
-    // 外国人フォームではリセットボタンを非表示
-    var _rb = document.getElementById('co-reset-float'); if (_rb) _rb.style.display = 'none';
-    goWizardStep(2);
-  }
+  document.getElementById('btnWrap').style.display = 'block';
 }
 function confirmName(isMatch){
   var overlay = document.getElementById('nameConfirmOverlay');
@@ -3707,6 +2701,16 @@ function confirmName(isMatch){
     _initFormBody();
   } else {
     // 名前違いの連絡画面を表示
+    // ver.20260531.02: アイデム経由（src=aidem）の場合は、アイデムのご担当者宛の案内に差し替え
+    if (srcParam === 'aidem') {
+      var box = document.getElementById('nameMismatchBox');
+      if (box) {
+        box.innerHTML =
+          '<div class="title">⚠️ お名前にご相違があるようです</div>' +
+          '<div class="desc">大変恐れ入りますが、表示されているお名前がご自身のものと異なる場合は、フォームへのご入力をお控えいただきますようお願いいたします。</div>' +
+          '<div class="contact"><strong>株式会社アイデム支援担当者へご連絡をお願いいたします。</strong></div>';
+      }
+    }
     document.getElementById('nameMismatchScreen').style.display = 'block';
     // header(form-headerなど)はそのまま、本体は出さない
   }
@@ -3718,29 +2722,17 @@ function confirmName(isMatch){
     document.getElementById('infoBox').innerHTML = '<span class="case-name">' + _escName + '</span>大房行政書士法人よりご依頼の情報をご入力ください。';
     document.getElementById('nameConfirmName').innerHTML = _escName;
   }
-  document.getElementById('formBody').innerHTML = (type === 'company' || type === 'card_delivery') ? buildForm(type) : buildWizard(type);
-  if (type === 'card_delivery') prefillCardDelivery();
+  document.getElementById('formBody').innerHTML = buildForm(type);
   if (fieldsFilter && fieldsFilter.length && type === 'company') {
     applyFieldsFilter(fieldsFilter);
+    disableCoPaging();  // ver.20260706.01: 部分ヒアリング時はタブを使わず全ページ表示
+  } else if (type === 'company' && document.getElementById('co-page1')) {
+    switchCoPage(1);   // ver.20260706.01: 企業フォームのページ初期化
   }
-  // ツールチップ初期化（DOM生成後に登録）
-  _initTips();
-  // 入力済み判定（薄オレンジ→白）
-  _initFilledState();
-  // 自動計算・連動表示初期化
-  _initAutoCalc();
-  // 氏名・役職の自動英語変換
-  _initNameAutoFill();
-  // 企業フォームのページ初期化（リセットボタン等を正しく表示）
-  if (type === 'company' && document.getElementById('co-page1')) {
-    switchCoPage(1);
-    var floatReset = document.getElementById('co-reset-float');
-    if (floatReset) floatReset.style.display = 'inline-flex';
-  }
-  // 会社名自動入力
-  if (type === 'company' && caseName) {
-    var coNameEl = document.getElementById('f-coName');
-    if (coNameEl && !coNameEl.value) coNameEl.value = caseName;
+  if (type === 'company') _applyCompanyDefaults();  // ver.20260707.03: デフォルト値（0・ー）を適用
+  if (type === 'company') {  // ver.20260707.04: 企業フォームは日本語のみのため翻訳バーを非表示
+    var _langBar = document.querySelector('.lang-bar');
+    if (_langBar) _langBar.style.display = 'none';
   }
   var verEl = document.getElementById('ver-display');
   if (verEl) verEl.textContent = FORM_VERSION;
@@ -3749,14 +2741,14 @@ function confirmName(isMatch){
   // 名前確認モーダル: caseNameがあって、未確認の場合のみ表示
   var _alreadyConfirmed = false;
   try { _alreadyConfirmed = !!localStorage.getItem('ofusa_name_confirmed_' + caseId + '_' + type); } catch(e){}
-  if (caseName && !_alreadyConfirmed) {
+  if (caseName && !_alreadyConfirmed && type !== 'support_org') {
     document.getElementById('nameConfirmOverlay').style.display = 'flex';
   } else {
     _initFormBody();
   }
 
   if (caseId) {
-    callRpc('form_load', { p_case_id: caseId, p_form_type: type, p_response_id: responseId || '', p_exclude_imported: true }).then(function(r){
+    callRpc('form_load', { p_case_id: caseId, p_form_type: type, p_response_id: responseId || '' }).then(function(r){
       if (!r.ok) throw new Error('HTTP ' + r.status);
       return r.json();
     })
@@ -3765,24 +2757,25 @@ function confirmName(isMatch){
         if (!data) return;
         var row = data;
         var resp = row.response;
-        var isSubmitted = !!row.imported_at;
-
-        if (isSubmitted) {
-          if (!responseId) return;
-          var infoEl = document.getElementById('infoBox');
+        var isImported = !!row.imported_at;
+        var isSubmitted = !!row.submitted_at;
+        // ver.20260605.01: 取込後・送信後も同じ行を表示し、再送信は同じ行をPATCHする（送信しても内容が消えない）
+        _draftResponseId = row.id;
+        var infoEl = document.getElementById('infoBox');
+        var btnEl = document.getElementById('btn-submit');
+        var draftBtn = document.getElementById('btn-draft');
+        if (isImported || isSubmitted) {
           if (infoEl) {
-            infoEl.style.background = '#fef3c7';
-            infoEl.style.borderColor = '#fcd34d';
-            infoEl.style.color = '#92400e';
-            infoEl.textContent = '✏️ 回答を編集中です。修正後、送信ボタンを押してください。';
+            infoEl.style.background = '#dcfce7';
+            infoEl.style.borderColor = '#86efac';
+            infoEl.style.color = '#166534';
+            infoEl.textContent = isImported
+              ? '✅ 送信・取込済みの内容を表示しています。修正する場合は内容を直して「修正を再送信する」を押してください。'
+              : '✅ 送信済みの内容を表示しています。修正する場合は内容を直して「修正を再送信する」を押してください。';
           }
-          var btnEl = document.getElementById('btn-submit');
-          if (btnEl) btnEl.textContent = '✏️ 修正を送信する';
-          var draftBtn = document.getElementById('btn-draft');
+          if (btnEl) btnEl.textContent = '✏️ 修正を再送信する';
           if (draftBtn) draftBtn.style.display = 'none';
         } else {
-          _draftResponseId = row.id;
-          var infoEl = document.getElementById('infoBox');
           if (infoEl) {
             infoEl.style.background = '#eff6ff';
             infoEl.style.borderColor = '#93c5fd';
@@ -3809,6 +2802,7 @@ function confirmName(isMatch){
 })();
 
 function prefillForm(resp) {
+  if (type === 'support_org') { _soFormPrefill(resp); return; }
   var keyToId = {
     applicantNameEn: 'f-name', birthdate: 'f-birth',
     nationality: 'f-nationality', passport: 'f-passport', passportExpiry: 'f-passExpiry',
@@ -3840,9 +2834,10 @@ function prefillForm(resp) {
     startTime: 'f-startTime', endTime: 'f-endTime', breakTime: 'f-breakTime',
     dailyHours: 'f-dailyHours', weeklyDays: 'f-weeklyDays', weeklyH: 'f-weeklyH',
     annualHolidays: 'f-annualHolidays',
-    nonRegWeeklyDays: 'f-nonRegWeeklyDays', nonRegMonthlyDays: 'f-nonRegMonthlyDays',
     jpCompAge: 'f-jpCompAge', jpCompExp: 'f-jpCompExp',
     jpCompJobDesc: 'f-jpCompJobDesc', jpCompSalary: 'f-jpCompSalary', jpCompReason: 'f-jpCompReason',
+    // ver.20260701: JAIM（製造業協議会）加入質問票
+    jaimIndustryCode: 'f-jaimIndustryCode', jaimProductName: 'f-jaimProductName', jaimProductPurpose: 'f-jaimProductPurpose', jaimFinalProductName: 'f-jaimFinalProductName', jaimFinalProductDesc: 'f-jaimFinalProductDesc', jaimEquipmentPurpose: 'f-jaimEquipmentPurpose', jaimEquipmentEffect: 'f-jaimEquipmentEffect', jaimBranchOfficeFlag: 'f-jaimBranchOfficeFlag', jaimBranchOfficeName: 'f-jaimBranchOfficeName', jaimBranchOfficeZip: 'f-jaimBranchOfficeZip', jaimBranchOfficeAddress: 'f-jaimBranchOfficeAddress', jaimBranchOfficeContact: 'f-jaimBranchOfficeContact', jaimBranchOfficeTel: 'f-jaimBranchOfficeTel', jaimCompanySize: 'f-jaimCompanySize', jaimMemberOrg: 'f-jaimMemberOrg',
     // 特定技能の追加項目
     residenceCardStatus: 'f-residenceCardStatus',
     addressStatus: 'f-addressStatus',
@@ -3903,6 +2898,14 @@ function prefillForm(resp) {
 
   try { prefillPayDate(resp); } catch(e) { console.error('prefillPayDate error (ignored):', e); }
 
+  // ver.20260701: JAIM該当性確認チェックボックスの復元
+  try {
+    var _jaimAgrEl = document.getElementById('f-jaimAgreement');
+    if (_jaimAgrEl && resp.jaimAgreement === '確認済み') {
+      _jaimAgrEl.checked = true;
+    }
+  } catch(e) { console.error('jaimAgreement restore error (ignored):', e); }
+
   var maxAllow = 1;
   for (var ai = 2; ai <= 4; ai++) {
     if (resp['allowance'+ai+'Name'] || resp['allowance'+ai+'Amount']) maxAllow = ai;
@@ -3958,8 +2961,27 @@ function prefillForm(resp) {
   } catch(restoreErr) {
     console.error('field restore error (ignored):', restoreErr);
   }
+  // ver.20260603.01: 技能実習2号 職種・作業の復元
+  try {
+    if(resp.gijutsuType){
+      var gtSel = document.getElementById('f-gijutsuType');
+      if(gtSel){
+        for(var gi=0;gi<gtSel.options.length;gi++){
+          if(gtSel.options[gi].value === resp.gijutsuType){ gtSel.selectedIndex = gi; break; }
+        }
+        _updateGijutsuWorkSelect(resp.gijutsuType);
+      }
+      if(resp.gijutsuWork){
+        var gwSel = document.getElementById('f-gijutsuWork');
+        if(gwSel){
+          for(var gj=0;gj<gwSel.options.length;gj++){
+            if(gwSel.options[gj].value === resp.gijutsuWork){ gwSel.selectedIndex = gj; break; }
+          }
+        }
+      }
+    }
+  } catch(e) { console.error('gijutsu restore error (ignored):', e); }
 }
 </script>
 </body>
 </html>
-
