@@ -188,7 +188,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20260707.04-test';
+var FORM_VERSION = 'ver.20260717.01-test';
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -2748,6 +2748,9 @@ function confirmName(isMatch){
   }
 
   if (caseId) {
+    // ver.20260717.01: 登録支援機関フォームは、アンシスのマスタ（support_orgs）に既にある情報を
+    //   起動時に流し込む。その後に途中保存/送信済み回答があればそちらで上書き（下書き優先）。
+    var _runSavedLoad = function(){
     callRpc('form_load', { p_case_id: caseId, p_form_type: type, p_response_id: responseId || '' }).then(function(r){
       if (!r.ok) throw new Error('HTTP ' + r.status);
       return r.json();
@@ -2798,6 +2801,24 @@ function confirmName(isMatch){
       // fetch失敗・JSON parse失敗・HTTPエラーすべて握りつぶし、フォームは普通に使えるようにする
       console.error('prefill fetch error (ignored to keep form usable):', e);
     });
+    };
+    if (type === 'support_org') {
+      callRpc('form_prefill_support_org', { p_org_id: caseId })
+        .then(function(r){ return r.ok ? r.json() : null; })
+        .then(function(m){
+          if (m && typeof m === 'object' && Object.keys(m).length) {
+            try { _soFormPrefill(m); } catch(e){ console.error('master prefill error (ignored):', e); }
+            var infoEl = document.getElementById('infoBox');
+            if (infoEl) {
+              infoEl.innerHTML = '<span class="case-name">' + String(caseName||m.name||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') + '</span>📋 既にお伺いしている情報は入力済みです。内容をご確認のうえ、変更・追加があれば修正してご送信ください。';
+            }
+          }
+        })
+        .catch(function(e){ console.error('master prefill fetch error (ignored):', e); })
+        .then(_runSavedLoad);
+    } else {
+      _runSavedLoad();
+    }
   }
 })();
 
