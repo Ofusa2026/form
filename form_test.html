@@ -1080,6 +1080,20 @@ function _soCopyConsultToEmg(){
   if(g('f-so_emg_mailAddr')&&g('f-so_consult_mailAddr')) g('f-so_emg_mailAddr').value=g('f-so_consult_mailAddr').value;
   _soMethToggle('emg');
 }
+var _soInterpCount = 0;
+function _soFormInterpRow(i){
+  return '<div class="so-interp-row" data-sointidx="'+i+'" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;padding:8px;border:1px solid #eef2f7;border-radius:8px;">'
+    + '<input type="text" id="f-so_interp'+i+'_language" placeholder="言語（例：ミャンマー語）" style="flex:1 1 45%;padding:8px;border:1.5px solid #e5e7eb;border-radius:8px;font-size:14px;min-height:44px;">'
+    + '<input type="text" id="f-so_interp'+i+'_org" placeholder="所属（例：株式会社三宝）" style="flex:1 1 45%;padding:8px;border:1.5px solid #e5e7eb;border-radius:8px;font-size:14px;min-height:44px;">'
+    + '<input type="text" id="f-so_interp'+i+'_name" placeholder="氏名（個人の場合）" style="flex:1 1 45%;padding:8px;border:1.5px solid #e5e7eb;border-radius:8px;font-size:14px;min-height:44px;">'
+    + '<input type="text" id="f-so_interp'+i+'_nameEn" placeholder="所属・氏名（英語）" style="flex:1 1 45%;padding:8px;border:1.5px solid #e5e7eb;border-radius:8px;font-size:14px;min-height:44px;">'
+    + '</div>';
+}
+function _soFormAddInterp(){
+  _soInterpCount++;
+  var c=document.getElementById('so-interp-container');
+  if(c) c.insertAdjacentHTML('beforeend', _soFormInterpRow(_soInterpCount));
+}
 function _soFormStaffRow(i){
   return '<div class="so-staff-row" data-soidx="'+i+'" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;padding:8px;border:1px solid #eef2f7;border-radius:8px;">'
     + '<input type="text" id="f-so_staff'+i+'_name" placeholder="氏名" style="flex:1 1 45%;padding:8px;border:1.5px solid #e5e7eb;border-radius:8px;font-size:15px;min-height:44px;">'
@@ -1197,6 +1211,56 @@ function buildSupportOrgForm() {
   h += '</div></div>';
   h += '<div class="card"><div class="section-title">相談方法</div>' + _soFormMethodHtml('consult') + '</div>';
   h += '<div class="card"><div class="section-title">緊急時対応</div>' + _soFormMethodHtml('emg') + '</div>';
+  // ===== ver.20260723: 1-17号 支援計画書用の標準情報（B群） =====
+  h += '<div class="card"><div class="section-title">📖 支援計画書（1-17号）用の標準情報</div>';
+  h += '<div style="font-size:12px;color:#6b7280;margin-bottom:10px;">貴機関の標準的な支援の進め方をお聞かせください。支援計画書の作成に使用します（一度ご回答いただければ以後の申請で使い回します）。</div>';
+  // B-1 実施言語・通訳者
+  h += field('f-so_supportLanguages','支援の実施言語','text',false,'例：ミャンマー語、ベトナム語','');
+  h += '<div style="font-size:13px;font-weight:700;margin:10px 0 4px;">通訳者（支援担当者以外の方が通訳を担う場合）</div>';
+  h += '<div id="so-interp-container">' + _soFormInterpRow(0) + '</div>';
+  h += '<button type="button" onclick="_soFormAddInterp()" style="margin-top:6px;padding:8px 14px;background:#eff6ff;color:#2563eb;border:1.5px solid #2563eb;border-radius:8px;font-weight:700;cursor:pointer;font-size:13px;">＋ 通訳者を追加</button>';
+  // B-2 定期面談
+  h += '<div style="font-size:13px;font-weight:700;margin:14px 0 4px;">定期面談の実施方法</div>';
+  h += '<label style="display:block;font-size:14px;margin-bottom:4px;"><input type="radio" name="f-so_rmMethod" value="face" style="width:18px;height:18px;vertical-align:middle;"> 対面</label>';
+  h += '<label style="display:block;font-size:14px;margin-bottom:4px;"><input type="radio" name="f-so_rmMethod" value="faceOnline" style="width:18px;height:18px;vertical-align:middle;"> 対面とオンラインで実施（同意しない・対面希望の場合は対面）</label>';
+  h += '<label style="display:block;font-size:14px;margin-bottom:4px;"><input type="radio" name="f-so_rmMethod" value="radio" style="width:18px;height:18px;vertical-align:middle;"> 無線や船舶電話（漁船漁業のみ）</label>';
+  h += field('f-so_rmSchedule','定期面談の実施時期','text',false,'例：3ヶ月に一回以上実施／1月、4月、7月、10月に実施','');
+  // B-3 実施方法（項目別）
+  h += '<div style="font-size:13px;font-weight:700;margin:14px 0 4px;">事前ガイダンスの実施方法</div>';
+  h += '<label style="margin-right:14px;font-size:14px;"><input type="checkbox" id="f-so_im_guid_face" style="width:18px;height:18px;vertical-align:middle;"> 対面</label>'
+     + '<label style="margin-right:14px;font-size:14px;"><input type="checkbox" id="f-so_im_guid_video" style="width:18px;height:18px;vertical-align:middle;"> テレビ電話装置</label>'
+     + '<label style="font-size:14px;"><input type="checkbox" id="f-so_im_guid_other" style="width:18px;height:18px;vertical-align:middle;"> その他</label>';
+  h += '<div style="font-size:13px;font-weight:700;margin:10px 0 4px;">生活オリエンテーションの実施方法</div>';
+  h += '<label style="margin-right:14px;font-size:14px;"><input type="checkbox" id="f-so_im_ori_face" style="width:18px;height:18px;vertical-align:middle;"> 対面</label>'
+     + '<label style="font-size:14px;"><input type="checkbox" id="f-so_im_ori_video" style="width:18px;height:18px;vertical-align:middle;"> テレビ電話やDVD等の動画視聴等</label>';
+  h += '<div style="font-size:13px;font-weight:700;margin:10px 0 4px;">住居確保・生活に必要な契約に係る支援の方法</div>';
+  h += '<label style="margin-right:14px;font-size:14px;"><input type="checkbox" id="f-so_im_life_info" style="width:18px;height:18px;vertical-align:middle;"> 手続に係る情報提供</label>'
+     + '<label style="margin-right:14px;font-size:14px;"><input type="checkbox" id="f-so_im_life_accompany" style="width:18px;height:18px;vertical-align:middle;"> 必要に応じて同行</label>'
+     + '<label style="font-size:14px;"><input type="checkbox" id="f-so_im_life_other" style="width:18px;height:18px;vertical-align:middle;"> その他</label>';
+  // B-4 実施時間
+  h += '<div style="display:flex;gap:10px;margin-top:12px;flex-wrap:wrap;">'
+     + '<div style="flex:1;min-width:150px;"><div style="font-size:13px;font-weight:700;margin-bottom:3px;">事前ガイダンス 合計時間</div><input type="number" id="f-so_implH_guidance" placeholder="例：3" min="0" step="0.5" style="width:100%;box-sizing:border-box;padding:8px;border:1.5px solid #e5e7eb;border-radius:8px;font-size:15px;min-height:44px;"></div>'
+     + '<div style="flex:1;min-width:150px;"><div style="font-size:13px;font-weight:700;margin-bottom:3px;">生活オリエンテーション 合計時間</div><input type="number" id="f-so_implH_orientation" placeholder="例：8（8時間以上が要件）" min="0" step="0.5" style="width:100%;box-sizing:border-box;padding:8px;border:1.5px solid #e5e7eb;border-radius:8px;font-size:15px;min-height:44px;"></div>'
+     + '</div>';
+  h += '</div>';
+  // B-5 実施予定の定型文言
+  h += '<div class="card"><div class="section-title">📅 各支援の実施予定（標準文言）</div>';
+  h += '<div style="font-size:12px;color:#6b7280;margin-bottom:10px;">支援計画書の「実施予定」欄に記載する標準的な文言をご入力ください（例を参考に貴機関の運用どおりに）。</div>';
+  var _sched=[['guidance','1. 事前ガイダンス','例：入国時実施'],['escort','2. 出入国時の送迎','例：入国時・帰国時に実施'],['housing','3. 住居確保・生活に必要な契約支援','例：入社後1週間以内'],['orientation','4. 生活オリエンテーション','例：入国時実施'],['procedures','5. 公的手続等への同行','例：入社後1週間以内'],['japanese','6. 日本語学習の機会の提供','例：適宜実施'],['consultation','7. 相談・苦情への対応','例：適宜実施'],['exchange','8. 日本人との交流促進','例：適宜実施'],['jobchange','9. 転職支援（人員整理等の場合）','例：非自発的離職時に実施']];
+  _sched.forEach(function(sc){ h += field('f-so_sched_'+sc[0], sc[1], 'text', false, sc[2], ''); });
+  h += '</div>';
+  // B-6 住居方針・B-7 共生施策
+  h += '<div class="card"><div class="section-title">🏠 住居確保支援の標準方針</div>';
+  [['a','a. 不動産仲介の情報提供・必要に応じ同行、連帯保証人／緊急連絡先の確保'],['b','b. 自ら賃借人となって住居を提供'],['c','c. 所有する社宅等を提供']].forEach(function(hp){
+    h += '<div style="margin-bottom:8px;"><div style="font-size:13px;font-weight:700;margin-bottom:2px;">'+hp[1]+'</div>'
+       + '<label style="margin-right:16px;font-size:14px;"><input type="radio" name="f-so_hp_'+hp[0]+'" value="有" style="width:18px;height:18px;vertical-align:middle;"> 有</label>'
+       + '<label style="font-size:14px;"><input type="radio" name="f-so_hp_'+hp[0]+'" value="無" style="width:18px;height:18px;vertical-align:middle;"> 無</label></div>';
+  });
+  h += field('f-so_hpNote','補足（実施条件など）','text',false,'例：bで合意しない場合はaで実施','');
+  h += '<div style="font-size:13px;font-weight:700;margin:12px 0 4px;">受入企業の自治体の共生施策（相談窓口等）の確認方法</div>';
+  h += '<label style="margin-right:14px;font-size:14px;"><input type="checkbox" id="f-so_symb_hp" style="width:18px;height:18px;vertical-align:middle;"> ホームページ</label>'
+     + '<span style="font-size:14px;">その他 <input type="text" id="f-so_symb_other" placeholder="例：市役所窓口で確認" style="padding:8px;border:1.5px solid #e5e7eb;border-radius:8px;font-size:14px;min-height:40px;width:200px;"></span>';
+  h += '</div>';
   h += '</div>';
   // ステップ③担当者・その他
   h += '<div class="so-step" data-sostep="2" style="display:none;">';
@@ -1258,7 +1322,18 @@ function _soFormCollect(){
     jjZip:v('f-so_jjZip'), jjPref:v('f-so_jjPref'), jjCity:v('f-so_jjCity'), jjAddressDetail:v('f-so_jjAddressDetail'),
     jjTel:v('f-so_jjTel'), jjPermitNo:v('f-so_jjPermitNo'), jjPermitDate:v('f-so_jjPermitDate'),
     supportHours:hours, consultMethods:meth('consult'), emergencyContact:meth('emg'),
-    supportStaffList:staff, offices:offices
+    supportStaffList:staff, offices:offices,
+    // ver.20260723: 1-17号用の標準情報（B群）
+    supportLanguages:v('f-so_supportLanguages'),
+    interpreters:(function(){ var arr=[]; document.querySelectorAll('#so-interp-container .so-interp-row').forEach(function(row){ var i=row.getAttribute('data-sointidx'); var lg=v('f-so_interp'+i+'_language'),og=v('f-so_interp'+i+'_org'),nm=v('f-so_interp'+i+'_name'),ne=v('f-so_interp'+i+'_nameEn'); if(lg||og||nm||ne) arr.push({language:lg,org:og,name:nm,nameEn:ne}); }); return arr; })(),
+    regularMeeting:{ method:(function(){var r=document.querySelector('input[name="f-so_rmMethod"]:checked');return r?r.value:'';})(), schedule:v('f-so_rmSchedule') },
+    implMethods:{ guidance:{face:(function(id){var e=document.getElementById(id);return !!(e&&e.checked);})('f-so_im_guid_face'),video:(function(id){var e=document.getElementById(id);return !!(e&&e.checked);})('f-so_im_guid_video'),other:(function(id){var e=document.getElementById(id);return !!(e&&e.checked);})('f-so_im_guid_other')},
+      orientation:{face:(function(id){var e=document.getElementById(id);return !!(e&&e.checked);})('f-so_im_ori_face'),video:(function(id){var e=document.getElementById(id);return !!(e&&e.checked);})('f-so_im_ori_video')},
+      lifeContract:{info:(function(id){var e=document.getElementById(id);return !!(e&&e.checked);})('f-so_im_life_info'),accompany:(function(id){var e=document.getElementById(id);return !!(e&&e.checked);})('f-so_im_life_accompany'),other:(function(id){var e=document.getElementById(id);return !!(e&&e.checked);})('f-so_im_life_other')} },
+    implHours:{ guidance:v('f-so_implH_guidance'), orientation:v('f-so_implH_orientation') },
+    implSchedules:{ guidance:v('f-so_sched_guidance'), escort:v('f-so_sched_escort'), housing:v('f-so_sched_housing'), orientation:v('f-so_sched_orientation'), procedures:v('f-so_sched_procedures'), japanese:v('f-so_sched_japanese'), consultation:v('f-so_sched_consultation'), exchange:v('f-so_sched_exchange'), jobchange:v('f-so_sched_jobchange') },
+    housingPolicy:{ a:(function(){var r=document.querySelector('input[name="f-so_hp_a"]:checked');return r?r.value:'';})(), b:(function(){var r=document.querySelector('input[name="f-so_hp_b"]:checked');return r?r.value:'';})(), c:(function(){var r=document.querySelector('input[name="f-so_hp_c"]:checked');return r?r.value:'';})(), note:v('f-so_hpNote') },
+    symbiosisCheck:{ hp:(function(id){var e=document.getElementById(id);return !!(e&&e.checked);})('f-so_symb_hp'), other:v('f-so_symb_other') }
   };
 }
 function _soFormValidate(){ if(!val('f-so_name')) return '登録支援機関名は必須です。'; return null; }
@@ -1270,6 +1345,31 @@ function _soFormPrefill(resp){
   function setMeth(pfx,mv){ mv=mv||{}; var g=function(id){return document.getElementById(id);}; if(g('f-so_'+pfx+'_f2f'))g('f-so_'+pfx+'_f2f').checked=!!mv.f2f; if(g('f-so_'+pfx+'_tel'))g('f-so_'+pfx+'_tel').checked=!!mv.tel; if(g('f-so_'+pfx+'_mail'))g('f-so_'+pfx+'_mail').checked=!!mv.mail; if(g('f-so_'+pfx+'_other'))g('f-so_'+pfx+'_other').value=mv.other||''; if(g('f-so_'+pfx+'_telNo'))g('f-so_'+pfx+'_telNo').value=mv.telNo||''; if(g('f-so_'+pfx+'_mailAddr'))g('f-so_'+pfx+'_mailAddr').value=mv.mailAddr||''; if(typeof _soMethToggle==='function')_soMethToggle(pfx); }
   setMeth('consult', resp.consultMethods); setMeth('emg', resp.emergencyContact);
   if(resp.supportProperness){ var _pr=document.querySelector('input[name="f-so_properness"][value="'+resp.supportProperness+'"]'); if(_pr)_pr.checked=true; }
+  // ver.20260723: B群復元
+  (function(){
+    var g=function(id){return document.getElementById(id);};
+    if(g('f-so_supportLanguages')&&resp.supportLanguages)g('f-so_supportLanguages').value=resp.supportLanguages;
+    if(Array.isArray(resp.interpreters)&&resp.interpreters.length){ var c=g('so-interp-container'); if(c){ c.innerHTML=''; _soInterpCount=0; resp.interpreters.forEach(function(it,idx){ c.insertAdjacentHTML('beforeend', _soFormInterpRow(idx)); _soInterpCount=idx; it=it||{}; ['language','org','name','nameEn'].forEach(function(k){ var e=g('f-so_interp'+idx+'_'+k); if(e)e.value=it[k]||''; }); }); } }
+    var rm=resp.regularMeeting||{};
+    if(rm.method){ var _r=document.querySelector('input[name="f-so_rmMethod"][value="'+rm.method+'"]'); if(_r)_r.checked=true; }
+    if(g('f-so_rmSchedule')&&rm.schedule)g('f-so_rmSchedule').value=rm.schedule;
+    var im=resp.implMethods||{};
+    var setC=function(id,val){ var e=g(id); if(e)e.checked=!!val; };
+    if(im.guidance){ setC('f-so_im_guid_face',im.guidance.face); setC('f-so_im_guid_video',im.guidance.video); setC('f-so_im_guid_other',im.guidance.other); }
+    if(im.orientation){ setC('f-so_im_ori_face',im.orientation.face); setC('f-so_im_ori_video',im.orientation.video); }
+    if(im.lifeContract){ setC('f-so_im_life_info',im.lifeContract.info); setC('f-so_im_life_accompany',im.lifeContract.accompany); setC('f-so_im_life_other',im.lifeContract.other); }
+    var ih=resp.implHours||{};
+    if(g('f-so_implH_guidance')&&ih.guidance)g('f-so_implH_guidance').value=ih.guidance;
+    if(g('f-so_implH_orientation')&&ih.orientation)g('f-so_implH_orientation').value=ih.orientation;
+    var sc=resp.implSchedules||{};
+    ['guidance','escort','housing','orientation','procedures','japanese','consultation','exchange','jobchange'].forEach(function(k){ var e=g('f-so_sched_'+k); if(e&&sc[k])e.value=sc[k]; });
+    var hp=resp.housingPolicy||{};
+    ['a','b','c'].forEach(function(k){ if(hp[k]){ var _h=document.querySelector('input[name="f-so_hp_'+k+'"][value="'+hp[k]+'"]'); if(_h)_h.checked=true; } });
+    if(g('f-so_hpNote')&&hp.note)g('f-so_hpNote').value=hp.note;
+    var sy=resp.symbiosisCheck||{};
+    setC('f-so_symb_hp',sy.hp);
+    if(g('f-so_symb_other')&&sy.other)g('f-so_symb_other').value=sy.other;
+  })();
   if(Array.isArray(resp.supportStaffList) && resp.supportStaffList.length){
     var c=document.getElementById('so-staff-container');
     if(c){ c.innerHTML=''; _soStaffCount=0;
