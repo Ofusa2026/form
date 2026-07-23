@@ -119,6 +119,9 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </style>
 </head>
 <body>
+<!-- TEST版バナー（本番との識別用・同期時はこのブロックごと維持すること） -->
+<div style="position:sticky;top:0;z-index:99999;background:repeating-linear-gradient(45deg,#f59e0b,#f59e0b 12px,#fbbf24 12px,#fbbf24 24px);color:#7c2d12;font-size:13px;font-weight:900;text-align:center;padding:6px 10px;letter-spacing:1px;">🧪 テスト版（TEST）— 動作確認用ページです。本番はこちらではありません</div>
+
 
 <!-- 翻訳バー -->
 <div class="lang-bar">
@@ -188,7 +191,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20260717.01-test';
+var FORM_VERSION = 'ver.20260717.01';
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -1355,157 +1358,7 @@ function applyFieldsFilter(fields) {
   }
 }
 
-// ver.20260706.01: 企業フォームを3ページ（タブ）構成に分割（テスト版と同方式）
 function buildCompanyForm() {
-  return (
-    '<div id="co-tabs" style="display:flex;gap:2px;margin-bottom:12px;border-radius:12px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.12);">' +
-      '<button id="co-tab1" type="button" onclick="switchCoPage(1)" style="flex:1;padding:12px 4px;background:#2563eb;color:white;border:none;font-size:11px;font-weight:800;cursor:pointer;line-height:1.4;text-align:center;">🏢<br>企業情報<br><span style="font-size:9px;opacity:.8;">1/3</span></button>' +
-      '<button id="co-tab2" type="button" onclick="switchCoPage(2)" style="flex:1;padding:12px 4px;background:#e5e7eb;color:#6b7280;border:none;font-size:11px;font-weight:800;cursor:pointer;line-height:1.4;text-align:center;">💴<br>雇用条件<br><span style="font-size:9px;opacity:.7;">2/3</span></button>' +
-      '<button id="co-tab3" type="button" onclick="switchCoPage(3)" style="flex:1;padding:12px 4px;background:#e5e7eb;color:#6b7280;border:none;font-size:11px;font-weight:800;cursor:pointer;line-height:1.4;text-align:center;">📋<br>その他情報<br><span style="font-size:9px;opacity:.7;">3/3</span></button>' +
-    '</div>' +
-    '<div id="co-page1">' + buildCompanyPage1() + '</div>' +
-    '<div id="co-next-btn" style="margin-bottom:60px;">' +
-      '<button type="button" onclick="resetCurrentPage(1)" style="width:100%;padding:10px;background:white;color:#dc2626;border:1.5px solid #fca5a5;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;margin-bottom:8px;">このページの入力内容をリセット</button>' +
-      '<button type="button" onclick="switchCoPage(2)" style="width:100%;padding:15px;background:#2563eb;color:white;border:none;border-radius:12px;font-size:15px;font-weight:800;cursor:pointer;">次へ → 雇用条件を入力 →</button>' +
-    '</div>' +
-    '<div id="co-page2" style="display:none;">' + buildCompanyPage2() + '</div>' +
-    '<div id="co-mid-btns" style="display:none;margin-bottom:60px;">' +
-      '<button type="button" onclick="resetCurrentPage(2)" style="width:100%;padding:10px;background:white;color:#dc2626;border:1.5px solid #fca5a5;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;margin-bottom:8px;">このページの入力内容をリセット</button>' +
-      '<button type="button" onclick="switchCoPage(3)" style="width:100%;padding:15px;background:#ea580c;color:white;border:none;border-radius:12px;font-size:14px;font-weight:800;cursor:pointer;margin-bottom:8px;">次へ → その他必要情報を入力 →</button>' +
-      '<button type="button" onclick="switchCoPage(1)" style="width:100%;padding:12px;background:white;color:#2563eb;border:2px solid #2563eb;border-radius:12px;font-size:13px;font-weight:800;cursor:pointer;">← 企業情報に戻る</button>' +
-    '</div>' +
-    '<div id="co-page3" style="display:none;">' + buildCompanyPage3() + '</div>' +
-    '<div id="co-back-btn" style="display:none;margin-bottom:60px;">' +
-      '<button type="button" onclick="resetCurrentPage(3)" style="width:100%;padding:10px;background:white;color:#dc2626;border:1.5px solid #fca5a5;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;margin-bottom:8px;">このページの入力内容をリセット</button>' +
-      '<button type="button" onclick="switchCoPage(2)" style="width:100%;padding:13px;background:white;color:#ea580c;border:2px solid #ea580c;border-radius:12px;font-size:14px;font-weight:800;cursor:pointer;">← 雇用条件に戻る</button>' +
-    '</div>'
-  );
-}
-
-var _currentCoPage = 1;
-function switchCoPage(page) {
-  var p1=document.getElementById('co-page1'), p2=document.getElementById('co-page2'), p3=document.getElementById('co-page3');
-  var t1=document.getElementById('co-tab1'), t2=document.getElementById('co-tab2'), t3=document.getElementById('co-tab3');
-  var next=document.getElementById('co-next-btn'), mid=document.getElementById('co-mid-btns'), back=document.getElementById('co-back-btn');
-  if (!p1) return;
-  [p1,p2,p3].forEach(function(p){if(p)p.style.display='none';});
-  [next,mid,back].forEach(function(b){if(b)b.style.display='none';});
-  [t1,t2,t3].forEach(function(t){if(t){t.style.background='#e5e7eb';t.style.color='#6b7280';}});
-  if (page===1) {
-    p1.style.display=''; if(next)next.style.display='';
-    if(t1){t1.style.background='#2563eb'; t1.style.color='white';}
-  } else if (page===2) {
-    p2.style.display=''; if(mid)mid.style.display='';
-    if(t2){t2.style.background='#ea580c'; t2.style.color='white';}
-  } else {
-    p3.style.display=''; if(back)back.style.display='';
-    if(t3){t3.style.background='#475569'; t3.style.color='white';}
-  }
-  _currentCoPage = page;
-  try { window.scrollTo({top:0, behavior:'smooth'}); } catch(e){ window.scrollTo(0,0); }
-}
-
-// ページ単位リセット
-function resetCurrentPage(page) {
-  var pageNames = {1:'企業情報', 2:'雇用条件', 3:'その他情報'};
-  if (!confirm('【' + (pageNames[page]||'このページ') + '】の入力内容をすべてリセットします。よろしいですか？')) return;
-  var pageEl = document.getElementById('co-page' + page);
-  if (!pageEl) return;
-  pageEl.querySelectorAll('input, select, textarea').forEach(function(el) {
-    if (el.type === 'checkbox' || el.type === 'radio') { el.checked = false; }
-    else { el.value = ''; }
-    el.dispatchEvent(new Event('change'));
-  });
-  if (typeof _applyCompanyDefaults === 'function') _applyCompanyDefaults();  // ver.20260707.03: リセット後もデフォルト値を復元
-  window.scrollTo({top: 0, behavior: 'smooth'});
-}
-
-// 部分ヒアリング（fieldsFilter）時はタブを使わず全ページを縦に表示する
-function disableCoPaging() {
-  ['co-tabs','co-next-btn','co-mid-btns','co-back-btn'].forEach(function(id){
-    var el = document.getElementById(id); if (el) el.style.display = 'none';
-  });
-  ['co-page1','co-page2','co-page3'].forEach(function(id){
-    var el = document.getElementById(id); if (el) el.style.display = '';
-  });
-}
-
-// ver.20260707.01: 会社情報を就業場所へコピー
-function copyCompanyToOffice() {
-  function v(id){ var el=document.getElementById(id); return el ? el.value.trim() : ''; }
-  function set(id, val){
-    var el=document.getElementById(id); if(!el || !val) return;
-    el.value = val; el.dispatchEvent(new Event('change')); el.dispatchEvent(new Event('input'));
-  }
-  set('f-officeName', v('f-coName'));
-  set('f-officeNameEn', v('f-coNameEn'));
-  var addr = [v('f-coPref'), v('f-coCity'), v('f-coAddress')].filter(function(s){return s;}).join('');
-  set('f-officeAddress', addr);
-  set('f-officeTel', v('f-coTel'));
-  if (!v('f-coName') && !addr && !v('f-coTel')) {
-    alert('会社情報（1ページ目の「企業基本情報」「所在地」）がまだ入力されていません。先に1ページ目をご入力ください。');
-  }
-}
-
-// ver.20260707.01: 代表者情報を雇用管理相談窓口へコピー
-function copyRepToConsult() {
-  function v(id){ var el=document.getElementById(id); return el ? el.value.trim() : ''; }
-  function set(id, val){
-    var el=document.getElementById(id); if(!el || !val) return;
-    el.value = val; el.dispatchEvent(new Event('change')); el.dispatchEvent(new Event('input'));
-  }
-  set('f-consultName', v('f-coRepName'));
-  set('f-consultNameEn', v('f-coRepNameEn'));
-  set('f-consultTel', v('f-coTel'));
-  if (!v('f-coRepName')) {
-    alert('代表者情報（上の「代表者・作成責任者」）がまだ入力されていません。先に代表者氏名をご入力ください。');
-  }
-}
-
-// ver.20260707.02: 代表者情報を作成責任者へコピー
-function copyRepToAuthor() {
-  function v(id){ var el=document.getElementById(id); return el ? el.value.trim() : ''; }
-  function set(id, val){
-    var el=document.getElementById(id); if(!el || !val) return;
-    el.value = val; el.dispatchEvent(new Event('change')); el.dispatchEvent(new Event('input'));
-  }
-  set('f-coAuthorName', v('f-coRepName'));
-  set('f-coAuthorTitle', v('f-coRepTitle'));
-  set('f-coAuthorNameEn', v('f-coRepNameEn'));
-  if (!v('f-coRepName')) {
-    alert('代表者情報がまだ入力されていません。先に上の代表者氏名をご入力ください。');
-  }
-}
-
-// ver.20260707.02: 代表者情報を役員①へコピー
-function copyRepToOfficer1() {
-  function v(id){ var el=document.getElementById(id); return el ? el.value.trim() : ''; }
-  function set(id, val){
-    var el=document.getElementById(id); if(!el || !val) return;
-    el.value = val; el.dispatchEvent(new Event('change')); el.dispatchEvent(new Event('input'));
-  }
-  set('f-officer1Title', v('f-coRepTitle'));
-  set('f-officer1Name', v('f-coRepName'));
-  if (!v('f-coRepName')) {
-    alert('代表者情報がまだ入力されていません。先に上の代表者氏名をご入力ください。');
-  } else {
-    var kana = document.getElementById('f-officer1Kana');
-    if (kana && !kana.value) kana.focus();
-  }
-}
-
-// ver.20260707.03: 企業フォームのデフォルト値（離職者系=0、住居=ー）
-function _applyCompanyDefaults() {
-  function setDefault(id, val) {
-    var el = document.getElementById(id);
-    if (el && !el.value) el.value = val;
-  }
-  ['f-resignJp','f-resignForeign','f-dismissJp','f-dismissForeign','f-missing1y'].forEach(function(id){ setDefault(id, '0'); });
-  setDefault('f-cohabitants', 'ー');
-  setDefault('f-actualCostDesc', 'ー');
-}
-
-function buildCompanyPage1() {
   return (
   '<div class="card"><div class="section-title">企業基本情報</div>' +
     field('f-coName','会社名','text',true,'例: 株式会社〇〇食品') +
@@ -1537,28 +1390,16 @@ function buildCompanyPage1() {
     field('f-coAddressEn','住所（英語）','text',false,'例: 3F OO Bldg., 2-1-1 Shinjuku, Shinjuku-ku, Tokyo') +
     field('f-coTel','電話番号','text',false,'例: 03-1234-5678') +
   '</div>' +
-  _coRepCards()
-  );
-}
 
-// 就業場所カード（ページ2の先頭に配置）
-function _coOfficeCard() {
-  return (
   '<div class="card"><div class="section-title">就業場所（事業所）</div>' +
-    '<button type="button" onclick="copyCompanyToOffice()" style="font-size:12px;padding:7px 14px;background:#eff6ff;border:1.5px solid #93c5fd;border-radius:8px;color:#1d4ed8;cursor:pointer;font-weight:700;margin-bottom:12px;">🏢 会社と同じ情報を入れる</button>' +
     field('f-officeName','事業所名','text',false,'例: 株式会社〇〇 板橋工場') +
     field('f-officeNameEn','事業所名（英語）','text',false,'例: OO Co., Ltd. Itabashi Factory') +
     field('f-officeAddress','事業所住所','text',false,'例: 東京都板橋区板橋1丁目2番3号') +
     field('f-officeTel','事業所電話番号','text',false,'例: 03-9876-5432') +
     field('f-jobCategory','業務内容（特定技能分野・区分）','text',false,'例: 飲食料品製造業 / 飲食料品製造') +
     field('f-jobDescription','受け入れる外国人の職務内容','textarea',false,'例: 食品製造ラインにおいて加工品の仕上げ・品質判別等に従事') +
-  '</div>'
-  );
-}
+  '</div>' +
 
-// 代表者・作成責任者／雇用管理相談窓口／役員情報（ページ1の後半）
-function _coRepCards() {
-  return (
   '<div class="card"><div class="section-title">代表者・作成責任者</div>' +
     '<div class="grid2">' +
       field('f-coRepName','代表者氏名','text',false,'例: 山田 太郎') +
@@ -1568,7 +1409,6 @@ function _coRepCards() {
       field('f-coRepNameEn','代表者氏名（英語）','text',false,'例: YAMADA TARO') +
       field('f-coRepTitleEn','代表者役職（英語）','text',false,'例: President') +
     '</div>' +
-    '<button type="button" onclick="copyRepToAuthor()" style="font-size:12px;padding:7px 14px;background:#eff6ff;border:1.5px solid #93c5fd;border-radius:8px;color:#1d4ed8;cursor:pointer;font-weight:700;margin-bottom:12px;">👤 作成責任者に代表者と同じ情報を入れる</button>' +
     '<div class="grid2">' +
       field('f-coAuthorName','作成責任者氏名','text',false,'例: 佐藤 花子') +
       field('f-coAuthorTitle','作成責任者役職','text',false,'例: 人事部長') +
@@ -1578,7 +1418,6 @@ function _coRepCards() {
 
   '<div class="card"><div class="section-title">雇用管理相談窓口</div>' +
     '<div style="font-size:11px;color:#9ca3af;margin-bottom:10px;">申請人の雇用条件の相談等に対応する窓口</div>' +
-    '<button type="button" onclick="copyRepToConsult()" style="font-size:12px;padding:7px 14px;background:#eff6ff;border:1.5px solid #93c5fd;border-radius:8px;color:#1d4ed8;cursor:pointer;font-weight:700;margin-bottom:12px;">👤 代表と同じ情報を入れる</button>' +
     field('f-consultDept','部署名','text',false,'例: 人事部') +
     '<div class="grid2">' +
       field('f-consultName','担当者名','text',false,'例: 田中 一郎') +
@@ -1589,18 +1428,11 @@ function _coRepCards() {
 
   '<div class="card"><div class="section-title">役員情報</div>' +
     '<div style="font-size:11px;color:#9ca3af;margin-bottom:10px;">代表者を含む全役員を記入してください</div>' +
-    '<button type="button" onclick="copyRepToOfficer1()" style="font-size:12px;padding:7px 14px;background:#eff6ff;border:1.5px solid #93c5fd;border-radius:8px;color:#1d4ed8;cursor:pointer;font-weight:700;margin-bottom:12px;">👤 代表者を役員①に入れる</button>' +
     '<div id="officers-container">' +
       officerRow(1) + officerRow(2) + officerRow(3) +
     '</div>' +
     '<button type="button" onclick="addOfficer()" style="font-size:11px;padding:5px 14px;background:white;border:1.5px dashed #c7d2fe;border-radius:6px;color:#6366f1;cursor:pointer;font-weight:700;">＋ 役員を追加</button>' +
-  '</div>'
-  );
-}
-
-function buildCompanyPage2() {
-  return (
-  _coOfficeCard() +
+  '</div>' +
 
   '<div class="card"><div class="section-title">雇用条件</div>' +
     '<div class="sub-label">【給与】</div>' +
@@ -1744,14 +1576,9 @@ function buildCompanyPage2() {
       field('f-contractEnd','契約終了日','date',false,'') +
     '</div>' +
     field('f-contractRenewal','契約更新の有無','select',false,'',null,['','更新する場合があり得る','更新しない','自動更新']) +
-  '</div>'
-  );
-}
+  '</div>' +
 
-function buildCompanyPage3() {
-  return (
   '<div class="card"><div class="section-title">離職者・行方不明者情報</div>' +
-    '<div style="font-size:11px;color:#2563eb;background:#eff6ff;border-radius:8px;padding:8px 10px;margin-bottom:10px;">※ あらかじめ「0」を入力しています。該当者がいない場合はそのまま、異なる場合のみ数字を変更してください。</div>' +
     '<div class="sub-label">【自己都合離職者（直近1年以内）】</div>' +
     '<div class="grid2">' +
       field('f-resignJp','日本人 人数','number',false,'例: 1') +
@@ -1768,9 +1595,8 @@ function buildCompanyPage3() {
 
   '<div class="card"><div class="section-title">住居（支援計画書用）</div>' +
     '<div style="font-size:11px;color:#9ca3af;margin-bottom:10px;">支援計画書に記載する住居情報</div>' +
-    '<div style="font-size:11px;color:#2563eb;background:#eff6ff;border-radius:8px;padding:8px 10px;margin-bottom:10px;">※ あらかじめ「ー」を入力しています。該当がない場合はそのまま、異なる場合のみ変更してください。</div>' +
     field('f-housingOwnership','住居形態（自己所有/借上）','select',false,'',null,['','自己所有','借上']) +
-    field('f-cohabitants','同居人数','text',false,'例: 3') +
+    field('f-cohabitants','同居人数','number',false,'例: 3') +
     field('f-actualCostDesc','実費相当の説明','textarea',false,'例: 月額13万円で借上の物件。居住人数10名のため1人当たり1万3千円は適正。') +
   '</div>' +
 
@@ -2725,14 +2551,6 @@ function confirmName(isMatch){
   document.getElementById('formBody').innerHTML = buildForm(type);
   if (fieldsFilter && fieldsFilter.length && type === 'company') {
     applyFieldsFilter(fieldsFilter);
-    disableCoPaging();  // ver.20260706.01: 部分ヒアリング時はタブを使わず全ページ表示
-  } else if (type === 'company' && document.getElementById('co-page1')) {
-    switchCoPage(1);   // ver.20260706.01: 企業フォームのページ初期化
-  }
-  if (type === 'company') _applyCompanyDefaults();  // ver.20260707.03: デフォルト値（0・ー）を適用
-  if (type === 'company') {  // ver.20260707.04: 企業フォームは日本語のみのため翻訳バーを非表示
-    var _langBar = document.querySelector('.lang-bar');
-    if (_langBar) _langBar.style.display = 'none';
   }
   var verEl = document.getElementById('ver-display');
   if (verEl) verEl.textContent = FORM_VERSION;
@@ -2750,6 +2568,7 @@ function confirmName(isMatch){
   if (caseId) {
     // ver.20260717.01: 登録支援機関フォームは、アンシスのマスタ（support_orgs）に既にある情報を
     //   起動時に流し込む。その後に途中保存/送信済み回答があればそちらで上書き（下書き優先）。
+    //   すべて修正可能な通常の入力欄に入るだけなので、先方はそのまま直して送信できる。
     var _runSavedLoad = function(){
     callRpc('form_load', { p_case_id: caseId, p_form_type: type, p_response_id: responseId || '' }).then(function(r){
       if (!r.ok) throw new Error('HTTP ' + r.status);
