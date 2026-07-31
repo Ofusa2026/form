@@ -191,7 +191,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20260717.01';
+var FORM_VERSION = 'ver.20260731.01';
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -1414,6 +1414,78 @@ function field(id, label, inputType, required, placeholder, transKey, options) {
   return h;
 }
 
+// ===== 企業フォーム 入力補助 =====
+
+// ① 郵便番号 → 住所自動入力（zipcloud API）
+var _coZipTimer = null;
+function coZipAutoFill(zipRaw, force) {
+  var zip = zipRaw.replace(/[－ー‐\-\s]/g,'').replace(/[０-９]/g, function(c){ return String.fromCharCode(c.charCodeAt(0)-0xFEE0); });
+  var msg = document.getElementById('co-zip-msg');
+  if (zip.length < 7) { if (msg) msg.innerHTML = ''; return; }
+  if (_coZipTimer) clearTimeout(_coZipTimer);
+  function doFetch() {
+    if (msg) msg.innerHTML = '<span style="color:#6b7280;">🔍 検索中...</span>';
+    fetch('https://zipcloud.ibsnet.co.jp/api/search?zipcode=' + zip)
+      .then(function(r){ return r.json(); })
+      .then(function(d){
+        if (!d.results) { if (msg) msg.innerHTML = '<span style="color:#ef4444;">❌ 住所が見つかりませんでした</span>'; return; }
+        var r = d.results[0];
+        var pref = r.address1, city = r.address2 + r.address3;
+        var el_pref = document.getElementById('f-coPref');
+        var el_city = document.getElementById('f-coCity');
+        if (el_pref) el_pref.value = pref;
+        if (el_city) el_city.value = city;
+        if (msg) msg.innerHTML = '<span style="color:#16a34a;">✅ ' + pref + city + '</span>';
+        setTimeout(function(){ if (msg) msg.innerHTML = ''; }, 3000);
+      })
+      .catch(function(){ if (msg) msg.innerHTML = '<span style="color:#ef4444;">❌ 通信エラー</span>'; });
+  }
+  if (force) { doFetch(); }
+  else { _coZipTimer = setTimeout(doFetch, 600); }
+}
+
+// ② 本社住所 → 事業所住所を転記
+function copyHQToOffice() {
+  var pref = (document.getElementById('f-coPref')||{}).value || '';
+  var city = (document.getElementById('f-coCity')||{}).value || '';
+  var addr = (document.getElementById('f-coAddress')||{}).value || '';
+  var full = (pref + city + addr).trim();
+  var el = document.getElementById('f-officeAddress');
+  if (!el) return;
+  if (!full) { alert('先に本社の所在地を入力してください'); return; }
+  el.value = full;
+  el.style.background = '#f0fdf4';
+  setTimeout(function(){ el.style.background = ''; }, 1500);
+}
+
+// ③ 会社名（ひらがな）補助 — 株式会社等の定型句を自動変換してヒントを表示
+var KANA_MAP = [
+  ['株式会社','かぶしきかいしゃ'],['有限会社','ゆうげんかいしゃ'],['合同会社','ごうどうかいしゃ'],
+  ['合資会社','ごうしかいしゃ'],['合名会社','ごうめいかいしゃ'],['一般社団法人','いっぱんしゃだんほうじん'],
+  ['公益社団法人','こうえきしゃだんほうじん'],['一般財団法人','いっぱんざいだんほうじん'],
+  ['公益財団法人','こうえきざいだんほうじん'],['農事組合法人','のうじくみあいほうじん'],
+  ['社会福祉法人','しゃかいふくしほうじん'],['医療法人','いりょうほうじん'],
+  ['学校法人','がっこうほうじん'],['特定非営利活動法人','とくていひえいりかつどうほうじん'],
+];
+function coNameKanaHelper(name) {
+  var sg = document.getElementById('co-kana-suggestion');
+  var kanaEl = document.getElementById('f-coNameKana');
+  if (!sg || !name) { if (sg) sg.innerHTML = ''; return; }
+  var hint = name;
+  KANA_MAP.forEach(function(pair){ hint = hint.replace(pair[0], '【' + pair[1] + '】'); });
+  if (hint !== name) {
+    sg.innerHTML = '💡 ひらがなのヒント: <span style="color:#2563eb;cursor:pointer;" onclick="applyKanaHint()">' + hint + '</span> <span style="font-size:10px;color:#9ca3af;">（クリックで貼り付け）</span>';
+    sg._hintRaw = hint.replace(/【|】/g,'');
+  } else {
+    sg.innerHTML = '';
+  }
+}
+function applyKanaHint() {
+  var sg = document.getElementById('co-kana-suggestion');
+  var el = document.getElementById('f-coNameKana');
+  if (el && sg && sg._hintRaw) { el.value = sg._hintRaw; sg.innerHTML = ''; }
+}
+
 // ===== 企業フォーム =====
 
 var FIELDS_TO_FORM_IDS = {
@@ -1501,8 +1573,8 @@ function applyFieldsFilter(fields) {
 function buildCompanyForm() {
   return (
   '<div class="card"><div class="section-title">企業基本情報</div>' +
-    field('f-coName','会社名','text',true,'例: 株式会社〇〇食品') +
-    field('f-coNameKana','会社名（ひらがな）','text',false,'例: かぶしきかいしゃ〇〇しょくひん') +
+    '<div class="field"><label>会社名<span class="req">*</span></label><input type="text" id="f-coName" placeholder="例: 株式会社〇〇食品" oninput="coNameKanaHelper(this.value)"></div>' +
+    '<div class="field"><label>会社名（ひらがな）</label><input type="text" id="f-coNameKana" placeholder="例: かぶしきかいしゃ〇〇しょくひん"><div id="co-kana-suggestion" style="font-size:11px;color:#6b7280;margin-top:3px;"></div></div>' +
     field('f-coNameEn','会社名（英語）','text',false,'例: OO Foods Co., Ltd.') +
     '<div class="grid2">' +
       field('f-coCorpNo','法人番号（13桁）','text',false,'例: 1234567890123') +
@@ -1521,17 +1593,26 @@ function buildCompanyForm() {
   '</div>' +
 
   '<div class="card"><div class="section-title">所在地</div>' +
-    '<div class="grid2">' +
-      field('f-coZip','郵便番号','text',false,'例: 160-0022') +
-      field('f-coPref','都道府県','text',false,'例: 東京都') +
+    '<div class="field"><label>郵便番号</label>' +
+      '<div style="display:flex;gap:8px;align-items:center;">' +
+        '<input type="text" id="f-coZip" placeholder="例: 160-0022" style="flex:1;" oninput="coZipAutoFill(this.value)" inputmode="numeric">' +
+        '<button type="button" onclick="coZipAutoFill(document.getElementById(\'f-coZip\').value, true)" style="white-space:nowrap;padding:10px 14px;background:#3b82f6;color:white;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;">🔍 住所を自動入力</button>' +
+      '</div>' +
+      '<div id="co-zip-msg" style="font-size:11px;margin-top:4px;"></div>' +
     '</div>' +
-    field('f-coCity','市区町村','text',false,'例: 新宿区') +
+    '<div class="grid2">' +
+      field('f-coPref','都道府県','text',false,'例: 東京都') +
+      field('f-coCity','市区町村','text',false,'例: 新宿区') +
+    '</div>' +
     field('f-coAddress','町名番地','text',false,'例: 新宿2丁目1番1号 〇〇ビル3F') +
     field('f-coAddressEn','住所（英語）','text',false,'例: 3F OO Bldg., 2-1-1 Shinjuku, Shinjuku-ku, Tokyo') +
     field('f-coTel','電話番号','text',false,'例: 03-1234-5678') +
   '</div>' +
 
   '<div class="card"><div class="section-title">就業場所（事業所）</div>' +
+    '<div style="margin-bottom:10px;">' +
+      '<button type="button" onclick="copyHQToOffice()" style="padding:8px 16px;background:#f0fdf4;color:#15803d;border:1.5px solid #86efac;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;">🏢 本社と同じ住所を転記</button>' +
+    '</div>' +
     field('f-officeName','事業所名','text',false,'例: 株式会社〇〇 板橋工場') +
     field('f-officeNameEn','事業所名（英語）','text',false,'例: OO Co., Ltd. Itabashi Factory') +
     field('f-officeAddress','事業所住所','text',false,'例: 東京都板橋区板橋1丁目2番3号') +
