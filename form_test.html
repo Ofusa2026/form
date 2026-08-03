@@ -191,7 +191,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20260803.03';
+var FORM_VERSION = 'ver.20260803.04';
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -743,15 +743,44 @@ function blockTokuteiKoushin() {
 var SKILL_EVAL_TYPES = ['分野別運用方針に定める評価方法による証明','技能実習２号を良好に修了'];
 var SKILL_EVAL_LABELS = {'分野別運用方針に定める評価方法による証明':'試験合格','技能実習２号を良好に修了':'技能実習２号を良好に修了'};
 
-// ver.20260803.02: 技能水準ブロック専用の選択肢（日本語ブロックは上のSKILL_EVAL_TYPESのまま）
+// ver.20260803.04: 技能水準ブロック専用の選択肢（日本語ブロックは上のSKILL_EVAL_TYPESのまま）
 // 送信値(value)は案シスと一致。技能実習3号は表示のみ分け、送信値は2号と同じ（案シス取込は2号扱いでOK）
+// i18n: 翻訳ボタン押下時に表示テキストのみ言語別へ差し替え（value=送信値は不変）。ローマ字補足(SSW / Senmonkyu, 3 Kyu, Hyoka choso)は各言語共通で末尾に付ける
 var SKILL_PROOF_OPTIONS = [
-  {value:'分野別運用方針に定める評価方法による証明', label:'試験合格(SSW)'},
-  {value:'技能実習２号を良好に修了', label:'技能実習2号終了（専門級・随時３級・評価調書）'},
-  {value:'技能実習２号を良好に修了', label:'技能実習3号終了（専門級・随時３級・評価調書）'}
+  {value:'分野別運用方針に定める評価方法による証明', label:'試験合格(SSW)', i18n:{
+    en:'Passed the exam (SSW)', vi:'Đã đỗ kỳ thi (SSW)', id:'Lulus ujian (SSW)',
+    my:'စာမေးပွဲ အောင်မြင်ခြင်း (SSW)', km:'ប្រឡងជាប់ (SSW)', ne:'परीक्षा उत्तीर्ण (SSW)', zh:'考试合格 (SSW)'}},
+  {value:'技能実習２号を良好に修了', label:'技能実習2号終了（専門級・随時３級・評価調書）', i18n:{
+    en:'Completed Technical Intern Training (ii) (Senmonkyu, 3 Kyu, Hyoka choso)',
+    vi:'Hoàn thành Thực tập kỹ năng số 2 (Senmonkyu, 3 Kyu, Hyoka choso)',
+    id:'Menyelesaikan Program Pelatihan Magang Teknis Fase 2 (Senmonkyu, 3 Kyu, Hyoka choso)',
+    my:'နည်းပညာ အလုပ်သင်သင်တန်း အဆင့် ၂ ပြီးမြောက် (Senmonkyu, 3 Kyu, Hyoka choso)',
+    km:'បញ្ចប់វគ្គបណ្តុះបណ្តាលជំនាញ លេខ ២ (Senmonkyu, 3 Kyu, Hyoka choso)',
+    ne:'प्राविधिक इन्टर्न तालिम नं. २ पूरा (Senmonkyu, 3 Kyu, Hyoka choso)',
+    zh:'技能实习2号修了 (Senmonkyu, 3 Kyu, Hyoka choso)'}},
+  {value:'技能実習２号を良好に修了', label:'技能実習3号終了（専門級・随時３級・評価調書）', i18n:{
+    en:'Completed Technical Intern Training (iii) (Senmonkyu, 3 Kyu, Hyoka choso)',
+    vi:'Hoàn thành Thực tập kỹ năng số 3 (Senmonkyu, 3 Kyu, Hyoka choso)',
+    id:'Menyelesaikan Program Pelatihan Magang Teknis Fase 3 (Senmonkyu, 3 Kyu, Hyoka choso)',
+    my:'နည်းပညာ အလုပ်သင်သင်တန်း အဆင့် ၃ ပြီးမြောက် (Senmonkyu, 3 Kyu, Hyoka choso)',
+    km:'បញ្ចប់វគ្គបណ្តុះបណ្តាលជំនាញ លេខ ៣ (Senmonkyu, 3 Kyu, Hyoka choso)',
+    ne:'प्राविधिक इन्टर्न तालिम नं. ३ पूरा (Senmonkyu, 3 Kyu, Hyoka choso)',
+    zh:'技能实习3号修了 (Senmonkyu, 3 Kyu, Hyoka choso)'}}
 ];
 function makeProofOptions(list) {
-  return list.map(function(o){ return '<option value="' + o.value + '">' + o.label + '</option>'; }).join('');
+  return list.map(function(o, i){ return '<option value="' + o.value + '" data-optidx="' + i + '">' + o.label + '</option>'; }).join('');
+}
+// 翻訳ボタン連動：技能水準セレクトの表示テキストを言語別に切替（value=送信値は不変）
+function applyProofOptionLang(l) {
+  var sel = document.getElementById('f-skillEvalType');
+  if (!sel) return;
+  Array.prototype.forEach.call(sel.options, function(opt){
+    var idx = opt.getAttribute('data-optidx');
+    if (idx === null) return;
+    var o = SKILL_PROOF_OPTIONS[+idx];
+    if (!o) return;
+    opt.textContent = (l && o.i18n && o.i18n[l]) ? o.i18n[l] : o.label;
+  });
 }
 
 // ver.20260523.03: 試験リストを分野別にグルーピング（3段階選択用）
@@ -2731,6 +2760,7 @@ function setLang(l) {
   if (tenshutsuNoteEl) {
     tenshutsuNoteEl.textContent = dict.tenshutsuNote || '※ お引越しの予定がある場合のみ';
   }
+  if (typeof applyProofOptionLang === 'function') applyProofOptionLang(l);
 }
 
 var TYPE_LABELS = {
