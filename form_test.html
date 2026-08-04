@@ -191,7 +191,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20260803.08';
+var FORM_VERSION = 'ver.20260803.10';
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -552,9 +552,12 @@ function blockContact(showResCard, showExtra) {
 
   if (isTokutei) {
     // 特定技能：在留カード・住所・一時帰国を統一仕様で表示（あり/なし切替）
-    h += blockResidenceCardTokutei();
-    h += blockAddressTokutei();
-    h += blockTempReturnTokutei();
+    // ver.20260803.10: 認定申請は日本国外からの申請のため、在留カード・現住所・一時帰国は表示しない
+    if (type !== 'tokutei_nintei') {
+      h += blockResidenceCardTokutei();
+      h += blockAddressTokutei();
+      h += blockTempReturnTokutei();
+    }
   } else {
     // 技人国などは従来どおり
     if (showResCard) h += field('f-residenceCard', '在留カード番号（ばんごう）', 'text', false, '例: AB12345678CD', 'residenceCard');
@@ -2508,15 +2511,17 @@ function validate() {
   if (type==='tokutei_nintei' && !val('f-entryCount')) return '来日回数を入力してください。';
   if (type==='tokutei_nintei' && !val('f-coeCount')) return 'COE申請回数を入力してください。';
 
-  // 特定技能：在留カード・現住所・一時帰国の必須チェック
-  if (isTokutei) {
+  // 特定技能：在留カード・現住所・一時帰国の必須チェック（認定は日本国外のため対象外）
+  if (isTokutei && type !== 'tokutei_nintei') {
     var rcStatus = val('f-residenceCardStatus');
     if (!rcStatus) return '在留カードの有無を選択してください。';
     if (rcStatus === 'あり' && !val('f-residenceCard')) return '在留カード番号を入力してください。';
 
     var adStatus = val('f-addressStatus');
-    if (!adStatus) return '日本の現住所の有無を選択してください。';
-    if (adStatus === 'あり' && !val('f-address')) return '日本の現住所を入力してください。';
+    if (type !== 'tokutei_nintei') {
+      if (!adStatus) return '日本の現住所の有無を選択してください。';
+      if (adStatus === 'あり' && !val('f-address')) return '日本の現住所を入力してください。';
+    }
 
     var trStatus = val('f-tempReturnStatus');
     if (!trStatus) return '一時帰国の有無を選択してください。';
