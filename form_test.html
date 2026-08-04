@@ -191,7 +191,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20260803.10';
+var FORM_VERSION = 'ver.20260803.11';
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -830,6 +830,54 @@ var JP_FIELD_GROUPS_2 = [
   {field:'日本語試験（にほんごしけん）', exams:['国際交流基金日本語基礎テスト','日本語能力試験','介護日本語評価試験']}
 ];
 
+// ver.20260803.11: 日本語能力ブロックの選択肢（評価区分・分野・試験名・受験地）を翻訳ボタン連動で表示切替
+// key=optionのvalue（送信値は不変）。ja=日本語表示（「なし」時に戻す。試験名はJFT/JLPT表記に合わせる）
+var JP_OPT_I18N = {
+  // 評価区分
+  '分野別運用方針に定める評価方法による証明':{ja:'試験合格',en:'Passed the exam',vi:'Đã đỗ kỳ thi',id:'Lulus ujian',my:'စာမေးပွဲ အောင်မြင်',km:'ប្រឡងជាប់',ne:'परीक्षा उत्तीर्ण',zh:'考试合格'},
+  '技能実習２号を良好に修了':{ja:'技能実習２号を良好に修了',en:'Completed Technical Intern Training (ii)',vi:'Hoàn thành Thực tập kỹ năng số 2',id:'Menyelesaikan Magang Teknis Fase 2',my:'နည်းပညာအလုပ်သင် အဆင့် ၂ ပြီးမြောက်',km:'បញ្ចប់កម្មសិក្សាជំនាញ លេខ ២',ne:'प्राविधिक तालिम नं. २ पूरा',zh:'技能实习2号修了'},
+  // 分野
+  '試験免除（しけんめんじょ）':{ja:'試験免除（しけんめんじょ）',en:'Exam exemption',vi:'Miễn thi',id:'Bebas ujian',my:'စာမေးပွဲ ကင်းလွတ်ခွင့်',km:'ការលើកលែងការប្រឡង',ne:'परीक्षा छुट',zh:'免除考试'},
+  '日本語試験（にほんごしけん）':{ja:'日本語試験（にほんごしけん）',en:'Japanese language test',vi:'Kỳ thi tiếng Nhật',id:'Ujian bahasa Jepang',my:'ဂျပန်စာ စာမေးပွဲ',km:'ការប្រឡងភាសាជប៉ុន',ne:'जापानी भाषा परीक्षा',zh:'日语考试'},
+  // 試験名（jaはJFT/JLPT表記に合わせる）
+  '試験免除':{ja:'試験免除',en:'Exam exemption',vi:'Miễn thi',id:'Bebas ujian',my:'စာမေးပွဲ ကင်းလွတ်ခွင့်',km:'ការលើកលែងការប្រឡង',ne:'परीक्षा छुट',zh:'免除考试'},
+  '国際交流基金日本語基礎テスト':{ja:'JFT-Basics （国際交流基金日本語基礎テスト）',en:'JFT-Basic',vi:'JFT-Basic',id:'JFT-Basic',my:'JFT-Basic',km:'JFT-Basic',ne:'JFT-Basic',zh:'JFT-Basic'},
+  '日本語能力試験':{ja:'JLPT（日本語能力試験）',en:'JLPT',vi:'JLPT',id:'JLPT',my:'JLPT',km:'JLPT',ne:'JLPT',zh:'JLPT'},
+  '介護日本語評価試験':{ja:'介護日本語評価試験',en:'Nursing Care Japanese Test',vi:'Kỳ thi tiếng Nhật ngành điều dưỡng',id:'Ujian Bahasa Jepang Keperawatan',my:'ပြုစုစောင့်ရှောက်ရေး ဂျပန်စာ စာမេးပွဲ',km:'ការប្រឡងភាសាជប៉ុនថែទាំ',ne:'हेरचाह जापानी भाषा परीक्षा',zh:'护理日语评价考试'},
+  // 受験地（国名）
+  '日本 Japan':{ja:'日本 Japan',en:'Japan',vi:'Nhật Bản',id:'Jepang',my:'ဂျပန်',km:'ជប៉ុន',ne:'जापान',zh:'日本'},
+  '中国 People\'s Republic of China':{ja:'中国 People\'s Republic of China',en:'China',vi:'Trung Quốc',id:'Tiongkok',my:'တရုတ်',km:'ចិន',ne:'चीन',zh:'中国'},
+  'ベトナム Viet Nam':{ja:'ベトナム Viet Nam',en:'Vietnam',vi:'Việt Nam',id:'Vietnam',my:'ဗီယက်နမ်',km:'វៀតណាម',ne:'भियतनाम',zh:'越南'},
+  '韓国 Republic of Korea':{ja:'韓国 Republic of Korea',en:'South Korea',vi:'Hàn Quốc',id:'Korea Selatan',my:'တောင်ကိုရီးယား',km:'កូរ៉េខាងត្បូង',ne:'दक्षिण कोरिया',zh:'韩国'},
+  'フィリピン Philippines':{ja:'フィリピン Philippines',en:'Philippines',vi:'Philippines',id:'Filipina',my:'ဖိလစ်ပိုင်',km:'ហ្វីលីពីន',ne:'फिलिपिन्स',zh:'菲律宾'},
+  'ブラジル Brazil':{ja:'ブラジル Brazil',en:'Brazil',vi:'Brazil',id:'Brasil',my:'ဘရာဇီး',km:'ប្រេស៊ីល',ne:'ब्राजिल',zh:'巴西'},
+  'ネパール Nepal':{ja:'ネパール Nepal',en:'Nepal',vi:'Nepal',id:'Nepal',my:'နီပေါ',km:'នេប៉ាល់',ne:'नेपाल',zh:'尼泊尔'},
+  'インドネシア Indonesia':{ja:'インドネシア Indonesia',en:'Indonesia',vi:'Indonesia',id:'Indonesia',my:'အင်ဒိုနီးရှား',km:'ឥណ្ឌូនេស៊ី',ne:'इन्डोनेसिया',zh:'印度尼西亚'},
+  'ミャンマー Myanmar':{ja:'ミャンマー Myanmar',en:'Myanmar',vi:'Myanmar',id:'Myanmar',my:'မြန်မာ',km:'មីយ៉ាន់ម៉ា',ne:'म्यानमार',zh:'缅甸'},
+  '台湾 Taiwan':{ja:'台湾 Taiwan',en:'Taiwan',vi:'Đài Loan',id:'Taiwan',my:'ထိုင်ဝမ်',km:'តៃវ៉ាន់',ne:'ताइवान',zh:'台湾'},
+  '米国 United States of America':{ja:'米国 United States of America',en:'USA',vi:'Hoa Kỳ',id:'Amerika Serikat',my:'အမေရိကန်',km:'សហរដ្ឋអាមេរិក',ne:'अमेरिका',zh:'美国'},
+  'カンボジア Cambodia':{ja:'カンボジア Cambodia',en:'Cambodia',vi:'Campuchia',id:'Kamboja',my:'ကမ္ဘောဒီးယား',km:'កម្ពុជា',ne:'कम्बोडिया',zh:'柬埔寨'},
+  'タイ Thailand':{ja:'タイ Thailand',en:'Thailand',vi:'Thái Lan',id:'Thailand',my:'ထိုင်း',km:'ថៃ',ne:'थाइल्यान्ड',zh:'泰国'},
+  'モンゴル Mongolia':{ja:'モンゴル Mongolia',en:'Mongolia',vi:'Mông Cổ',id:'Mongolia',my:'မွန်ဂိုးလီးယား',km:'ម៉ុងហ្គោលី',ne:'मंगोलिया',zh:'蒙古'},
+  'バングラデシュ Bangladesh':{ja:'バングラデシュ Bangladesh',en:'Bangladesh',vi:'Bangladesh',id:'Bangladesh',my:'ဘင်္ဂလားဒေ့ရှ်',km:'បង់ក្លាដេស',ne:'बंगलादेश',zh:'孟加拉国'},
+  'スリランカ Sri Lanka':{ja:'スリランカ Sri Lanka',en:'Sri Lanka',vi:'Sri Lanka',id:'Sri Lanka',my:'သီရိလင်္ကာ',km:'ស្រីលង្កា',ne:'श्रीलंका',zh:'斯里兰卡'},
+  'パキスタン Pakistan':{ja:'パキスタン Pakistan',en:'Pakistan',vi:'Pakistan',id:'Pakistan',my:'ပါကစ္စတန်',km:'ប៉ាគីស្ថាន',ne:'पाकिस्तान',zh:'巴基斯坦'},
+  'インド India':{ja:'インド India',en:'India',vi:'Ấn Độ',id:'India',my:'အိန္ဒိယ',km:'ឥណ្ឌា',ne:'भारत',zh:'印度'},
+  'ウズベキスタン Uzbekistan':{ja:'ウズベキスタン Uzbekistan',en:'Uzbekistan',vi:'Uzbekistan',id:'Uzbekistan',my:'ဥဇဘက်ကစ္စတန်',km:'អ៊ូបេគីស្ថាន',ne:'उज्बेकिस्तान',zh:'乌兹别克斯坦'}
+};
+// 日本語ブロック各セレクトのoption表示を言語別へ切替（value=送信値は不変）
+function applyJpBlockLang(l) {
+  ['f-jpEvalType','f-jpField1','f-jpField2','f-jpExam1','f-jpExam2','f-jpExamLoc1','f-jpExamLoc2'].forEach(function(id){
+    var sel = document.getElementById(id);
+    if (!sel) return;
+    Array.prototype.forEach.call(sel.options, function(opt){
+      var m = JP_OPT_I18N[opt.value];
+      if (!m) return; // '---'やマッピング外はそのまま
+      opt.textContent = (l && m[l]) ? m[l] : m.ja;
+    });
+  });
+}
+
 // 試験名から所属分野を逆引き
 function _findFieldForExam(groups, examName){
   for(var i=0;i<groups.length;i++){
@@ -937,6 +985,7 @@ function onJpFieldChange(num, fieldValue) {
   if(num === 2 && typeof toggleJpExam2Loc === 'function'){
     toggleJpExam2Loc(examSel ? examSel.value : '');
   }
+  if (typeof applyJpBlockLang === 'function') applyJpBlockLang(currentLang);
 }
 
 // ===== 技能証明ブロック =====
@@ -2796,6 +2845,7 @@ function setLang(l) {
   }
   if (typeof applyProofOptionLang === 'function') applyProofOptionLang(l);
   if (typeof applyGijutsuProofLang === 'function') applyGijutsuProofLang(l);
+  if (typeof applyJpBlockLang === 'function') applyJpBlockLang(l);
 }
 
 var TYPE_LABELS = {
