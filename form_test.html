@@ -191,7 +191,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20260803.05';
+var FORM_VERSION = 'ver.20260803.06';
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -813,6 +813,15 @@ var JP_FIELD_GROUPS = [
   {field:'日本語試験（にほんごしけん）', exams:['国際交流基金日本語基礎テスト','日本語能力試験','介護日本語評価試験']}
 ];
 var JP_EXAM_LIST = JP_FIELD_GROUPS.reduce(function(acc, g){ return acc.concat(g.exams); }, []);
+// ver.20260803.06: 日本語試験名① は介護を除く2つ、② は3つ。表示ラベルはJFT/JLPT表記（送信値=正式名称は据え置き）
+var JP_FIELD_GROUPS_1 = [
+  {field:'試験免除（しけんめんじょ）', exams:['試験免除']},
+  {field:'日本語試験（にほんごしけん）', exams:['国際交流基金日本語基礎テスト','日本語能力試験']}
+];
+var JP_EXAM_LABELS = {
+  '国際交流基金日本語基礎テスト':'JFT-Basics （国際交流基金日本語基礎テスト）',
+  '日本語能力試験':'JLPT（日本語能力試験）'
+};
 
 // 試験名から所属分野を逆引き
 function _findFieldForExam(groups, examName){
@@ -884,7 +893,8 @@ function _updateExamSelect(selectId, groups, fieldValue) {
     for(var i=0;i<groups.length;i++){ if(groups[i].field === fieldValue){ group = groups[i]; break; } }
     if(group){
       newOptions += group.exams.map(function(v){
-        return '<option value="' + v + '">' + v + '</option>';
+        var lbl = (typeof JP_EXAM_LABELS !== 'undefined' && JP_EXAM_LABELS[v]) ? JP_EXAM_LABELS[v] : v;
+        return '<option value="' + v + '">' + lbl + '</option>';
       }).join('');
     }
   }
@@ -911,7 +921,8 @@ function onSkillFieldChange(num, fieldValue) {
 }
 
 function onJpFieldChange(num, fieldValue) {
-  _updateExamSelect('f-jpExam' + num, JP_FIELD_GROUPS, fieldValue);
+  var groups = (num === 1) ? JP_FIELD_GROUPS_1 : JP_FIELD_GROUPS;
+  _updateExamSelect('f-jpExam' + num, groups, fieldValue);
   var examSel = document.getElementById('f-jpExam' + num);
   if(examSel && fieldValue === '試験免除（しけんめんじょ）'){
     examSel.value = '試験免除';
