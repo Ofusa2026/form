@@ -191,7 +191,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20260803.07';
+var FORM_VERSION = 'ver.20260803.08';
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -822,6 +822,10 @@ var JP_EXAM_LABELS = {
   '国際交流基金日本語基礎テスト':'JFT-Basics （国際交流基金日本語基礎テスト）',
   '日本語能力試験':'JLPT（日本語能力試験）'
 };
+// ver.20260803.08: 分野② は「試験免除」を外し「日本語試験」のみ（介護日本語試験に合格した人向け）
+var JP_FIELD_GROUPS_2 = [
+  {field:'日本語試験（にほんごしけん）', exams:['国際交流基金日本語基礎テスト','日本語能力試験','介護日本語評価試験']}
+];
 
 // 試験名から所属分野を逆引き
 function _findFieldForExam(groups, examName){
@@ -1009,7 +1013,7 @@ function blockJapaneseProof() {
   h += '<div class="sub-label" style="background:#f0fdf4;color:#15803d;border-radius:6px;padding:6px 10px;margin:12px 0 8px;font-size:12px;font-weight:700;">【日本語試験②（にほんごしけん②・介護日本語試験に合格している場合）】</div>';
   // ver.20260523.03: ②も分野→試験名の2段階セレクト
   h += '<div class="field"><label>分野（ぶんや）②<div class="trans" data-key="jpField2"></div></label>';
-  h += '<select id="f-jpField2" onchange="onJpFieldChange(2, this.value)"><option value="">なし / 該当しない</option>' + makeFieldOptions(JP_FIELD_GROUPS) + '</select></div>';
+  h += '<select id="f-jpField2" onchange="onJpFieldChange(2, this.value)"><option value="">なし / 該当しない</option>' + makeFieldOptions(JP_FIELD_GROUPS_2) + '</select></div>';
   h += '<div class="field"><label>日本語試験名②（にほんごしけんめい②）<div class="trans" data-key="jpProof2ExamType"></div></label>';
   h += '<select id="f-jpExam2" onchange="toggleJpExam2Loc(this.value)"><option value="">---</option></select></div>';
   h += '<div id="jpExam2LocWrap" style="display:none;">';
