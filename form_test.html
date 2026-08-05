@@ -191,7 +191,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20260803.14';
+var FORM_VERSION = 'ver.20260803.17';
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -2548,6 +2548,151 @@ function collectData() {
   return d;
 }
 
+// ver.20260803.17: 全エラーのふりがな/翻訳（日本語文言をキーに引く。未登録は素の日本語表示）
+var ERR_MSG_I18N = {
+  '氏名（パスポート表記）は必須です。':{fr:'しめい（ぱすぽーとひょうき）は ひっすです。',en:'Full name (as in passport) is required.',vi:'Họ tên (như trên hộ chiếu) là bắt buộc.',id:'Nama lengkap (sesuai paspor) wajib diisi.',my:'အမည် (ပတ်စ်ပို့အတိုင်း) ဖြည့်ရန်လိုအပ်သည်။',km:'ឈ្មោះ (តាមលិខិតឆ្លងដែន) ត្រូវបំពេញ។',ne:'नाम (राहदानी अनुसार) अनिवार्य छ।',zh:'姓名（护照拼写）为必填项。'},
+  '生年月日は必須です。':{fr:'せいねんがっぴは ひっすです。',en:'Date of birth is required.',vi:'Ngày sinh là bắt buộc.',id:'Tanggal lahir wajib diisi.',my:'မွေးသက္ကရာဇ် ဖြည့်ရန်လိုအပ်သည်။',km:'ថ្ងៃខែឆ្នាំកំណើត ត្រូវបំពេញ។',ne:'जन्म मिति अनिवार्य छ।',zh:'出生年月日为必填项。'},
+  '国籍は必須です。':{fr:'こくせきは ひっすです。',en:'Nationality is required.',vi:'Quốc tịch là bắt buộc.',id:'Kewarganegaraan wajib diisi.',my:'နိုင်ငံသား ဖြည့်ရန်လိုအပ်သည်။',km:'សញ្ជាតិ ត្រូវបំពេញ។',ne:'राष्ट्रियता अनिवार्य छ।',zh:'国籍为必填项。'},
+  'メールアドレスは必須です。':{fr:'めーるあどれすは ひっすです。',en:'Email address is required.',vi:'Địa chỉ email là bắt buộc.',id:'Alamat email wajib diisi.',my:'အီးမေးလ်လိပ်စာ ဖြည့်ရန်လိုအပ်သည်။',km:'អាសយដ្ឋានអ៊ីមែល ត្រូវបំពេញ។',ne:'इमेल ठेगाना अनिवार्य छ।',zh:'电子邮件为必填项。'},
+  '結婚しているかどうかを選択してください。':{fr:'けっこんして いるか どうかを えらんで ください。',en:'Please select whether you are married.',vi:'Vui lòng chọn tình trạng hôn nhân.',id:'Silakan pilih status pernikahan.',my:'အိမ်ထောင်ရှိမရှိ ရွေးချယ်ပါ။',km:'សូមជ្រើសរើសស្ថានភាពអាពាហ៍ពិពាហ៍។',ne:'विवाहित हो/होइन छान्नुहोस्।',zh:'请选择是否已婚。'},
+  '来日回数を入力してください。':{fr:'らいにちかいすうを にゅうりょくして ください。',en:'Please enter the number of times you have visited Japan.',vi:'Vui lòng nhập số lần đến Nhật.',id:'Masukkan jumlah kedatangan ke Jepang.',my:'ဂျပန်သို့ လာရောက်ခဲ့သည့် အကြိမ်ရေ ဖြည့်ပါ။',km:'សូមបញ្ចូលចំនួនដងដែលបានមកជប៉ុន។',ne:'जापान आएको पटक संख्या लेख्नुहोस्।',zh:'请输入来日次数。'},
+  'COE申請回数を入力してください。':{fr:'こーいー（COE）しんせいかいすうを にゅうりょくして ください。',en:'Please enter the number of COE applications.',vi:'Vui lòng nhập số lần xin COE.',id:'Masukkan jumlah pengajuan COE.',my:'COE လျှောက်ထားခဲ့သည့် အကြိမ်ရေ ဖြည့်ပါ။',km:'សូមបញ្ចូលចំនួនដងនៃការស្នើសុំ COE។',ne:'COE आवेदन पटक संख्या लेख्नुहोस्।',zh:'请输入COE申请次数。'},
+  '在留カードの有無を選択してください。':{fr:'ざいりゅうかーどの うむを えらんで ください。',en:'Please select whether you have a Residence Card.',vi:'Vui lòng chọn có/không có Thẻ cư trú.',id:'Silakan pilih ada/tidaknya Kartu Izin Tinggal.',my:'နေထိုင်ခွင့်ကတ် ရှိမရှိ ရွေးချယ်ပါ။',km:'សូមជ្រើសរើសថាមាន/គ្មានប័ណ្ណស្នាក់នៅ។',ne:'निवास कार्ड छ/छैन छान्नुहोस्।',zh:'请选择是否持有在留卡。'},
+  '在留カード番号を入力してください。':{fr:'ざいりゅうかーどばんごうを にゅうりょくして ください。',en:'Please enter your Residence Card number.',vi:'Vui lòng nhập số Thẻ cư trú.',id:'Masukkan nomor Kartu Izin Tinggal.',my:'နေထိုင်ခွင့်ကတ် နံပါတ် ဖြည့်ပါ။',km:'សូមបញ្ចូលលេខប័ណ្ណស្នាក់នៅ។',ne:'निवास कार्ड नम्बर लेख्नुहोस्।',zh:'请输入在留卡号码。'},
+  '日本の現住所の有無を選択してください。':{fr:'にほんの げんじゅうしょの うむを えらんで ください。',en:'Please select whether you have a current address in Japan.',vi:'Vui lòng chọn có/không có địa chỉ hiện tại ở Nhật.',id:'Silakan pilih ada/tidaknya alamat di Jepang.',my:'ဂျပန်တွင် လက်ရှိနေရပ်လိပ်စာ ရှိမရှိ ရွေးချယ်ပါ။',km:'សូមជ្រើសរើសថាមាន/គ្មានអាសយដ្ឋានបច្ចុប្បន្ននៅជប៉ុន។',ne:'जापानमा हालको ठेगाना छ/छैन छान्नुहोस्।',zh:'请选择在日本是否有现住址。'},
+  '日本の現住所を入力してください。':{fr:'にほんの げんじゅうしょを にゅうりょくして ください。',en:'Please enter your current address in Japan.',vi:'Vui lòng nhập địa chỉ hiện tại ở Nhật.',id:'Masukkan alamat Anda di Jepang.',my:'ဂျပန်တွင် လက်ရှိနေရပ်လိပ်စာ ဖြည့်ပါ။',km:'សូមបញ្ចូលអាសយដ្ឋានបច្ចុប្បន្ននៅជប៉ុន។',ne:'जापानमा हालको ठेगाना लेख्नुहोस्।',zh:'请输入在日本的现住址。'},
+  '一時帰国の有無を選択してください。':{fr:'いちじきこくの うむを えらんで ください。',en:'Please select whether you plan a temporary return home.',vi:'Vui lòng chọn có/không về nước tạm thời.',id:'Silakan pilih ada/tidaknya rencana pulang sementara.',my:'ယာယီ ပြန်မည်/မပြန် ရွေးချယ်ပါ။',km:'សូមជ្រើសរើសថាមាន/គ្មានការត្រឡប់ស្រុកបណ្តោះអាសន្ន។',ne:'अस्थायी स्वदेश फिर्ती छ/छैन छान्नुहोस्।',zh:'请选择是否有临时回国计划。'},
+  '一時帰国の出国予定日を入力してください。':{fr:'いちじきこくの しゅっこくよていびを にゅうりょくして ください。',en:'Please enter the planned departure date for your temporary return.',vi:'Vui lòng nhập ngày dự kiến xuất cảnh về nước tạm thời.',id:'Masukkan tanggal rencana keberangkatan pulang sementara.',my:'ယာယီပြန်မည့် ထွက်ခွာမည့်ရက် ဖြည့်ပါ။',km:'សូមបញ្ចូលថ្ងៃគ្រោងចេញដំណើរត្រឡប់ស្រុក។',ne:'अस्थायी फिर्तीको प्रस्थान मिति लेख्नुहोस्।',zh:'请输入临时回国的预定出境日期。'},
+  '卒業年月日を入力してください。':{fr:'そつぎょう ねんがっぴを にゅうりょくして ください。',en:'Please enter your graduation date.',vi:'Vui lòng nhập ngày tốt nghiệp.',id:'Masukkan tanggal kelulusan.',my:'ဘွဲ့ရ သက္ကရာဇ် ဖြည့်ပါ။',km:'សូមបញ្ចូលថ្ងៃបញ្ចប់ការសិក្សា។',ne:'स्नातक मिति लेख्नुहोस्।',zh:'请输入毕业年月日。'},
+  '日本語能力（JLPT N2またはBJT 400点以上）の有無を選択してください。':{fr:'にほんごのうりょく（JLPT N2 または BJT 400てんいじょう）の うむを えらんで ください。',en:'Please select whether you have Japanese proficiency (JLPT N2 or BJT 400+).',vi:'Vui lòng chọn có/không năng lực tiếng Nhật (JLPT N2 hoặc BJT 400+).',id:'Silakan pilih ada/tidaknya kemampuan Jepang (JLPT N2 atau BJT 400+).',my:'ဂျပန်ဘာသာ အရည်အချင်း (JLPT N2 သို့ BJT 400+) ရှိမရှိ ရွေးပါ။',km:'សូមជ្រើសរើសសមត្ថភាពភាសាជប៉ុន (JLPT N2 ឬ BJT 400+)។',ne:'जापानी दक्षता (JLPT N2 वा BJT 400+) छ/छैन छान्नुहोस्।',zh:'请选择是否具备日语能力（JLPT N2或BJT 400分以上）。'},
+  '現職の役職の有無を選択してください。':{fr:'げんしょくの やくしょくの うむを えらんで ください。',en:'Please select whether you hold a position in your current job.',vi:'Vui lòng chọn có/không chức vụ ở công việc hiện tại.',id:'Silakan pilih ada/tidaknya jabatan di pekerjaan saat ini.',my:'လက်ရှိအလုပ်တွင် ရာထူး ရှိမရှိ ရွေးပါ။',km:'សូមជ្រើសរើសថាមាន/គ្មានតួនាទីនៅការងារបច្ចុប្បន្ន។',ne:'हालको जागिरमा पद छ/छैन छान्नुहोस्।',zh:'请选择现职是否有职务。'},
+  '役職名を入力してください。':{fr:'やくしょくめいを にゅうりょくして ください。',en:'Please enter your position title.',vi:'Vui lòng nhập tên chức vụ.',id:'Masukkan nama jabatan.',my:'ရာထူးအမည် ဖြည့်ပါ။',km:'សូមបញ្ចូលឈ្មោះតួនាទី។',ne:'पदको नाम लेख्नुहोस्।',zh:'请输入职务名称。'},
+  '技人国の実務経験年数の有無を選択してください。':{fr:'ぎじんこくの じつむけいけん ねんすうの うむを えらんで ください。',en:'Please select whether you have work experience (Engineer/Specialist).',vi:'Vui lòng chọn có/không kinh nghiệm làm việc (Kỹ sư/Nhân văn).',id:'Silakan pilih ada/tidaknya pengalaman kerja.',my:'အလုပ်အတွေ့အကြုံ နှစ် ရှိမရှိ ရွေးပါ။',km:'សូមជ្រើសរើសថាមាន/គ្មានបទពិសោធន៍ការងារ។',ne:'कार्य अनुभव वर्ष छ/छैन छान्नुहोस्।',zh:'请选择是否有技人国实务经验年数。'},
+  '実務経験の年数または月数を入力してください。':{fr:'じつむけいけんの ねんすう または つきすうを にゅうりょくして ください。',en:'Please enter years or months of work experience.',vi:'Vui lòng nhập số năm hoặc tháng kinh nghiệm.',id:'Masukkan jumlah tahun atau bulan pengalaman kerja.',my:'အလုပ်အတွေ့အကြုံ နှစ် သို့ လ ဖြည့်ပါ။',km:'សូមបញ្ចូលចំនួនឆ្នាំ ឬ ខែនៃបទពិសោធន៍។',ne:'कार्य अनुभवको वर्ष वा महिना लेख्नुहोस्।',zh:'请输入实务经验的年数或月数。'},
+  '技能水準 評価区分を選択してください。':{fr:'ぎのうすいじゅん ひょうかくぶんを えらんで ください。',en:'Please select the skill proficiency category.',vi:'Vui lòng chọn phân loại đánh giá tay nghề.',id:'Silakan pilih kategori penilaian keterampilan.',my:'ကျွမ်းကျင်မှုအဆင့် အမျိုးအစား ရွေးပါ။',km:'សូមជ្រើសរើសប្រភេទវាយតម្លៃជំនាញ។',ne:'सीप स्तर मूल्यांकन वर्ग छान्नुहोस्।',zh:'请选择技能水平评价区分。'},
+  '技能試験名①を選択してください。':{fr:'ぎのうしけんめい①を えらんで ください。',en:'Please select skill exam name ①.',vi:'Vui lòng chọn tên kỳ thi tay nghề ①.',id:'Silakan pilih nama ujian keterampilan ①.',my:'ကျွမ်းကျင်မှုစာမေးပွဲအမည် ① ရွေးပါ။',km:'សូមជ្រើសរើសឈ្មោះការប្រឡងជំនាញ ①។',ne:'सीप परीक्षा नाम ① छान्नुहोस्।',zh:'请选择技能考试名称①。'},
+  '技能試験 受験地①を選択してください。':{fr:'ぎのうしけん じゅけんち①を えらんで ください。',en:'Please select skill exam location ①.',vi:'Vui lòng chọn nơi thi tay nghề ①.',id:'Silakan pilih lokasi ujian keterampilan ①.',my:'ကျွမ်းကျင်မှုစာမေးပွဲ ဖြေဆိုသည့်နေရာ ① ရွေးပါ။',km:'សូមជ្រើសរើសទីតាំងប្រឡងជំនាញ ①។',ne:'सीप परीक्षा स्थान ① छान्नुहोस्।',zh:'请选择技能考试地点①。'},
+  '職種（技能実習2号）を入力してください。':{fr:'しょくしゅ（ぎのうじっしゅう2ごう）を にゅうりょくして ください。',en:'Please enter the occupation (Technical Intern (ii)).',vi:'Vui lòng nhập ngành nghề (Thực tập kỹ năng số 2).',id:'Masukkan jenis pekerjaan (Magang Teknis 2).',my:'အလုပ်အကိုင် (နည်းပညာအလုပ်သင် ၂) ဖြည့်ပါ။',km:'សូមបញ្ចូលមុខរបរ (កម្មសិក្សាជំនាញលេខ២)។',ne:'पेशा (प्राविधिक तालिम नं.२) लेख्नुहोस्।',zh:'请输入职种（技能实习2号）。'},
+  '作業を入力してください。':{fr:'さぎょうを にゅうりょくして ください。',en:'Please enter the work/task.',vi:'Vui lòng nhập công việc.',id:'Masukkan jenis pekerjaan.',my:'လုပ်ငန်း ဖြည့်ပါ။',km:'សូមបញ្ចូលការងារ។',ne:'काम लेख्नुहोस्।',zh:'请输入作业内容。'},
+  '修了証明を選択してください。':{fr:'しゅうりょうしょうめいを えらんで ください。',en:'Please select the completion certificate.',vi:'Vui lòng chọn chứng nhận hoàn thành.',id:'Silakan pilih sertifikat penyelesaian.',my:'ပြီးဆုံးကြောင်း သက်သေခံ ရွေးပါ။',km:'សូមជ្រើសរើសវិញ្ញាបនបត្របញ្ចប់។',ne:'समाप्ति प्रमाण छान्नुहोस्।',zh:'请选择修了证明。'},
+  '日本語能力 評価区分を選択してください。':{fr:'にほんごのうりょく ひょうかくぶんを えらんで ください。',en:'Please select the Japanese proficiency category.',vi:'Vui lòng chọn phân loại đánh giá tiếng Nhật.',id:'Silakan pilih kategori penilaian bahasa Jepang.',my:'ဂျပန်ဘာသာ အရည်အချင်း အမျိုးအစား ရွေးပါ။',km:'សូមជ្រើសរើសប្រភេទវាយតម្លៃភាសាជប៉ុន។',ne:'जापानी दक्षता मूल्यांकन वर्ग छान्नुहोस्।',zh:'请选择日语能力评价区分。'},
+  '日本語試験名①を選択してください。':{fr:'にほんごしけんめい①を えらんで ください。',en:'Please select Japanese exam name ①.',vi:'Vui lòng chọn tên kỳ thi tiếng Nhật ①.',id:'Silakan pilih nama ujian bahasa Jepang ①.',my:'ဂျပန်ဘာသာစာမေးပွဲအမည် ① ရွေးပါ။',km:'សូមជ្រើសរើសឈ្មោះការប្រឡងភាសាជប៉ុន ①។',ne:'जापानी परीक्षा नाम ① छान्नुहोस्।',zh:'请选择日语考试名称①。'},
+  '日本語試験 受験地①を選択してください。':{fr:'にほんごしけん じゅけんち①を えらんで ください。',en:'Please select Japanese exam location ①.',vi:'Vui lòng chọn nơi thi tiếng Nhật ①.',id:'Silakan pilih lokasi ujian bahasa Jepang ①.',my:'ဂျပန်ဘာသာစာမေးပွဲ ဖြေဆိုသည့်နေရာ ① ရွေးပါ။',km:'សូមជ្រើសរើសទីតាំងប្រឡងភាសាជប៉ុន ①។',ne:'जापानी परीक्षा स्थान ① छान्नुहोस्।',zh:'请选择日语考试地点①。'}
+};
+function _renderPlainError(str){
+  var m = ERR_MSG_I18N[str];
+  if(!m) return null;
+  var L = currentLang || '';
+  var msg = (L && m[L]) ? m[L] : str;
+  var html = '<div style="font-weight:700;">' + msg + '</div>';
+  if(!L && m.fr){ html += '<div style="font-size:11px;color:#9a3f3f;margin-top:2px;">' + m.fr + '</div>'; }
+  return html;
+}
+
+// ver.20260803.16: 入力ミスの候補提示＆エラーのふりがな/翻訳 -----------------------------
+// エラーメッセージ（ja=日本語 / fr=ふりがな / 各言語）
+var ERR_I18N = {
+  emailFormat:{ja:'メールアドレスの形式が正しくありません。（例: your@email.com）',fr:'めーるあどれすの かたちが ただしく ありません。',en:'The email address format is incorrect (e.g. your@email.com).',vi:'Định dạng địa chỉ email không đúng (ví dụ: your@email.com).',id:'Format alamat email tidak benar (contoh: your@email.com).',my:'အီးမေးလ်လိပ်စာ ပုံစံ မမှန်ကန်ပါ (ဥပမာ - your@email.com)။',km:'ទម្រង់អ៊ីមែលមិនត្រឹមត្រូវ (ឧ. your@email.com)។',ne:'इमेल ठेगानाको ढाँचा मिलेन (उदाहरण: your@email.com)।',zh:'电子邮件格式不正确（例: your@email.com）。'},
+  emailTypo:{ja:'メールアドレスの末尾を確認してください。「.com」の打ち間違いかもしれません。',fr:'めーるあどれすの まつびを かくにんして ください。「.com」の うちまちがい かもしれません。',en:'Please check the end of the email. It may be a typo for ".com".',vi:'Vui lòng kiểm tra phần cuối email. Có thể bạn gõ nhầm ".com".',id:'Periksa akhiran email. Mungkin salah ketik dari ".com".',my:'အီးမေးလ် အဆုံးသတ်ကို စစ်ဆေးပါ။ ".com" ကို ရိုက်မှားခြင်း ဖြစ်နိုင်သည်။',km:'សូមពិនិត្យផ្នែកចុងអ៊ីមែល។ វាអាចជាការវាយខុស ".com"។',ne:'इमेलको अन्त्य जाँच गर्नुहोस्। ".com" गलत टाइप भएको हुन सक्छ।',zh:'请检查邮箱结尾，可能是「.com」的拼写错误。'},
+  addrPref:{ja:'住所は都道府県から入力してください。（例: 東京都新宿区…）',fr:'じゅうしょは とどうふけんから にゅうりょくして ください。',en:'Please enter the address starting from the prefecture (e.g. Tokyo-to Shinjuku-ku…).',vi:'Vui lòng nhập địa chỉ bắt đầu từ tỉnh/phủ (ví dụ: Tokyo-to Shinjuku-ku…).',id:'Masukkan alamat mulai dari prefektur (contoh: Tokyo-to Shinjuku-ku…).',my:'လိပ်စာကို ခရိုင်(တိုၚ်ဒိုဟု)မှ စ၍ ရိုက်ထည့်ပါ။',km:'សូមបញ្ចូលអាសយដ្ឋានចាប់ពីខេត្ត (ឧ. Tokyo-to…)។',ne:'ठेगाना प्रिफेक्चर(तोदोफुकेन)बाट सुरु गरी लेख्नुहोस्।',zh:'请从都道府县开始填写地址（例: 东京都新宿区…）。'}
+};
+var SUGGEST_LABEL = {ja:'もしかして',fr:'もしかして',en:'Did you mean',vi:'Có phải là',id:'Mungkin maksudnya',my:'ဆိုလိုသည်မှာ',km:'តើអ្នកចង់សរសេរ',ne:'तपाईंको मतलब',zh:'您是否想输入'};
+var ADDR_PICK_LABEL = {ja:'都道府県を選んで先頭に追加',fr:'とどうふけんを えらんで せんとうに ついか',en:'Pick a prefecture to add at the start',id:'Pilih prefektur untuk ditambahkan di awal',vi:'Chọn tỉnh để thêm vào đầu',my:'ရှေ့တွင်ထည့်ရန် ခရိုင်ရွေးပါ',km:'ជ្រើសខេត្តដើម្បីបន្ថែមខាងដើម',ne:'सुरुमा थप्न प्रिफेक्चर छान्नुहोस्',zh:'选择都道府县加到开头'};
+var USE_BTN_LABEL = {ja:'これにする',fr:'これにする',en:'Use this',vi:'Dùng cái này',id:'Gunakan ini',my:'ဤအရာသုံးမည်',km:'ប្រើនេះ',ne:'यो प्रयोग गर्नुहोस्',zh:'使用此项'};
+
+// メアドのよくある打ち間違いを直した候補を返す（無ければnull）
+function _computeEmailFix(email){
+  if(!email) return null;
+  var e = email.replace(/\s/g,'').replace(/。/g,'.').replace(/、/g,',');
+  e = e.replace(/\.(con|comm|coom|copm|cpm|vom|cim|xom|ocm|cmo)$/i,'.com');
+  if(e !== email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e)) return e;
+  return null;
+}
+
+// 市区町村→都道府県（推測候補用）。ambiguousは自動的に複数になる
+var _PREF_CITIES = {
+  '北海道':['札幌市','函館市','旭川市','釧路市','帯広市','苫小牧市','千歳市'],
+  '青森県':['青森市','弘前市','八戸市'],'岩手県':['盛岡市','一関市','奥州市'],
+  '宮城県':['仙台市','石巻市','大崎市'],'秋田県':['秋田市','横手市'],
+  '山形県':['山形市','鶴岡市','酒田市'],'福島県':['福島市','郡山市','いわき市','会津若松市'],
+  '茨城県':['水戸市','つくば市','日立市','土浦市','古河市'],'栃木県':['宇都宮市','小山市','足利市','栃木市'],
+  '群馬県':['前橋市','高崎市','太田市','伊勢崎市','桐生市'],
+  '埼玉県':['さいたま市','川口市','川越市','所沢市','越谷市','春日部市','熊谷市'],
+  '千葉県':['千葉市','船橋市','松戸市','市川市','柏市','成田市'],
+  '東京都':['千代田区','中央区','港区','新宿区','文京区','台東区','墨田区','江東区','品川区','目黒区','大田区','世田谷区','渋谷区','中野区','杉並区','豊島区','北区','荒川区','板橋区','練馬区','足立区','葛飾区','江戸川区','八王子市','町田市','府中市','立川市'],
+  '神奈川県':['横浜市','川崎市','相模原市','藤沢市','横須賀市','平塚市','厚木市'],
+  '新潟県':['新潟市','長岡市','上越市'],'富山県':['富山市','高岡市'],'石川県':['金沢市','白山市'],
+  '福井県':['福井市'],'山梨県':['甲府市'],'長野県':['長野市','松本市','上田市'],
+  '岐阜県':['岐阜市','大垣市','各務原市'],'静岡県':['静岡市','浜松市','富士市','沼津市','磐田市'],
+  '愛知県':['名古屋市','豊田市','豊橋市','岡崎市','一宮市','春日井市','安城市','刈谷市'],
+  '三重県':['津市','四日市市','鈴鹿市'],'滋賀県':['大津市','草津市','彦根市'],
+  '京都府':['京都市','宇治市'],'大阪府':['大阪市','堺市','東大阪市','豊中市','吹田市','高槻市','枚方市','八尾市'],
+  '兵庫県':['神戸市','姫路市','西宮市','尼崎市','明石市','加古川市'],
+  '奈良県':['奈良市','橿原市'],'和歌山県':['和歌山市'],'鳥取県':['鳥取市','米子市'],
+  '島根県':['松江市','出雲市'],'岡山県':['岡山市','倉敷市'],'広島県':['広島市','福山市','呉市','東広島市','府中市'],
+  '山口県':['山口市','下関市','周南市'],'徳島県':['徳島市'],'香川県':['高松市','丸亀市'],
+  '愛媛県':['松山市','今治市','新居浜市'],'高知県':['高知市'],
+  '福岡県':['福岡市','北九州市','久留米市','飯塚市'],'佐賀県':['佐賀市'],
+  '長崎県':['長崎市','佐世保市'],'熊本県':['熊本市','八代市'],'大分県':['大分市','別府市'],
+  '宮崎県':['宮崎市','都城市'],'鹿児島県':['鹿児島市','霧島市'],'沖縄県':['那覇市','沖縄市','うるま市']
+};
+var _CITY_PREF = {};
+Object.keys(_PREF_CITIES).forEach(function(pref){
+  _PREF_CITIES[pref].forEach(function(c){ (_CITY_PREF[c] = _CITY_PREF[c] || []).push(pref); });
+});
+// 住所の先頭市区町村から都道府県を推測し、完成住所の候補配列を返す
+function _computeAddressFixes(addr){
+  if(!addr) return [];
+  var out = [];
+  Object.keys(_CITY_PREF).forEach(function(city){
+    if(addr.indexOf(city) === 0){ _CITY_PREF[city].forEach(function(pref){ out.push(pref + addr); }); }
+  });
+  return out;
+}
+
+// 候補ボタン等を反映
+function _applyFieldValue(fieldId, value){
+  var el = document.getElementById(fieldId);
+  if(el){ el.value = value; el.dispatchEvent(new Event('input')); }
+  var em = document.getElementById('errorMsg'); if(em){ em.style.display='none'; em.innerHTML=''; }
+  if(el) el.focus();
+}
+function _prependPref(fieldId){
+  var sel = document.getElementById('_addrPrefPick'); var el = document.getElementById(fieldId);
+  if(!sel || !el || !sel.value) return;
+  el.value = sel.value + el.value; el.dispatchEvent(new Event('input'));
+  var em = document.getElementById('errorMsg'); if(em){ em.style.display='none'; em.innerHTML=''; }
+  el.focus();
+}
+// リッチエラー（ふりがな/翻訳＋候補）を生成
+function _renderRichError(err){
+  var L = currentLang || '';
+  var m = ERR_I18N[err.key] || {};
+  var msg = (L && m[L]) ? m[L] : (m.ja || '');
+  var html = '<div style="font-weight:700;">' + msg + '</div>';
+  if(!L && m.fr){ html += '<div style="font-size:11px;color:#9a3f3f;margin-top:2px;">' + m.fr + '</div>'; }
+  var sLbl = (L && SUGGEST_LABEL[L]) ? SUGGEST_LABEL[L] : SUGGEST_LABEL.ja;
+  var uLbl = (L && USE_BTN_LABEL[L]) ? USE_BTN_LABEL[L] : USE_BTN_LABEL.ja;
+  // 候補ボタン
+  if(err.fixes && err.fixes.length){
+    html += '<div style="margin-top:8px;">';
+    err.fixes.slice(0,4).forEach(function(fx){
+      var esc = fx.replace(/'/g,"\\'");
+      html += '<button type="button" onclick="_applyFieldValue(\''+err.field+'\',\''+esc+'\')" style="display:block;width:100%;text-align:left;margin:4px 0;padding:9px 11px;background:#ecfdf5;border:1.5px solid #34d399;border-radius:8px;font-size:13px;color:#065f46;cursor:pointer;font-family:inherit;">'+sLbl+': <strong>'+fx+'</strong></button>';
+    });
+    html += '</div>';
+  }
+  // 住所：都道府県ピッカー
+  if(err.key === 'addrPref'){
+    var pLbl = (L && ADDR_PICK_LABEL[L]) ? ADDR_PICK_LABEL[L] : ADDR_PICK_LABEL.ja;
+    html += '<div style="margin-top:8px;font-size:12px;color:#7a3f3f;">'+pLbl+'</div>';
+    html += '<div style="display:flex;gap:6px;margin-top:4px;"><select id="_addrPrefPick" style="flex:1;padding:8px;border:1.5px solid #fca5a5;border-radius:8px;font-size:14px;">';
+    _SO_PREF_LIST.forEach(function(p){ html += '<option value="'+p+'">'+(p===''?'---':p)+'</option>'; });
+    html += '</select><button type="button" onclick="_prependPref(\''+err.field+'\')" style="padding:8px 12px;background:#0f766e;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">'+uLbl+'</button></div>';
+  }
+  return html;
+}
+
 function validate() {
   if (type === 'company') {
     if (!val('f-coName')) return '会社名は必須です。';
@@ -2567,11 +2712,19 @@ function validate() {
   if (!val('f-birth')) return '生年月日は必須です。';
   if (!val('f-nationality')) return '国籍は必須です。';
   if (!val('f-email')) return 'メールアドレスは必須です。';
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val('f-email'))) return 'メールアドレスの形式が正しくありません（例: your@email.com）。';
-  // ver.20260803.14: 現住所は都道府県から始まっていないと入管オンラインで弾かれるためチェック
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val('f-email'))) {
+    var _ef = _computeEmailFix(val('f-email'));
+    return {key:'emailFormat', field:'f-email', fixes:(_ef?[_ef]:[])};
+  }
+  // ver.20260803.16: .com のよくある打ち間違い → 候補提示
+  if (/\.(con|comm|cpm|vom|cim|xom|ocm|cmo|coom|copm)$/i.test(val('f-email'))) {
+    var _ef2 = _computeEmailFix(val('f-email'));
+    return {key:'emailTypo', field:'f-email', fixes:(_ef2?[_ef2]:[])};
+  }
+  // 現住所は都道府県から始まっていないと入管オンラインで弾かれる → 候補＋都道府県ピッカー
   var _addr = val('f-address');
   if (_addr && !_SO_PREF_LIST.some(function(p){ return p && _addr.indexOf(p) === 0; })) {
-    return '現住所は都道府県から入力してください（例: 東京都新宿区…）。市区町村だけの入力はできません。';
+    return {key:'addrPref', field:'f-address', fixes:_computeAddressFixes(_addr)};
   }
   if (!val('f-married')) return '結婚しているかどうかを選択してください。';
   if (type==='tokutei_nintei' && !val('f-entryCount')) return '来日回数を入力してください。';
@@ -2652,7 +2805,9 @@ async function submitForm() {
   var err = validate();
   if (err) {
     var el = document.getElementById('errorMsg');
-    el.textContent = err; el.style.display = 'block';
+    if (typeof err === 'object') { el.innerHTML = _renderRichError(err); }
+    else { var _rh = _renderPlainError(err); if (_rh) el.innerHTML = _rh; else el.textContent = err; }
+    el.style.display = 'block';
     el.scrollIntoView({behavior:'smooth',block:'center'});
     return;
   }
