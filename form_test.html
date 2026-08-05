@@ -191,7 +191,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20260803.12';
+var FORM_VERSION = 'ver.20260803.14';
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -1540,7 +1540,12 @@ function field(id, label, inputType, required, placeholder, transKey, options) {
   } else if (inputType === 'textarea') {
     h += '<textarea id="' + id + '" rows="2" placeholder="' + placeholder + '"></textarea>';
   } else {
-    h += '<input type="' + inputType + '" id="' + id + '" placeholder="' + placeholder + '">';
+    if (id === 'f-email') {
+      // ver.20260803.13: メアド欄はスペース入力を除去し、メール用キーボード・自動大文字/補正オフ
+      h += '<input type="email" id="f-email" placeholder="' + placeholder + '" inputmode="email" autocapitalize="off" autocorrect="off" spellcheck="false" oninput="this.value=this.value.replace(/\\s/g,\'\')">';
+    } else {
+      h += '<input type="' + inputType + '" id="' + id + '" placeholder="' + placeholder + '">';
+    }
   }
   h += '</div>';
   return h;
@@ -2562,6 +2567,12 @@ function validate() {
   if (!val('f-birth')) return '生年月日は必須です。';
   if (!val('f-nationality')) return '国籍は必須です。';
   if (!val('f-email')) return 'メールアドレスは必須です。';
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val('f-email'))) return 'メールアドレスの形式が正しくありません（例: your@email.com）。';
+  // ver.20260803.14: 現住所は都道府県から始まっていないと入管オンラインで弾かれるためチェック
+  var _addr = val('f-address');
+  if (_addr && !_SO_PREF_LIST.some(function(p){ return p && _addr.indexOf(p) === 0; })) {
+    return '現住所は都道府県から入力してください（例: 東京都新宿区…）。市区町村だけの入力はできません。';
+  }
   if (!val('f-married')) return '結婚しているかどうかを選択してください。';
   if (type==='tokutei_nintei' && !val('f-entryCount')) return '来日回数を入力してください。';
   if (type==='tokutei_nintei' && !val('f-coeCount')) return 'COE申請回数を入力してください。';
