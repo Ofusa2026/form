@@ -191,7 +191,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20260803.17';
+var FORM_VERSION = 'ver.20260803.18';
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -225,7 +225,7 @@ var isGijinkoku = (type === 'gijinkoku_nintei' || type === 'gijinkoku_koushin' |
 // ===== 翻訳辞書 =====
 var TRANS = {
   en: {
-    skillField1:'Field ①', skillField2:'Field ②', jpField1:'Field ①', jpField2:'Field ②',
+    skillField1:'Field ①', skillField2:'Field ②', jpField1:'Field ①', jpField2:'Japanese proficiency certificate you have',
     name:'Full Name (as in passport)', birth:'Date of Birth', nationality:'Nationality',
     passport:'Passport Number', passExpiry:'Passport Expiry Date',
     married:'Are you married?', email:'Email Address',
@@ -262,7 +262,7 @@ var TRANS = {
     tenshutsuDate:'Date of submitting change of address notification',tenshutsuTitle:'/ Change of Address',tenshutsuNote:'※ Only if you have a planned move'
   },
   vi: {
-    skillField1:'Lĩnh vực ①', skillField2:'Lĩnh vực ②', jpField1:'Lĩnh vực ①', jpField2:'Lĩnh vực ②',
+    skillField1:'Lĩnh vực ①', skillField2:'Lĩnh vực ②', jpField1:'Lĩnh vực ①', jpField2:'Chứng chỉ năng lực tiếng Nhật đang có',
     name:'Họ và tên (theo hộ chiếu)', birth:'Ngày sinh', nationality:'Quốc tịch',
     passport:'Số hộ chiếu', passExpiry:'Ngày hết hạn hộ chiếu',
     married:'Bạn đã kết hôn chưa?', email:'Địa chỉ email',
@@ -299,7 +299,7 @@ var TRANS = {
     tenshutsuDate:'Ngày nộp thông báo thay đổi địa chỉ',tenshutsuTitle:'/ Thay đổi địa chỉ',tenshutsuNote:'※ Chỉ khi có kế hoạch chuyển nhà'
   },
   id: {
-    skillField1:'Bidang ①', skillField2:'Bidang ②', jpField1:'Bidang ①', jpField2:'Bidang ②',
+    skillField1:'Bidang ①', skillField2:'Bidang ②', jpField1:'Bidang ①', jpField2:'Sertifikat Bahasa Jepang yang dimiliki',
     name:'Nama Lengkap (sesuai paspor)', birth:'Tanggal Lahir', nationality:'Kewarganegaraan',
     passport:'Nomor Paspor', passExpiry:'Masa Berlaku Paspor',
     married:'Apakah Anda sudah menikah?', email:'Alamat Email',
@@ -335,7 +335,7 @@ var TRANS = {
     tenshutsuDate:'Tanggal pelaporan pindah alamat',tenshutsuTitle:'/ Pindah Alamat',tenshutsuNote:'※ Hanya jika ada rencana pindah'
   },
   my: {
-    skillField1:'နယ်ပယ် ①', skillField2:'နယ်ပယ် ②', jpField1:'နယ်ပယ် ①', jpField2:'နယ်ပယ် ②',
+    skillField1:'နယ်ပယ် ①', skillField2:'နယ်ပယ် ②', jpField1:'နယ်ပယ် ①', jpField2:'ရှိသော ဂျပန်ဘာသာ အရည်အချင်း လက်မှတ်',
     name:'အမည် (နိုင်ငံကူးလက်မှတ်)', birth:'မွေးသက္ကရာဇ်', nationality:'နိုင်ငံသား',
     passport:'ပတ်စ်ပို့ နံပါတ်', passExpiry:'သက်တမ်းကုန်ဆုံးရက်',
     married:'အိမ်ထောင်ရှိပါသလား？', email:'အီးမေးလ်',
@@ -370,7 +370,7 @@ var TRANS = {
     tenshutsuDate:'နေရပ်ပြောင်းရွှေ့ကြောင်း အကြောင်းကြားစာ တင်သွင်းမည့်ရက်',tenshutsuTitle:'/ နေရာပြောင်းရွှေ့မှု',tenshutsuNote:'※ ပြောင်းရွှေ့ရန် စီစဉ်ထားပါက သာ'
   },
   km: {
-    skillField1:'វិស័យ ①', skillField2:'វិស័យ ②', jpField1:'វិស័យ ①', jpField2:'វិស័យ ②',
+    skillField1:'វិស័យ ①', skillField2:'វិស័យ ②', jpField1:'វិស័យ ①', jpField2:'វិញ្ញាបនបត្រសមត្ថភាពភាសាជប៉ុនដែលមាន',
     name:'ឈ្មោះ (តាមលិខិតឆ្លងដែន)', birth:'ថ្ងៃខែឆ្នាំកំណើត', nationality:'សញ្ជាតិ',
     passport:'លេខលិខិតឆ្លងដែន', passExpiry:'ថ្ងៃផុតសុពលភាព',
     married:'តើអ្នកបានរៀបការហើយឬ？', email:'អ៊ីមែល',
@@ -405,7 +405,7 @@ var TRANS = {
     tenshutsuDate:'ថ្ងៃដាក់លិខិតជូនដំណឹងផ្លាស់ប្តូរអាសយដ្ឋាន',tenshutsuTitle:'/ ផ្លាស់ប្តូរអាសយដ្ឋាន',tenshutsuNote:'※ តែក្នុងករណីមានផែនការ引越しប៉ុណ្ណោះ'
   },
   ne: {
-    skillField1:'क्षेत्र ①', skillField2:'क्षेत्र ②', jpField1:'क्षेत्र ①', jpField2:'क्षेत्र ②',
+    skillField1:'क्षेत्र ①', skillField2:'क्षेत्र ②', jpField1:'क्षेत्र ①', jpField2:'तपाईंसँग भएको जापानी दक्षता प्रमाणपत्र',
     name:'पूरा नाम (राहदानी अनुसार)', birth:'जन्म मिति', nationality:'राष्ट्रियता',
     passport:'राहदानी नम्बर', passExpiry:'राहदानी म्याद सकिने मिति',
     married:'के तपाईं विवाहित हुनुहुन्छ？', email:'इमेल ठेगाना',
@@ -440,7 +440,7 @@ var TRANS = {
     tenshutsuDate:'ठेगाना परिवर्तन सूचना दिने मिति',tenshutsuTitle:'/ ठेगाना परिवर्तन',tenshutsuNote:'※ सर्ने योजना भएमा मात्र'
   },
   zh: {
-    skillField1:'领域①', skillField2:'领域②', jpField1:'领域①', jpField2:'领域②',
+    skillField1:'领域①', skillField2:'领域②', jpField1:'领域①', jpField2:'持有的日语能力证明',
     name:'姓名（护照记载）', birth:'出生日期', nationality:'国籍',
     passport:'护照号码', passExpiry:'护照有效期',
     married:'您结婚了吗？', email:'电子邮件地址',
@@ -867,11 +867,24 @@ var JP_OPT_I18N = {
 };
 // 「なし / 該当しない」プレースホルダー（value空）の翻訳
 var JP_NONE_I18N = {ja:'なし / 該当しない',en:'None / N/A',vi:'Không có / Không áp dụng',id:'Tidak ada / Tidak berlaku',my:'မရှိ / မသက်ဆိုင်ပါ',km:'គ្មាន / មិនពាក់ព័ន្ធ',ne:'छैन / लागू हुँदैन',zh:'无 / 不适用'};
+// ver.20260803.18: 日本語試験②の分野セレクト専用の訳（value不変。①とは別表示）
+var JP_FIELD2_I18N = {
+  '':{ja:'もっていない / 試験免除',en:'None / Exam exemption',vi:'Không có / Miễn thi',id:'Tidak punya / dibebaskan dari ujian',my:'မရှိ / စာမေးပွဲ ကင်းလွတ်ခွင့်',km:'គ្មាន / លើកលែងការប្រឡង',ne:'छैन / परीक्षा छुट',zh:'没有 / 免除考试'},
+  '日本語試験（にほんごしけん）':{ja:'日本語の能力証明を持っている',en:'I have a Japanese proficiency certificate',vi:'Có chứng chỉ năng lực tiếng Nhật',id:'Punya sertifikat Bahasa Jepang',my:'ဂျပန်ဘာသာ အရည်အချင်း လက်မှတ် ရှိသည်',km:'មានវិញ្ញាបនបត្រសមត្ថភាពភាសាជប៉ុន',ne:'जापानी दक्षता प्रमाणपत्र छ',zh:'持有日语能力证明'}
+};
 // 日本語ブロック各セレクトのoption表示を言語別へ切替（value=送信値は不変）
 function applyJpBlockLang(l) {
   ['f-jpEvalType','f-jpField1','f-jpField2','f-jpExam1','f-jpExam2','f-jpExamLoc1','f-jpExamLoc2'].forEach(function(id){
     var sel = document.getElementById(id);
     if (!sel) return;
+    if (id === 'f-jpField2') {
+      Array.prototype.forEach.call(sel.options, function(opt){
+        var m2 = JP_FIELD2_I18N[opt.value];
+        if (!m2) return;
+        opt.textContent = (l && m2[l]) ? m2[l] : m2.ja;
+      });
+      return;
+    }
     Array.prototype.forEach.call(sel.options, function(opt){
       if (opt.getAttribute && opt.getAttribute('data-none')) {
         opt.textContent = (l && JP_NONE_I18N[l]) ? JP_NONE_I18N[l] : JP_NONE_I18N.ja;
@@ -1069,9 +1082,9 @@ function blockJapaneseProof() {
   h += '</div>';
 
   h += '<div class="sub-label" style="background:#f0fdf4;color:#15803d;border-radius:6px;padding:6px 10px;margin:12px 0 8px;font-size:12px;font-weight:700;">【日本語試験②（にほんごしけん②・介護日本語試験に合格している場合）】</div>';
-  // ver.20260523.03: ②も分野→試験名の2段階セレクト
-  h += '<div class="field"><label>分野（ぶんや）②<div class="trans" data-key="jpField2"></div></label>';
-  h += '<select id="f-jpField2" onchange="onJpFieldChange(2, this.value)"><option value="" data-none="1">なし / 該当しない</option>' + makeFieldOptions(JP_FIELD_GROUPS_2) + '</select></div>';
+  // ver.20260803.18: ②は「持っている日本語の能力証明」。表示のみ変更、valueは不変（①と送信値共有）
+  h += '<div class="field"><label>持っている日本語の能力証明<div class="trans" data-key="jpField2"></div></label>';
+  h += '<select id="f-jpField2" onchange="onJpFieldChange(2, this.value)"><option value="">もっていない / 試験免除</option><option value="日本語試験（にほんごしけん）">日本語の能力証明を持っている</option></select></div>';
   h += '<div class="field"><label>日本語試験名②（にほんごしけんめい②）<div class="trans" data-key="jpProof2ExamType"></div></label>';
   h += '<select id="f-jpExam2" onchange="toggleJpExam2Loc(this.value)"><option value="">---</option></select></div>';
   h += '<div id="jpExam2LocWrap" style="display:none;">';
