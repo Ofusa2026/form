@@ -191,7 +191,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20260812.01';
+var FORM_VERSION = 'ver.20260812.02';
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -212,6 +212,9 @@ var responseId = params.get('response_id') || '';  // 編集モード: 既存回
 var editMode = !!responseId;
 var srcParam = params.get('src') || '';  // ver.20260531.02: 流入元（aidem 等）。本人不一致時の連絡先案内の出し分けに使用
 var fieldsFilter = params.get('fields') ? params.get('fields').split(',').map(function(s){return s.trim();}) : null;
+// ver.20260812: 介護分野判定（URLパラメータ ?field=介護 で指定）
+var applicantField = params.get('field') || '';
+var isKaigo = applicantField.indexOf('介護') >= 0;
 
 // typeなしでco_始まりのcaseId（所属機関）またはsrc=jaimの場合はjaimをデフォルト
 if (!type && (caseId.indexOf('co_') === 0 || srcParam === 'jaim')) { type = 'jaim'; }
@@ -1068,16 +1071,34 @@ function blockJapaneseProof() {
   h += '<div style="font-size:12px;color:#6b7280;padding:8px 10px;background:#f9fafb;border-radius:8px;">技能実習２号を良好に修了した場合、日本語試験は免除されます。</div>';
   h += '</div>';
 
-  h += '<div class="sub-label" style="background:#f0fdf4;color:#15803d;border-radius:6px;padding:6px 10px;margin:12px 0 8px;font-size:12px;font-weight:700;">【日本語試験②（にほんごしけん②・介護日本語試験に合格している場合）】</div>';
-  // ver.20260523.03: ②も分野→試験名の2段階セレクト
-  h += '<div class="field"><label>分野（ぶんや）②<div class="trans" data-key="jpField2"></div></label>';
-  h += '<select id="f-jpField2" onchange="onJpFieldChange(2, this.value)"><option value="" data-none="1">なし / 該当しない</option>' + makeFieldOptions(JP_FIELD_GROUPS_2) + '</select></div>';
-  h += '<div class="field"><label>日本語試験名②（にほんごしけんめい②）<div class="trans" data-key="jpProof2ExamType"></div></label>';
-  h += '<select id="f-jpExam2" onchange="toggleJpExam2Loc(this.value)"><option value="">---</option></select></div>';
-  h += '<div id="jpExam2LocWrap" style="display:none;">';
-  h += '<div class="field"><label>日本語試験 受験地②（にほんごしけん じゅけんち②）<div class="trans" data-key="jpProof2Place"></div></label>';
-  h += '<select id="f-jpExamLoc2"><option value="">---</option>' + makeOptions(COUNTRY_LIST_ONLINE) + '</select></div>';
-  h += '</div>';
+  // ver.20260812: 介護案件は専用セクション、非介護は②非表示
+  if (isKaigo) {
+    h += '<div class="sub-label" style="background:#f0fdf4;color:#15803d;border-radius:6px;padding:6px 10px;margin:12px 0 8px;font-size:12px;font-weight:700;">【介護日本語評価試験（かいごにほんごひょうかしけん）】</div>';
+    h += '<input type="hidden" id="f-kaigoJpEvalType" value="特定技能評価試験">';
+    h += '<input type="hidden" id="f-kaigoJpExam1" value="介護日本語評価試験">';
+    h += '<div style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;padding:10px 12px;margin-bottom:10px;font-size:13px;color:#374151;">';
+    h += '<div style="margin-bottom:4px;"><span style="color:#6b7280;font-size:11px;">評価区分</span><br><strong>特定技能評価試験</strong></div>';
+    h += '<div><span style="color:#6b7280;font-size:11px;">試験名</span><br><strong><span data-i18n="介護日本語評価試験">介護日本語評価試験</span></strong></div>';
+    h += '</div>';
+    h += '<div class="field"><label>介護日本語 受験地（かいごにほんご じゅけんち）<span class="req">*</span></label>';
+    h += '<select id="f-kaigoJpExamLoc1"><option value="">---</option>' + makeOptions(COUNTRY_LIST_ONLINE) + '</select></div>';
+    // 隠しフィールド（②互換）
+    h += '<input type="hidden" id="f-jpField2" value="">';
+    h += '<input type="hidden" id="f-jpExam2" value="">';
+    h += '<div id="jpExam2LocWrap" style="display:none;">';
+    h += '<input type="hidden" id="f-jpExamLoc2" value="">';
+    h += '</div>';
+  } else {
+    // 介護以外：②セクション非表示（隠しフィールドで互換性維持）
+    h += '<input type="hidden" id="f-kaigoJpEvalType" value="">';
+    h += '<input type="hidden" id="f-kaigoJpExam1" value="">';
+    h += '<input type="hidden" id="f-kaigoJpExamLoc1" value="">';
+    h += '<input type="hidden" id="f-jpField2" value="">';
+    h += '<input type="hidden" id="f-jpExam2" value="">';
+    h += '<div id="jpExam2LocWrap" style="display:none;">';
+    h += '<input type="hidden" id="f-jpExamLoc2" value="">';
+    h += '</div>';
+  }
 
   h += '</div>';
   return h;
@@ -2527,6 +2548,12 @@ function collectData() {
     d.jpExamLoc1     = val('f-jpExamLoc1');
     d.jpExam2        = val('f-jpExam2');
     d.jpExamLoc2     = val('f-jpExamLoc2');
+    // ver.20260812: 介護案件は kaigoJp* を直接送信
+    if (isKaigo) {
+      d.kaigoJpEvalType = '特定技能評価試験';
+      d.kaigoJpExam1    = '介護日本語評価試験';
+      d.kaigoJpExamLoc1 = val('f-kaigoJpExamLoc1');
+    }
   }
   d.hasFamily = val('f-hasFamily');
   if (d.hasFamily === 'yes') {
@@ -3212,8 +3239,14 @@ function prefillForm(resp) {
     gijinkokuTitle: 'f-gijinkokuTitle',
     gijinkokuExpStatus: 'f-gijinkokuExpStatus',
     gijinkokuExpYears: 'f-gijinkokuExpYears',
-    gijinkokuExpMonths: 'f-gijinkokuExpMonths'
+    gijinkokuExpMonths: 'f-gijinkokuExpMonths',
+    // ver.20260812: 介護日本語評価試験
+    kaigoJpExamLoc1: 'f-kaigoJpExamLoc1'
   };
+  // ver.20260812: 旧形式（jpExam2='介護日本語評価試験'）からの移行
+  if (resp.jpExam2 === '介護日本語評価試験' && !resp.kaigoJpExamLoc1) {
+    resp.kaigoJpExamLoc1 = resp.jpExamLoc2 || '';
+  }
 
   // 特定技能の場合、residenceCard="なし" はステータスを「なし」として扱う
   if (isTokutei) {
