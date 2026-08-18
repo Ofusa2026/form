@@ -191,7 +191,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20260818.05-test';
+var FORM_VERSION = 'ver.20260818.06-test';
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -2122,20 +2122,6 @@ function buildCompanyGijinkokuForm() {
     '<div id="allowanceRows">' + allowanceRow(1) + '</div>' +
     '<button type="button" id="addAllowanceBtn" onclick="addAllowanceRow()" style="font-size:11px;padding:4px 14px;background:white;border:1.5px dashed #c7d2fe;border-radius:6px;color:#6366f1;cursor:pointer;font-weight:700;margin-bottom:10px;">＋ 手当を追加</button>' +
 
-    '<div class="sub-label">【昇給・賞与・退職金】</div>' +
-    '<div class="grid2">' +
-      field('f-salaryRaise','昇給','select',false,'',null,['','有','無']) +
-      field('f-salaryRaiseCond','昇給 条件・時期','text',false,'例: 毎年4月（査定による）') +
-    '</div>' +
-    '<div class="grid2">' +
-      field('f-bonus','賞与','select',false,'',null,['','有','無']) +
-      field('f-bonusCond','賞与 条件・時期','text',false,'例: 年2回（6月・12月）') +
-    '</div>' +
-    '<div class="grid2">' +
-      field('f-retirement','退職金','select',false,'',null,['','有','無']) +
-      field('f-retirementDetail','退職金 制度内容','text',false,'例: 勤続3年以上') +
-    '</div>' +
-
     '<div class="sub-label">【社会保険】</div>' +
     '<div class="grid2">' +
       field('f-insKenpo','健康保険 加入','select',false,'',null,['','加入','未加入']) +
@@ -2200,7 +2186,6 @@ function buildCompanyGijinkokuForm() {
     '</div>' +
     '</div>' +
     field('f-otherHoliday','その他休日（夏季・年末年始等）','text',false,'例: GW・夏季・年末年始') +
-    field('f-annualHolidays','年間休日数','number',false,'例: 120') +
   '</div>' +
 
   '<div class="card"><div class="section-title">報酬の同等性</div>' +
@@ -2838,9 +2823,6 @@ function collectData() {
       allowance2Name: val('f-allowance2Name'), allowance2Amount: val('f-allowance2Amount'), allowance2Cond: val('f-allowance2Cond'),
       allowance3Name: val('f-allowance3Name'), allowance3Amount: val('f-allowance3Amount'), allowance3Cond: val('f-allowance3Cond'),
       allowance4Name: val('f-allowance4Name'), allowance4Amount: val('f-allowance4Amount'), allowance4Cond: val('f-allowance4Cond'),
-      salaryRaise: val('f-salaryRaise'), salaryRaiseCond: val('f-salaryRaiseCond'),
-      bonus: val('f-bonus'), bonusCond: val('f-bonusCond'),
-      retirement: val('f-retirement'), retirementDetail: val('f-retirementDetail'),
       insKenpo: val('f-insKenpo'), insPension: val('f-insPension'),
       insEmp: val('f-insEmp'), insLabor: val('f-insLabor'),
       payMethod: val('f-payMethod'),
@@ -2857,7 +2839,7 @@ function collectData() {
       fixedHolidayFri: val('f-fixedHolidayFri'), fixedHolidaySat: val('f-fixedHolidaySat'),
       fixedHolidaySun: val('f-fixedHolidaySun'), fixedHolidayHol: val('f-fixedHolidayHol'),
       nonRegWeeklyDays: val('f-nonRegWeeklyDays'), nonRegMonthlyDays: val('f-nonRegMonthlyDays'),
-      otherHoliday: val('f-otherHoliday'), annualHolidays: val('f-annualHolidays'),
+      otherHoliday: val('f-otherHoliday'),
       // 報酬の同等性
       jpCompExists: val('f-gjCompExists'),
       jpCompExp: val('f-jpCompExp'), jpCompJobDesc: val('f-jpCompJobDesc'), jpCompSalary: val('f-jpCompSalary'),
