@@ -191,7 +191,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20260803.19';
+var FORM_VERSION = 'ver.20260818.03-test';
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -1178,6 +1178,8 @@ function buildForm(t) {
       return blockBasic() + blockMarried() + blockEducation() + blockGijinkokuExtra() + blockContact(false, true);
     case 'company':
       return buildCompanyForm();
+    case 'company_gijinkoku':
+      return buildCompanyGijinkokuForm();
     case 'jaim':
       return buildJaimOnlyForm();
     case 'support_org':
@@ -1541,7 +1543,7 @@ function field(id, label, inputType, required, placeholder, transKey, options) {
   h += '<label>' + label + (required ? '<span class="req">*</span>' : '') + '</label>';
   if (transKey) h += '<div class="trans" data-key="' + transKey + '"></div>';
   if (inputType === 'select') {
-    var _onchange = (id === 'f-nationality') ? ' onchange="toggleNationalityOther(this.value)"' : (id === 'f-flexFlg') ? ' onchange="toggleFlexType(this.value)"' : (id === 'f-holidayType') ? ' onchange="toggleHolidayType(this.value)"' : '';
+    var _onchange = (id === 'f-nationality') ? ' onchange="toggleNationalityOther(this.value)"' : (id === 'f-flexFlg') ? ' onchange="toggleFlexType(this.value)"' : (id === 'f-holidayType') ? ' onchange="toggleHolidayType(this.value)"' : (id === 'f-gjHasStore') ? ' onchange="toggleStoreBlock(this.value)"' : '';
     h += '<select id="' + id + '"' + _onchange + '>';
     (options||[]).forEach(function(o) {
       h += '<option value="' + o + '">' + (o === '' ? '---' : o) + '</option>';
@@ -2001,6 +2003,215 @@ function buildCompanyForm() {
   );
 }
 
+// ===== 技人国 企業ヒアリングフォーム（type=company_gijinkoku）=====
+// ver.20260818.01: 技術・人文知識・国際業務 の雇用理由書・雇用契約書作成用。
+//   企業情報フォーム(type=company)と多くの入力欄IDを共有しつつ、
+//   技人国特有の「業務内容と専攻の関連性」「報酬の同等性」「採用理由」を厚く聞く。
+function buildCompanyGijinkokuForm() {
+  return (
+  '<div class="info-box" style="background:#ecfdf5;color:#047857;border-color:#a7f3d0;">' +
+    'このフォームは「技術・人文知識・国際業務」の在留資格申請にあたり、貴社の情報をお伺いするものです。判明している範囲でご入力ください（途中保存できます）。' +
+  '</div>' +
+
+  '<div class="card"><div class="section-title">企業基本情報</div>' +
+    '<div class="field"><label>会社名<span class="req">*</span></label><input type="text" id="f-coName" placeholder="例: 株式会社〇〇" oninput="coNameKanaHelper(this.value)"></div>' +
+    '<div class="field"><label>会社名（ひらがな）</label><input type="text" id="f-coNameKana" placeholder="例: かぶしきかいしゃ〇〇"><div id="co-kana-suggestion" style="font-size:11px;color:#6b7280;margin-top:3px;"></div></div>' +
+    field('f-coNameEn','会社名（英語）','text',false,'例: OO Co., Ltd.') +
+    field('f-coCorpNo','法人番号（13桁）','text',false,'例: 1234567890123') +
+    field('f-coEmpInsNo','雇用保険適用事業所番号','text',false,'例: 1234-567890-1') +
+    field('f-coHomepage','企業ホームページ（URL）','text',false,'例: https://www.example.co.jp') +
+    field('f-gjEstablished','設立年月日','date',false,'') +
+    '<div class="grid2">' +
+      field('f-coCapital','資本金（円）','number',false,'例: 10000000') +
+      field('f-coAnnualSales','年間売上金額（円）','number',false,'例: 500000000') +
+    '</div>' +
+    '<div class="grid2">' +
+      field('f-coEmployees','常勤職員数','number',false,'例: 50') +
+      field('f-coForeignEmployees','うち外国人職員数','number',false,'例: 5') +
+    '</div>' +
+    field('f-coTrainees','技能実習生数','number',false,'例: 0') +
+    field('f-gjListedCategory','企業区分（所属機関カテゴリ）','select',false,'',null,['','上場企業等（カテゴリ1）','源泉徴収税額1000万円以上（カテゴリ2）','源泉徴収の法定調書提出あり（カテゴリ3）','その他（カテゴリ4）','不明']) +
+    field('f-gjBusiness','事業内容（主な取扱商品・サービス）','textarea',false,'例: 業務用ソフトウェアの受託開発および保守') +
+  '</div>' +
+
+  '<div class="card"><div class="section-title">所在地</div>' +
+    '<div class="field"><label>郵便番号</label>' +
+      '<div style="display:flex;gap:8px;align-items:center;">' +
+        '<input type="text" id="f-coZip" placeholder="例: 160-0022" style="flex:1;" oninput="coZipAutoFill(this.value)" inputmode="numeric">' +
+        '<button type="button" onclick="coZipAutoFill(document.getElementById(\'f-coZip\').value, true)" style="white-space:nowrap;padding:10px 14px;background:#3b82f6;color:white;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;">🔍 住所を自動入力</button>' +
+      '</div>' +
+      '<div id="co-zip-msg" style="font-size:11px;margin-top:4px;"></div>' +
+    '</div>' +
+    '<div class="grid2">' +
+      field('f-coPref','都道府県','text',false,'例: 東京都') +
+      field('f-coCity','市区町村','text',false,'例: 新宿区') +
+    '</div>' +
+    field('f-coAddress','町名番地','text',false,'例: 新宿2丁目1番1号 〇〇ビル3F') +
+    field('f-coAddressEn','住所（英語）','text',false,'例: 3F OO Bldg., 2-1-1 Shinjuku, Shinjuku-ku, Tokyo') +
+    field('f-coTel','電話番号','text',false,'例: 03-1234-5678') +
+  '</div>' +
+
+  '<div class="card"><div class="section-title">就業場所（配属先事業所）</div>' +
+    '<div style="margin-bottom:10px;">' +
+      '<button type="button" onclick="copyHQToOffice()" style="padding:8px 16px;background:#f0fdf4;color:#15803d;border:1.5px solid #86efac;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;">🏢 本社と同じ住所を転記</button>' +
+    '</div>' +
+    field('f-officeName','事業所名','text',false,'例: 株式会社〇〇 本社') +
+    field('f-officeAddress','事業所住所','text',false,'例: 東京都新宿区新宿2丁目1番1号') +
+    field('f-officeTel','事業所電話番号','text',false,'例: 03-1234-5678') +
+  '</div>' +
+
+  '<div class="card"><div class="section-title">管理する店舗情報</div>' +
+    field('f-gjHasStore','管理・担当する店舗の有無','select',false,'',null,['','なし','あり']) +
+    '<div id="storeBlock" style="display:none;">' +
+      '<div style="font-size:11px;color:#9ca3af;margin:10px 0;">申請人が管理・担当する店舗の店名・住所・電話番号をご記入ください（複数可）。</div>' +
+      '<div id="storeRows">' + storeRow(1) + '</div>' +
+      '<button type="button" id="addStoreBtn" onclick="addStoreRow()" style="font-size:11px;padding:5px 14px;background:white;border:1.5px dashed #c7d2fe;border-radius:6px;color:#6366f1;cursor:pointer;font-weight:700;">＋ 店舗を追加</button>' +
+    '</div>' +
+  '</div>' +
+
+  '<div class="card"><div class="section-title">代表者・作成責任者</div>' +
+    '<div class="grid2">' +
+      field('f-coRepName','代表者氏名','text',false,'例: 山田 太郎') +
+      field('f-coRepTitle','代表者役職','text',false,'例: 代表取締役') +
+    '</div>' +
+    '<div class="grid2">' +
+      field('f-coRepNameEn','代表者氏名（英語）','text',false,'例: YAMADA TARO') +
+      field('f-coRepTitleEn','代表者役職（英語）','text',false,'例: President') +
+    '</div>' +
+    '<div class="grid2">' +
+      field('f-coAuthorName','作成責任者氏名','text',false,'例: 佐藤 花子') +
+      field('f-coAuthorTitle','作成責任者役職','text',false,'例: 人事部長') +
+    '</div>' +
+  '</div>' +
+
+  '<div class="card"><div class="section-title">配属部署・職務内容</div>' +
+    '<div style="font-size:11px;color:#9ca3af;margin-bottom:10px;">雇用理由書の中心となる項目です。できるだけ具体的にご記入ください。</div>' +
+    '<div class="grid2">' +
+      field('f-gjDept','配属部署名','text',false,'例: システム開発部') +
+      field('f-gjPosition','役職・肩書','text',false,'例: システムエンジニア') +
+    '</div>' +
+    field('f-gjSupervisor','直属の上司（指揮命令者）','text',false,'例: 開発部長 鈴木 一郎') +
+    field('f-gjJobType','職種','select',false,'',null,['','システムエンジニア・プログラマー','翻訳・通訳','海外業務・貿易','営業','マーケティング・企画','経理・総務','設計・技術開発','デザイナー','語学教師','その他']) +
+    field('f-gjJobDesc','業務内容の詳細（具体的な作業を箇条書きで）','textarea',false,'例: ・自社Webシステムの設計/開発\n・要件定義および顧客折衝\n・保守運用') +
+    field('f-gjMajorRelation','必要な専門知識・技術（大学等での専攻・学んだ内容との関連性）','textarea',false,'例: 大学の情報工学専攻で学んだプログラミング/データベース設計の知識を、自社システム開発に直接活用する') +
+    field('f-gjLangSkill','使用する語学・スキル','text',false,'例: 英語（対外折衝）、中国語（現地法人との連絡）') +
+    field('f-gjSimpleWork','単純作業の有無・割合','text',false,'例: なし（専門業務が中心）') +
+  '</div>' +
+
+  '<div class="card"><div class="section-title">雇用条件</div>' +
+    field('f-gjEmployType','雇用形態','select',false,'',null,['','正社員','契約社員','その他']) +
+    '<div class="sub-label">【給与】</div>' +
+    '<div class="grid2">' +
+      field('f-salaryType','給与形態','select',false,'',null,['','月給','時給','日給','年俸']) +
+      field('f-salaryMonthly','基本給（月額・円）','number',false,'例: 250000') +
+    '</div>' +
+
+    '<div class="sub-label">【手当】</div>' +
+    '<div id="allowanceRows">' + allowanceRow(1) + '</div>' +
+    '<button type="button" id="addAllowanceBtn" onclick="addAllowanceRow()" style="font-size:11px;padding:4px 14px;background:white;border:1.5px dashed #c7d2fe;border-radius:6px;color:#6366f1;cursor:pointer;font-weight:700;margin-bottom:10px;">＋ 手当を追加</button>' +
+
+    '<div class="sub-label">【昇給・賞与・退職金】</div>' +
+    '<div class="grid2">' +
+      field('f-salaryRaise','昇給','select',false,'',null,['','有','無']) +
+      field('f-salaryRaiseCond','昇給 条件・時期','text',false,'例: 毎年4月（査定による）') +
+    '</div>' +
+    '<div class="grid2">' +
+      field('f-bonus','賞与','select',false,'',null,['','有','無']) +
+      field('f-bonusCond','賞与 条件・時期','text',false,'例: 年2回（6月・12月）') +
+    '</div>' +
+    '<div class="grid2">' +
+      field('f-retirement','退職金','select',false,'',null,['','有','無']) +
+      field('f-retirementDetail','退職金 制度内容','text',false,'例: 勤続3年以上') +
+    '</div>' +
+
+    '<div class="sub-label">【社会保険】</div>' +
+    '<div class="grid2">' +
+      field('f-insKenpo','健康保険 加入','select',false,'',null,['','加入','未加入']) +
+      field('f-insPension','厚生年金 加入','select',false,'',null,['','加入','未加入']) +
+    '</div>' +
+    '<div class="grid2">' +
+      field('f-insEmp','雇用保険 加入','select',false,'',null,['','加入','未加入']) +
+      field('f-insLabor','労災保険 加入','select',false,'',null,['','加入','未加入']) +
+    '</div>' +
+
+    '<div class="sub-label">【支払方法・締め日】</div>' +
+    field('f-payMethod','支払方法','select',false,'',null,['','口座振込','現金','その他']) +
+    buildPayDateFields() +
+
+    '<div class="sub-label">【契約期間】</div>' +
+    field('f-gjContractTermFlg','契約期間の定めの有無','select',false,'',null,['','定めなし（無期）','定めあり（有期）']) +
+    '<div class="grid2">' +
+      field('f-contractStart','契約開始日','date',false,'') +
+      field('f-contractEnd','契約終了日','date',false,'') +
+    '</div>' +
+    field('f-contractRenewal','契約更新の有無','select',false,'',null,['','期間の定めなし','更新する場合があり得る','更新しない','自動更新']) +
+  '</div>' +
+
+  '<div class="card"><div class="section-title">労働時間・休日</div>' +
+    '<div class="sub-label">【所定労働時間】</div>' +
+    '<div class="grid2">' +
+      field('f-startTime','始業時刻','time',false,'') +
+      field('f-endTime','終業時刻','time',false,'') +
+    '</div>' +
+    '<div class="grid2">' +
+      field('f-breakTime','休憩時間（分）','number',false,'例: 60') +
+      field('f-dailyHours','1日所定労働時間（時間）','number',false,'例: 8') +
+    '</div>' +
+    '<div class="grid2">' +
+      field('f-weeklyDays','週所定労働日数','number',false,'例: 5') +
+      field('f-weeklyH','週所定労働時間','number',false,'例: 40') +
+    '</div>' +
+    '<div class="sub-label">【休日】</div>' +
+    field('f-holidayType','休日の種類','select',false,'',null,['','定例日','非定例日','定例日＋非定例日']) +
+    '<div id="holiday-fixed-area" style="display:none;">' +
+    '<div class="grid2">' +
+      field('f-fixedHolidayMon','月曜日','select',false,'',null,['','休み','出勤']) +
+      field('f-fixedHolidayTue','火曜日','select',false,'',null,['','休み','出勤']) +
+    '</div>' +
+    '<div class="grid2">' +
+      field('f-fixedHolidayWed','水曜日','select',false,'',null,['','休み','出勤']) +
+      field('f-fixedHolidayThu','木曜日','select',false,'',null,['','休み','出勤']) +
+    '</div>' +
+    '<div class="grid2">' +
+      field('f-fixedHolidayFri','金曜日','select',false,'',null,['','休み','出勤']) +
+      field('f-fixedHolidaySat','土曜日','select',false,'',null,['','休み','出勤']) +
+    '</div>' +
+    '<div class="grid2">' +
+      field('f-fixedHolidaySun','日曜日','select',false,'',null,['','休み','出勤']) +
+      field('f-fixedHolidayHol','祝日','select',false,'',null,['','休み','出勤']) +
+    '</div>' +
+    '</div>' +
+    '<div id="holiday-nonreg-area" style="display:none;">' +
+    '<div class="grid2">' +
+      field('f-nonRegWeeklyDays','週あたりの休日日数','number',false,'例: 2') +
+      field('f-nonRegMonthlyDays','月あたりの休日日数','number',false,'例: 8') +
+    '</div>' +
+    '</div>' +
+    field('f-otherHoliday','その他休日（夏季・年末年始等）','text',false,'例: GW・夏季・年末年始') +
+    field('f-annualHolidays','年間休日数','number',false,'例: 120') +
+  '</div>' +
+
+  '<div class="card"><div class="section-title">報酬の同等性</div>' +
+    '<div style="font-size:11px;color:#9ca3af;margin-bottom:10px;">日本人が従事する場合に受ける報酬と同等額以上であることの確認（審査で重視されます）。</div>' +
+    field('f-gjCompExists','同種の業務を行う日本人従業員の有無','select',false,'',null,['','いる','いない']) +
+    '<div class="sub-label">【いる場合：当該日本人従業員の情報】</div>' +
+    field('f-jpCompExp','経験年数','text',false,'例: 5年') +
+    field('f-jpCompJobDesc','職務内容','text',false,'例: 自社システムの設計・開発') +
+    field('f-jpCompSalary','月額報酬（円）','number',false,'例: 260000') +
+    '<div class="sub-label">【いない場合：報酬額の設定根拠】</div>' +
+    field('f-salaryRuleFlg','賃金規程の有無','select',false,'',null,['','有','無']) +
+    field('f-gjCompBasis','報酬額の設定根拠（賃金規程・給与テーブル等）','textarea',false,'例: 当社賃金規程の総合職初任給テーブルに基づき設定') +
+    field('f-jpCompReason','同等額以上であることの理由','textarea',false,'例: 同一部署の日本人正社員と同一の給与テーブルを適用しているため') +
+  '</div>' +
+
+  '<div class="card"><div class="section-title">採用理由・その他</div>' +
+    field('f-gjHireReason','採用の経緯・理由（なぜこの人材が必要か）','textarea',false,'例: 海外展開の強化にあたり、〇〇語対応と情報工学の専門知識を併せ持つ人材が必要なため') +
+    field('f-gjExpectation','今後の事業展開・本人への期待','textarea',false,'例: 将来的に海外拠点の技術責任者として活躍を期待') +
+    field('f-gjRemarks','その他 申請上の特記事項','textarea',false,'') +
+  '</div>'
+  );
+}
+
 // JAIM専用ヒアリングフォーム（type=jaim）
 function buildJaimOnlyForm() {
   return (
@@ -2206,6 +2417,45 @@ function removeAllowanceRow(n) {
   if (row) { row.remove(); _allowanceCount--; }
   var btn = document.getElementById('addAllowanceBtn');
   if (btn) btn.style.display = 'inline-block';
+}
+
+// ver.20260818.02: 管理する店舗（可変行）— 技人国 企業フォーム用
+var _storeCount = 1;
+var _maxStore = 20;
+function storeRow(n) {
+  return '<div id="storeRow'+n+'" style="border:1px solid #e5e7eb;border-radius:8px;padding:10px;margin-bottom:6px;background:#f9fafb;">' +
+    '<div style="font-size:10px;font-weight:700;color:#6366f1;margin-bottom:6px;display:flex;align-items:center;justify-content:space-between;">' +
+    '店舗'+n +
+    (n > 1 ? '<button type="button" onclick="removeStoreRow('+n+')" style="font-size:10px;padding:1px 8px;background:white;color:#dc2626;border:1px solid #fca5a5;border-radius:4px;cursor:pointer;">削除</button>' : '') +
+    '</div>' +
+    field('f-store'+n+'Name','店名','text',false,'例: 〇〇店') +
+    field('f-store'+n+'Address','住所','text',false,'例: 東京都渋谷区〇〇1-2-3') +
+    field('f-store'+n+'Tel','電話番号','text',false,'例: 03-1234-5678') +
+    '</div>';
+}
+function addStoreRow() {
+  if (_storeCount >= _maxStore) return;
+  _storeCount++;
+  var container = document.getElementById('storeRows');
+  if (!container) return;
+  var div = document.createElement('div');
+  div.innerHTML = storeRow(_storeCount);
+  container.appendChild(div.firstChild);
+  if (_storeCount >= _maxStore) {
+    var btn = document.getElementById('addStoreBtn');
+    if (btn) btn.style.display = 'none';
+  }
+  if (typeof setLang === 'function') setLang(currentLang);
+}
+function removeStoreRow(n) {
+  var row = document.getElementById('storeRow'+n);
+  if (row) { row.remove(); _storeCount--; }
+  var btn = document.getElementById('addStoreBtn');
+  if (btn) btn.style.display = 'inline-block';
+}
+function toggleStoreBlock(v) {
+  var blk = document.getElementById('storeBlock');
+  if (blk) blk.style.display = (v === 'あり') ? 'block' : 'none';
 }
 
 function toggleNationalityOther(val) {
@@ -2419,6 +2669,78 @@ function collectData() {
       jaimIndustryCode: val('f-jaimIndustryCode'), jaimAgreement: (document.getElementById('f-jaimAgreement') && document.getElementById('f-jaimAgreement').checked) ? '確認済み' : '', jaimProductName: val('f-jaimProductName'), jaimProductPurpose: val('f-jaimProductPurpose'), jaimFinalProductName: val('f-jaimFinalProductName'), jaimFinalProductDesc: val('f-jaimFinalProductDesc'), jaimEquipmentPurpose: val('f-jaimEquipmentPurpose'), jaimEquipmentEffect: val('f-jaimEquipmentEffect'), jaimBranchOfficeFlag: val('f-jaimBranchOfficeFlag'), jaimBranchOfficeName: val('f-jaimBranchOfficeName'), jaimBranchOfficeZip: val('f-jaimBranchOfficeZip'), jaimBranchOfficeAddress: val('f-jaimBranchOfficeAddress'), jaimBranchOfficeContact: val('f-jaimBranchOfficeContact'), jaimBranchOfficeTel: val('f-jaimBranchOfficeTel'), jaimCompanySize: val('f-jaimCompanySize'), jaimMemberOrg: val('f-jaimMemberOrg'), jaimAnnualFee: _jaimFeeValue()
     };
     Object.assign(d, officers);
+    return d;
+  }
+
+  // ver.20260818.01: 技人国 企業ヒアリング（type=company_gijinkoku）
+  if (t === 'company_gijinkoku') {
+    var d = {
+      name: val('f-coName'), nameKana: val('f-coNameKana'), nameEn: val('f-coNameEn'),
+      corpNo: val('f-coCorpNo'), established: val('f-gjEstablished'),
+      empInsNo: val('f-coEmpInsNo'), homepage: val('f-coHomepage'),
+      capital: val('f-coCapital'), annualSales: val('f-coAnnualSales'),
+      employees: val('f-coEmployees'), foreignEmployees: val('f-coForeignEmployees'),
+      trainees: val('f-coTrainees'),
+      listedCategory: val('f-gjListedCategory'), businessDesc: val('f-gjBusiness'),
+      zip: val('f-coZip'), pref: val('f-coPref'), city: val('f-coCity'),
+      address: val('f-coAddress'), addressEn: val('f-coAddressEn'), tel: val('f-coTel'),
+      officeName: val('f-officeName'), officeAddress: val('f-officeAddress'), officeTel: val('f-officeTel'),
+      repName: val('f-coRepName'), repTitle: val('f-coRepTitle'),
+      repNameEn: val('f-coRepNameEn'), repTitleEn: val('f-coRepTitleEn'),
+      authorName: val('f-coAuthorName'), authorTitle: val('f-coAuthorTitle'),
+      // 技人国：配属・職務内容
+      dept: val('f-gjDept'), position: val('f-gjPosition'), supervisor: val('f-gjSupervisor'),
+      jobType: val('f-gjJobType'), jobDescription: val('f-gjJobDesc'),
+      majorRelation: val('f-gjMajorRelation'), langSkill: val('f-gjLangSkill'), simpleWork: val('f-gjSimpleWork'),
+      // 雇用条件
+      employType: val('f-gjEmployType'),
+      salaryType: val('f-salaryType'), salaryMonthly: val('f-salaryMonthly'),
+      allowance1Name: val('f-allowance1Name'), allowance1Amount: val('f-allowance1Amount'), allowance1Cond: val('f-allowance1Cond'),
+      allowance2Name: val('f-allowance2Name'), allowance2Amount: val('f-allowance2Amount'), allowance2Cond: val('f-allowance2Cond'),
+      allowance3Name: val('f-allowance3Name'), allowance3Amount: val('f-allowance3Amount'), allowance3Cond: val('f-allowance3Cond'),
+      allowance4Name: val('f-allowance4Name'), allowance4Amount: val('f-allowance4Amount'), allowance4Cond: val('f-allowance4Cond'),
+      salaryRaise: val('f-salaryRaise'), salaryRaiseCond: val('f-salaryRaiseCond'),
+      bonus: val('f-bonus'), bonusCond: val('f-bonusCond'),
+      retirement: val('f-retirement'), retirementDetail: val('f-retirementDetail'),
+      insKenpo: val('f-insKenpo'), insPension: val('f-insPension'),
+      insEmp: val('f-insEmp'), insLabor: val('f-insLabor'),
+      payMethod: val('f-payMethod'),
+      ...collectPayDate(),
+      contractStart: val('f-contractStart'), contractEnd: val('f-contractEnd'), contractRenewal: val('f-contractRenewal'),
+      contractTermFlg: val('f-gjContractTermFlg'),
+      // 労働時間・休日
+      startTime: val('f-startTime'), endTime: val('f-endTime'),
+      breakTime: val('f-breakTime'), dailyHours: val('f-dailyHours'),
+      weeklyDays: val('f-weeklyDays'), weeklyH: val('f-weeklyH'),
+      holidayType: val('f-holidayType'),
+      fixedHolidayMon: val('f-fixedHolidayMon'), fixedHolidayTue: val('f-fixedHolidayTue'),
+      fixedHolidayWed: val('f-fixedHolidayWed'), fixedHolidayThu: val('f-fixedHolidayThu'),
+      fixedHolidayFri: val('f-fixedHolidayFri'), fixedHolidaySat: val('f-fixedHolidaySat'),
+      fixedHolidaySun: val('f-fixedHolidaySun'), fixedHolidayHol: val('f-fixedHolidayHol'),
+      nonRegWeeklyDays: val('f-nonRegWeeklyDays'), nonRegMonthlyDays: val('f-nonRegMonthlyDays'),
+      otherHoliday: val('f-otherHoliday'), annualHolidays: val('f-annualHolidays'),
+      // 報酬の同等性
+      jpCompExists: val('f-gjCompExists'),
+      jpCompExp: val('f-jpCompExp'), jpCompJobDesc: val('f-jpCompJobDesc'), jpCompSalary: val('f-jpCompSalary'),
+      salaryRuleFlg: val('f-salaryRuleFlg'), jpCompBasis: val('f-gjCompBasis'), jpCompReason: val('f-jpCompReason'),
+      // 採用理由・その他
+      hireReason: val('f-gjHireReason'), expectation: val('f-gjExpectation'), remarks: val('f-gjRemarks'),
+      hasStore: val('f-gjHasStore')
+    };
+    // 管理する店舗（可変行）— 「あり」のときのみ収集
+    if (val('f-gjHasStore') === 'あり') {
+      document.querySelectorAll('[id^="storeRow"]').forEach(function(row) {
+        var idx = row.id.replace('storeRow','');
+        var nm = val('f-store'+idx+'Name');
+        var ad = val('f-store'+idx+'Address');
+        var tel = val('f-store'+idx+'Tel');
+        if (nm || ad || tel) {
+          d['store'+idx+'Name'] = nm;
+          d['store'+idx+'Address'] = ad;
+          d['store'+idx+'Tel'] = tel;
+        }
+      });
+    }
     return d;
   }
 
@@ -2707,7 +3029,7 @@ function _renderRichError(err){
 }
 
 function validate() {
-  if (type === 'company') {
+  if (type === 'company' || type === 'company_gijinkoku') {
     if (!val('f-coName')) return '会社名は必須です。';
     return null;
   }
@@ -2809,6 +3131,7 @@ function validate() {
 // Supabase側トリガーと同じ閾値を使用（二重防御）
 function _minKeysForType(t) {
   if (t === 'company') return 1;
+  if (t === 'company_gijinkoku') return 1;
   if (t === 'jaim') return 1;  // JAIM: 該当性確認のみ必須（他は任意）
   return 6;
 }
@@ -2842,7 +3165,7 @@ async function submitForm() {
   // 🛡️ 必須項目チェック（申請人フォームのみ）: 氏名・生年月日・国籍・メールが揃っていることを確認
   // ver: company/jaim に加え support_org（登録支援機関）・card_delivery（在留カード送付先）も除外。
   //      これらは applicantNameEn 等を持たないため、除外しないと送信が必ず弾かれる。
-  if (type !== 'company' && type !== 'jaim' && type !== 'support_org' && type !== 'card_delivery') {
+  if (type !== 'company' && type !== 'company_gijinkoku' && type !== 'jaim' && type !== 'support_org' && type !== 'card_delivery') {
     var requiredKeys = ['applicantNameEn', 'birthdate', 'nationality', 'email'];
     var missingKeys = requiredKeys.filter(function(k){
       return !response[k] || String(response[k]).trim() === '';
@@ -2948,7 +3271,7 @@ async function saveDraft(auto) {
     }
     // 既知バグパターン2: residenceCard='なし'+address='なし'+他1〜2項目だけ（必須項目が一切無い状態）
     // → 「なし」系のデフォルト値しか入っていない=DOMが破壊された状態と判断
-    if (_keyCount <= 4 && type !== 'company') {
+    if (_keyCount <= 4 && type !== 'company' && type !== 'company_gijinkoku') {
       var hasRcNashi = response.residenceCard === 'なし';
       var hasAdNashi = response.address === 'なし';
       var hasRequiredField = !!(response.applicantNameEn || response.birthdate || response.nationality || response.email);
@@ -3041,6 +3364,7 @@ var TYPE_LABELS = {
   gijinkoku_koushin:{ cat:'技人国', kind:'更新', catClass:'badge-gijinkoku', kindClass:'badge-koushin' },
   gijinkoku_henkou: { cat:'技人国', kind:'変更', catClass:'badge-gijinkoku', kindClass:'badge-koushin' },
   company:          { cat:'企業情報', kind:'', catClass:'badge-company', kindClass:'' },
+  company_gijinkoku:{ cat:'技人国 企業', kind:'', catClass:'badge-gijinkoku', kindClass:'' },
   support_org:      { cat:'登録支援機関', kind:'', catClass:'badge-company', kindClass:'' }
 };
 
