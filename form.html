@@ -191,7 +191,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20260812.02';
+var FORM_VERSION = 'ver.20260812.03';
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -874,7 +874,7 @@ var JP_NONE_I18N = {ja:'なし / 該当しない',en:'None / N/A',vi:'Không có
 function applyJpBlockLang(l) {
   ['f-jpEvalType','f-jpField1','f-jpField2','f-jpExam1','f-jpExam2','f-jpExamLoc1','f-jpExamLoc2'].forEach(function(id){
     var sel = document.getElementById(id);
-    if (!sel) return;
+    if (!sel || !sel.options) return;  // ver.20260812: input要素(②の非表示欄)はスキップ
     Array.prototype.forEach.call(sel.options, function(opt){
       if (opt.getAttribute && opt.getAttribute('data-none')) {
         opt.textContent = (l && JP_NONE_I18N[l]) ? JP_NONE_I18N[l] : JP_NONE_I18N.ja;
