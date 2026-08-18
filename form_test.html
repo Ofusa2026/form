@@ -191,7 +191,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20260818.03-test';
+var FORM_VERSION = 'ver.20260818.04-test';
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -1180,6 +1180,8 @@ function buildForm(t) {
       return buildCompanyForm();
     case 'company_gijinkoku':
       return buildCompanyGijinkokuForm();
+    case 'company_designated9':
+      return buildCompanyDesignated9Form();
     case 'jaim':
       return buildJaimOnlyForm();
     case 'support_org':
@@ -1543,7 +1545,7 @@ function field(id, label, inputType, required, placeholder, transKey, options) {
   h += '<label>' + label + (required ? '<span class="req">*</span>' : '') + '</label>';
   if (transKey) h += '<div class="trans" data-key="' + transKey + '"></div>';
   if (inputType === 'select') {
-    var _onchange = (id === 'f-nationality') ? ' onchange="toggleNationalityOther(this.value)"' : (id === 'f-flexFlg') ? ' onchange="toggleFlexType(this.value)"' : (id === 'f-holidayType') ? ' onchange="toggleHolidayType(this.value)"' : (id === 'f-gjHasStore') ? ' onchange="toggleStoreBlock(this.value)"' : '';
+    var _onchange = (id === 'f-nationality') ? ' onchange="toggleNationalityOther(this.value)"' : (id === 'f-flexFlg') ? ' onchange="toggleFlexType(this.value)"' : (id === 'f-holidayType') ? ' onchange="toggleHolidayType(this.value)"' : (id === 'f-gjHasStore') ? ' onchange="toggleStoreBlock(this.value)"' : (id === 'f-gjHaken') ? ' onchange="toggleHakenBlock(this.value)"' : '';
     h += '<select id="' + id + '"' + _onchange + '>';
     (options||[]).forEach(function(o) {
       h += '<option value="' + o + '">' + (o === '' ? '---' : o) + '</option>';
@@ -2098,6 +2100,23 @@ function buildCompanyGijinkokuForm() {
     field('f-gjSimpleWork','単純作業の有無・割合','text',false,'例: なし（専門業務が中心）') +
   '</div>' +
 
+  '<div class="card"><div class="section-title">派遣雇用の場合</div>' +
+    field('f-gjHaken','派遣雇用ですか','select',false,'',null,['','いいえ（直接雇用）','はい（派遣雇用）']) +
+    '<div id="hakenBlock" style="display:none;">' +
+      '<div style="font-size:11px;color:#9ca3af;margin:10px 0;">派遣先の情報をご記入ください。</div>' +
+      field('f-hakenName','派遣先の名称','text',false,'例: 株式会社△△') +
+      field('f-hakenCorpNo','派遣先の法人番号（13桁）','text',false,'例: 9876543210987') +
+      field('f-hakenBusiness','派遣先の主たる業種','text',false,'例: 情報通信業（システム開発）') +
+      '<div class="grid2">' +
+        field('f-hakenCapital','派遣先資本金（円）','number',false,'例: 30000000') +
+        field('f-hakenAnnualSales','派遣先の年間売上高（直近年度・円）','number',false,'例: 800000000') +
+      '</div>' +
+      field('f-hakenAddress','派遣先住所','text',false,'例: 東京都港区△△1-2-3') +
+      field('f-hakenTel','派遣先の電話番号','text',false,'例: 03-9999-8888') +
+      field('f-hakenPeriod','派遣先の派遣予定期間','text',false,'例: 2026年4月1日〜2027年3月31日') +
+    '</div>' +
+  '</div>' +
+
   '<div class="card"><div class="section-title">雇用条件</div>' +
     field('f-gjEmployType','雇用形態','select',false,'',null,['','正社員','契約社員','その他']) +
     '<div class="sub-label">【給与】</div>' +
@@ -2208,6 +2227,84 @@ function buildCompanyGijinkokuForm() {
     field('f-gjHireReason','採用の経緯・理由（なぜこの人材が必要か）','textarea',false,'例: 海外展開の強化にあたり、〇〇語対応と情報工学の専門知識を併せ持つ人材が必要なため') +
     field('f-gjExpectation','今後の事業展開・本人への期待','textarea',false,'例: 将来的に海外拠点の技術責任者として活躍を期待') +
     field('f-gjRemarks','その他 申請上の特記事項','textarea',false,'') +
+  '</div>'
+  );
+}
+
+// ===== 特定活動（告示第9号）企業ヒアリングフォーム（type=company_designated9）=====
+// ver.20260818.04: インターンシップ（特定活動告示第9号）受入れ企業向け。
+//   企業基本情報・所在地・代表者は技人国と同じIDを共有し、
+//   告示9号特有の「インターンシップ生数/1号技能実習生数/実施体制・指導員」を聞く。
+function buildCompanyDesignated9Form() {
+  return (
+  '<div class="info-box" style="background:#eff6ff;color:#1d4ed8;border-color:#bfdbfe;">' +
+    'このフォームは「特定活動（告示第9号）＝インターンシップ」の在留資格申請にあたり、受入れ企業の情報をお伺いするものです。判明している範囲でご入力ください（途中保存できます）。' +
+  '</div>' +
+
+  '<div class="card"><div class="section-title">企業基本情報</div>' +
+    '<div class="field"><label>会社名<span class="req">*</span></label><input type="text" id="f-coName" placeholder="例: 株式会社〇〇" oninput="coNameKanaHelper(this.value)"></div>' +
+    '<div class="field"><label>会社名（ひらがな）</label><input type="text" id="f-coNameKana" placeholder="例: かぶしきかいしゃ〇〇"><div id="co-kana-suggestion" style="font-size:11px;color:#6b7280;margin-top:3px;"></div></div>' +
+    field('f-coNameEn','会社名（英語）','text',false,'例: OO Co., Ltd.') +
+    field('f-coCorpNo','法人番号（13桁）','text',false,'例: 1234567890123') +
+    field('f-coHomepage','企業ホームページ（URL）','text',false,'例: https://www.example.co.jp') +
+    field('f-d9Established','設立年月日','date',false,'') +
+    '<div class="grid2">' +
+      field('f-coCapital','資本金（円）','number',false,'例: 10000000') +
+      field('f-coAnnualSales','年間売上金額（円）','number',false,'例: 500000000') +
+    '</div>' +
+    field('f-d9Business','事業内容（主な取扱商品・サービス）','textarea',false,'例: 業務用ソフトウェアの受託開発および保守') +
+  '</div>' +
+
+  '<div class="card"><div class="section-title">所在地</div>' +
+    '<div class="field"><label>郵便番号</label>' +
+      '<div style="display:flex;gap:8px;align-items:center;">' +
+        '<input type="text" id="f-coZip" placeholder="例: 160-0022" style="flex:1;" oninput="coZipAutoFill(this.value)" inputmode="numeric">' +
+        '<button type="button" onclick="coZipAutoFill(document.getElementById(\'f-coZip\').value, true)" style="white-space:nowrap;padding:10px 14px;background:#3b82f6;color:white;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;">🔍 住所を自動入力</button>' +
+      '</div>' +
+      '<div id="co-zip-msg" style="font-size:11px;margin-top:4px;"></div>' +
+    '</div>' +
+    '<div class="grid2">' +
+      field('f-coPref','都道府県','text',false,'例: 東京都') +
+      field('f-coCity','市区町村','text',false,'例: 新宿区') +
+    '</div>' +
+    field('f-coAddress','町名番地','text',false,'例: 新宿2丁目1番1号 〇〇ビル3F') +
+    field('f-coTel','電話番号','text',false,'例: 03-1234-5678') +
+  '</div>' +
+
+  '<div class="card"><div class="section-title">代表者・作成責任者</div>' +
+    '<div class="grid2">' +
+      field('f-coRepName','代表者氏名','text',false,'例: 山田 太郎') +
+      field('f-coRepTitle','代表者役職','text',false,'例: 代表取締役') +
+    '</div>' +
+    '<div class="grid2">' +
+      field('f-coAuthorName','作成責任者氏名','text',false,'例: 佐藤 花子') +
+      field('f-coAuthorTitle','作成責任者役職','text',false,'例: 人事部長') +
+    '</div>' +
+  '</div>' +
+
+  '<div class="card"><div class="section-title">受入れ状況</div>' +
+    '<div class="grid2">' +
+      field('f-d9Employees','常勤職員数','number',false,'例: 50') +
+      field('f-d9ForeignEmployees','うち外国人職員数','number',false,'例: 5') +
+    '</div>' +
+    '<div class="grid2">' +
+      field('f-d9InternCount','インターンシップ生数','number',false,'例: 3') +
+      field('f-d9Trainee1Count','1号技能実習生数','number',false,'例: 0') +
+    '</div>' +
+  '</div>' +
+
+  '<div class="card"><div class="section-title">実施体制</div>' +
+    '<div style="font-size:11px;color:#9ca3af;margin-bottom:10px;">インターンシップの実施責任者・指導員をご記入ください（複数可）。</div>' +
+    '<div class="sub-label">【責任者】</div>' +
+    '<div id="d9MgrRows">' + d9MgrRow(1) + '</div>' +
+    '<button type="button" id="addD9MgrBtn" onclick="addD9MgrRow()" style="font-size:11px;padding:5px 14px;background:white;border:1.5px dashed #c7d2fe;border-radius:6px;color:#6366f1;cursor:pointer;font-weight:700;margin-bottom:14px;">＋ 責任者を追加</button>' +
+    '<div class="sub-label">【指導員（1年以上の経験を有する者）】</div>' +
+    '<div id="d9InsRows">' + d9InsRow(1) + '</div>' +
+    '<button type="button" id="addD9InsBtn" onclick="addD9InsRow()" style="font-size:11px;padding:5px 14px;background:white;border:1.5px dashed #c7d2fe;border-radius:6px;color:#6366f1;cursor:pointer;font-weight:700;">＋ 指導員を追加</button>' +
+  '</div>' +
+
+  '<div class="card"><div class="section-title">その他</div>' +
+    field('f-d9Remarks','その他 申請上の特記事項','textarea',false,'') +
   '</div>'
   );
 }
@@ -2457,6 +2554,57 @@ function toggleStoreBlock(v) {
   var blk = document.getElementById('storeBlock');
   if (blk) blk.style.display = (v === 'あり') ? 'block' : 'none';
 }
+function toggleHakenBlock(v) {
+  var blk = document.getElementById('hakenBlock');
+  if (blk) blk.style.display = (v === 'はい（派遣雇用）') ? 'block' : 'none';
+}
+
+// ver.20260818.04: 告示第9号 実施体制（責任者・指導員）可変行
+var _d9MgrCount = 1;
+var _d9InsCount = 1;
+var _maxD9 = 20;
+function d9MgrRow(n) {
+  return '<div id="d9MgrRow'+n+'" style="border:1px solid #e5e7eb;border-radius:8px;padding:10px;margin-bottom:6px;background:#f9fafb;">' +
+    '<div style="font-size:10px;font-weight:700;color:#6366f1;margin-bottom:6px;display:flex;align-items:center;justify-content:space-between;">責任者'+n +
+    (n > 1 ? '<button type="button" onclick="removeD9MgrRow('+n+')" style="font-size:10px;padding:1px 8px;background:white;color:#dc2626;border:1px solid #fca5a5;border-radius:4px;cursor:pointer;">削除</button>' : '') +
+    '</div>' +
+    '<div class="grid2">' +
+      field('f-d9Mgr'+n+'Title','役職','text',false,'例: 管理部長') +
+      field('f-d9Mgr'+n+'Name','氏名','text',false,'例: 田中 一郎') +
+    '</div>' +
+    '</div>';
+}
+function d9InsRow(n) {
+  return '<div id="d9InsRow'+n+'" style="border:1px solid #e5e7eb;border-radius:8px;padding:10px;margin-bottom:6px;background:#f9fafb;">' +
+    '<div style="font-size:10px;font-weight:700;color:#6366f1;margin-bottom:6px;display:flex;align-items:center;justify-content:space-between;">指導員'+n +
+    (n > 1 ? '<button type="button" onclick="removeD9InsRow('+n+')" style="font-size:10px;padding:1px 8px;background:white;color:#dc2626;border:1px solid #fca5a5;border-radius:4px;cursor:pointer;">削除</button>' : '') +
+    '</div>' +
+    '<div class="grid2">' +
+      field('f-d9Ins'+n+'Title','役職','text',false,'例: 開発課長') +
+      field('f-d9Ins'+n+'Name','氏名','text',false,'例: 鈴木 花子') +
+    '</div>' +
+    '</div>';
+}
+function addD9MgrRow() {
+  if (_d9MgrCount >= _maxD9) return;
+  _d9MgrCount++;
+  var c = document.getElementById('d9MgrRows'); if (!c) return;
+  var div = document.createElement('div'); div.innerHTML = d9MgrRow(_d9MgrCount); c.appendChild(div.firstChild);
+  if (typeof setLang === 'function') setLang(currentLang);
+}
+function removeD9MgrRow(n) {
+  var row = document.getElementById('d9MgrRow'+n); if (row) { row.remove(); _d9MgrCount--; }
+}
+function addD9InsRow() {
+  if (_d9InsCount >= _maxD9) return;
+  _d9InsCount++;
+  var c = document.getElementById('d9InsRows'); if (!c) return;
+  var div = document.createElement('div'); div.innerHTML = d9InsRow(_d9InsCount); c.appendChild(div.firstChild);
+  if (typeof setLang === 'function') setLang(currentLang);
+}
+function removeD9InsRow(n) {
+  var row = document.getElementById('d9InsRow'+n); if (row) { row.remove(); _d9InsCount--; }
+}
 
 function toggleNationalityOther(val) {
   var el = document.getElementById('f-nationalityOther');
@@ -2694,6 +2842,11 @@ function collectData() {
       majorRelation: val('f-gjMajorRelation'), langSkill: val('f-gjLangSkill'), simpleWork: val('f-gjSimpleWork'),
       // 雇用条件
       employType: val('f-gjEmployType'),
+      // 派遣雇用
+      haken: val('f-gjHaken'),
+      hakenName: val('f-hakenName'), hakenCorpNo: val('f-hakenCorpNo'), hakenBusiness: val('f-hakenBusiness'),
+      hakenCapital: val('f-hakenCapital'), hakenAnnualSales: val('f-hakenAnnualSales'),
+      hakenAddress: val('f-hakenAddress'), hakenTel: val('f-hakenTel'), hakenPeriod: val('f-hakenPeriod'),
       salaryType: val('f-salaryType'), salaryMonthly: val('f-salaryMonthly'),
       allowance1Name: val('f-allowance1Name'), allowance1Amount: val('f-allowance1Amount'), allowance1Cond: val('f-allowance1Cond'),
       allowance2Name: val('f-allowance2Name'), allowance2Amount: val('f-allowance2Amount'), allowance2Cond: val('f-allowance2Cond'),
@@ -2741,6 +2894,39 @@ function collectData() {
         }
       });
     }
+    // 派遣「はい」以外のときは派遣先詳細をクリア（残存防止）
+    if (val('f-gjHaken') !== 'はい（派遣雇用）') {
+      ['hakenName','hakenCorpNo','hakenBusiness','hakenCapital','hakenAnnualSales','hakenAddress','hakenTel','hakenPeriod'].forEach(function(k){ d[k] = ''; });
+    }
+    return d;
+  }
+
+  // ver.20260818.04: 特定活動（告示第9号）企業ヒアリング（type=company_designated9）
+  if (t === 'company_designated9') {
+    var d = {
+      name: val('f-coName'), nameKana: val('f-coNameKana'), nameEn: val('f-coNameEn'),
+      corpNo: val('f-coCorpNo'), homepage: val('f-coHomepage'), established: val('f-d9Established'),
+      capital: val('f-coCapital'), annualSales: val('f-coAnnualSales'), businessDesc: val('f-d9Business'),
+      zip: val('f-coZip'), pref: val('f-coPref'), city: val('f-coCity'),
+      address: val('f-coAddress'), tel: val('f-coTel'),
+      repName: val('f-coRepName'), repTitle: val('f-coRepTitle'),
+      authorName: val('f-coAuthorName'), authorTitle: val('f-coAuthorTitle'),
+      employees: val('f-d9Employees'), foreignEmployees: val('f-d9ForeignEmployees'),
+      internCount: val('f-d9InternCount'), trainee1Count: val('f-d9Trainee1Count'),
+      remarks: val('f-d9Remarks')
+    };
+    // 実施体制：責任者（可変行）
+    document.querySelectorAll('[id^="d9MgrRow"]').forEach(function(row) {
+      var idx = row.id.replace('d9MgrRow','');
+      var ti = val('f-d9Mgr'+idx+'Title'); var nm = val('f-d9Mgr'+idx+'Name');
+      if (ti || nm) { d['mgr'+idx+'Title'] = ti; d['mgr'+idx+'Name'] = nm; }
+    });
+    // 指導員（可変行）
+    document.querySelectorAll('[id^="d9InsRow"]').forEach(function(row) {
+      var idx = row.id.replace('d9InsRow','');
+      var ti = val('f-d9Ins'+idx+'Title'); var nm = val('f-d9Ins'+idx+'Name');
+      if (ti || nm) { d['ins'+idx+'Title'] = ti; d['ins'+idx+'Name'] = nm; }
+    });
     return d;
   }
 
@@ -3029,7 +3215,7 @@ function _renderRichError(err){
 }
 
 function validate() {
-  if (type === 'company' || type === 'company_gijinkoku') {
+  if (type === 'company' || type === 'company_gijinkoku' || type === 'company_designated9') {
     if (!val('f-coName')) return '会社名は必須です。';
     return null;
   }
@@ -3132,6 +3318,7 @@ function validate() {
 function _minKeysForType(t) {
   if (t === 'company') return 1;
   if (t === 'company_gijinkoku') return 1;
+  if (t === 'company_designated9') return 1;
   if (t === 'jaim') return 1;  // JAIM: 該当性確認のみ必須（他は任意）
   return 6;
 }
@@ -3165,7 +3352,7 @@ async function submitForm() {
   // 🛡️ 必須項目チェック（申請人フォームのみ）: 氏名・生年月日・国籍・メールが揃っていることを確認
   // ver: company/jaim に加え support_org（登録支援機関）・card_delivery（在留カード送付先）も除外。
   //      これらは applicantNameEn 等を持たないため、除外しないと送信が必ず弾かれる。
-  if (type !== 'company' && type !== 'company_gijinkoku' && type !== 'jaim' && type !== 'support_org' && type !== 'card_delivery') {
+  if (type !== 'company' && type !== 'company_gijinkoku' && type !== 'company_designated9' && type !== 'jaim' && type !== 'support_org' && type !== 'card_delivery') {
     var requiredKeys = ['applicantNameEn', 'birthdate', 'nationality', 'email'];
     var missingKeys = requiredKeys.filter(function(k){
       return !response[k] || String(response[k]).trim() === '';
@@ -3271,7 +3458,7 @@ async function saveDraft(auto) {
     }
     // 既知バグパターン2: residenceCard='なし'+address='なし'+他1〜2項目だけ（必須項目が一切無い状態）
     // → 「なし」系のデフォルト値しか入っていない=DOMが破壊された状態と判断
-    if (_keyCount <= 4 && type !== 'company' && type !== 'company_gijinkoku') {
+    if (_keyCount <= 4 && type !== 'company' && type !== 'company_gijinkoku' && type !== 'company_designated9') {
       var hasRcNashi = response.residenceCard === 'なし';
       var hasAdNashi = response.address === 'なし';
       var hasRequiredField = !!(response.applicantNameEn || response.birthdate || response.nationality || response.email);
@@ -3365,6 +3552,7 @@ var TYPE_LABELS = {
   gijinkoku_henkou: { cat:'技人国', kind:'変更', catClass:'badge-gijinkoku', kindClass:'badge-koushin' },
   company:          { cat:'企業情報', kind:'', catClass:'badge-company', kindClass:'' },
   company_gijinkoku:{ cat:'技人国 企業', kind:'', catClass:'badge-gijinkoku', kindClass:'' },
+  company_designated9:{ cat:'特定活動9号 企業', kind:'', catClass:'badge-company', kindClass:'' },
   support_org:      { cat:'登録支援機関', kind:'', catClass:'badge-company', kindClass:'' }
 };
 
