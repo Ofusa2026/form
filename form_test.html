@@ -191,7 +191,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20260818.04-test';
+var FORM_VERSION = 'ver.20260818.05-test';
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -2037,13 +2037,6 @@ function buildCompanyGijinkokuForm() {
   '</div>' +
 
   '<div class="card"><div class="section-title">所在地</div>' +
-    '<div class="field"><label>郵便番号</label>' +
-      '<div style="display:flex;gap:8px;align-items:center;">' +
-        '<input type="text" id="f-coZip" placeholder="例: 160-0022" style="flex:1;" oninput="coZipAutoFill(this.value)" inputmode="numeric">' +
-        '<button type="button" onclick="coZipAutoFill(document.getElementById(\'f-coZip\').value, true)" style="white-space:nowrap;padding:10px 14px;background:#3b82f6;color:white;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;">🔍 住所を自動入力</button>' +
-      '</div>' +
-      '<div id="co-zip-msg" style="font-size:11px;margin-top:4px;"></div>' +
-    '</div>' +
     '<div class="grid2">' +
       field('f-coPref','都道府県','text',false,'例: 東京都') +
       field('f-coCity','市区町村','text',false,'例: 新宿区') +
@@ -2256,13 +2249,6 @@ function buildCompanyDesignated9Form() {
   '</div>' +
 
   '<div class="card"><div class="section-title">所在地</div>' +
-    '<div class="field"><label>郵便番号</label>' +
-      '<div style="display:flex;gap:8px;align-items:center;">' +
-        '<input type="text" id="f-coZip" placeholder="例: 160-0022" style="flex:1;" oninput="coZipAutoFill(this.value)" inputmode="numeric">' +
-        '<button type="button" onclick="coZipAutoFill(document.getElementById(\'f-coZip\').value, true)" style="white-space:nowrap;padding:10px 14px;background:#3b82f6;color:white;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;">🔍 住所を自動入力</button>' +
-      '</div>' +
-      '<div id="co-zip-msg" style="font-size:11px;margin-top:4px;"></div>' +
-    '</div>' +
     '<div class="grid2">' +
       field('f-coPref','都道府県','text',false,'例: 東京都') +
       field('f-coCity','市区町村','text',false,'例: 新宿区') +
@@ -2830,7 +2816,7 @@ function collectData() {
       employees: val('f-coEmployees'), foreignEmployees: val('f-coForeignEmployees'),
       trainees: val('f-coTrainees'),
       listedCategory: val('f-gjListedCategory'), businessDesc: val('f-gjBusiness'),
-      zip: val('f-coZip'), pref: val('f-coPref'), city: val('f-coCity'),
+      pref: val('f-coPref'), city: val('f-coCity'),
       address: val('f-coAddress'), addressEn: val('f-coAddressEn'), tel: val('f-coTel'),
       officeName: val('f-officeName'), officeAddress: val('f-officeAddress'), officeTel: val('f-officeTel'),
       repName: val('f-coRepName'), repTitle: val('f-coRepTitle'),
@@ -2907,7 +2893,7 @@ function collectData() {
       name: val('f-coName'), nameKana: val('f-coNameKana'), nameEn: val('f-coNameEn'),
       corpNo: val('f-coCorpNo'), homepage: val('f-coHomepage'), established: val('f-d9Established'),
       capital: val('f-coCapital'), annualSales: val('f-coAnnualSales'), businessDesc: val('f-d9Business'),
-      zip: val('f-coZip'), pref: val('f-coPref'), city: val('f-coCity'),
+      pref: val('f-coPref'), city: val('f-coCity'),
       address: val('f-coAddress'), tel: val('f-coTel'),
       repName: val('f-coRepName'), repTitle: val('f-coRepTitle'),
       authorName: val('f-coAuthorName'), authorTitle: val('f-coAuthorTitle'),
