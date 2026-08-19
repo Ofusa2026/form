@@ -191,7 +191,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20260818.07-test';
+var FORM_VERSION = 'ver.20260818.08-test';
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -1180,6 +1180,8 @@ function buildForm(t) {
       return buildCompanyForm();
     case 'company_gijinkoku':
       return buildCompanyGijinkokuForm();
+    case 'company_designated46':
+      return buildCompanyDesignated46Form();
     case 'company_designated9':
       return buildCompanyDesignated9Form();
     case 'jaim':
@@ -2012,6 +2014,7 @@ function buildCompanyForm() {
 function buildCompanyGijinkokuForm() {
   return (
   '<div class="info-box" style="background:#ecfdf5;color:#047857;border-color:#a7f3d0;">' +
+    '<span class="case-name">技術・人文知識・国際業務</span>' +
     'このフォームは「技術・人文知識・国際業務」の在留資格申請にあたり、貴社の情報をお伺いするものです。判明している範囲でご入力ください（途中保存できます）。' +
   '</div>' +
 
@@ -2209,6 +2212,14 @@ function buildCompanyGijinkokuForm() {
   );
 }
 
+// ===== 特定活動（告示第46号）企業ヒアリングフォーム（type=company_designated46）=====
+// ver.20260818: 技人国と内容同一。案内文の正式名称のみ差し替える。
+function buildCompanyDesignated46Form() {
+  return buildCompanyGijinkokuForm()
+    .replace('<span class="case-name">技術・人文知識・国際業務</span>', '<span class="case-name">特定活動（告示第46号）</span>')
+    .replace('このフォームは「技術・人文知識・国際業務」の在留資格申請にあたり、', 'このフォームは「特定活動（告示第46号）」の在留資格申請にあたり、');
+}
+
 // ===== 特定活動（告示第9号）企業ヒアリングフォーム（type=company_designated9）=====
 // ver.20260818.04: インターンシップ（特定活動告示第9号）受入れ企業向け。
 //   企業基本情報・所在地・代表者は技人国と同じIDを共有し、
@@ -2216,6 +2227,7 @@ function buildCompanyGijinkokuForm() {
 function buildCompanyDesignated9Form() {
   return (
   '<div class="info-box" style="background:#eff6ff;color:#1d4ed8;border-color:#bfdbfe;">' +
+    '<span class="case-name">特定活動（告示第9号）</span>' +
     'このフォームは「特定活動（告示第9号）＝インターンシップ」の在留資格申請にあたり、受入れ企業の情報をお伺いするものです。判明している範囲でご入力ください（途中保存できます）。' +
   '</div>' +
 
@@ -2826,7 +2838,7 @@ function collectData() {
   }
 
   // ver.20260818.01: 技人国 企業ヒアリング（type=company_gijinkoku）
-  if (t === 'company_gijinkoku') {
+  if (t === 'company_gijinkoku' || t === 'company_designated46') {
     var d = {
       name: val('f-coName'), nameKana: val('f-coNameKana'), nameEn: val('f-coNameEn'),
       corpNo: val('f-coCorpNo'), established: val('f-gjEstablished'),
@@ -3229,7 +3241,7 @@ function _renderRichError(err){
 }
 
 function validate() {
-  if (type === 'company' || type === 'company_gijinkoku' || type === 'company_designated9') {
+  if (type === 'company' || type === 'company_gijinkoku' || type === 'company_designated46' || type === 'company_designated9') {
     if (!val('f-coName')) return '会社名は必須です。';
     return null;
   }
@@ -3332,6 +3344,7 @@ function validate() {
 function _minKeysForType(t) {
   if (t === 'company') return 1;
   if (t === 'company_gijinkoku') return 1;
+  if (t === 'company_designated46') return 1;
   if (t === 'company_designated9') return 1;
   if (t === 'jaim') return 1;  // JAIM: 該当性確認のみ必須（他は任意）
   return 6;
@@ -3366,7 +3379,7 @@ async function submitForm() {
   // 🛡️ 必須項目チェック（申請人フォームのみ）: 氏名・生年月日・国籍・メールが揃っていることを確認
   // ver: company/jaim に加え support_org（登録支援機関）・card_delivery（在留カード送付先）も除外。
   //      これらは applicantNameEn 等を持たないため、除外しないと送信が必ず弾かれる。
-  if (type !== 'company' && type !== 'company_gijinkoku' && type !== 'company_designated9' && type !== 'jaim' && type !== 'support_org' && type !== 'card_delivery') {
+  if (type !== 'company' && type !== 'company_gijinkoku' && type !== 'company_designated46' && type !== 'company_designated9' && type !== 'jaim' && type !== 'support_org' && type !== 'card_delivery') {
     var requiredKeys = ['applicantNameEn', 'birthdate', 'nationality', 'email'];
     var missingKeys = requiredKeys.filter(function(k){
       return !response[k] || String(response[k]).trim() === '';
@@ -3472,7 +3485,7 @@ async function saveDraft(auto) {
     }
     // 既知バグパターン2: residenceCard='なし'+address='なし'+他1〜2項目だけ（必須項目が一切無い状態）
     // → 「なし」系のデフォルト値しか入っていない=DOMが破壊された状態と判断
-    if (_keyCount <= 4 && type !== 'company' && type !== 'company_gijinkoku' && type !== 'company_designated9') {
+    if (_keyCount <= 4 && type !== 'company' && type !== 'company_gijinkoku' && type !== 'company_designated46' && type !== 'company_designated9') {
       var hasRcNashi = response.residenceCard === 'なし';
       var hasAdNashi = response.address === 'なし';
       var hasRequiredField = !!(response.applicantNameEn || response.birthdate || response.nationality || response.email);
@@ -3566,6 +3579,7 @@ var TYPE_LABELS = {
   gijinkoku_henkou: { cat:'技人国', kind:'変更', catClass:'badge-gijinkoku', kindClass:'badge-koushin' },
   company:          { cat:'企業情報', kind:'', catClass:'badge-company', kindClass:'' },
   company_gijinkoku:{ cat:'技人国 企業', kind:'', catClass:'badge-gijinkoku', kindClass:'' },
+  company_designated46:{ cat:'特定活動46号 企業', kind:'', catClass:'badge-gijinkoku', kindClass:'' },
   company_designated9:{ cat:'特定活動9号 企業', kind:'', catClass:'badge-company', kindClass:'' },
   support_org:      { cat:'登録支援機関', kind:'', catClass:'badge-company', kindClass:'' }
 };
