@@ -191,7 +191,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20260818.06-test';
+var FORM_VERSION = 'ver.20260818.07-test';
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -2264,6 +2264,12 @@ function buildCompanyDesignated9Form() {
     '</div>' +
   '</div>' +
 
+  '<div class="card"><div class="section-title">インターンシップ実習内容</div>' +
+    '<div style="font-size:11px;color:#9ca3af;margin-bottom:10px;">インターンシップ生が行う実習の内容・期間・指導体制をご記入ください（複数の実習内容がある場合は追加できます）。</div>' +
+    '<div id="d9TaskRows">' + d9TaskRow(1) + '</div>' +
+    '<button type="button" id="addD9TaskBtn" onclick="addD9TaskRow()" style="font-size:11px;padding:5px 14px;background:white;border:1.5px dashed #c7d2fe;border-radius:6px;color:#6366f1;cursor:pointer;font-weight:700;">＋ 実習内容を追加</button>' +
+  '</div>' +
+
   '<div class="card"><div class="section-title">実施体制</div>' +
     '<div style="font-size:11px;color:#9ca3af;margin-bottom:10px;">インターンシップの実施責任者・指導員をご記入ください（複数可）。</div>' +
     '<div class="sub-label">【責任者】</div>' +
@@ -2575,6 +2581,34 @@ function addD9InsRow() {
 }
 function removeD9InsRow(n) {
   var row = document.getElementById('d9InsRow'+n); if (row) { row.remove(); _d9InsCount--; }
+}
+
+// ver.20260818.07: 告示第9号 インターンシップ実習内容（可変行）
+var _d9TaskCount = 1;
+var _maxD9Task = 20;
+function d9TaskRow(n) {
+  return '<div id="d9TaskRow'+n+'" style="border:1px solid #e5e7eb;border-radius:8px;padding:10px;margin-bottom:6px;background:#f9fafb;">' +
+    '<div style="font-size:10px;font-weight:700;color:#6366f1;margin-bottom:6px;display:flex;align-items:center;justify-content:space-between;">実習内容'+n +
+    (n > 1 ? '<button type="button" onclick="removeD9TaskRow('+n+')" style="font-size:10px;padding:1px 8px;background:white;color:#dc2626;border:1px solid #fca5a5;border-radius:4px;cursor:pointer;">削除</button>' : '') +
+    '</div>' +
+    field('f-d9Task'+n+'Desc','実習内容（具体的な作業・学ぶ内容）','textarea',false,'例: 自社システム開発チームでの要件定義・設計補助、コードレビュー同席') +
+    '<div class="grid2">' +
+      field('f-d9Task'+n+'Period','実習期間','text',false,'例: 2026年4月〜2026年9月（6か月）') +
+      field('f-d9Task'+n+'Hours','実習時間（週あたり等）','text',false,'例: 週5日・1日8時間') +
+    '</div>' +
+    field('f-d9Task'+n+'Place','実習場所','text',false,'例: 本社 開発部（東京都〇〇）') +
+    field('f-d9Task'+n+'Guidance','指導体制（担当指導員・指導方法）','textarea',false,'例: 開発課長がOJTで指導、週1回進捗面談を実施') +
+  '</div>';
+}
+function addD9TaskRow() {
+  if (_d9TaskCount >= _maxD9Task) return;
+  _d9TaskCount++;
+  var c = document.getElementById('d9TaskRows'); if (!c) return;
+  var div = document.createElement('div'); div.innerHTML = d9TaskRow(_d9TaskCount); c.appendChild(div.firstChild);
+  if (typeof setLang === 'function') setLang(currentLang);
+}
+function removeD9TaskRow(n) {
+  var row = document.getElementById('d9TaskRow'+n); if (row) { row.remove(); _d9TaskCount--; }
 }
 
 function toggleNationalityOther(val) {
@@ -2894,6 +2928,18 @@ function collectData() {
       var idx = row.id.replace('d9InsRow','');
       var ti = val('f-d9Ins'+idx+'Title'); var nm = val('f-d9Ins'+idx+'Name');
       if (ti || nm) { d['ins'+idx+'Title'] = ti; d['ins'+idx+'Name'] = nm; }
+    });
+    // インターンシップ実習内容（可変行）
+    document.querySelectorAll('[id^="d9TaskRow"]').forEach(function(row) {
+      var idx = row.id.replace('d9TaskRow','');
+      var desc = val('f-d9Task'+idx+'Desc'); var period = val('f-d9Task'+idx+'Period');
+      var hours = val('f-d9Task'+idx+'Hours'); var place = val('f-d9Task'+idx+'Place');
+      var guid = val('f-d9Task'+idx+'Guidance');
+      if (desc || period || hours || place || guid) {
+        d['task'+idx+'Desc'] = desc; d['task'+idx+'Period'] = period;
+        d['task'+idx+'Hours'] = hours; d['task'+idx+'Place'] = place;
+        d['task'+idx+'Guidance'] = guid;
+      }
     });
     return d;
   }
