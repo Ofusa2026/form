@@ -124,7 +124,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 
 
 <!-- 翻訳バー -->
-<div class="lang-bar">
+<div class="lang-bar" id="langBar">
   <div class="lang-bar-inner">
     <span class="lang-bar-label">🌐 翻訳:</span>
     <button class="lang-btn" data-lang="en" onclick="setLang('en')">English</button>
@@ -191,7 +191,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20260812.03';
+var FORM_VERSION = 'ver.20260812.04';
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -207,7 +207,21 @@ if (!caseId) {
 }
 var type    = params.get('type') || '';   // tokutei_nintei / tokutei_koushin / tokutei_henkou / gijinkoku_nintei / gijinkoku_koushin / gijinkoku_henkou / company
 var caseName = params.get('name') ? decodeURIComponent(params.get('name')) : '';
+// ver.20260812: 企業系フォームは翻訳不要（日本人担当者が入力）
+var _isCompanyForm = (type === 'company' || type === 'support_org' || (type||'').indexOf('jaim') >= 0);
+// ver.20260812: 国籍→言語の自動判定マップ（案シスの国籍値に対応）
+var _NAT_LANG_MAP = {
+  'インドネシア':'id', 'ベトナム':'vi', 'ミャンマー':'my', 'ミヤンマー':'my',
+  'カンボジア':'km', 'ネパール':'ne',
+  '中国':'zh', '台湾':'zh', '香港':'zh',
+  'フィリピン':'en', 'タイ':'en', 'スリランカ':'en', 'インド':'en', 'バングラデシュ':'en'
+};
 var currentLang = params.get('lang') || '';
+// lang明示指定がなく、企業フォームでもなければ国籍から自動判定
+if (!currentLang && !_isCompanyForm) {
+  var _natParam = params.get('nationality') ? decodeURIComponent(params.get('nationality')) : '';
+  if (_natParam) currentLang = _NAT_LANG_MAP[_natParam] || '';
+}
 var responseId = params.get('response_id') || '';  // 編集モード: 既存回答のID
 var editMode = !!responseId;
 var srcParam = params.get('src') || '';  // ver.20260531.02: 流入元（aidem 等）。本人不一致時の連絡先案内の出し分けに使用
@@ -995,6 +1009,8 @@ function onJpFieldChange(num, fieldValue) {
     toggleJpExam2Loc(examSel ? examSel.value : '');
   }
   if (typeof applyJpBlockLang === 'function') applyJpBlockLang(currentLang);
+  // ver.20260812: 企業系フォームは言語バーを非表示
+  if (_isCompanyForm) { var _lb = document.getElementById('langBar'); if (_lb) _lb.style.display = 'none'; }
 }
 
 // ===== 技能証明ブロック =====
