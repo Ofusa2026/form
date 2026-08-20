@@ -191,7 +191,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20260818.06';
+var FORM_VERSION = 'ver.20260818.07';
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -2161,6 +2161,17 @@ function buildCompanyGijinkokuForm() {
       field('f-coRepNameEn','代表者氏名（英語）','text',false,'例: YAMADA TARO') +
       field('f-coRepTitleEn','代表者役職（英語）','text',false,'例: President') +
     '</div>' +
+    // ver.20260819: 代表者の国籍（日本以外は在留カード番号・氏名英語を追加表示）
+    '<div class="field"><label>代表者の国籍</label>' +
+      '<select id="f-gjRepNationality" onchange="toggleGjRepNationality(this.value)">' +
+        '<option value="">---</option>' +
+        '<option value="日本">日本</option>' +
+        '<option value="日本以外">日本以外</option>' +
+      '</select></div>' +
+    '<div id="gjRepForeignWrap" style="display:none;">' +
+      field('f-gjRepResidenceCard','代表者 在留カード番号','text',false,'例: AB12345678CD') +
+      field('f-gjRepNameEnForeign','代表者 氏名（英語表記）','text',false,'例: NGUYEN VAN A') +
+    '</div>' +
     '<div class="grid2">' +
       field('f-coAuthorName','作成責任者氏名','text',false,'例: 佐藤 花子') +
       field('f-coAuthorTitle','作成責任者役職','text',false,'例: 人事部長') +
@@ -2628,6 +2639,18 @@ function toggleStoreBlock(v) {
   var blk = document.getElementById('storeBlock');
   if (blk) blk.style.display = (v === 'あり') ? 'block' : 'none';
 }
+// ver.20260819: 代表者の国籍が「日本以外」のとき在留カード番号・氏名英語を表示
+function toggleGjRepNationality(v) {
+  var wrap = document.getElementById('gjRepForeignWrap');
+  if (!wrap) return;
+  if (v === '日本以外') {
+    wrap.style.display = 'block';
+  } else {
+    wrap.style.display = 'none';
+    var rc = document.getElementById('f-gjRepResidenceCard'); if (rc) rc.value = '';
+    var ne = document.getElementById('f-gjRepNameEnForeign'); if (ne) ne.value = '';
+  }
+}
 function toggleHakenBlock(v) {
   var blk = document.getElementById('hakenBlock');
   if (blk) blk.style.display = (v === 'はい（派遣雇用）') ? 'block' : 'none';
@@ -2924,6 +2947,10 @@ function collectData() {
 
   if (t === 'company_gijinkoku' || t === 'company_designated46') {
     var d = {
+      // ver.20260819: 代表者の国籍・在留カード番号・氏名英語
+      gjRepNationality: val('f-gjRepNationality'),
+      gjRepResidenceCard: val('f-gjRepResidenceCard'),
+      gjRepNameEnForeign: val('f-gjRepNameEnForeign'),
       name: val('f-coName'), nameKana: val('f-coNameKana'), nameEn: val('f-coNameEn'),
       corpNo: val('f-coCorpNo'), established: val('f-gjEstablished'),
       empInsNo: val('f-coEmpInsNo'), homepage: val('f-coHomepage'),
@@ -3856,6 +3883,9 @@ function prefillForm(resp) {
     gijinkokuExpStatus: 'f-gijinkokuExpStatus',
     gijinkokuExpYears: 'f-gijinkokuExpYears',
     gijinkokuExpMonths: 'f-gijinkokuExpMonths',
+    gjRepNationality: 'f-gjRepNationality',
+    gjRepResidenceCard: 'f-gjRepResidenceCard',
+    gjRepNameEnForeign: 'f-gjRepNameEnForeign',
     // ver.20260812: 介護日本語評価試験
     kaigoJpExamLoc1: 'f-kaigoJpExamLoc1'
   };
