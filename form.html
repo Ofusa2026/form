@@ -191,7 +191,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20260818.08';
+var FORM_VERSION = 'ver.20260818.09';
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -3487,6 +3487,28 @@ function _minKeysForType(t) {
   return 6;
 }
 
+// ver.20260821: 送信完了モーダル（保存できたことを分かりやすく大きく表示）
+function showSubmitDoneModal() {
+  // 既存があれば消す
+  var old = document.getElementById('submitDoneOverlay');
+  if (old) old.remove();
+  var ov = document.createElement('div');
+  ov.id = 'submitDoneOverlay';
+  ov.className = 'name-confirm-overlay';
+  ov.innerHTML =
+    '<div class="name-confirm-modal" style="max-width:380px;text-align:center;">'
+    + '<div style="font-size:56px;line-height:1;margin-bottom:10px;">✅</div>'
+    + '<div class="title" style="font-size:20px;color:#166534;margin-bottom:10px;">送信が完了しました</div>'
+    + '<div style="font-size:14px;color:#334155;line-height:1.7;margin-bottom:20px;">'
+    +   'ご回答ありがとうございました。<br>内容はしっかり保存されました。<br>'
+    +   '<span style="font-size:12px;color:#64748b;">この画面は閉じていただいて大丈夫です。</span>'
+    + '</div>'
+    + '<button onclick="document.getElementById(\'submitDoneOverlay\').remove()" style="width:100%;padding:14px;background:#16a34a;color:white;border:none;border-radius:10px;font-size:15px;font-weight:800;cursor:pointer;">閉じる</button>'
+    + '<div style="font-size:11px;color:#94a3b8;margin-top:12px;line-height:1.6;">修正したい場合は、この画面を閉じて内容を直し、<br>もう一度「修正を再送信する」を押してください。</div>'
+    + '</div>';
+  document.body.appendChild(ov);
+}
+
 async function submitForm() {
   document.getElementById('errorMsg').style.display = 'none';
   var err = validate();
@@ -3567,8 +3589,12 @@ async function submitForm() {
     okBanner.innerHTML = '✅ 送信が完了しました。ご回答ありがとうございました。<br>'
       + '<span style="font-weight:400;font-size:13px;line-height:1.7;display:inline-block;margin-top:6px;">入力内容はこのまま表示されています。修正する場合は内容を直して、もう一度「修正を再送信する」を押してください。</span>';
     try { okBanner.scrollIntoView({ behavior:'smooth', block:'start' }); } catch(_) {}
+    // ver.20260821: 送信完了をモーダルで大きく表示（保存できたことが明確に伝わるように）
+    showSubmitDoneModal();
     btn.disabled = false;
-    btn.textContent = '✏️ 修正を再送信する';
+    // ボタンは緑の「送信済み ✓」状態に（押せば修正再送信できる）
+    btn.textContent = '✅ 送信済み（修正する場合はもう一度押す）';
+    btn.style.background = '#16a34a';
     var _draftBtn0 = document.getElementById('btn-draft');
     if (_draftBtn0) _draftBtn0.style.display = 'none';
   } catch(e) {
