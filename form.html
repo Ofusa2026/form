@@ -191,7 +191,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20260818.07';
+var FORM_VERSION = 'ver.20260818.08';
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -228,6 +228,9 @@ var srcParam = params.get('src') || '';  // ver.20260531.02: 流入元（aidem �
 var fieldsFilter = params.get('fields') ? params.get('fields').split(',').map(function(s){return s.trim();}) : null;
 // ver.20260812: 介護分野判定（URLパラメータ ?field=介護 で指定）
 var applicantField = params.get('field') || '';
+// ver.20260821: 推薦票の企業対応（suisen=other）のときだけ、ベトナム技能実習生の追加情報を表示
+var suisenParam = params.get('suisen') || '';
+var isSuisenOther = (suisenParam === 'other');
 var isKaigo = applicantField.indexOf('介護') >= 0;
 
 // typeなしでco_始まりのcaseId（所属機関）またはsrc=jaimの場合はjaimをデフォルト
@@ -619,6 +622,16 @@ function blockContact(showResCard, showExtra) {
   h += '<button type="button" onclick="addFamilyMember()" style="font-size:11px;padding:5px 14px;background:white;border:1.5px dashed #c7d2fe;border-radius:6px;color:#6366f1;cursor:pointer;font-weight:700;margin-top:4px;">＋ 家族を追加</button>';
   h += '</div>';
   h += '</div>';
+
+  // ver.20260821: 企業対応(suisen=other)のとき、ベトナム技能実習生の大使館推薦票に必要な追加情報
+  if (isSuisenOther) {
+    h += '<div class="card"><div class="section-title">本国の情報（ほんごくのじょうほう）<div class="trans" data-key="suisenVnTitle"></div></div>';
+    h += '<div style="font-size:11px;color:#9ca3af;margin-bottom:10px;">大使館推薦票の申請に必要な情報です。</div>';
+    h += field('f-vnFamilyAddress', 'ベトナムのご家族の住所（かぞくのじゅうしょ）', 'text', false, '例: 123 Le Loi Street, Hanoi', 'vnFamilyAddress');
+    h += field('f-vnFamilyTel', 'ベトナムのご家族の電話番号（でんわばんごう）', 'text', false, '例: +84 90 123 4567', 'vnFamilyTel');
+    h += field('f-vnSendingOrg', '送り出し機関の名前（おくりだしきかんのなまえ）', 'text', false, '例: ○○ Human Resources Co., Ltd.', 'vnSendingOrg');
+    h += '</div>';
+  }
 
   if (showExtra) {
     // 転出届
@@ -3101,6 +3114,13 @@ function collectData() {
     married: val('f-married'), email: val('f-email')
   };
 
+  // ver.20260821: 推薦票の企業対応（suisen=other）で追加した本国情報
+  if (isSuisenOther) {
+    d.vnFamilyAddress = val('f-vnFamilyAddress');
+    d.vnFamilyTel = val('f-vnFamilyTel');
+    d.vnSendingOrg = val('f-vnSendingOrg');
+  }
+
   // 特定技能：在留カード・住所・一時帰国（あり/なし＋条件付き入力）
   if (isTokutei) {
     var rcStatus = val('f-residenceCardStatus');
@@ -3841,6 +3861,7 @@ function prefillForm(resp) {
     applicantNameEn: 'f-name', birthdate: 'f-birth',
     nationality: 'f-nationality', passport: 'f-passport', passportExpiry: 'f-passExpiry',
     married: 'f-married', email: 'f-email',
+    vnFamilyAddress: 'f-vnFamilyAddress', vnFamilyTel: 'f-vnFamilyTel', vnSendingOrg: 'f-vnSendingOrg',
     residenceCard: 'f-residenceCard', address: 'f-address',
     residenceStatus: 'f-residenceStatus', completionDate: 'f-completionDate',
     tempReturn: 'f-tempReturn',
