@@ -191,7 +191,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20260818.12';
+var FORM_VERSION = 'ver.20260818.13';
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -2133,27 +2133,81 @@ function blockT2Pledge() {
   h += field('f-t2JobDetail', '③ 具体的な職務内容（製造物・収穫物・作業工程など）', 'textarea', false, '具体的にご記入ください', '');
   h += field('f-t2JobDiff', '④ 技能実習生・１号特定技能外国人が同じ職場にいる場合、その人たちとの職務内容の違い', 'textarea', false, '分野別方針で定める２号の業務内容と相違のないよう記載', '');
 
-  // 指導を受ける対象者一覧（2名以上必須・重複不可）
+  // 指導を受ける対象者一覧（分野により必要人数が変わる）
   h += '<div class="sub-label" style="background:#f0fdf4;color:#15803d;border-radius:6px;padding:6px 10px;margin:14px 0 6px;font-size:12px;font-weight:700;">【指導を受ける対象者一覧】</div>';
-  h += '<div style="font-size:12px;color:#b45309;background:#fffbeb;border:1px solid #fcd34d;border-radius:8px;padding:10px 12px;margin-bottom:10px;line-height:1.8;">'
-    + '❗ <b>重要：指導を受ける対象者は「２名以上」の選定が必要です。</b><br>'
-    + '・対象者は<b>他の２号特定技能外国人に指導を受けていない</b>方に限ります（重複不可）。<br>'
-    + '・同一の事業所に出勤し、原則同一部署でフルタイム勤務の方に限ります。<br>'
-    + '<span style="color:#991b1b;">※ ２名以上を別途選定し、重複がないことを必ずご確認ください。要件を満たさないと許可されません。</span>'
-    + '</div>';
+  // ver.20260822: 分野プルダウン（分野により必要人数が変わる）
+  h += '<div class="field"><label>特定産業分野（とくていさんぎょうぶんや）<span class="req">*</span></label>';
+  h += '<select id="f-t2Field" onchange="onT2FieldChange(this.value)">';
+  h += '<option value="">--- 分野を選んでください ---</option>';
+  _T2_FIELDS.forEach(function(f){ h += '<option value="'+f.key+'">'+f.label+'</option>'; });
+  h += '</select></div>';
+  h += '<div id="t2TargetNote" style="font-size:12px;color:#6b7280;background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;padding:10px 12px;margin-bottom:10px;line-height:1.8;">分野を選ぶと、必要な指導対象者の人数が表示されます。</div>';
   h += '<div id="t2TargetContainer">' + t2TargetRow(1) + t2TargetRow(2) + '</div>';
   h += '<button type="button" onclick="addT2Target()" style="font-size:11px;padding:5px 14px;background:white;border:1.5px dashed #86efac;border-radius:6px;color:#15803d;cursor:pointer;font-weight:700;margin-top:4px;">＋ 対象者を追加</button>';
 
   // 必須確認チェックボックス
-  h += '<div style="margin-top:16px;padding:12px 14px;background:#fef2f2;border:1.5px solid #fca5a5;border-radius:10px;">';
+  h += '<div id="t2ConfirmWrap" style="margin-top:16px;padding:12px 14px;background:#fef2f2;border:1.5px solid #fca5a5;border-radius:10px;">';
   h += '<label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-size:13px;color:#991b1b;font-weight:700;line-height:1.6;">';
   h += '<input type="checkbox" id="f-t2Confirm" style="width:20px;height:20px;flex-shrink:0;margin-top:1px;">';
-  h += '<span>指導を受ける対象者を<b>２名以上</b>選定し、いずれも<b>他の２号特定技能外国人に指導を受けていない（重複していない）</b>ことを確認しました。<span class="req">*</span></span>';
+  h += '<span id="t2ConfirmText">指導を受ける対象者を選定し、いずれも<b>他の２号特定技能外国人に指導を受けていない（重複していない）</b>ことを確認しました。<span class="req">*</span></span>';
   h += '</label>';
   h += '</div>';
 
   h += '</div>';
   return h;
+}
+
+// ver.20260822: 特定産業分野ごとの必要指導対象者数（第1-32号 誓約書の表より）
+var _T2_FIELDS = [
+  {key:'kaigo', label:'介護', min:2},
+  {key:'building', label:'ビルクリーニング', min:2},
+  {key:'kogyo', label:'工業製品製造業', min:2},
+  {key:'construction', label:'建設', min:2},
+  {key:'shipbuilding', label:'造船・舶用工業', min:2},
+  {key:'automobile', label:'自動車整備', min:1},
+  {key:'aviation', label:'航空', min:1},
+  {key:'accommodation', label:'宿泊', min:2},
+  {key:'agriculture', label:'農業', min:2},
+  {key:'fishery', label:'漁業', min:0},
+  {key:'food', label:'飲食料品製造業', min:2},
+  {key:'restaurant', label:'外食業', min:0}
+];
+function _t2MinForField(key){
+  for (var i=0;i<_T2_FIELDS.length;i++){ if(_T2_FIELDS[i].key===key) return _T2_FIELDS[i].min; }
+  return 2; // 未選択時は安全側で2
+}
+// 分野選択時に必要人数の注記と確認文を更新
+function onT2FieldChange(key){
+  var min = _t2MinForField(key);
+  var note = document.getElementById('t2TargetNote');
+  var confirmText = document.getElementById('t2ConfirmText');
+  var confirmWrap = document.getElementById('t2ConfirmWrap');
+  if (note){
+    if (key === ''){
+      note.innerHTML = '分野を選ぶと、必要な指導対象者の人数が表示されます。';
+      note.style.color = '#6b7280';
+    } else if (min === 0){
+      note.innerHTML = 'この分野では、指導を受ける対象者の選定は<b>必須ではありません</b>。該当者がいれば任意でご入力ください。';
+      note.style.color = '#15803d';
+    } else {
+      note.innerHTML = '❗ <b>この分野では、指導を受ける対象者を「'+min+'名以上」選定する必要があります。</b><br>'
+        + '・対象者は<b>他の２号特定技能外国人に指導を受けていない</b>方に限ります（重複不可）。<br>'
+        + '・同一の事業所に出勤し、原則同一部署でフルタイム勤務の方に限ります。<br>'
+        + '<span style="color:#991b1b;">※ '+min+'名以上を別途選定し、重複がないことを必ずご確認ください。要件を満たさないと許可されません。</span>';
+      note.style.color = '#b45309';
+    }
+  }
+  if (confirmText && key !== ''){
+    if (min === 0){
+      confirmText.innerHTML = '（該当者を入力した場合）いずれも<b>他の２号特定技能外国人に指導を受けていない（重複していない）</b>ことを確認しました。';
+    } else {
+      confirmText.innerHTML = '指導を受ける対象者を<b>'+min+'名以上</b>選定し、いずれも<b>他の２号特定技能外国人に指導を受けていない（重複していない）</b>ことを確認しました。<span class="req">*</span>';
+    }
+  }
+  // 対象者不要の分野では確認チェックを任意扱いに（見た目を薄く）
+  if (confirmWrap){
+    confirmWrap.style.opacity = (min === 0) ? '0.7' : '1';
+  }
 }
 
 var _t2TargetCount = 2;
@@ -3028,6 +3082,7 @@ function collectData() {
     Object.assign(d, officers);
         // ver.20260822: 特定技能2号の誓約書データ（企業フォーム）
     if (t === 'company_tokutei2') {
+      d.t2Field = val('f-t2Field');
       d.t2ApplicantName = val('f-t2ApplicantName');
       d.t2Dept = val('f-t2Dept');
       d.t2Position = val('f-t2Position');
@@ -3465,8 +3520,13 @@ function _renderRichError(err){
 }
 
 function validate() {
-  // ver.20260822: 特定技能2号 企業フォームの誓約書チェック
+  // ver.20260822: 特定技能2号 企業フォームの誓約書チェック（分野別の必要人数）
   if (type === 'company_tokutei2') {
+    var _t2field = val('f-t2Field');
+    if (!_t2field) {
+      return '特定産業分野を選んでください。';
+    }
+    var _t2min = (typeof _t2MinForField === 'function') ? _t2MinForField(_t2field) : 2;
     var _t2rows = document.querySelectorAll('#t2TargetContainer .t2-target-row');
     var _filled = 0;
     _t2rows.forEach(function(row){
@@ -3474,12 +3534,15 @@ function validate() {
       var nm = val('f-t2tgt'+i+'_name');
       if (nm && nm.trim() !== '') _filled++;
     });
-    if (_filled < 2) {
-      return '指導を受ける対象者を2名以上ご入力ください（氏名が必要です）。他の2号特定技能外国人と重複しない方を選定してください。';
+    if (_t2min > 0 && _filled < _t2min) {
+      return '指導を受ける対象者を' + _t2min + '名以上ご入力ください（氏名が必要です）。他の2号特定技能外国人と重複しない方を選定してください。';
     }
-    var _cb = document.getElementById('f-t2Confirm');
-    if (!_cb || !_cb.checked) {
-      return '「2名以上を選定し、重複がないことを確認しました」のチェックを入れてください。';
+    // 対象者不要の分野(min=0)ではチェック必須にしない
+    if (_t2min > 0) {
+      var _cb = document.getElementById('f-t2Confirm');
+      if (!_cb || !_cb.checked) {
+        return '「' + _t2min + '名以上を選定し、重複がないことを確認しました」のチェックを入れてください。';
+      }
     }
   }
     if (type === 'company' || type === 'company_tokutei2' || type === 'company_gijinkoku' || type === 'company_designated46' || type === 'company_designated9') {
