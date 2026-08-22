@@ -191,7 +191,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20260818.11';
+var FORM_VERSION = 'ver.20260818.12';
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -2162,7 +2162,8 @@ function t2TargetRow(n) {
   return '<div class="t2-target-row" id="t2TargetRow'+n+'" style="border:1px solid #e5e7eb;border-radius:8px;padding:10px;margin-bottom:8px;background:#fafafa;">'
     + '<div style="font-size:11px;font-weight:700;color:#15803d;margin-bottom:6px;">対象者 '+n+(n<=2?'（必須）':'')+'</div>'
     + '<div style="display:flex;flex-wrap:wrap;gap:6px;">'
-    + '<input type="text" id="f-t2tgt'+n+'_name" placeholder="氏名（外国人は在留カード番号も）" style="flex:1 1 100%;padding:8px;border:1.5px solid #e5e7eb;border-radius:8px;font-size:14px;min-height:44px;">'
+    + '<input type="text" id="f-t2tgt'+n+'_name" placeholder="氏名" style="flex:1 1 45%;padding:8px;border:1.5px solid #e5e7eb;border-radius:8px;font-size:14px;min-height:44px;">'
+    + '<input type="text" id="f-t2tgt'+n+'_card" placeholder="在留カード番号（外国人のみ）" style="flex:1 1 45%;padding:8px;border:1.5px solid #e5e7eb;border-radius:8px;font-size:14px;min-height:44px;">'
     + '<input type="text" id="f-t2tgt'+n+'_dept" placeholder="事業所及び所属部署名" style="flex:1 1 45%;padding:8px;border:1.5px solid #e5e7eb;border-radius:8px;font-size:14px;min-height:44px;">'
     + '<input type="text" id="f-t2tgt'+n+'_position" placeholder="役職又は地位" style="flex:1 1 45%;padding:8px;border:1.5px solid #e5e7eb;border-radius:8px;font-size:14px;min-height:44px;">'
     + '<input type="text" id="f-t2tgt'+n+'_job" placeholder="指導を受ける職務内容" style="flex:1 1 100%;padding:8px;border:1.5px solid #e5e7eb;border-radius:8px;font-size:14px;min-height:44px;">'
@@ -3036,8 +3037,8 @@ function collectData() {
       var _t2targets = [];
       document.querySelectorAll('#t2TargetContainer .t2-target-row').forEach(function(row){
         var i = row.id.replace('t2TargetRow','');
-        var nm = val('f-t2tgt'+i+'_name'), dp = val('f-t2tgt'+i+'_dept'), po = val('f-t2tgt'+i+'_position'), jb = val('f-t2tgt'+i+'_job');
-        if (nm||dp||po||jb) _t2targets.push({name:nm, dept:dp, position:po, job:jb});
+        var nm = val('f-t2tgt'+i+'_name'), cd = val('f-t2tgt'+i+'_card'), dp = val('f-t2tgt'+i+'_dept'), po = val('f-t2tgt'+i+'_position'), jb = val('f-t2tgt'+i+'_job');
+        if (nm||cd||dp||po||jb) _t2targets.push({name:nm, card:cd, dept:dp, position:po, job:jb});
       });
       d.t2Targets = _t2targets;
     }
