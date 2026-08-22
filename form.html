@@ -191,7 +191,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20260818.10';
+var FORM_VERSION = 'ver.20260818.11';
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -237,8 +237,7 @@ var isKaigo = applicantField.indexOf('介護') >= 0;
 if (!type && (caseId.indexOf('co_') === 0 || srcParam === 'jaim')) { type = 'jaim'; }
 
 // 特定技能フラグ（type=tokutei_* のとき true）
-var isTokutei = (type === 'tokutei_nintei' || type === 'tokutei_koushin' || type === 'tokutei_henkou' || type === 'tokutei2_nintei' || type === 'tokutei2_koushin' || type === 'tokutei2_henkou');
-var isTokutei2 = (type === 'tokutei2_nintei' || type === 'tokutei2_koushin' || type === 'tokutei2_henkou');
+var isTokutei = (type === 'tokutei_nintei' || type === 'tokutei_koushin' || type === 'tokutei_henkou');
 
 // 技人国フラグ（type=gijinkoku_* のとき true）
 var isGijinkoku = (type === 'gijinkoku_nintei' || type === 'gijinkoku_koushin' || type === 'gijinkoku_henkou');
@@ -1027,46 +1026,6 @@ function onJpFieldChange(num, fieldValue) {
   if (_isCompanyForm) { var _lb = document.getElementById('langBar'); if (_lb) _lb.style.display = 'none'; }
 }
 
-// ===== 特定技能2号 業務内容誓約書ブロック（参考様式第1-32号）=====
-// ver.20260821: 2号特定技能外国人の業務内容・指導を受ける対象者一覧
-function blockTokutei2Pledge() {
-  var h = '<div class="card"><div class="section-title">２号特定技能の業務内容（にごう ぎょうむないよう）<div class="trans" data-key="t2Title"></div></div>';
-  h += '<div style="font-size:11px;color:#9ca3af;margin-bottom:12px;line-height:1.6;">「２号特定技能外国人の業務内容に関する誓約書」に必要な情報です。具体的にご記入ください。</div>';
-
-  h += '<div class="sub-label" style="background:#eff6ff;color:#1d4ed8;border-radius:6px;padding:6px 10px;margin-bottom:8px;font-size:12px;font-weight:700;">【あなたの業務内容】</div>';
-  h += field('f-t2Dept', '所属部署名（しょぞくぶしょめい）', 'text', false, '例: 製造部 第一課', 't2Dept');
-  h += field('f-t2Position', '役職又は地位（やくしょく または ちい）', 'text', false, '例: 班長、リーダー', 't2Position');
-  h += field('f-t2JobDetail', '具体的な職務内容（ぐたいてきな しょくむないよう）', 'textarea', false, '例: 製造物・収穫物・作業工程などを具体的に', 't2JobDetail');
-  h += field('f-t2JobDiff', '技能実習生・１号特定技能外国人との職務内容の違い（ちがい）', 'textarea', false, '同じ職場に技能実習生や１号がいる場合、その人たちとあなたの仕事の違いを記入', 't2JobDiff');
-
-  h += '<div class="sub-label" style="background:#f0fdf4;color:#15803d;border-radius:6px;padding:6px 10px;margin:14px 0 8px;font-size:12px;font-weight:700;">【あなたが指導する対象者（していするたいしょうしゃ）】</div>';
-  h += '<div style="font-size:11px;color:#9ca3af;margin-bottom:8px;line-height:1.6;">あなたが指導する技能実習生・１号特定技能外国人などがいれば記入してください（いなければ空欄で構いません）。</div>';
-  h += '<div id="t2TargetContainer">' + t2TargetRow(1) + '</div>';
-  h += '<button type="button" onclick="addT2Target()" style="font-size:11px;padding:5px 14px;background:white;border:1.5px dashed #86efac;border-radius:6px;color:#15803d;cursor:pointer;font-weight:700;margin-top:4px;">＋ 対象者を追加</button>';
-
-  h += '</div>';
-  return h;
-}
-
-var _t2TargetCount = 1;
-var _maxT2Target = 20;
-function t2TargetRow(n) {
-  return '<div class="t2-target-row" id="t2TargetRow'+n+'" style="border:1px solid #e5e7eb;border-radius:8px;padding:10px;margin-bottom:8px;background:#fafafa;">'
-    + '<div style="font-size:11px;font-weight:700;color:#15803d;margin-bottom:6px;">対象者 '+n+'</div>'
-    + '<div style="display:flex;flex-wrap:wrap;gap:6px;">'
-    + '<input type="text" id="f-t2tgt'+n+'_name" placeholder="氏名（外国人は在留カード番号も）" style="flex:1 1 100%;padding:8px;border:1.5px solid #e5e7eb;border-radius:8px;font-size:14px;min-height:44px;">'
-    + '<input type="text" id="f-t2tgt'+n+'_dept" placeholder="事業所及び所属部署名" style="flex:1 1 45%;padding:8px;border:1.5px solid #e5e7eb;border-radius:8px;font-size:14px;min-height:44px;">'
-    + '<input type="text" id="f-t2tgt'+n+'_position" placeholder="役職又は地位" style="flex:1 1 45%;padding:8px;border:1.5px solid #e5e7eb;border-radius:8px;font-size:14px;min-height:44px;">'
-    + '<input type="text" id="f-t2tgt'+n+'_job" placeholder="指導を受ける職務内容" style="flex:1 1 100%;padding:8px;border:1.5px solid #e5e7eb;border-radius:8px;font-size:14px;min-height:44px;">'
-    + '</div></div>';
-}
-function addT2Target() {
-  if (_t2TargetCount >= _maxT2Target) return;
-  _t2TargetCount++;
-  var c = document.getElementById('t2TargetContainer');
-  if (c) c.insertAdjacentHTML('beforeend', t2TargetRow(_t2TargetCount));
-}
-
 // ===== 技能証明ブロック =====
 function blockSkillProof() {
   var h = '<div class="card"><div class="section-title">技能水準の証明（ぎのうすいじゅんのしょうめい）</div>';
@@ -1249,12 +1208,6 @@ function buildForm(t) {
     case 'tokutei_koushin':
     case 'tokutei_henkou':
       return blockBasic() + blockMarried() + blockTokuteiKoushin() + blockSkillProof() + blockJapaneseProof() + blockContact(false, true);
-    // ver.20260821: 特定技能2号（1号の内容＋業務内容誓約書）
-    case 'tokutei2_nintei':
-      return blockBasic() + blockMarried() + blockTokuteiNintei() + blockSkillProof() + blockJapaneseProof() + blockTokutei2Pledge() + blockContact(false, false);
-    case 'tokutei2_koushin':
-    case 'tokutei2_henkou':
-      return blockBasic() + blockMarried() + blockTokuteiKoushin() + blockSkillProof() + blockJapaneseProof() + blockTokutei2Pledge() + blockContact(false, true);
     case 'gijinkoku_nintei':
       return blockBasic() + blockMarried() + blockEducation() + blockGijinkokuExtra() + blockContact(false, false);
     case 'gijinkoku_koushin':
@@ -1262,6 +1215,8 @@ function buildForm(t) {
       return blockBasic() + blockMarried() + blockEducation() + blockGijinkokuExtra() + blockContact(false, true);
     case 'company':
       return buildCompanyForm();
+    case 'company_tokutei2':
+      return buildCompanyTokutei2Form();
     case 'company_gijinkoku':
       return buildCompanyGijinkokuForm();
     case 'company_designated46':
@@ -2152,6 +2107,74 @@ function buildCompanyForm() {
   );
 }
 
+// ===== 特定技能2号 企業ヒアリングフォーム（type=company_tokutei2）=====
+// ver.20260822: 特定技能の企業フォーム＋第1-32号「2号特定技能外国人の業務内容に関する誓約書」
+//   誓約書は企業（特定技能所属機関）が作成するもの。指導対象者は2名以上・他の2号と重複不可。
+function buildCompanyTokutei2Form() {
+  // 特定技能の企業フォーム本体をそのまま使い、末尾に誓約書セクションを足す
+  var base = buildCompanyForm();
+  return base + blockT2Pledge();
+}
+
+// 第1-32号 業務内容誓約書ブロック（企業が入力）
+function blockT2Pledge() {
+  var h = '<div class="card"><div class="section-title">２号特定技能外国人の業務内容（第１－３２号 誓約書）</div>';
+  h += '<div style="font-size:12px;color:#b45309;background:#fffbeb;border:1px solid #fcd34d;border-radius:8px;padding:10px 12px;margin-bottom:14px;line-height:1.7;">'
+    + '⚠️ <b>この内容は在留資格の許可に大きく影響します。</b>すべて具体的にご記入ください。<br>'
+    + '記載内容と実際の内容に相違がある場合、在留資格が取り消される可能性があります。'
+    + '</div>';
+
+  // 対象の2号特定技能外国人（申請人）
+  h += field('f-t2ApplicantName', '２号特定技能外国人の氏名', 'text', false, '例: NGUYEN VAN A', '');
+
+  h += '<div class="sub-label" style="background:#eff6ff;color:#1d4ed8;border-radius:6px;padding:6px 10px;margin:12px 0 8px;font-size:12px;font-weight:700;">【当該２号特定技能外国人の業務内容】</div>';
+  h += field('f-t2Dept', '① 所属部署名', 'text', false, '例: 製造部 第一課', '');
+  h += field('f-t2Position', '② 役職又は地位', 'text', false, '例: 班長', '');
+  h += field('f-t2JobDetail', '③ 具体的な職務内容（製造物・収穫物・作業工程など）', 'textarea', false, '具体的にご記入ください', '');
+  h += field('f-t2JobDiff', '④ 技能実習生・１号特定技能外国人が同じ職場にいる場合、その人たちとの職務内容の違い', 'textarea', false, '分野別方針で定める２号の業務内容と相違のないよう記載', '');
+
+  // 指導を受ける対象者一覧（2名以上必須・重複不可）
+  h += '<div class="sub-label" style="background:#f0fdf4;color:#15803d;border-radius:6px;padding:6px 10px;margin:14px 0 6px;font-size:12px;font-weight:700;">【指導を受ける対象者一覧】</div>';
+  h += '<div style="font-size:12px;color:#b45309;background:#fffbeb;border:1px solid #fcd34d;border-radius:8px;padding:10px 12px;margin-bottom:10px;line-height:1.8;">'
+    + '❗ <b>重要：指導を受ける対象者は「２名以上」の選定が必要です。</b><br>'
+    + '・対象者は<b>他の２号特定技能外国人に指導を受けていない</b>方に限ります（重複不可）。<br>'
+    + '・同一の事業所に出勤し、原則同一部署でフルタイム勤務の方に限ります。<br>'
+    + '<span style="color:#991b1b;">※ ２名以上を別途選定し、重複がないことを必ずご確認ください。要件を満たさないと許可されません。</span>'
+    + '</div>';
+  h += '<div id="t2TargetContainer">' + t2TargetRow(1) + t2TargetRow(2) + '</div>';
+  h += '<button type="button" onclick="addT2Target()" style="font-size:11px;padding:5px 14px;background:white;border:1.5px dashed #86efac;border-radius:6px;color:#15803d;cursor:pointer;font-weight:700;margin-top:4px;">＋ 対象者を追加</button>';
+
+  // 必須確認チェックボックス
+  h += '<div style="margin-top:16px;padding:12px 14px;background:#fef2f2;border:1.5px solid #fca5a5;border-radius:10px;">';
+  h += '<label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-size:13px;color:#991b1b;font-weight:700;line-height:1.6;">';
+  h += '<input type="checkbox" id="f-t2Confirm" style="width:20px;height:20px;flex-shrink:0;margin-top:1px;">';
+  h += '<span>指導を受ける対象者を<b>２名以上</b>選定し、いずれも<b>他の２号特定技能外国人に指導を受けていない（重複していない）</b>ことを確認しました。<span class="req">*</span></span>';
+  h += '</label>';
+  h += '</div>';
+
+  h += '</div>';
+  return h;
+}
+
+var _t2TargetCount = 2;
+var _maxT2Target = 20;
+function t2TargetRow(n) {
+  return '<div class="t2-target-row" id="t2TargetRow'+n+'" style="border:1px solid #e5e7eb;border-radius:8px;padding:10px;margin-bottom:8px;background:#fafafa;">'
+    + '<div style="font-size:11px;font-weight:700;color:#15803d;margin-bottom:6px;">対象者 '+n+(n<=2?'（必須）':'')+'</div>'
+    + '<div style="display:flex;flex-wrap:wrap;gap:6px;">'
+    + '<input type="text" id="f-t2tgt'+n+'_name" placeholder="氏名（外国人は在留カード番号も）" style="flex:1 1 100%;padding:8px;border:1.5px solid #e5e7eb;border-radius:8px;font-size:14px;min-height:44px;">'
+    + '<input type="text" id="f-t2tgt'+n+'_dept" placeholder="事業所及び所属部署名" style="flex:1 1 45%;padding:8px;border:1.5px solid #e5e7eb;border-radius:8px;font-size:14px;min-height:44px;">'
+    + '<input type="text" id="f-t2tgt'+n+'_position" placeholder="役職又は地位" style="flex:1 1 45%;padding:8px;border:1.5px solid #e5e7eb;border-radius:8px;font-size:14px;min-height:44px;">'
+    + '<input type="text" id="f-t2tgt'+n+'_job" placeholder="指導を受ける職務内容" style="flex:1 1 100%;padding:8px;border:1.5px solid #e5e7eb;border-radius:8px;font-size:14px;min-height:44px;">'
+    + '</div></div>';
+}
+function addT2Target() {
+  if (_t2TargetCount >= _maxT2Target) return;
+  _t2TargetCount++;
+  var c = document.getElementById('t2TargetContainer');
+  if (c) c.insertAdjacentHTML('beforeend', t2TargetRow(_t2TargetCount));
+}
+
 // ===== 技人国 企業ヒアリングフォーム（type=company_gijinkoku）=====
 // ver.20260818.01: 技術・人文知識・国際業務 の雇用理由書・雇用契約書作成用。
 //   企業情報フォーム(type=company)と多くの入力欄IDを共有しつつ、
@@ -2928,7 +2951,7 @@ function val(id) { var el=document.getElementById(id); return el ? el.value.trim
 
 function collectData() {
   var t = type;
-  if (t === 'company') {
+  if (t === 'company' || t === 'company_tokutei2') {
     var officers = {};
     document.querySelectorAll('.officer-row').forEach(function(row) {
       var idx = row.getAttribute('data-idx');
@@ -3002,6 +3025,22 @@ function collectData() {
       jaimIndustryCode: val('f-jaimIndustryCode'), jaimAgreement: (document.getElementById('f-jaimAgreement') && document.getElementById('f-jaimAgreement').checked) ? '確認済み' : '', jaimProductName: val('f-jaimProductName'), jaimProductPurpose: val('f-jaimProductPurpose'), jaimFinalProductName: val('f-jaimFinalProductName'), jaimFinalProductDesc: val('f-jaimFinalProductDesc'), jaimEquipmentPurpose: val('f-jaimEquipmentPurpose'), jaimEquipmentEffect: val('f-jaimEquipmentEffect'), jaimBranchOfficeFlag: val('f-jaimBranchOfficeFlag'), jaimBranchOfficeName: val('f-jaimBranchOfficeName'), jaimBranchOfficeZip: val('f-jaimBranchOfficeZip'), jaimBranchOfficeAddress: val('f-jaimBranchOfficeAddress'), jaimBranchOfficeContact: val('f-jaimBranchOfficeContact'), jaimBranchOfficeTel: val('f-jaimBranchOfficeTel'), jaimCompanySize: val('f-jaimCompanySize'), jaimMemberOrg: val('f-jaimMemberOrg'), jaimAnnualFee: _jaimFeeValue()
     };
     Object.assign(d, officers);
+        // ver.20260822: 特定技能2号の誓約書データ（企業フォーム）
+    if (t === 'company_tokutei2') {
+      d.t2ApplicantName = val('f-t2ApplicantName');
+      d.t2Dept = val('f-t2Dept');
+      d.t2Position = val('f-t2Position');
+      d.t2JobDetail = val('f-t2JobDetail');
+      d.t2JobDiff = val('f-t2JobDiff');
+      d.t2Confirm = (document.getElementById('f-t2Confirm') && document.getElementById('f-t2Confirm').checked) ? 'confirmed' : '';
+      var _t2targets = [];
+      document.querySelectorAll('#t2TargetContainer .t2-target-row').forEach(function(row){
+        var i = row.id.replace('t2TargetRow','');
+        var nm = val('f-t2tgt'+i+'_name'), dp = val('f-t2tgt'+i+'_dept'), po = val('f-t2tgt'+i+'_position'), jb = val('f-t2tgt'+i+'_job');
+        if (nm||dp||po||jb) _t2targets.push({name:nm, dept:dp, position:po, job:jb});
+      });
+      d.t2Targets = _t2targets;
+    }
     return d;
   }
 
@@ -3168,21 +3207,6 @@ function collectData() {
     d.vnSendingOrg = val('f-vnSendingOrg');
   }
 
-  // ver.20260821: 特定技能2号の業務内容誓約書（第1-32号）
-  if (isTokutei2) {
-    d.t2Dept = val('f-t2Dept');
-    d.t2Position = val('f-t2Position');
-    d.t2JobDetail = val('f-t2JobDetail');
-    d.t2JobDiff = val('f-t2JobDiff');
-    var _t2targets = [];
-    document.querySelectorAll('#t2TargetContainer .t2-target-row').forEach(function(row){
-      var i = row.id.replace('t2TargetRow','');
-      var nm = val('f-t2tgt'+i+'_name'), dp = val('f-t2tgt'+i+'_dept'), po = val('f-t2tgt'+i+'_position'), jb = val('f-t2tgt'+i+'_job');
-      if (nm||dp||po||jb) _t2targets.push({name:nm, dept:dp, position:po, job:jb});
-    });
-    if (_t2targets.length) d.t2Targets = _t2targets;
-  }
-
   // 特定技能：在留カード・住所・一時帰国（あり/なし＋条件付き入力）
   if (isTokutei) {
     var rcStatus = val('f-residenceCardStatus');
@@ -3221,14 +3245,14 @@ function collectData() {
     }
   }
 
-  if (t === 'tokutei_nintei' || t === 'gijinkoku_nintei' || t === 'tokutei2_nintei') {
+  if (t === 'tokutei_nintei' || t === 'gijinkoku_nintei') {
     d.entryCount = val('f-entryCount');
     d.coeCount   = val('f-coeCount');
     d.coeDenied  = val('f-coeDenied');
     d.lastEntryFrom = val('f-lastEntryFrom');
     d.lastEntryTo   = val('f-lastEntryTo');
   }
-  if (t === 'tokutei_koushin' || t === 'tokutei_henkou' || t === 'gijinkoku_koushin' || t === 'gijinkoku_henkou' || t === 'tokutei2_koushin' || t === 'tokutei2_henkou') {
+  if (t === 'tokutei_koushin' || t === 'tokutei_henkou' || t === 'gijinkoku_koushin' || t === 'gijinkoku_henkou') {
     var fStatus = val('f-firstEntryStatus');
     if (fStatus === 'future') {
       d.firstEntry = 'これから特定技能になる';
@@ -3440,7 +3464,24 @@ function _renderRichError(err){
 }
 
 function validate() {
-    if (type === 'company' || type === 'company_gijinkoku' || type === 'company_designated46' || type === 'company_designated9') {
+  // ver.20260822: 特定技能2号 企業フォームの誓約書チェック
+  if (type === 'company_tokutei2') {
+    var _t2rows = document.querySelectorAll('#t2TargetContainer .t2-target-row');
+    var _filled = 0;
+    _t2rows.forEach(function(row){
+      var i = row.id.replace('t2TargetRow','');
+      var nm = val('f-t2tgt'+i+'_name');
+      if (nm && nm.trim() !== '') _filled++;
+    });
+    if (_filled < 2) {
+      return '指導を受ける対象者を2名以上ご入力ください（氏名が必要です）。他の2号特定技能外国人と重複しない方を選定してください。';
+    }
+    var _cb = document.getElementById('f-t2Confirm');
+    if (!_cb || !_cb.checked) {
+      return '「2名以上を選定し、重複がないことを確認しました」のチェックを入れてください。';
+    }
+  }
+    if (type === 'company' || type === 'company_tokutei2' || type === 'company_gijinkoku' || type === 'company_designated46' || type === 'company_designated9') {
     if (!val('f-coName')) return '会社名は必須です。';
     return null;
   }
@@ -3542,6 +3583,7 @@ function validate() {
 // Supabase側トリガーと同じ閾値を使用（二重防御）
 function _minKeysForType(t) {
   if (t === 'company') return 1;
+  if (t === 'company_tokutei2') return 1;
   if (t === 'company_gijinkoku') return 1;
   if (t === 'company_designated46') return 1;
   if (t === 'company_designated9') return 1;
@@ -3799,13 +3841,11 @@ var TYPE_LABELS = {
   tokutei_nintei:   { cat:'特定技能', kind:'認定', catClass:'badge-tokutei', kindClass:'badge-nintei' },
   tokutei_koushin:  { cat:'特定技能', kind:'更新', catClass:'badge-tokutei', kindClass:'badge-koushin' },
   tokutei_henkou:   { cat:'特定技能', kind:'変更', catClass:'badge-tokutei', kindClass:'badge-koushin' },
-  tokutei2_nintei:  { cat:'特定技能2号', kind:'認定', catClass:'badge-tokutei', kindClass:'badge-nintei' },
-  tokutei2_koushin: { cat:'特定技能2号', kind:'更新', catClass:'badge-tokutei', kindClass:'badge-koushin' },
-  tokutei2_henkou:  { cat:'特定技能2号', kind:'変更', catClass:'badge-tokutei', kindClass:'badge-koushin' },
   gijinkoku_nintei: { cat:'技人国', kind:'認定', catClass:'badge-gijinkoku', kindClass:'badge-nintei' },
   gijinkoku_koushin:{ cat:'技人国', kind:'更新', catClass:'badge-gijinkoku', kindClass:'badge-koushin' },
   gijinkoku_henkou: { cat:'技人国', kind:'変更', catClass:'badge-gijinkoku', kindClass:'badge-koushin' },
   company:          { cat:'企業情報', kind:'', catClass:'badge-company', kindClass:'' },
+  company_tokutei2: { cat:'特定技能2号 企業', kind:'', catClass:'badge-tokutei', kindClass:'' },
   company_gijinkoku:{ cat:'技人国 企業', kind:'', catClass:'badge-gijinkoku', kindClass:'' },
   company_designated46:{ cat:'特定活動46号 企業', kind:'', catClass:'badge-gijinkoku', kindClass:'' },
   company_designated9:{ cat:'特定活動9号 企業', kind:'', catClass:'badge-company', kindClass:'' },
@@ -3953,7 +3993,6 @@ function prefillForm(resp) {
     nationality: 'f-nationality', passport: 'f-passport', passportExpiry: 'f-passExpiry',
     married: 'f-married', email: 'f-email',
     vnFamilyAddress: 'f-vnFamilyAddress', vnFamilyTel: 'f-vnFamilyTel', vnSendingOrg: 'f-vnSendingOrg',
-    t2Dept: 'f-t2Dept', t2Position: 'f-t2Position', t2JobDetail: 'f-t2JobDetail', t2JobDiff: 'f-t2JobDiff',
     residenceCard: 'f-residenceCard', address: 'f-address',
     residenceStatus: 'f-residenceStatus', completionDate: 'f-completionDate',
     tempReturn: 'f-tempReturn',
