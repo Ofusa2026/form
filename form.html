@@ -191,7 +191,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20260818.20';
+var FORM_VERSION = 'ver.20260818.21';
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -1644,6 +1644,7 @@ function buildKazokuForm() {
     h += '<select id="f-kzPastCoe"><option value="">---</option><option value="有">有</option><option value="無">無</option></select></div>';
     h += '</div>';
   }
+  h += '</div>';  // ステップ0（申請人情報）を閉じる
 
   // ===== ステップ2：届出・在日親族・生活 =====
   h += '<div class="so-step" data-sostep="1" style="display:none;">';
@@ -1669,6 +1670,7 @@ function buildKazokuForm() {
   h += '<div class="field"><label>滞在費支弁方法（たいざいひしべんほうほう）<div class="trans" data-key="kzSupport"></div></label>';
   h += '<select id="f-kzSupport"><option value="">---</option><option value="親族負担">親族負担</option><option value="外国送金">外国送金</option><option value="身元保証人">身元保証人</option><option value="その他">その他</option></select></div>';
   h += '</div>';
+  h += '</div>';  // ステップ1（届出・在日親族・生活）を閉じる
 
   // ===== ステップ3：扶養者情報 =====
   h += '<div class="so-step" data-sostep="2" style="display:none;">';
@@ -1692,6 +1694,7 @@ function buildKazokuForm() {
   h += field('f-kzSpWorkTel','勤務先電話番号','text',false,'例: 03-1234-5678','kzSpWorkTel');
   h += field('f-kzSpIncome','年収（ねんしゅう）','text',false,'例: 400万円','kzSpIncome');
   h += '</div>';
+  h += '</div>';  // ステップ2（扶養者情報）を閉じる
 
   // ステップ移動ボタン
   h += '<div style="display:flex;justify-content:space-between;gap:8px;margin-top:4px;">';
