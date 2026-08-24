@@ -191,7 +191,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20260818.16';
+var FORM_VERSION = 'ver.20260818.17';
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -4015,10 +4015,10 @@ function confirmName(isMatch){
   if (verEl) verEl.textContent = FORM_VERSION;
   setLang(currentLang);
 
-  // 名前確認モーダル: caseNameがあって、未確認の場合のみ表示
+  // 名前確認モーダル: caseNameがあって、未確認の場合のみ表示（企業系フォームはスキップ）
   var _alreadyConfirmed = false;
   try { _alreadyConfirmed = !!localStorage.getItem('ofusa_name_confirmed_' + caseId + '_' + type); } catch(e){}
-  if (caseName && !_alreadyConfirmed && type !== 'support_org') {
+  if (caseName && !_alreadyConfirmed && !_isCompanyForm) {
     document.getElementById('nameConfirmOverlay').style.display = 'flex';
   } else {
     _initFormBody();
