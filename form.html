@@ -191,7 +191,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20260818.14';
+var FORM_VERSION = 'ver.20260818.15';
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -2173,7 +2173,6 @@ function blockT2Pledge() {
 
 // ver.20260822: 特定産業分野ごとの必要指導対象者数（第1-32号 誓約書の表より）
 var _T2_FIELDS = [
-  {key:'kaigo', label:'介護', min:2},
   {key:'building', label:'ビルクリーニング', min:2},
   {key:'kogyo', label:'工業製品製造業', min:2},
   {key:'construction', label:'建設', min:2},
