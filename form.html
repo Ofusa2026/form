@@ -191,7 +191,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20260818.19';
+var FORM_VERSION = 'ver.20260818.20';
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -1253,6 +1253,10 @@ function buildForm(t) {
     case 'gijinkoku_koushin':
     case 'gijinkoku_henkou':
       return blockBasic() + blockMarried() + blockEducation() + blockGijinkokuExtra() + blockContact(false, true);
+    case 'kazoku_nintei':
+    case 'kazoku_henkou':
+    case 'kazoku_koushin':
+      return buildKazokuForm();
     case 'company':
       return buildCompanyForm();
     case 'company_tokutei2':
@@ -1404,11 +1408,15 @@ function _soFormAddOffice(){
   if (c) c.insertAdjacentHTML('beforeend', _soFormOfficeRow(_soOfficeCount));
 }
 var _SO_STEP_LABELS = ['基本情報','支援体制','担当者・その他'];
+// ver.20260822: ステップバーのラベルを動的に切替（家族滞在フォーム等で流用）
+var _ACTIVE_STEP_LABELS = _SO_STEP_LABELS;
 function _soStepBarHtml(active){
+  var labels = _ACTIVE_STEP_LABELS || _SO_STEP_LABELS;
+  var total = labels.length;
   var h='<div id="so-stepbar" style="display:flex;gap:6px;margin-bottom:14px;">';
-  _SO_STEP_LABELS.forEach(function(lbl,i){
+  labels.forEach(function(lbl,i){
     var on=(i===active);
-    h+='<button type="button" onclick="_soGoStep('+i+')" style="flex:1;padding:10px 6px;border:none;border-radius:10px;cursor:pointer;font-weight:800;font-size:13px;line-height:1.3;background:'+(on?'#2563eb':'#eef2f7')+';color:'+(on?'#fff':'#64748b')+';">'+lbl+'<div style="font-size:10px;font-weight:600;opacity:.85;">'+(i+1)+'/3</div></button>';
+    h+='<button type="button" onclick="_soGoStep('+i+')" style="flex:1;padding:10px 6px;border:none;border-radius:10px;cursor:pointer;font-weight:800;font-size:13px;line-height:1.3;background:'+(on?'#2563eb':'#eef2f7')+';color:'+(on?'#fff':'#64748b')+';">'+lbl+'<div style="font-size:10px;font-weight:600;opacity:.85;">'+(i+1)+'/'+total+'</div></button>';
   });
   h+='</div>';
   return h;
@@ -1568,6 +1576,165 @@ function buildSupportOrgForm() {
   h += '</div>';
   return h;
 }
+
+// ===== 家族滞在ヒアリングフォーム（3層タブ）=====
+// ver.20260822: 家族滞在の在留申請。type= kazoku_nintei / kazoku_henkou / kazoku_koushin
+var _KZ_STEP_LABELS = ['申請人情報','届出・在日親族','扶養者情報'];
+var _NAT_LIST_KZ = ['','ベトナム','インドネシア','ミャンマー','カンボジア','ネパール','フィリピン','中国','タイ','モンゴル','韓国','スリランカ','バングラデシュ','インド','その他'];
+function buildKazokuForm() {
+  _ACTIVE_STEP_LABELS = _KZ_STEP_LABELS;  // ステップバーのラベルを家族滞在用に
+  var isNintei = (type === 'kazoku_nintei');
+  var isHenkou = (type === 'kazoku_henkou');
+  var isKoushin = (type === 'kazoku_koushin');
+  var h = _soStepBarHtml(0);
+
+  // ===== ステップ1：申請人（本人）情報 =====
+  h += '<div class="so-step" data-sostep="0">';
+  h += '<div class="card"><div class="section-title">申請人（本人）情報（しんせいにん ほんにん）</div>';
+  h += field('f-kzNationality','国籍・地域（こくせき）','select',true,'','kzNationality', _NAT_LIST_KZ);
+  h += field('f-kzBirth','生年月日（せいねんがっぴ）','date',true,'','kzBirth');
+  h += field('f-kzNameEn','氏名（ローマ字・旅券どおり）','text',true,'例: NGUYEN VAN A','kzNameEn');
+  h += '<div class="field"><label>性別（せいべつ）<span class="req">*</span><div class="trans" data-key="kzGender"></div></label>';
+  h += '<select id="f-kzGender"><option value="">---</option><option value="男">男 / Male</option><option value="女">女 / Female</option></select></div>';
+  if (isNintei || isHenkou) {
+    h += field('f-kzBirthPlace','出生地（しゅっせいち）','text',false,'例: Hanoi','kzBirthPlace');
+  }
+  h += '<div class="field"><label>配偶者の有無（はいぐうしゃのうむ）<div class="trans" data-key="kzSpouse"></div></label>';
+  h += '<select id="f-kzSpouse"><option value="">---</option><option value="有">有 / Yes</option><option value="無">無 / No</option></select></div>';
+  h += field('f-kzJob','職業（しょくぎょう）','text',false,'例: 主婦 / Homemaker','kzJob');
+  h += field('f-kzHomeAddress','本国における居住地（ほんごくのじゅうしょ）','text',false,'例: 123 Le Loi, Hanoi','kzHomeAddress');
+  h += '</div>';
+
+  h += '<div class="card"><div class="section-title">日本における連絡先（にほんのれんらくさき）</div>';
+  h += field('f-kzZip','郵便番号（ゆうびんばんごう）','text',false,'例: 144-0052','kzZip');
+  h += field('f-kzAddress','住居地（じゅうきょち）','text',false,'例: 東京都大田区蒲田…','kzAddress');
+  h += field('f-kzTel','電話番号／携帯電話番号（でんわ）','text',true,'例: 090-1234-5678','kzTel');
+  h += '</div>';
+
+  h += '<div class="card"><div class="section-title">旅券（りょけん）</div>';
+  h += field('f-kzPassport','旅券番号（りょけんばんごう）','text',true,'例: AB1234567','kzPassport');
+  h += field('f-kzPassExpiry','旅券有効期限（ゆうこうきげん）','date',false,'','kzPassExpiry');
+  h += '</div>';
+
+  if (isHenkou || isKoushin) {
+    h += '<div class="card"><div class="section-title">現在の在留資格（げんざいのざいりゅうしかく）</div>';
+    h += field('f-kzCurStatus','現に有する在留資格','text',false,'例: 家族滞在','kzCurStatus');
+    h += field('f-kzCurPeriod','在留期間','text',false,'例: 1年','kzCurPeriod');
+    h += field('f-kzCurExpiry','在留期間の満了日','date',false,'','kzCurExpiry');
+    h += '<div class="field"><label>在留カードの有無<div class="trans" data-key="kzHasCard"></div></label>';
+    h += '<select id="f-kzHasCard" onchange="toggleKzCard(this.value)"><option value="">---</option><option value="有">有</option><option value="無">無</option></select></div>';
+    h += '<div id="kzCardWrap" style="display:none;">';
+    h += field('f-kzCardNo','在留カード番号／在留カード番号（ED番号）','text',false,'例: AB12345678CD','kzCardNo');
+    h += '</div>';
+    h += '</div>';
+  }
+
+  if (isNintei) {
+    h += '<div class="card"><div class="section-title">入国に関する情報（にゅうこく）</div>';
+    h += field('f-kzEntryPurpose','入国目的（にゅうこくもくてき）','text',false,'例: 扶養者との同居','kzEntryPurpose');
+    h += field('f-kzEntryDate','入国予定年月日','date',false,'','kzEntryDate');
+    h += field('f-kzEntryPort','上陸予定港（じょうりくよていこう）','text',false,'例: 成田空港','kzEntryPort');
+    h += field('f-kzStayPeriod','滞在予定期間（たいざいよていきかん）','text',false,'例: 1年','kzStayPeriod');
+    h += field('f-kzVisaPlace','査証申請予定地（さしょうしんせいよていち）','text',false,'例: 在ベトナム日本国大使館','kzVisaPlace');
+    h += '<div class="field"><label>同伴者の有無<div class="trans" data-key="kzCompanion"></div></label>';
+    h += '<select id="f-kzCompanion"><option value="">---</option><option value="有">有</option><option value="無">無</option></select></div>';
+    h += '<div class="field"><label>過去の出入国歴<div class="trans" data-key="kzPastEntry"></div></label>';
+    h += '<select id="f-kzPastEntry"><option value="">---</option><option value="有">有</option><option value="無">無</option></select></div>';
+    h += '<div class="field"><label>過去の在留資格認定証明書交付申請歴<div class="trans" data-key="kzPastCoe"></div></label>';
+    h += '<select id="f-kzPastCoe"><option value="">---</option><option value="有">有</option><option value="無">無</option></select></div>';
+    h += '</div>';
+  }
+
+  // ===== ステップ2：届出・在日親族・生活 =====
+  h += '<div class="so-step" data-sostep="1" style="display:none;">';
+  h += '<div class="card"><div class="section-title">届出（とどけで）</div>';
+  h += '<div class="field"><label>届出種別（とどけでしゅべつ）<span class="req">*</span><div class="trans" data-key="kzNotifyType"></div></label>';
+  h += '<select id="f-kzNotifyType"><option value="">---</option><option value="婚姻">婚姻（配偶者）</option><option value="出生">出生（子）</option><option value="縁組">縁組（子）</option></select></div>';
+  h += field('f-kzJpNotifyPlace','日本国届出先（にほんこくとどけでさき）','text',false,'例: 大田区役所','kzJpNotifyPlace');
+  h += field('f-kzJpNotifyDate','日本国届出年月日','date',false,'','kzJpNotifyDate');
+  h += field('f-kzHomeNotifyPlace','本国等届出先（ほんごくとどけでさき）','text',false,'例: ハノイ市人民委員会','kzHomeNotifyPlace');
+  h += field('f-kzHomeNotifyDate','本国等届出年月日','date',false,'','kzHomeNotifyDate');
+  h += '</div>';
+
+  h += '<div class="card"><div class="section-title">在日親族及び同居者（ざいにちしんぞく）</div>';
+  h += '<div class="field"><label>在日親族・同居者の有無<span class="req">*</span><div class="trans" data-key="kzHasRelative"></div></label>';
+  h += '<select id="f-kzHasRelative" onchange="toggleKzRelative(this.value)"><option value="">---</option><option value="有">有</option><option value="無">無</option></select></div>';
+  h += '<div id="kzRelativeWrap" style="display:none;">';
+  h += '<div id="kzRelativeContainer">' + kzRelativeRow(1) + '</div>';
+  h += '<button type="button" onclick="addKzRelative()" style="font-size:11px;padding:5px 14px;background:white;border:1.5px dashed #c7d2fe;border-radius:6px;color:#6366f1;cursor:pointer;font-weight:700;margin-top:4px;">＋ 親族を追加</button>';
+  h += '</div>';
+  h += '</div>';
+
+  h += '<div class="card"><div class="section-title">生活（せいかつ）</div>';
+  h += '<div class="field"><label>滞在費支弁方法（たいざいひしべんほうほう）<div class="trans" data-key="kzSupport"></div></label>';
+  h += '<select id="f-kzSupport"><option value="">---</option><option value="親族負担">親族負担</option><option value="外国送金">外国送金</option><option value="身元保証人">身元保証人</option><option value="その他">その他</option></select></div>';
+  h += '</div>';
+
+  // ===== ステップ3：扶養者情報 =====
+  h += '<div class="so-step" data-sostep="2" style="display:none;">';
+  h += '<div class="card"><div class="section-title">扶養者情報（ふようしゃじょうほう）</div>';
+  h += field('f-kzSpNameEn','扶養者 氏名（ローマ字）','text',true,'例: NGUYEN VAN B','kzSpNameEn');
+  h += field('f-kzSpBirth','扶養者 生年月日','date',false,'','kzSpBirth');
+  h += field('f-kzSpNationality','扶養者 国籍・地域','select',false,'','kzSpNationality', _NAT_LIST_KZ);
+  h += field('f-kzSpCardNo','扶養者 在留カード番号','text',false,'例: AB12345678CD','kzSpCardNo');
+  h += field('f-kzSpStatus','扶養者 在留資格','text',false,'例: 技術・人文知識・国際業務','kzSpStatus');
+  h += field('f-kzSpPeriod','扶養者 在留期間','text',false,'例: 3年','kzSpPeriod');
+  h += field('f-kzSpExpiry','扶養者 在留期間の満了日','date',false,'','kzSpExpiry');
+  h += '<div class="field"><label>申請人との関係（続柄）<span class="req">*</span><div class="trans" data-key="kzRelation"></div></label>';
+  h += '<select id="f-kzRelation" onchange="toggleKzRelationOther(this.value)"><option value="">---</option><option value="夫">夫</option><option value="妻">妻</option><option value="父">父</option><option value="母">母</option><option value="養父">養父</option><option value="養母">養母</option><option value="その他">その他</option></select></div>';
+  h += '<div id="kzRelationOtherWrap" style="display:none;">';
+  h += field('f-kzRelationOther','関係（その他の内容）','text',false,'例: 兄','kzRelationOther');
+  h += '</div>';
+  h += '</div>';
+
+  h += '<div class="card"><div class="section-title">扶養者の勤務先（任意）（きんむさき）</div>';
+  h += field('f-kzSpWorkplace','勤務先名称','text',false,'例: 株式会社〇〇','kzSpWorkplace');
+  h += field('f-kzSpWorkTel','勤務先電話番号','text',false,'例: 03-1234-5678','kzSpWorkTel');
+  h += field('f-kzSpIncome','年収（ねんしゅう）','text',false,'例: 400万円','kzSpIncome');
+  h += '</div>';
+
+  // ステップ移動ボタン
+  h += '<div style="display:flex;justify-content:space-between;gap:8px;margin-top:4px;">';
+  h += '<button type="button" id="so-prev" onclick="_soGoStep(window._soStep-1)" style="visibility:hidden;padding:11px 20px;background:#fff;color:#2563eb;border:1.5px solid #2563eb;border-radius:10px;font-weight:800;font-size:15px;cursor:pointer;">← 戻る</button>';
+  h += '<button type="button" id="so-next" onclick="_soGoStep(window._soStep+1)" style="padding:11px 20px;background:#2563eb;color:#fff;border:none;border-radius:10px;font-weight:800;font-size:15px;cursor:pointer;">次へ →</button>';
+  h += '</div>';
+  return h;
+}
+
+// 在日親族の可変行
+var _kzRelativeCount = 1;
+function kzRelativeRow(idx) {
+  return '<div class="kz-relative-row" data-kzridx="'+idx+'" style="border:1px solid #eef2f7;border-radius:8px;padding:10px;margin-bottom:8px;background:#fafafa;">'
+    + '<div style="font-size:11px;font-weight:700;color:#6366f1;margin-bottom:6px;">親族 '+idx+'</div>'
+    + '<div style="display:flex;flex-wrap:wrap;gap:6px;">'
+    + '<input type="text" id="f-kzRel'+idx+'_relation" placeholder="続柄" style="flex:1 1 45%;padding:8px;border:1.5px solid #e5e7eb;border-radius:8px;font-size:14px;min-height:44px;">'
+    + '<input type="text" id="f-kzRel'+idx+'_name" placeholder="氏名" style="flex:1 1 45%;padding:8px;border:1.5px solid #e5e7eb;border-radius:8px;font-size:14px;min-height:44px;">'
+    + '<input type="text" id="f-kzRel'+idx+'_birth" placeholder="生年月日" style="flex:1 1 45%;padding:8px;border:1.5px solid #e5e7eb;border-radius:8px;font-size:14px;min-height:44px;">'
+    + '<input type="text" id="f-kzRel'+idx+'_nationality" placeholder="国籍・地域" style="flex:1 1 45%;padding:8px;border:1.5px solid #e5e7eb;border-radius:8px;font-size:14px;min-height:44px;">'
+    + '<input type="text" id="f-kzRel'+idx+'_workschool" placeholder="勤務先・通学先" style="flex:1 1 45%;padding:8px;border:1.5px solid #e5e7eb;border-radius:8px;font-size:14px;min-height:44px;">'
+    + '<input type="text" id="f-kzRel'+idx+'_card" placeholder="在留カード番号" style="flex:1 1 45%;padding:8px;border:1.5px solid #e5e7eb;border-radius:8px;font-size:14px;min-height:44px;">'
+    + '<select id="f-kzRel'+idx+'_together" style="flex:1 1 45%;padding:8px;border:1.5px solid #e5e7eb;border-radius:8px;font-size:14px;min-height:44px;"><option value="">同居の有無</option><option value="同居">同居</option><option value="別居">別居</option></select>'
+    + '</div></div>';
+}
+function addKzRelative() {
+  _kzRelativeCount++;
+  var c = document.getElementById('kzRelativeContainer');
+  if (c) c.insertAdjacentHTML('beforeend', kzRelativeRow(_kzRelativeCount));
+}
+function toggleKzRelative(v) {
+  var w = document.getElementById('kzRelativeWrap');
+  if (w) w.style.display = (v === '有') ? 'block' : 'none';
+}
+function toggleKzRelationOther(v) {
+  var w = document.getElementById('kzRelationOtherWrap');
+  if (w) w.style.display = (v === 'その他') ? 'block' : 'none';
+}
+function toggleKzCard(v) {
+  var w = document.getElementById('kzCardWrap');
+  if (w) w.style.display = (v === '有') ? 'block' : 'none';
+}
+
+
 function _soFormCollect(){
   function v(id){ return val(id); }
   var hours={}; _SO_DAYS.forEach(function(d){ var _hn=document.getElementById('f-so_hours_'+d[0]+'_none'); hours[d[0]]={from:v('f-so_hours_'+d[0]+'_from'),to:v('f-so_hours_'+d[0]+'_to'),none:!!(_hn&&_hn.checked)}; });
@@ -3066,6 +3233,67 @@ function val(id) { var el=document.getElementById(id); return el ? el.value.trim
 
 function collectData() {
   var t = type;
+  // ver.20260822: 家族滞在フォーム
+  if ((t||'').indexOf('kazoku_') === 0) {
+    var d = {};
+    // ステップ1：申請人情報
+    d.kzNationality = val('f-kzNationality');
+    d.kzBirth = val('f-kzBirth');
+    d.kzNameEn = val('f-kzNameEn');
+    d.kzGender = val('f-kzGender');
+    d.kzBirthPlace = val('f-kzBirthPlace');
+    d.kzSpouse = val('f-kzSpouse');
+    d.kzJob = val('f-kzJob');
+    d.kzHomeAddress = val('f-kzHomeAddress');
+    d.kzZip = val('f-kzZip');
+    d.kzAddress = val('f-kzAddress');
+    d.kzTel = val('f-kzTel');
+    d.kzPassport = val('f-kzPassport');
+    d.kzPassExpiry = val('f-kzPassExpiry');
+    d.kzCurStatus = val('f-kzCurStatus');
+    d.kzCurPeriod = val('f-kzCurPeriod');
+    d.kzCurExpiry = val('f-kzCurExpiry');
+    d.kzHasCard = val('f-kzHasCard');
+    d.kzCardNo = val('f-kzCardNo');
+    d.kzEntryPurpose = val('f-kzEntryPurpose');
+    d.kzEntryDate = val('f-kzEntryDate');
+    d.kzEntryPort = val('f-kzEntryPort');
+    d.kzStayPeriod = val('f-kzStayPeriod');
+    d.kzVisaPlace = val('f-kzVisaPlace');
+    d.kzCompanion = val('f-kzCompanion');
+    d.kzPastEntry = val('f-kzPastEntry');
+    d.kzPastCoe = val('f-kzPastCoe');
+    // ステップ2：届出・在日親族・生活
+    d.kzNotifyType = val('f-kzNotifyType');
+    d.kzJpNotifyPlace = val('f-kzJpNotifyPlace');
+    d.kzJpNotifyDate = val('f-kzJpNotifyDate');
+    d.kzHomeNotifyPlace = val('f-kzHomeNotifyPlace');
+    d.kzHomeNotifyDate = val('f-kzHomeNotifyDate');
+    d.kzHasRelative = val('f-kzHasRelative');
+    var _kzRels = [];
+    document.querySelectorAll('#kzRelativeContainer .kz-relative-row').forEach(function(row){
+      var i = row.getAttribute('data-kzridx');
+      var rel = val('f-kzRel'+i+'_relation'), nm = val('f-kzRel'+i+'_name'), bd = val('f-kzRel'+i+'_birth'),
+          nat = val('f-kzRel'+i+'_nationality'), ws = val('f-kzRel'+i+'_workschool'), cd = val('f-kzRel'+i+'_card'), tg = val('f-kzRel'+i+'_together');
+      if (rel||nm||bd||nat||ws||cd||tg) _kzRels.push({relation:rel, name:nm, birth:bd, nationality:nat, workSchool:ws, card:cd, together:tg});
+    });
+    if (_kzRels.length) d.kzRelatives = _kzRels;
+    d.kzSupport = val('f-kzSupport');
+    // ステップ3：扶養者情報
+    d.kzSpNameEn = val('f-kzSpNameEn');
+    d.kzSpBirth = val('f-kzSpBirth');
+    d.kzSpNationality = val('f-kzSpNationality');
+    d.kzSpCardNo = val('f-kzSpCardNo');
+    d.kzSpStatus = val('f-kzSpStatus');
+    d.kzSpPeriod = val('f-kzSpPeriod');
+    d.kzSpExpiry = val('f-kzSpExpiry');
+    d.kzRelation = val('f-kzRelation');
+    d.kzRelationOther = val('f-kzRelationOther');
+    d.kzSpWorkplace = val('f-kzSpWorkplace');
+    d.kzSpWorkTel = val('f-kzSpWorkTel');
+    d.kzSpIncome = val('f-kzSpIncome');
+    return d;
+  }
   // ver.20260822: 誓約書だけのフォーム（企業情報なし）
   if (t === 'tokutei2_pledge') {
     var d = {};
@@ -3740,6 +3968,7 @@ function _minKeysForType(t) {
   if (t === 'company_designated46') return 1;
   if (t === 'company_designated9') return 1;
   if (t === 'jaim') return 1;  // JAIM: 該当性確認のみ必須（他は任意）
+  if ((t||'').indexOf('kazoku_') === 0) return 3;  // 家族滞在
   return 6;
 }
 
@@ -3999,6 +4228,9 @@ var TYPE_LABELS = {
   gijinkoku_nintei: { cat:'技人国', kind:'認定', catClass:'badge-gijinkoku', kindClass:'badge-nintei' },
   gijinkoku_koushin:{ cat:'技人国', kind:'更新', catClass:'badge-gijinkoku', kindClass:'badge-koushin' },
   gijinkoku_henkou: { cat:'技人国', kind:'変更', catClass:'badge-gijinkoku', kindClass:'badge-koushin' },
+  kazoku_nintei:    { cat:'家族滞在', kind:'認定', catClass:'badge-tokutei', kindClass:'badge-nintei' },
+  kazoku_henkou:    { cat:'家族滞在', kind:'変更', catClass:'badge-tokutei', kindClass:'badge-koushin' },
+  kazoku_koushin:   { cat:'家族滞在', kind:'更新', catClass:'badge-tokutei', kindClass:'badge-koushin' },
   company:          { cat:'企業情報', kind:'', catClass:'badge-company', kindClass:'' },
   company_tokutei2: { cat:'特定技能2号 企業', kind:'', catClass:'badge-tokutei', kindClass:'' },
   tokutei2_pledge:  { cat:'特定技能2号 誓約書', kind:'', catClass:'badge-tokutei', kindClass:'' },
