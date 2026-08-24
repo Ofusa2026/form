@@ -191,7 +191,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20260818.17';
+var FORM_VERSION = 'ver.20260818.18';
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -2136,9 +2136,10 @@ function buildCompanyTokutei2Form() {
 function buildTokutei2PledgeForm() {
   var h = '';
   // 会社名の見出し（どの会社の誓約書か分かるように）
+  var _coNm = caseName ? String(caseName).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;') : '（会社名）';
   h += '<div class="card" style="background:#f0fdf4;border-color:#86efac;">';
   h += '<div style="font-size:12px;color:#15803d;font-weight:700;margin-bottom:4px;">📋 特定技能2号 業務内容の確認</div>';
-  h += '<div style="font-size:15px;font-weight:800;color:#0f2040;">' + (caseName ? esc(caseName) : '（会社名）') + '</div>';
+  h += '<div style="font-size:15px;font-weight:800;color:#0f2040;">' + _coNm + '</div>';
   h += '<div style="font-size:11px;color:#6b7280;margin-top:4px;">第1-32号「2号特定技能外国人の業務内容に関する誓約書」の情報をご入力ください。</div>';
   h += '</div>';
   h += blockT2Pledge();
