@@ -191,7 +191,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20260818.18';
+var FORM_VERSION = 'ver.20260818.19';
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -237,7 +237,7 @@ var isKaigo = applicantField.indexOf('介護') >= 0;
 if (!type && (caseId.indexOf('co_') === 0 || srcParam === 'jaim')) { type = 'jaim'; }
 
 // 特定技能フラグ（type=tokutei_* のとき true）
-var isTokutei = (type === 'tokutei_nintei' || type === 'tokutei_koushin' || type === 'tokutei_henkou');
+var isTokutei = (type === 'tokutei_nintei' || type === 'tokutei_koushin' || type === 'tokutei_henkou' || (type||'').indexOf('tokutei2_person') === 0);
 
 // 技人国フラグ（type=gijinkoku_* のとき true）
 var isGijinkoku = (type === 'gijinkoku_nintei' || type === 'gijinkoku_koushin' || type === 'gijinkoku_henkou');
@@ -1040,6 +1040,32 @@ function onJpFieldChange(num, fieldValue) {
   }
 }
 
+// ===== 技能移転申告書ブロック（参考様式第1-10号）=====
+// ver.20260822: 特定技能2号の人材フォーム用。技能実習で修得した技能等（本国への移転対象）を申告
+function blockGinoIten() {
+  var h = '<div class="card"><div class="section-title">技能移転に係る申告（ぎのういてんにかかるしんこく）<div class="trans" data-key="itenTitle"></div></div>';
+  h += '<div style="font-size:11px;color:#9ca3af;margin-bottom:10px;line-height:1.6;">技能実習を修了した方は、本国への技能移転の申告に必要な情報をご入力ください。</div>';
+  h += '<div class="grid2">';
+  h += '<div class="field"><label>技能実習で修得した職種（しゅうとくした しょくしゅ）<div class="trans" data-key="itenJob"></div></label>';
+  h += '<select id="f-itenJob" onchange="_updateItenWorkSelect(this.value)"><option value="">---</option>' + makeOptions(GINOJISSHU_TYPE_LIST) + '</select></div>';
+  h += '<div class="field"><label>作業（さぎょう）<div class="trans" data-key="itenTask"></div></label>';
+  h += '<select id="f-itenWork"><option value="">---</option></select></div>';
+  h += '</div>';
+  h += '<div class="field"><label>本国では修得が困難な技能等（ほんごくで しゅうとくが こんなんな ぎのう）<div class="trans" data-key="itenReason"></div></label>';
+  h += '<input type="text" id="f-itenSkill" placeholder="例: そう菜製造業に係る技能" style="width:100%;padding:10px;border:1.5px solid #e5e7eb;border-radius:8px;font-size:15px;min-height:44px;"></div>';
+  h += '</div>';
+  return h;
+}
+// 職種→作業の連動（技能実習の職種選択時に作業リストを更新）
+function _updateItenWorkSelect(jobType) {
+  var sel = document.getElementById('f-itenWork');
+  if (!sel) return;
+  // 既存の技能実習 職種→作業マップ（GINOJISSHU_WORK_MAP）があれば流用
+  var works = (typeof GINOJISSHU_WORK_MAP !== 'undefined' && GINOJISSHU_WORK_MAP[jobType]) ? GINOJISSHU_WORK_MAP[jobType] : [];
+  sel.innerHTML = '<option value="">---</option>';
+  works.forEach(function(w){ sel.innerHTML += '<option value="'+w+'">'+w+'</option>'; });
+}
+
 // ===== 技能証明ブロック =====
 function blockSkillProof() {
   var h = '<div class="card"><div class="section-title">技能水準の証明（ぎのうすいじゅんのしょうめい）</div>';
@@ -1233,6 +1259,11 @@ function buildForm(t) {
       return buildCompanyTokutei2Form();
     case 'tokutei2_pledge':
       return buildTokutei2PledgeForm();
+    case 'tokutei2_person_nintei':
+      return blockBasic() + blockMarried() + blockTokuteiNintei() + blockSkillProof() + blockJapaneseProof() + blockGinoIten() + blockContact(false, false);
+    case 'tokutei2_person_koushin':
+    case 'tokutei2_person_henkou':
+      return blockBasic() + blockMarried() + blockTokuteiKoushin() + blockSkillProof() + blockJapaneseProof() + blockGinoIten() + blockContact(false, true);
     case 'company_gijinkoku':
       return buildCompanyGijinkokuForm();
     case 'company_designated46':
@@ -3312,6 +3343,13 @@ function collectData() {
     d.vnSendingOrg = val('f-vnSendingOrg');
   }
 
+  // ver.20260822: 特定技能2号 人材フォームの技能移転申告書（第1-10号）
+  if ((type||'').indexOf('tokutei2_person') === 0) {
+    d.itenJob = val('f-itenJob');
+    d.itenWork = val('f-itenWork');
+    d.itenSkill = val('f-itenSkill');
+  }
+
   // 特定技能：在留カード・住所・一時帰国（あり/なし＋条件付き入力）
   if (isTokutei) {
     var rcStatus = val('f-residenceCardStatus');
@@ -3955,6 +3993,9 @@ var TYPE_LABELS = {
   tokutei_nintei:   { cat:'特定技能', kind:'認定', catClass:'badge-tokutei', kindClass:'badge-nintei' },
   tokutei_koushin:  { cat:'特定技能', kind:'更新', catClass:'badge-tokutei', kindClass:'badge-koushin' },
   tokutei_henkou:   { cat:'特定技能', kind:'変更', catClass:'badge-tokutei', kindClass:'badge-koushin' },
+  tokutei2_person_nintei:  { cat:'特定技能2号 人材', kind:'認定', catClass:'badge-tokutei', kindClass:'badge-nintei' },
+  tokutei2_person_koushin: { cat:'特定技能2号 人材', kind:'更新', catClass:'badge-tokutei', kindClass:'badge-koushin' },
+  tokutei2_person_henkou:  { cat:'特定技能2号 人材', kind:'変更', catClass:'badge-tokutei', kindClass:'badge-koushin' },
   gijinkoku_nintei: { cat:'技人国', kind:'認定', catClass:'badge-gijinkoku', kindClass:'badge-nintei' },
   gijinkoku_koushin:{ cat:'技人国', kind:'更新', catClass:'badge-gijinkoku', kindClass:'badge-koushin' },
   gijinkoku_henkou: { cat:'技人国', kind:'変更', catClass:'badge-gijinkoku', kindClass:'badge-koushin' },
@@ -4108,6 +4149,7 @@ function prefillForm(resp) {
     nationality: 'f-nationality', passport: 'f-passport', passportExpiry: 'f-passExpiry',
     married: 'f-married', email: 'f-email',
     vnFamilyAddress: 'f-vnFamilyAddress', vnFamilyTel: 'f-vnFamilyTel', vnSendingOrg: 'f-vnSendingOrg',
+    itenJob: 'f-itenJob', itenWork: 'f-itenWork', itenSkill: 'f-itenSkill',
     residenceCard: 'f-residenceCard', address: 'f-address',
     residenceStatus: 'f-residenceStatus', completionDate: 'f-completionDate',
     tempReturn: 'f-tempReturn',
