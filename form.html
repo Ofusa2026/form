@@ -191,7 +191,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20260818.13';
+var FORM_VERSION = 'ver.20260818.14';
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -208,7 +208,7 @@ if (!caseId) {
 var type    = params.get('type') || '';   // tokutei_nintei / tokutei_koushin / tokutei_henkou / gijinkoku_nintei / gijinkoku_koushin / gijinkoku_henkou / company
 var caseName = params.get('name') ? decodeURIComponent(params.get('name')) : '';
 // ver.20260812: 企業系フォームは翻訳不要（日本人担当者が入力）
-var _isCompanyForm = (type === 'company' || type === 'support_org' || (type||'').indexOf('jaim') >= 0);
+var _isCompanyForm = (type === 'company' || type === 'support_org' || (type||'').indexOf('jaim') >= 0 || (type||'').indexOf('company_') === 0);
 // ver.20260812: 国籍→言語の自動判定マップ（案シスの国籍値に対応）
 var _NAT_LANG_MAP = {
   'インドネシア':'id', 'ベトナム':'vi', 'ミャンマー':'my', 'ミヤンマー':'my',
@@ -1024,6 +1024,20 @@ function onJpFieldChange(num, fieldValue) {
   if (typeof applyJpBlockLang === 'function') applyJpBlockLang(currentLang);
   // ver.20260812: 企業系フォームは言語バーを非表示
   if (_isCompanyForm) { var _lb = document.getElementById('langBar'); if (_lb) _lb.style.display = 'none'; }
+  // ver.20260822: 特定技能2号フォームで、URLの分野(field)からプルダウンを自動選択
+  if (type === 'company_tokutei2' && applicantField) {
+    var _fieldSel = document.getElementById('f-t2Field');
+    if (_fieldSel) {
+      // 英字キー（kaigo等）でも日本語（介護等）でも対応
+      var _fkey = applicantField;
+      var _jpToKey = {'介護':'kaigo','ビルクリーニング':'building','工業製品':'kogyo','建設':'construction','造船':'shipbuilding','自動車整備':'automobile','航空':'aviation','宿泊':'accommodation','農業':'agriculture','漁業':'fishery','飲食料品':'food','外食':'restaurant'};
+      if (!/^[a-z]+$/.test(_fkey)) {
+        for (var _jp in _jpToKey) { if (_fkey.indexOf(_jp) >= 0) { _fkey = _jpToKey[_jp]; break; } }
+      }
+      _fieldSel.value = _fkey;
+      if (typeof onT2FieldChange === 'function') onT2FieldChange(_fkey);
+    }
+  }
 }
 
 // ===== 技能証明ブロック =====
