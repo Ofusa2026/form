@@ -191,7 +191,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20260818.15';
+var FORM_VERSION = 'ver.20260818.16';
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -208,7 +208,7 @@ if (!caseId) {
 var type    = params.get('type') || '';   // tokutei_nintei / tokutei_koushin / tokutei_henkou / gijinkoku_nintei / gijinkoku_koushin / gijinkoku_henkou / company
 var caseName = params.get('name') ? decodeURIComponent(params.get('name')) : '';
 // ver.20260812: 企業系フォームは翻訳不要（日本人担当者が入力）
-var _isCompanyForm = (type === 'company' || type === 'support_org' || (type||'').indexOf('jaim') >= 0 || (type||'').indexOf('company_') === 0);
+var _isCompanyForm = (type === 'company' || type === 'support_org' || type === 'tokutei2_pledge' || (type||'').indexOf('jaim') >= 0 || (type||'').indexOf('company_') === 0);
 // ver.20260812: 国籍→言語の自動判定マップ（案シスの国籍値に対応）
 var _NAT_LANG_MAP = {
   'インドネシア':'id', 'ベトナム':'vi', 'ミャンマー':'my', 'ミヤンマー':'my',
@@ -1025,7 +1025,7 @@ function onJpFieldChange(num, fieldValue) {
   // ver.20260812: 企業系フォームは言語バーを非表示
   if (_isCompanyForm) { var _lb = document.getElementById('langBar'); if (_lb) _lb.style.display = 'none'; }
   // ver.20260822: 特定技能2号フォームで、URLの分野(field)からプルダウンを自動選択
-  if (type === 'company_tokutei2' && applicantField) {
+  if ((type === 'company_tokutei2' || type === 'tokutei2_pledge') && applicantField) {
     var _fieldSel = document.getElementById('f-t2Field');
     if (_fieldSel) {
       // 英字キー（kaigo等）でも日本語（介護等）でも対応
@@ -1231,6 +1231,8 @@ function buildForm(t) {
       return buildCompanyForm();
     case 'company_tokutei2':
       return buildCompanyTokutei2Form();
+    case 'tokutei2_pledge':
+      return buildTokutei2PledgeForm();
     case 'company_gijinkoku':
       return buildCompanyGijinkokuForm();
     case 'company_designated46':
@@ -2130,6 +2132,19 @@ function buildCompanyTokutei2Form() {
   return base + blockT2Pledge();
 }
 
+// ver.20260822: 特定技能2号 誓約書だけのシンプル版（企業情報なし・会社名のみ表示）
+function buildTokutei2PledgeForm() {
+  var h = '';
+  // 会社名の見出し（どの会社の誓約書か分かるように）
+  h += '<div class="card" style="background:#f0fdf4;border-color:#86efac;">';
+  h += '<div style="font-size:12px;color:#15803d;font-weight:700;margin-bottom:4px;">📋 特定技能2号 業務内容の確認</div>';
+  h += '<div style="font-size:15px;font-weight:800;color:#0f2040;">' + (caseName ? esc(caseName) : '（会社名）') + '</div>';
+  h += '<div style="font-size:11px;color:#6b7280;margin-top:4px;">第1-32号「2号特定技能外国人の業務内容に関する誓約書」の情報をご入力ください。</div>';
+  h += '</div>';
+  h += blockT2Pledge();
+  return h;
+}
+
 // 第1-32号 業務内容誓約書ブロック（企業が入力）
 function blockT2Pledge() {
   var h = '<div class="card"><div class="section-title">２号特定技能外国人の業務内容（第１－３２号 誓約書）</div>';
@@ -3019,6 +3034,26 @@ function val(id) { var el=document.getElementById(id); return el ? el.value.trim
 
 function collectData() {
   var t = type;
+  // ver.20260822: 誓約書だけのフォーム（企業情報なし）
+  if (t === 'tokutei2_pledge') {
+    var d = {};
+    d.t2Field = val('f-t2Field');
+    d.t2ApplicantName = val('f-t2ApplicantName');
+    d.t2Dept = val('f-t2Dept');
+    d.t2Position = val('f-t2Position');
+    d.t2JobDetail = val('f-t2JobDetail');
+    d.t2JobDiff = val('f-t2JobDiff');
+    d.t2Confirm = (document.getElementById('f-t2Confirm') && document.getElementById('f-t2Confirm').checked) ? 'confirmed' : '';
+    var _t2t = [];
+    document.querySelectorAll('#t2TargetContainer .t2-target-row').forEach(function(row){
+      var i = row.id.replace('t2TargetRow','');
+      var nm = val('f-t2tgt'+i+'_name'), cd = val('f-t2tgt'+i+'_card'), dp = val('f-t2tgt'+i+'_dept'), po = val('f-t2tgt'+i+'_position'), jb = val('f-t2tgt'+i+'_job');
+      if (nm||cd||dp||po||jb) _t2t.push({name:nm, card:cd, dept:dp, position:po, job:jb});
+    });
+    d.t2Targets = _t2t;
+    return d;
+  }
+
   if (t === 'company' || t === 'company_tokutei2') {
     var officers = {};
     document.querySelectorAll('.officer-row').forEach(function(row) {
@@ -3534,7 +3569,7 @@ function _renderRichError(err){
 
 function validate() {
   // ver.20260822: 特定技能2号 企業フォームの誓約書チェック（分野別の必要人数）
-  if (type === 'company_tokutei2') {
+  if (type === 'company_tokutei2' || type === 'tokutei2_pledge') {
     var _t2field = val('f-t2Field');
     if (!_t2field) {
       return '特定産業分野を選んでください。';
@@ -3661,6 +3696,7 @@ function validate() {
 function _minKeysForType(t) {
   if (t === 'company') return 1;
   if (t === 'company_tokutei2') return 1;
+  if (t === 'tokutei2_pledge') return 1;
   if (t === 'company_gijinkoku') return 1;
   if (t === 'company_designated46') return 1;
   if (t === 'company_designated9') return 1;
@@ -3923,6 +3959,7 @@ var TYPE_LABELS = {
   gijinkoku_henkou: { cat:'技人国', kind:'変更', catClass:'badge-gijinkoku', kindClass:'badge-koushin' },
   company:          { cat:'企業情報', kind:'', catClass:'badge-company', kindClass:'' },
   company_tokutei2: { cat:'特定技能2号 企業', kind:'', catClass:'badge-tokutei', kindClass:'' },
+  tokutei2_pledge:  { cat:'特定技能2号 誓約書', kind:'', catClass:'badge-tokutei', kindClass:'' },
   company_gijinkoku:{ cat:'技人国 企業', kind:'', catClass:'badge-gijinkoku', kindClass:'' },
   company_designated46:{ cat:'特定活動46号 企業', kind:'', catClass:'badge-gijinkoku', kindClass:'' },
   company_designated9:{ cat:'特定活動9号 企業', kind:'', catClass:'badge-company', kindClass:'' },
