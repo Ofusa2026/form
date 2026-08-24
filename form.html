@@ -191,7 +191,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20260818.21';
+var FORM_VERSION = 'ver.20260818.22';
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -1593,7 +1593,7 @@ function buildKazokuForm() {
   h += '<div class="card"><div class="section-title">申請人（本人）情報（しんせいにん ほんにん）</div>';
   h += field('f-kzNationality','国籍・地域（こくせき）','select',true,'','kzNationality', _NAT_LIST_KZ);
   h += field('f-kzBirth','生年月日（せいねんがっぴ）','date',true,'','kzBirth');
-  h += field('f-kzNameEn','氏名（ローマ字・旅券どおり）','text',true,'例: NGUYEN VAN A','kzNameEn');
+  h += field('f-kzNameEn','氏名（ローマ字・パスポートどおり）','text',true,'例: NGUYEN VAN A','kzNameEn');
   h += '<div class="field"><label>性別（せいべつ）<span class="req">*</span><div class="trans" data-key="kzGender"></div></label>';
   h += '<select id="f-kzGender"><option value="">---</option><option value="男">男 / Male</option><option value="女">女 / Female</option></select></div>';
   if (isNintei || isHenkou) {
@@ -1611,9 +1611,9 @@ function buildKazokuForm() {
   h += field('f-kzTel','電話番号／携帯電話番号（でんわ）','text',true,'例: 090-1234-5678','kzTel');
   h += '</div>';
 
-  h += '<div class="card"><div class="section-title">旅券（りょけん）</div>';
-  h += field('f-kzPassport','旅券番号（りょけんばんごう）','text',true,'例: AB1234567','kzPassport');
-  h += field('f-kzPassExpiry','旅券有効期限（ゆうこうきげん）','date',false,'','kzPassExpiry');
+  h += '<div class="card"><div class="section-title">パスポート</div>';
+  h += field('f-kzPassport','パスポート番号（ばんごう）','text',true,'例: AB1234567','kzPassport');
+  h += field('f-kzPassExpiry','パスポート有効期限（ゆうこうきげん）','date',false,'','kzPassExpiry');
   h += '</div>';
 
   if (isHenkou || isKoushin) {
