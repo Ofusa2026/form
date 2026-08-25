@@ -191,7 +191,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20260825.03';
+var FORM_VERSION = 'ver.20260825.04';
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -2356,7 +2356,7 @@ function blockT2Pledge() {
     + '</div>';
 
   // 対象の2号特定技能外国人（申請人）
-  // ver.20260825.03: 単独の氏名欄は廃止。2号ごとに氏名＋指導対象者を t2TargetContainer にネスト生成する
+  // ver.20260825.04: 単独の氏名欄は廃止。2号ごとに氏名＋指導対象者を t2TargetContainer にネスト生成する
 
   h += '<div class="sub-label" style="background:#eff6ff;color:#1d4ed8;border-radius:6px;padding:6px 10px;margin:12px 0 8px;font-size:12px;font-weight:700;">【当該２号特定技能外国人の業務内容】</div>';
   h += field('f-t2Dept', '① 所属部署名', 'text', false, '例: 製造部 第一課', '');
@@ -2379,7 +2379,7 @@ function blockT2Pledge() {
   h += '<div class="field" style="flex:1;"><label>今回の２号採用人数（こんかい）<span class="req">*</span></label>';
   h += '<select id="f-t2CountThis" onchange="recalcT2Targets()">' + _t2CountOptions(1) + '</select></div>';
   h += '</div>';
-  // ver.20260825.03: 2号ごとに（氏名＋その2号の指導対象者min名）をネスト生成するコンテナ
+  // ver.20260825.04: 2号ごとに（氏名＋その2号の指導対象者min名）をネスト生成するコンテナ
   h += '<div id="t2TargetNote" style="font-size:12px;color:#6b7280;background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;padding:10px 12px;margin-bottom:10px;line-height:1.8;">分野と採用人数を選ぶと、必要な指導対象者の人数が表示されます。</div>';
   h += '<div id="t2TargetContainer"></div>';
 
@@ -2426,8 +2426,8 @@ function _t2CountOptions(defaultVal){
   }
   return s;
 }
-// ver.20260825.03: 現在/今回の2号氏名欄を人数分だけ生成（入力済みの値は保持）
-// ver.20260825.03: 2号ごとに（氏名＋その2号の指導対象者min名）をネスト生成。入力済みは保持
+// ver.20260825.04: 現在/今回の2号氏名欄を人数分だけ生成（入力済みの値は保持）
+// ver.20260825.04: 2号ごとに（氏名＋その2号の指導対象者min名）をネスト生成。入力済みは保持
 function _t2esc(v){ return String(v==null?'':v).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;'); }
 function t2TargetRow2(group, pidx, k){
   var base='f-t2tgt_'+group+pidx+'_'+k;
@@ -2448,21 +2448,24 @@ function t2TargetRow2(group, pidx, k){
 function _renderT2Structure(cntNow, cntThis, perPerson){
   var c=document.getElementById('t2TargetContainer'); if(!c) return;
   var per=Math.max(perPerson||0,0);
-  function personBlock(group,label,pidx){
+  // ver.20260825.04: 2号1人ごとに左端の色をローテーション（緑→青→橙→紫→桃→黄…）
+  var _pal=[['#86efac','#166534'],['#93c5fd','#1e40af'],['#fdba74','#c2410c'],['#d8b4fe','#7e22ce'],['#f9a8d4','#be185d'],['#fde047','#a16207']];
+  function personBlock(group,label,pidx,seq){
     var nameId='f-t2Name'+(group==='now'?'Now':'This')+'_'+pidx;
     var ex=document.getElementById(nameId); var nv=ex?ex.value:'';
-    var h='<div class="t2-person-block" style="border-left:3px solid #86efac;padding-left:10px;margin-bottom:14px;">';
-    h+='<div style="font-size:12px;font-weight:800;color:#166534;margin-bottom:4px;">'+label+'</div>';
-    h+='<input id="'+nameId+'" placeholder="２号特定技能外国人の氏名（例: NGUYEN VAN A）" value="'+_t2esc(nv)+'" style="width:100%;margin-bottom:6px;padding:9px 12px;border:1.5px solid #d1d5db;border-radius:8px;font-size:14px;box-sizing:border-box;">';
+    var col=_pal[(seq-1)%_pal.length];
+    var h='<div class="t2-person-block" style="border-left:3px solid '+col[0]+';padding-left:10px;margin-bottom:14px;">';
+    h+='<div style="font-size:12px;font-weight:800;color:'+col[1]+';margin-bottom:4px;">'+label+'</div>';
+    h+='<input id="'+nameId+'" placeholder="２号特定技能外国人の氏名（'+pidx+'人目）" value="'+_t2esc(nv)+'" style="width:100%;margin-bottom:6px;padding:9px 12px;border:1.5px solid #d1d5db;border-radius:8px;font-size:14px;box-sizing:border-box;">';
     if(per===0){ h+='<div style="font-size:11px;color:#6b7280;margin:2px 0 6px 14px;">この分野は指導対象者の選定は任意です（必要に応じてご入力ください）。</div>'; }
     else { h+='<div style="font-size:11px;color:#6b7280;margin:2px 0 4px 14px;">この2号が指導する対象者を'+per+'名ご入力ください。</div>'; }
     for(var k=1;k<=per;k++){ h+=t2TargetRow2(group,pidx,k); }
     h+='</div>';
     return h;
   }
-  var html='';
-  for(var i=1;i<=cntNow;i++){ html+=personBlock('now','現在の２号 '+i+'人目', i); }
-  for(var j=1;j<=cntThis;j++){ html+=personBlock('this','今回の２号 '+j+'人目', j); }
+  var html=''; var _seq=0;
+  for(var i=1;i<=cntNow;i++){ _seq++; html+=personBlock('now','現在の２号 '+i+'人目', i, _seq); }
+  for(var j=1;j<=cntThis;j++){ _seq++; html+=personBlock('this','今回の２号 '+j+'人目', j, _seq); }
   if(!cntNow && !cntThis){ html='<div style="font-size:12px;color:#6b7280;">採用人数を選ぶと、2号ごとに氏名と指導対象者の入力欄が表示されます。</div>'; }
   c.innerHTML=html;
 }
@@ -2480,7 +2483,7 @@ function recalcT2Targets(){
   var confirmWrap = document.getElementById('t2ConfirmWrap');
 
   // 必要数分の対象者枠を用意（不足していれば追加）
-  // ver.20260825.03: 枠は _renderT2Structure が2号ごとに生成するため、旧 _ensureT2TargetRows は不使用
+  // ver.20260825.04: 枠は _renderT2Structure が2号ごとに生成するため、旧 _ensureT2TargetRows は不使用
 
   if (note){
     if (key === ''){
@@ -3407,7 +3410,7 @@ function collectData() {
     d.t2Field = val('f-t2Field');
       d.t2CountNow = val('f-t2CountNow');
       d.t2CountThis = val('f-t2CountThis');
-    // ver.20260825.03: 現在/今回の2号氏名を人数分収集（単独氏名欄は廃止）
+    // ver.20260825.04: 現在/今回の2号氏名を人数分収集（単独氏名欄は廃止）
     var _namesNow=[]; for(var _ni=1;_ni<=20;_ni++){ var _nv=val('f-t2NameNow_'+_ni); if(_nv) _namesNow.push(_nv); }
     var _namesThis=[]; for(var _ti=1;_ti<=20;_ti++){ var _tv=val('f-t2NameThis_'+_ti); if(_tv) _namesThis.push(_tv); }
     d.t2NamesNow = _namesNow;
@@ -3507,7 +3510,7 @@ function collectData() {
       d.t2Field = val('f-t2Field');
       d.t2CountNow = val('f-t2CountNow');
       d.t2CountThis = val('f-t2CountThis');
-      // ver.20260825.03: 現在/今回の2号氏名を人数分収集（単独氏名欄は廃止）
+      // ver.20260825.04: 現在/今回の2号氏名を人数分収集（単独氏名欄は廃止）
     var _namesNow=[]; for(var _ni=1;_ni<=20;_ni++){ var _nv=val('f-t2NameNow_'+_ni); if(_nv) _namesNow.push(_nv); }
     var _namesThis=[]; for(var _ti=1;_ti<=20;_ti++){ var _tv=val('f-t2NameThis_'+_ti); if(_tv) _namesThis.push(_tv); }
     d.t2NamesNow = _namesNow;
