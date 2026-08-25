@@ -191,7 +191,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20260818.23';
+var FORM_VERSION = 'ver.20260825.01';
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -2477,12 +2477,30 @@ function recalcT2Targets(){
 function _ensureT2TargetRows(need){
   var c = document.getElementById('t2TargetContainer');
   if (!c) return;
+  var cap = Math.min(need, _maxT2Target);
+  // 不足分を追加
   var cur = c.querySelectorAll('.t2-target-row').length;
-  while (cur < need && _t2TargetCount < _maxT2Target){
+  while (cur < cap && _t2TargetCount < _maxT2Target){
     _t2TargetCount++;
     c.insertAdjacentHTML('beforeend', t2TargetRow(_t2TargetCount));
     cur++;
   }
+  // ver.20260825: 余剰分を末尾から削除して need にぴったり合わせる（入力済みの枠は消さない）
+  var rows = c.querySelectorAll('.t2-target-row');
+  for (var i = rows.length - 1; i >= 0; i--){
+    if (c.querySelectorAll('.t2-target-row').length <= cap) break;
+    if (_t2RowHasInput(rows[i])) continue; // 入力がある枠は残す
+    rows[i].parentNode.removeChild(rows[i]);
+  }
+}
+// 枠内に入力があるか（空欄の余剰枠だけ削除するための判定）
+function _t2RowHasInput(row){
+  if (!row) return false;
+  var ins = row.querySelectorAll('input, select, textarea');
+  for (var i = 0; i < ins.length; i++){
+    if (String(ins[i].value || '').trim() !== '') return true;
+  }
+  return false;
 }
 
 var _t2TargetCount = 2;
