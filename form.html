@@ -191,7 +191,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20260818.22';
+var FORM_VERSION = 'ver.20260818.23';
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -2372,7 +2372,14 @@ function blockT2Pledge() {
   h += '<option value="">--- 分野を選んでください ---</option>';
   _T2_FIELDS.forEach(function(f){ h += '<option value="'+f.key+'">'+f.label+'</option>'; });
   h += '</select></div>';
-  h += '<div id="t2TargetNote" style="font-size:12px;color:#6b7280;background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;padding:10px 12px;margin-bottom:10px;line-height:1.8;">分野を選ぶと、必要な指導対象者の人数が表示されます。</div>';
+  // ver.20260824: 2号特定技能外国人の採用人数（現在＋今回）。合計×分野の必要数が指導対象者数
+  h += '<div style="display:flex;gap:8px;">';
+  h += '<div class="field" style="flex:1;"><label>現在の２号採用人数（げんざい）</label>';
+  h += '<select id="f-t2CountNow" onchange="recalcT2Targets()">' + _t2CountOptions(0) + '</select></div>';
+  h += '<div class="field" style="flex:1;"><label>今回の２号採用人数（こんかい）<span class="req">*</span></label>';
+  h += '<select id="f-t2CountThis" onchange="recalcT2Targets()">' + _t2CountOptions(1) + '</select></div>';
+  h += '</div>';
+  h += '<div id="t2TargetNote" style="font-size:12px;color:#6b7280;background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;padding:10px 12px;margin-bottom:10px;line-height:1.8;">分野と採用人数を選ぶと、必要な指導対象者の人数が表示されます。</div>';
   h += '<div id="t2TargetContainer">' + t2TargetRow(1) + t2TargetRow(2) + '</div>';
   h += '<button type="button" onclick="addT2Target()" style="font-size:11px;padding:5px 14px;background:white;border:1.5px dashed #86efac;border-radius:6px;color:#15803d;cursor:pointer;font-weight:700;margin-top:4px;">＋ 対象者を追加</button>';
 
@@ -2408,35 +2415,73 @@ function _t2MinForField(key){
 }
 // 分野選択時に必要人数の注記と確認文を更新
 function onT2FieldChange(key){
-  var min = _t2MinForField(key);
+  recalcT2Targets();
+}
+
+// ver.20260824: 採用人数プルダウンの選択肢（0〜20名）
+function _t2CountOptions(defaultVal){
+  var s = '';
+  for (var i=0;i<=20;i++){
+    s += '<option value="'+i+'"'+(i===defaultVal?' selected':'')+'>'+i+'名</option>';
+  }
+  return s;
+}
+// ver.20260824: 分野 × 合計採用人数 で必要な指導対象者数を計算し、枠・注記・確認文を更新
+function recalcT2Targets(){
+  var key = (document.getElementById('f-t2Field')||{}).value || '';
+  var perPerson = _t2MinForField(key);  // 分野の1人あたり必要数
+  var cntNow = parseInt((document.getElementById('f-t2CountNow')||{}).value || '0', 10);
+  var cntThis = parseInt((document.getElementById('f-t2CountThis')||{}).value || '0', 10);
+  var total = cntNow + cntThis;
+  var need = perPerson * total;  // 必要な指導対象者の総数
   var note = document.getElementById('t2TargetNote');
   var confirmText = document.getElementById('t2ConfirmText');
   var confirmWrap = document.getElementById('t2ConfirmWrap');
+
+  // 必要数分の対象者枠を用意（不足していれば追加）
+  if (need > 0) _ensureT2TargetRows(need);
+
   if (note){
     if (key === ''){
-      note.innerHTML = '分野を選ぶと、必要な指導対象者の人数が表示されます。';
+      note.innerHTML = '分野と採用人数を選ぶと、必要な指導対象者の人数が表示されます。';
       note.style.color = '#6b7280';
-    } else if (min === 0){
+    } else if (perPerson === 0){
       note.innerHTML = 'この分野では、指導を受ける対象者の選定は<b>必須ではありません</b>。該当者がいれば任意でご入力ください。';
       note.style.color = '#15803d';
+    } else if (total === 0){
+      note.innerHTML = '今回の採用人数を選んでください。';
+      note.style.color = '#6b7280';
     } else {
-      note.innerHTML = '❗ <b>この分野では、指導を受ける対象者を「'+min+'名以上」選定する必要があります。</b><br>'
+      note.innerHTML = '❗ <b>指導を受ける対象者を「'+need+'名以上」選定する必要があります。</b><br>'
+        + '（２号 '+total+'名 × '+perPerson+'名／人 ＝ '+need+'名）<br>'
         + '・対象者は<b>他の２号特定技能外国人に指導を受けていない</b>方に限ります（重複不可）。<br>'
         + '・同一の事業所に出勤し、原則同一部署でフルタイム勤務の方に限ります。<br>'
-        + '<span style="color:#991b1b;">※ '+min+'名以上を別途選定し、重複がないことを必ずご確認ください。要件を満たさないと許可されません。</span>';
+        + '<span style="color:#991b1b;">※ '+need+'名以上を別途選定し、重複がないことを必ずご確認ください。要件を満たさないと許可されません。</span>';
       note.style.color = '#b45309';
     }
   }
-  if (confirmText && key !== ''){
-    if (min === 0){
+  if (confirmText){
+    if (key !== '' && perPerson === 0){
       confirmText.innerHTML = '（該当者を入力した場合）いずれも<b>他の２号特定技能外国人に指導を受けていない（重複していない）</b>ことを確認しました。';
+    } else if (need > 0){
+      confirmText.innerHTML = '指導を受ける対象者を<b>'+need+'名以上</b>選定し、いずれも<b>他の２号特定技能外国人に指導を受けていない（重複していない）</b>ことを確認しました。<span class="req">*</span>';
     } else {
-      confirmText.innerHTML = '指導を受ける対象者を<b>'+min+'名以上</b>選定し、いずれも<b>他の２号特定技能外国人に指導を受けていない（重複していない）</b>ことを確認しました。<span class="req">*</span>';
+      confirmText.innerHTML = '指導を受ける対象者を選定し、いずれも<b>他の２号特定技能外国人に指導を受けていない（重複していない）</b>ことを確認しました。<span class="req">*</span>';
     }
   }
-  // 対象者不要の分野では確認チェックを任意扱いに（見た目を薄く）
   if (confirmWrap){
-    confirmWrap.style.opacity = (min === 0) ? '0.7' : '1';
+    confirmWrap.style.opacity = (perPerson === 0) ? '0.7' : '1';
+  }
+}
+// 必要数分の対象者枠を確保（現在の枠数が足りなければ追加）
+function _ensureT2TargetRows(need){
+  var c = document.getElementById('t2TargetContainer');
+  if (!c) return;
+  var cur = c.querySelectorAll('.t2-target-row').length;
+  while (cur < need && _t2TargetCount < _maxT2Target){
+    _t2TargetCount++;
+    c.insertAdjacentHTML('beforeend', t2TargetRow(_t2TargetCount));
+    cur++;
   }
 }
 
@@ -3301,6 +3346,8 @@ function collectData() {
   if (t === 'tokutei2_pledge') {
     var d = {};
     d.t2Field = val('f-t2Field');
+      d.t2CountNow = val('f-t2CountNow');
+      d.t2CountThis = val('f-t2CountThis');
     d.t2ApplicantName = val('f-t2ApplicantName');
     d.t2Dept = val('f-t2Dept');
     d.t2Position = val('f-t2Position');
@@ -3394,6 +3441,8 @@ function collectData() {
         // ver.20260822: 特定技能2号の誓約書データ（企業フォーム）
     if (t === 'company_tokutei2') {
       d.t2Field = val('f-t2Field');
+      d.t2CountNow = val('f-t2CountNow');
+      d.t2CountThis = val('f-t2CountThis');
       d.t2ApplicantName = val('f-t2ApplicantName');
       d.t2Dept = val('f-t2Dept');
       d.t2Position = val('f-t2Position');
@@ -3844,7 +3893,15 @@ function validate() {
     if (!_t2field) {
       return '特定産業分野を選んでください。';
     }
-    var _t2min = (typeof _t2MinForField === 'function') ? _t2MinForField(_t2field) : 2;
+    var _t2per = (typeof _t2MinForField === 'function') ? _t2MinForField(_t2field) : 2;
+    // ver.20260824: 必要数 = 分野の1人あたり必要数 × 合計採用人数（現在＋今回）
+    var _cntNow = parseInt(val('f-t2CountNow') || '0', 10);
+    var _cntThis = parseInt(val('f-t2CountThis') || '0', 10);
+    var _total = _cntNow + _cntThis;
+    if (_t2per > 0 && _cntThis === 0) {
+      return '今回の２号採用人数を選んでください。';
+    }
+    var _need = _t2per * _total;
     var _t2rows = document.querySelectorAll('#t2TargetContainer .t2-target-row');
     var _filled = 0;
     _t2rows.forEach(function(row){
@@ -3852,14 +3909,14 @@ function validate() {
       var nm = val('f-t2tgt'+i+'_name');
       if (nm && nm.trim() !== '') _filled++;
     });
-    if (_t2min > 0 && _filled < _t2min) {
-      return '指導を受ける対象者を' + _t2min + '名以上ご入力ください（氏名が必要です）。他の2号特定技能外国人と重複しない方を選定してください。';
+    if (_need > 0 && _filled < _need) {
+      return '指導を受ける対象者を' + _need + '名以上ご入力ください（２号' + _total + '名×' + _t2per + '名／人）。氏名が必要です。他の2号特定技能外国人と重複しない方を選定してください。';
     }
-    // 対象者不要の分野(min=0)ではチェック必須にしない
-    if (_t2min > 0) {
+    // 対象者不要の分野(per=0)ではチェック必須にしない
+    if (_need > 0) {
       var _cb = document.getElementById('f-t2Confirm');
       if (!_cb || !_cb.checked) {
-        return '「' + _t2min + '名以上を選定し、重複がないことを確認しました」のチェックを入れてください。';
+        return '「' + _need + '名以上を選定し、重複がないことを確認しました」のチェックを入れてください。';
       }
     }
   }
