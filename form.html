@@ -191,7 +191,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20260825.04';
+var FORM_VERSION = 'ver.20260825.05';
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -276,7 +276,7 @@ var TRANS = {
     jpProof2Type:'Type of Proof ② (if 2 passed)', jpProof2ExamType:'Type of Japanese Test', jpProof2Place:'Exam Location',
     jpProof2Job:'Occupation', jpProof2Task:'Task', jpProof2Doc:'Type of Certificate',
     hasFamily:'Do you have family in Japan?',
-    familyRelation:'Relationship / Relation', familyResidenceCard:'Family Member\'s Residence Card No.',
+    familyName:'Full Name', familyRelation:'Relationship / Relation', familyResidenceCard:'Family Member\'s Residence Card No.',
     familyWorkplace:'Family Member\'s Workplace', familyLiveTogether:'Do you live together?',
     familyAddress:'Family Member\'s Address',
     tenshutsuDate:'Date of submitting change of address notification',tenshutsuTitle:'/ Change of Address',tenshutsuNote:'※ Only if you have a planned move'
@@ -313,7 +313,7 @@ var TRANS = {
     jpProof2Type:'Loại chứng chỉ tiếng Nhật ②', jpProof2ExamType:'Loại bài thi tiếng Nhật', jpProof2Place:'Địa điểm thi',
     jpProof2Job:'Nghề', jpProof2Task:'Công việc', jpProof2Doc:'Loại chứng chỉ',
     hasFamily:'Bạn có người thân ở Nhật không?',
-    familyRelation:'Quan hệ', familyResidenceCard:'Số thẻ cư trú của người thân',
+    familyName:'Họ và tên', familyRelation:'Quan hệ', familyResidenceCard:'Số thẻ cư trú của người thân',
     familyWorkplace:'Nơi làm việc của người thân', familyLiveTogether:'Bạn có sống chung không?',
     familyAddress:'Địa chỉ của người thân',
     tenshutsuDate:'Ngày nộp thông báo thay đổi địa chỉ',tenshutsuTitle:'/ Thay đổi địa chỉ',tenshutsuNote:'※ Chỉ khi có kế hoạch chuyển nhà'
@@ -349,7 +349,7 @@ var TRANS = {
     jpProof2Type:'Jenis Bukti Bahasa Jepang ②', jpProof2ExamType:'Jenis ujian bahasa Jepang', jpProof2Place:'Lokasi ujian',
     jpProof2Job:'Jenis pekerjaan', jpProof2Task:'Pekerjaan', jpProof2Doc:'Jenis sertifikat',
     hasFamily:'Apakah Anda memiliki keluarga di Jepang?',
-    familyRelation:'Hubungan', familyResidenceCard:'No. Kartu Izin Tinggal anggota keluarga',
+    familyName:'Nama Lengkap', familyRelation:'Hubungan', familyResidenceCard:'No. Kartu Izin Tinggal anggota keluarga',
     familyWorkplace:'Tempat kerja anggota keluarga', familyLiveTogether:'Apakah tinggal bersama?',
     familyAddress:'Alamat anggota keluarga',
     tenshutsuDate:'Tanggal pelaporan pindah alamat',tenshutsuTitle:'/ Pindah Alamat',tenshutsuNote:'※ Hanya jika ada rencana pindah'
@@ -384,7 +384,7 @@ var TRANS = {
     jpProof2Type:'ဂျပန်စာ အထောက်အထား ②', jpProof2ExamType:'ဂျပန်စာ စာမေးပွဲအမျိုးအစား', jpProof2Place:'စာမေးပွဲကျင်းပရာ',
     jpProof2Job:'အလုပ်အကိုင်', jpProof2Task:'တာဝန်', jpProof2Doc:'လက်မှတ်အမျိုးအစား',
     hasFamily:'ဂျပန်တွင် မိသားစုရှိပါသလား？',
-    familyRelation:'ဆက်ဆံရေး', familyResidenceCard:'မိသားစုဝင် နေထိုင်ခွင့်ကတ်နံပါတ်',
+    familyName:'အမည်အပြည့်အစုံ', familyRelation:'ဆက်ဆံရေး', familyResidenceCard:'မိသားစုဝင် နေထိုင်ခွင့်ကတ်နံပါတ်',
     familyWorkplace:'မိသားစုဝင် အလုပ်ခွင်', familyLiveTogether:'အတူနေထိုင်ပါသလား？',
     familyAddress:'မိသားစုဝင် လိပ်စာ',
     tenshutsuDate:'နေရပ်ပြောင်းရွှေ့ကြောင်း အကြောင်းကြားစာ တင်သွင်းမည့်ရက်',tenshutsuTitle:'/ နေရာပြောင်းရွှေ့မှု',tenshutsuNote:'※ ပြောင်းရွှေ့ရန် စီစဉ်ထားပါက သာ'
@@ -419,7 +419,7 @@ var TRANS = {
     jpProof2Type:'ភស្តុតាងភាសាជប៉ុន ②', jpProof2ExamType:'ប្រភេទការប្រឡងភាសាជប៉ុន', jpProof2Place:'ទីកន្លែងប្រឡង',
     jpProof2Job:'វិជ្ជាជីវៈ', jpProof2Task:'ការងារ', jpProof2Doc:'ប្រភេទវិញ្ញាបនប័ត្រ',
     hasFamily:'តើអ្នកមានក្រុមគ្រួសារនៅជប៉ុនទេ？',
-    familyRelation:'ទំនាក់ទំនង', familyResidenceCard:'លេខកាតស្នាក់នៅរបស់សមាជិកគ្រួសារ',
+    familyName:'ឈ្មោះពេញ', familyRelation:'ទំនាក់ទំនង', familyResidenceCard:'លេខកាតស្នាក់នៅរបស់សមាជិកគ្រួសារ',
     familyWorkplace:'កន្លែងធ្វើការរបស់សមាជិកគ្រួសារ', familyLiveTogether:'តើរស់នៅជាមួយគ្នាទេ？',
     familyAddress:'អាសយដ្ឋានរបស់សមាជិកគ្រួសារ',
     tenshutsuDate:'ថ្ងៃដាក់លិខិតជូនដំណឹងផ្លាស់ប្តូរអាសយដ្ឋាន',tenshutsuTitle:'/ ផ្លាស់ប្តូរអាសយដ្ឋាន',tenshutsuNote:'※ តែក្នុងករណីមានផែនការ引越しប៉ុណ្ណោះ'
@@ -454,7 +454,7 @@ var TRANS = {
     jpProof2Type:'जापानी भाषा प्रमाण ②', jpProof2ExamType:'जापानी परीक्षाको प्रकार', jpProof2Place:'परीक्षा स्थान',
     jpProof2Job:'पेशा', jpProof2Task:'काम', jpProof2Doc:'प्रमाणपत्रको प्रकार',
     hasFamily:'के तपाईंका परिवारजन जापानमा छन्？',
-    familyRelation:'नाता', familyResidenceCard:'परिवारको बसोबास कार्ड नम्बर',
+    familyName:'पूरा नाम', familyRelation:'नाता', familyResidenceCard:'परिवारको बसोबास कार्ड नम्बर',
     familyWorkplace:'परिवारको कार्यस्थल', familyLiveTogether:'के सँगै बस्नुहुन्छ？',
     familyAddress:'परिवारको ठेगाना',
     tenshutsuDate:'ठेगाना परिवर्तन सूचना दिने मिति',tenshutsuTitle:'/ ठेगाना परिवर्तन',tenshutsuNote:'※ सर्ने योजना भएमा मात्र'
@@ -489,7 +489,7 @@ var TRANS = {
     jpProof2Type:'日语能力证明②', jpProof2ExamType:'日语考试类型', jpProof2Place:'考试地点',
     jpProof2Job:'职种', jpProof2Task:'作业', jpProof2Doc:'证明书类型',
     hasFamily:'在日本是否有家属？',
-    familyRelation:'关系', familyResidenceCard:'家属居留卡号码',
+    familyName:'姓名', familyRelation:'关系', familyResidenceCard:'家属居留卡号码',
     familyWorkplace:'家属工作单位', familyLiveTogether:'是否同住？',
     familyAddress:'家属地址',
     tenshutsuDate:'迁出申报日期',tenshutsuTitle:'/ 迁出申报',tenshutsuNote:'※ 仅在有搬家计划时填写'
@@ -3278,7 +3278,10 @@ function familyMemberRow(idx) {
   if (idx > 1) h += '<button type="button" onclick="removeFamilyMember(' + idx + ')" style="font-size:11px;padding:2px 8px;background:white;border:1px solid #fca5a5;border-radius:4px;color:#dc2626;cursor:pointer;">削除</button>';
   h += '</div>';
   h += '<div class="grid2">';
+  h += '<div class="field"><label>氏名（しめい） / Full Name<div class="trans" data-key="familyName"></div></label><input type="text" id="f-family' + idx + 'Name" placeholder="例: NGUYEN VAN A"></div>';
   h += '<div class="field"><label>続柄（つづきがら） / Relation<div class="trans" data-key="familyRelation"></div></label><input type="text" id="f-family' + idx + 'Relation" placeholder="例: 配偶者 / Spouse"></div>';
+  h += '</div>';
+  h += '<div class="grid2">';
   h += '<div class="field"><label>家族の在留カード番号（かぞくのざいりゅうカードばんごう）<div class="trans" data-key="familyResidenceCard"></div></label><input type="text" id="f-family' + idx + 'ResidenceCard" placeholder="例: AB12345678CD"></div>';
   h += '</div>';
   h += '<div class="field"><label>家族が働いている会社（かぞくがはたらいているかいしゃ）<div class="trans" data-key="familyWorkplace"></div></label><input type="text" id="f-family' + idx + 'Workplace" placeholder="例: 株式会社〇〇"></div>';
@@ -3799,6 +3802,7 @@ function collectData() {
     document.querySelectorAll('#familyMembersContainer [data-fidx]').forEach(function(row) {
       var i = row.getAttribute('data-fidx');
       var member = {
+        name:          val('f-family' + i + 'Name'),
         relation:      val('f-family' + i + 'Relation'),
         residenceCard: val('f-family' + i + 'ResidenceCard'),
         workplace:     val('f-family' + i + 'Workplace'),
