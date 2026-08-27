@@ -191,7 +191,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20260827.01';
+var FORM_VERSION = 'ver.20260827.02';
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -3526,9 +3526,9 @@ function collectData() {
       d.t2Confirm = (document.getElementById('f-t2Confirm') && document.getElementById('f-t2Confirm').checked) ? 'confirmed' : '';
       var _t2targets = [];
       document.querySelectorAll('#t2TargetContainer .t2-target-row').forEach(function(row){
-        var i = row.id.replace('t2TargetRow','');
-        var nm = val('f-t2tgt'+i+'_name'), cd = val('f-t2tgt'+i+'_card'), dp = val('f-t2tgt'+i+'_dept'), po = val('f-t2tgt'+i+'_position'), jb = val('f-t2tgt'+i+'_job');
-        if (nm||cd||dp||po||jb) _t2targets.push({name:nm, card:cd, dept:dp, position:po, job:jb});
+        var g=function(sfx){ var el=row.querySelector('[data-fld="'+sfx+'"]'); return el?(el.value||'').trim():''; };
+        var nm=g('name'), cd=g('card'), dp=g('dept'), po=g('position'), jb=g('job');
+        if (nm||cd||dp||po||jb) _t2targets.push({name:nm, card:cd, dept:dp, position:po, job:jb, group:(row.dataset.group||''), person:(row.dataset.person||'')});
       });
       d.t2Targets = _t2targets;
     }
@@ -3981,9 +3981,9 @@ function validate() {
     var _t2rows = document.querySelectorAll('#t2TargetContainer .t2-target-row');
     var _filled = 0;
     _t2rows.forEach(function(row){
-      var i = row.id.replace('t2TargetRow','');
-      var nm = val('f-t2tgt'+i+'_name');
-      if (nm && nm.trim() !== '') _filled++;
+      var el = row.querySelector('[data-fld="name"]');
+      var nm = el ? (el.value||'').trim() : '';
+      if (nm !== '') _filled++;
     });
     if (_need > 0 && _filled < _need) {
       return '指導を受ける対象者を' + _need + '名以上ご入力ください（２号' + _total + '名×' + _t2per + '名／人）。氏名が必要です。他の2号特定技能外国人と重複しない方を選定してください。';
