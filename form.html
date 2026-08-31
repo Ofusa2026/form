@@ -191,7 +191,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20260827.02';
+var FORM_VERSION = 'ver.20260827.03';
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -3995,6 +3995,10 @@ function validate() {
         return '「' + _need + '名以上を選定し、重複がないことを確認しました」のチェックを入れてください。';
       }
     }
+    // ver.20260831: 誓約書単独フォーム(tokutei2_pledge)は氏名/会社名フィールドを持たない。
+    //   誓約書チェックを通過したらここで完了させ、下の f-name 必須チェックに落ちて
+    //   「氏名（パスポート表記）は必須です」で送信不能になるバグを修正。
+    if (type === 'tokutei2_pledge') return null;
   }
     if (type === 'company' || type === 'company_tokutei2' || type === 'company_gijinkoku' || type === 'company_designated46' || type === 'company_designated9') {
     if (!val('f-coName')) return '会社名は必須です。';
