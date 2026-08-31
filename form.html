@@ -191,7 +191,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20260827.03';
+var FORM_VERSION = 'ver.20260827.04';
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -4163,7 +4163,7 @@ async function submitForm() {
   // 🛡️ 必須項目チェック（申請人フォームのみ）: 氏名・生年月日・国籍・メールが揃っていることを確認
   // ver: company/jaim に加え support_org（登録支援機関）・card_delivery（在留カード送付先）も除外。
   //      これらは applicantNameEn 等を持たないため、除外しないと送信が必ず弾かれる。
-  if (type !== 'company' && type !== 'company_gijinkoku' && type !== 'company_designated46' && type !== 'company_designated9' && type !== 'jaim' && type !== 'support_org' && type !== 'card_delivery') {
+  if (type !== 'company' && type !== 'company_tokutei2' && type !== 'tokutei2_pledge' && type !== 'company_gijinkoku' && type !== 'company_designated46' && type !== 'company_designated9' && type !== 'jaim' && type !== 'support_org' && type !== 'card_delivery') {
     var requiredKeys = ['applicantNameEn', 'birthdate', 'nationality', 'email'];
     var missingKeys = requiredKeys.filter(function(k){
       return !response[k] || String(response[k]).trim() === '';
