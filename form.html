@@ -191,7 +191,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20260831.01';
+var FORM_VERSION = 'ver.20260902.01';
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -4705,6 +4705,53 @@ function prefillForm(resp) {
       }
     }
   } catch(e) { console.error('gijutsu restore error (ignored):', e); }
+
+  // ver.20260902.28: 特定技能2号 誓約書フォーム（tokutei2_pledge / company_tokutei2）の入力復元
+  try {
+    if (type === 'tokutei2_pledge' || type === 'company_tokutei2') {
+      var _t2set = function(id, v){ var el=document.getElementById(id); if(el && v!=null && v!=='') el.value = v; };
+      _t2set('f-t2Field', resp.t2Field);
+      _t2set('f-t2CountNow', resp.t2CountNow);
+      _t2set('f-t2CountThis', resp.t2CountThis);
+      // 分野・採用人数から「2号ごとの氏名＋指導対象者枠」を同期生成
+      if (typeof recalcT2Targets === 'function') recalcT2Targets();
+      // 2号ごとの氏名
+      (resp.t2NamesNow||[]).forEach(function(nm, i){ _t2set('f-t2NameNow_'+(i+1), nm); });
+      (resp.t2NamesThis||[]).forEach(function(nm, i){ _t2set('f-t2NameThis_'+(i+1), nm); });
+      // 指導対象者を各行へ流し込み
+      var _rows = document.querySelectorAll('#t2TargetContainer .t2-target-row');
+      var _tgts = resp.t2Targets || [];
+      var _fillRow = function(row, tg){
+        ['name','card','dept','position','job'].forEach(function(sfx){
+          var el = row.querySelector('[data-fld="'+sfx+'"]');
+          if (el && tg[sfx] != null) el.value = tg[sfx];
+        });
+      };
+      var _hasKey = _tgts.some(function(t){ return t && (t.group || t.person); });
+      if (_hasKey) {
+        // group|person で対応付け（同一人物の複数対象者は順に）
+        var _byKey = {};
+        _tgts.forEach(function(tg){ var k=(tg.group||'')+'|'+(tg.person||''); (_byKey[k]=_byKey[k]||[]).push(tg); });
+        var _ptr = {};
+        _rows.forEach(function(row){
+          var k=(row.dataset.group||'')+'|'+(row.dataset.person||'');
+          var arr=_byKey[k]; if(!arr) return;
+          var idx=_ptr[k]||0; if(idx>=arr.length) return;
+          _ptr[k]=idx+1; _fillRow(row, arr[idx]);
+        });
+      } else {
+        // 旧データ（group情報なし）はDOM順で流す
+        _rows.forEach(function(row, i){ if(_tgts[i]) _fillRow(row, _tgts[i]); });
+      }
+      // スカラー項目
+      _t2set('f-t2Dept', resp.t2Dept);
+      _t2set('f-t2Position', resp.t2Position);
+      _t2set('f-t2JobDetail', resp.t2JobDetail);
+      _t2set('f-t2JobDiff', resp.t2JobDiff);
+      var _t2cf = document.getElementById('f-t2Confirm');
+      if (_t2cf && resp.t2Confirm === 'confirmed') _t2cf.checked = true;
+    }
+  } catch(e) { console.error('t2 pledge prefill error (ignored):', e); }
 }
 </script>
 </body>
