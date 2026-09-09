@@ -126,7 +126,7 @@
     <span class="company" id="companyBadge">（企業名は URL から自動表示）</span>
     <h1>申請依頼フォーム</h1>
     <p class="lead">内容をご入力ください。申請種別に応じて請求金額が自動計算されます。</p>
-    <p style="font-size:11px;color:var(--muted);margin:4px 0 0" id="ver">ver.20260909.01</p>
+    <p style="font-size:11px;color:var(--muted);margin:4px 0 0" id="ver">ver.20260909.02</p>
   </header>
 
   <!-- 1. 採用される会社（所属機関） -->
@@ -165,10 +165,10 @@
 
   <!-- 3. 人材（複数可） -->
   <section class="card">
-    <div class="sec-head"><span class="sec-num">3</span><h2>人材</h2>
+    <div class="sec-head"><span class="sec-num">3</span><h2>申請人</h2>
       <span class="opt">（複数登録できます）</span></div>
     <div id="people"></div>
-    <button type="button" class="addbtn" id="addPerson">＋ 人材を追加</button>
+    <button type="button" class="addbtn" id="addPerson">＋ 申請人を追加</button>
   </section>
 
   <!-- 4. 請求書送付先 -->
@@ -183,14 +183,14 @@
   <!-- 5. 請求金額 -->
   <section class="card">
     <div class="sec-head"><span class="sec-num">5</span><h2>請求金額</h2></div>
-    <p style="font-size:13px; color:var(--muted); margin:0 0 8px">単価（税抜）</p>
+    <p style="font-size:13px; color:var(--muted); margin:0 0 8px">単価</p>
     <table class="rate">
       <thead><tr><th>在留資格</th><th>申請種別</th><th style="text-align:right">単価</th></tr></thead>
       <tbody>
-        <tr><td>技人国</td><td>認定</td><td class="price">50,000円</td></tr>
-        <tr><td>技人国</td><td>変更</td><td class="price">50,000円</td></tr>
-        <tr><td>技人国</td><td>更新（転職有）</td><td class="price">50,000円</td></tr>
-        <tr><td>技人国</td><td>更新（転職無）</td><td class="price">30,000円</td></tr>
+        <tr><td>技人国</td><td>在留資格認定証明書交付申請</td><td class="price">50,000円</td></tr>
+        <tr><td>技人国</td><td>在留資格変更申請</td><td class="price">50,000円</td></tr>
+        <tr><td>技人国</td><td>在留期間更新許可申請（転職有）</td><td class="price">50,000円</td></tr>
+        <tr><td>技人国</td><td>在留期間更新許可申請（転職無）</td><td class="price">30,000円</td></tr>
       </tbody>
     </table>
 
@@ -198,8 +198,9 @@
       <div>
         <div class="label">合計金額（<span id="cnt">0</span>名）</div>
       </div>
-      <div class="amt">¥<span id="total">0</span><small>（税抜）</small></div>
+      <div class="amt">¥<span id="total">0</span></div>
     </div>
+    <p style="font-size:12px; color:var(--muted); margin:10px 0 0">※ 発行手数料、収入印紙代をご負担いただきます。</p>
 
     <div class="confirm-amt">
       <div class="check">
@@ -259,9 +260,9 @@
     div.className = "person";
     div.dataset.id = idx;
     div.innerHTML = `
-      <div class="ptitle">人材 #${idx}</div>
+      <div class="ptitle">申請人 #${idx}</div>
       <button type="button" class="remove">削除</button>
-      <label class="f"><span>人材名<span class="req">*</span></span>
+      <label class="f"><span>申請人名<span class="req">*</span></span>
         <input type="text" class="p-name" placeholder="氏名"></label>
       <div class="grid2">
         <label class="f"><span>在留資格</span>
@@ -271,9 +272,9 @@
         <label class="f"><span>申請種別<span class="req">*</span></span>
           <select class="p-type">
             <option value="">選択してください</option>
-            <option value="認定">認定</option>
-            <option value="変更">変更</option>
-            <option value="更新">更新</option>
+            <option value="認定">在留資格認定証明書交付申請</option>
+            <option value="変更">在留資格変更申請</option>
+            <option value="更新">在留期間更新許可申請</option>
           </select></label>
       </div>
       <div class="transfer">
@@ -285,7 +286,7 @@
       </div>
       <div class="grid2">
         <label class="f"><span>メールアドレス<span class="req">*</span></span><input type="email" class="p-email"></label>
-        <label class="f"><span>電話番号<span class="req">*</span></span><input type="tel" class="p-tel"></label>
+        <label class="f"><span>電話番号<span style="color:var(--muted);font-weight:400">（任意）</span></span><input type="tel" class="p-tel optional"></label>
       </div>
       <div class="subtotal">小計：<b class="p-sub">¥0</b></div>
     `;
@@ -333,6 +334,7 @@
     // 表示中のすべての入力・選択を必須チェック（＝全項目必須）
     document.querySelectorAll(".card input[type=text], .card input[type=email], .card input[type=tel], .card select").forEach(el=>{
       if(el.offsetParent === null) return;      // 非表示（派遣先OFF等）はスキップ
+      if(el.classList.contains("optional")) return; // 任意項目はスキップ
       if(!el.value.trim()) ok = false;
     });
     // 更新の転職有無（表示中のみ、いずれか選択必須）
