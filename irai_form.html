@@ -89,7 +89,12 @@
   table.rate{width:100%; border-collapse:collapse; font-size:13px; margin-top:4px}
   table.rate th, table.rate td{border:1px solid var(--line); padding:7px 9px; text-align:left}
   table.rate th{background:#f3f4f6; font-weight:600}
-  table.rate td.price{text-align:right; font-variant-numeric:tabular-nums}
+  table.rate td.price, table.rate td.rcnt, table.rate td.ramt{text-align:right; font-variant-numeric:tabular-nums}
+  .firm{margin-top:28px; padding:16px; border-top:1px solid var(--line); text-align:center; color:var(--muted)}
+  .firm-t{font-size:12px; letter-spacing:.1em}
+  .firm-n{font-size:15px; font-weight:700; color:var(--ink); margin-top:4px}
+  .firm-c{font-size:13px; margin-top:4px}
+  .firm-c a{color:var(--accent); text-decoration:none}
 
   /* 合計 */
   .total-card{
@@ -129,7 +134,7 @@
     <span class="company" id="companyBadge">（企業名は URL から自動表示）</span>
     <h1>申請依頼フォーム</h1>
     <p class="lead">内容をご入力ください。申請種別に応じて請求金額が自動計算されます。</p>
-    <p style="font-size:11px;color:var(--muted);margin:4px 0 0" id="ver">ver.20260909.03</p>
+    <p style="font-size:11px;color:var(--muted);margin:4px 0 0" id="ver">ver.20260909.04</p>
   </header>
 
   <!-- 1. 採用される会社（所属機関） -->
@@ -188,22 +193,26 @@
     <div class="sec-head"><span class="sec-num">5</span><h2>請求金額</h2></div>
     <p style="font-size:13px; color:var(--muted); margin:0 0 8px">単価</p>
     <table class="rate">
-      <thead><tr><th>在留資格</th><th>申請種別</th><th style="text-align:right">単価</th></tr></thead>
+      <thead><tr><th>在留資格</th><th>申請種別</th><th style="text-align:right">単価</th><th style="text-align:right">人数</th><th style="text-align:right">金額</th></tr></thead>
       <tbody>
-        <tr><td>技術・人文知識・国際業務</td><td>在留資格認定証明書交付申請</td><td class="price">50,000円</td></tr>
-        <tr><td>技術・人文知識・国際業務</td><td>在留資格変更申請</td><td class="price">50,000円</td></tr>
-        <tr><td>技術・人文知識・国際業務</td><td>在留期間更新許可申請（転職有）</td><td class="price">50,000円</td></tr>
-        <tr><td>技術・人文知識・国際業務</td><td>在留期間更新許可申請（転職無）</td><td class="price">30,000円</td></tr>
+        <tr data-type="認定"><td>技術・人文知識・国際業務</td><td>在留資格認定証明書交付申請</td><td class="price">50,000円</td><td class="rcnt">0名</td><td class="ramt">¥0</td></tr>
+        <tr data-type="変更"><td>技術・人文知識・国際業務</td><td>在留資格変更申請</td><td class="price">50,000円</td><td class="rcnt">0名</td><td class="ramt">¥0</td></tr>
+        <tr data-type="更新_転職有"><td>技術・人文知識・国際業務</td><td>在留期間更新許可申請（転職有）</td><td class="price">50,000円</td><td class="rcnt">0名</td><td class="ramt">¥0</td></tr>
+        <tr data-type="更新_転職無"><td>技術・人文知識・国際業務</td><td>在留期間更新許可申請（転職無）</td><td class="price">30,000円</td><td class="rcnt">0名</td><td class="ramt">¥0</td></tr>
       </tbody>
     </table>
 
     <div class="total-card">
       <div>
-        <div class="label">合計金額（<span id="cnt">0</span>名）</div>
+        <div class="label">合計金額（<span id="cnt">0</span>名・税抜）</div>
       </div>
       <div class="amt">¥<span id="total">0</span></div>
     </div>
-    <p style="font-size:12px; color:var(--muted); margin:10px 0 0">※ 発行手数料、収入印紙代をご負担いただきます。</p>
+    <p style="font-size:12px; color:var(--muted); margin:10px 0 0; line-height:1.7">
+      ※ 表示金額はすべて税抜です。<br>
+      ※ 発行手数料、収入印紙代をご負担いただきます。<br>
+      ※ お支払いに関しては、着手月末請求／翌月支払いとなります。
+    </p>
 
     <div class="confirm-amt">
       <div class="check">
@@ -224,7 +233,12 @@
   </div>
 
   <button type="button" class="submit" id="submitBtn" disabled>依頼を送信する</button>
-  <p class="note">※ これはデザイン確認用のプロトタイプです。送信は行われません。</p>
+
+  <div class="firm">
+    <div class="firm-t">弊社担当先</div>
+    <div class="firm-n">大房行政書士法人</div>
+    <div class="firm-c"><a href="tel:0364248849">03-6424-8849</a>　担当：中林／町田／宮澤</div>
+  </div>
 
 </div>
 
@@ -308,6 +322,13 @@
     persons.forEach(p=>{ const v=priceOf(p); if(v) total+=v; });
     document.getElementById("total").textContent = total.toLocaleString();
     document.getElementById("cnt").textContent = persons.length;
+    const counts = {"認定":0,"変更":0,"更新_転職有":0,"更新_転職無":0};
+    persons.forEach(p=>{ const t=p.querySelector(".p-type").value; if(t in counts) counts[t]++; });
+    document.querySelectorAll("table.rate tr[data-type]").forEach(row=>{
+      const t=row.dataset.type, price=RATES["技人国"][t], n=counts[t]||0;
+      row.querySelector(".rcnt").textContent = n+"名";
+      row.querySelector(".ramt").textContent = "¥"+(price*n).toLocaleString();
+    });
     validate();
   }
 
@@ -331,7 +352,7 @@
   document.getElementById("addPerson").addEventListener("click", personRow);
 
   document.getElementById("submitBtn").addEventListener("click", ()=>{
-    alert("プロトタイプのため送信はされません。\n（本番では保存先テーブルへ登録する想定）");
+    alert("送信機能は現在準備中です。\nお手数ですが、記載の弊社担当先までご連絡ください。");
   });
 
   personRow(); // 初期1名
