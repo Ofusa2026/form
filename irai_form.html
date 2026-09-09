@@ -148,7 +148,7 @@
     <span class="company" id="companyBadge">（企業名は URL から自動表示）</span>
     <h1>申請依頼フォーム</h1>
     <p class="lead">内容をご入力ください。申請種別に応じて請求金額が自動計算されます。</p>
-    <p style="font-size:11px;color:var(--muted);margin:4px 0 0" id="ver">ver.20260909.08</p>
+    <p style="font-size:11px;color:var(--muted);margin:4px 0 0" id="ver">ver.20260909.09</p>
   </header>
 
   <!-- 1. 採用される会社（所属機関） -->
@@ -158,12 +158,12 @@
       <input type="text" id="orgName" placeholder="株式会社〇〇"></label>
     <div class="grid2">
       <label class="f"><span>担当者名<span class="req">*</span></span>
-        <input type="text" placeholder="山田 太郎"></label>
+        <input type="text" class="co-contact" placeholder="山田 太郎"></label>
       <label class="f"><span>電話番号<span class="req">*</span></span>
-        <input type="tel" placeholder="03-0000-0000"></label>
+        <input type="tel" class="co-tel" placeholder="03-0000-0000"></label>
     </div>
     <label class="f"><span>メールアドレス<span class="req">*</span></span>
-      <input type="email" placeholder="tantou@example.com"></label>
+      <input type="email" class="co-email" placeholder="tantou@example.com"></label>
   </section>
 
   <!-- 2. 派遣先（任意） -->
@@ -197,9 +197,9 @@
   <section class="card">
     <div class="sec-head"><span class="sec-num">4</span><h2>請求書送付先</h2></div>
     <label class="f"><span>送付先（宛名・部署など）<span class="req">*</span></span>
-      <input type="text" placeholder="株式会社〇〇 経理部 御中"></label>
+      <input type="text" class="inv-to" placeholder="株式会社〇〇 経理部 御中"></label>
     <label class="f"><span>メールアドレス<span class="req">*</span></span>
-      <input type="email" placeholder="keiri@example.com"></label>
+      <input type="email" class="inv-email" placeholder="keiri@example.com"></label>
     <p style="font-size:12px; color:var(--muted); margin:10px 0 0">※ 手続きのご連絡は、所属機関のメールを TO、各申請人のメールを CC としてお送りします。</p>
   </section>
 
@@ -465,8 +465,51 @@
   document.addEventListener("change", validate);
   document.getElementById("addPerson").addEventListener("click", personRow);
 
-  document.getElementById("submitBtn").addEventListener("click", ()=>{
-    alert("送信機能は現在準備中です。\nお手数ですが、記載の弊社担当先までご連絡ください。");
+  const FN_URL = "https://ehwlgbwpycglmopiqyty.supabase.co/functions/v1/intake-submit";
+  const APP_LABEL = {"認定":"在留資格認定証明書交付申請","変更":"在留資格変更申請","更新_転職有":"在留期間更新許可申請（転職有）","更新_転職無":"在留期間更新許可申請（転職無）"};
+  document.getElementById("submitBtn").addEventListener("click", async ()=>{
+    const btn = document.getElementById("submitBtn");
+    const applicants = [...peopleEl.querySelectorAll(".person")].map(p=>({
+      name: p.querySelector(".p-name").value.trim(),
+      nationality: p.querySelector(".p-nat").value.trim(),
+      appType: p.querySelector(".p-type").value,
+      appTypeLabel: APP_LABEL[p.querySelector(".p-type").value] || "",
+      expiry: p.querySelector(".p-expiry") ? p.querySelector(".p-expiry").value : "",
+      email: p.querySelector(".p-email").value.trim(),
+      tel: p.querySelector(".p-tel").value.trim()
+    }));
+    const ckAll = [...document.querySelectorAll(".ck")].filter(c=>!c.disabled);
+    const ckDone = ckAll.filter(c=>c.checked).length;
+    const payload = {
+      company: {
+        name: document.getElementById("orgName").value.trim(),
+        contact: (document.querySelector(".co-contact")||{}).value?.trim() || "",
+        tel: (document.querySelector(".co-tel")||{}).value?.trim() || "",
+        email: (document.querySelector(".co-email")||{}).value?.trim() || ""
+      },
+      invoice: {
+        to: (document.querySelector(".inv-to")||{}).value?.trim() || "",
+        email: (document.querySelector(".inv-email")||{}).value?.trim() || ""
+      },
+      applicants: applicants,
+      totalYen: parseInt((document.getElementById("total").textContent||"0").replace(/[^0-9]/g,"")) || 0,
+      checklist: ckDone + "/" + ckAll.length + "項目 確認済み"
+    };
+    const orig = btn.textContent;
+    btn.disabled = true; btn.textContent = "送信中…";
+    try {
+      const r = await fetch(FN_URL, { method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify(payload) });
+      const j = await r.json().catch(()=>({ok:r.ok}));
+      if (j && j.ok) {
+        btn.textContent = "送信しました";
+        alert("送信しました。担当者よりご連絡いたします。");
+      } else {
+        throw new Error((j && j.error) || ("HTTP "+r.status));
+      }
+    } catch (e) {
+      alert("送信に失敗しました。お手数ですが、記載の弊社担当先までご連絡ください。");
+      btn.disabled = false; btn.textContent = orig;
+    }
   });
 
   // チェックリスト：開閉トグル
