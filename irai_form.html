@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>申請依頼フォーム（プロトタイプ）</title>
+<style>
+  :root{
+    --ink:#1f2933; --muted:#6b7280; --line:#e2e5ea; --bg:#f6f7f9;
+    --card:#ffffff; --accent:#0f766e; --accent-soft:#e6f2f0;
+    --warn:#b45309; --warn-soft:#fef4e6; --warn-line:#f2c78a;
+    --radius:10px;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:"Hiragino Kaku Gothic ProN","Noto Sans JP",system-ui,-apple-system,sans-serif;
+    line-height:1.6; font-size:15px;
+  }
+  .wrap{max-width:720px; margin:0 auto; padding:24px 16px 96px}
+  header.top{padding:20px 0 8px}
+  header.top .company{
+    display:inline-block; background:var(--accent-soft); color:var(--accent);
+    font-weight:700; padding:4px 12px; border-radius:999px; font-size:13px;
+  }
+  header.top h1{font-size:20px; margin:12px 0 4px; letter-spacing:.02em}
+  header.top p.lead{color:var(--muted); font-size:13px; margin:0}
+
+  section.card{
+    background:var(--card); border:1px solid var(--line); border-radius:var(--radius);
+    padding:18px 18px 20px; margin-top:16px;
+  }
+  .sec-head{display:flex; align-items:baseline; gap:10px; margin:0 0 14px}
+  .sec-num{
+    flex:0 0 auto; width:24px; height:24px; border-radius:6px;
+    background:var(--ink); color:#fff; font-size:13px; font-weight:700;
+    display:grid; place-items:center;
+  }
+  .sec-head h2{font-size:16px; margin:0}
+  .sec-head .opt{color:var(--muted); font-size:12px; font-weight:400}
+
+  label.f{display:block; margin:10px 0 0}
+  label.f > span{display:block; font-size:13px; color:var(--muted); margin-bottom:4px}
+  label.f .req{color:#dc2626; margin-left:4px}
+  input[type=text], input[type=email], input[type=tel], select{
+    width:100%; padding:9px 10px; border:1px solid var(--line); border-radius:8px;
+    font-size:15px; font-family:inherit; background:#fff; color:var(--ink);
+  }
+  input:focus, select:focus{outline:2px solid var(--accent-soft); border-color:var(--accent)}
+  .grid2{display:grid; grid-template-columns:1fr 1fr; gap:12px}
+  @media(max-width:520px){.grid2{grid-template-columns:1fr}}
+
+  .toggle-row{display:flex; align-items:center; gap:8px; margin-top:2px}
+  .toggle-row input{width:auto}
+
+  /* 人材カード */
+  .person{
+    border:1px solid var(--line); border-radius:10px; padding:14px; margin-top:12px;
+    background:#fafbfc; position:relative;
+  }
+  .person .ptitle{font-size:13px; font-weight:700; color:var(--accent)}
+  .person .remove{
+    position:absolute; top:10px; right:10px; border:1px solid var(--line);
+    background:#fff; color:var(--muted); border-radius:6px; padding:3px 8px;
+    font-size:12px; cursor:pointer;
+  }
+  .person .remove:hover{color:#dc2626; border-color:#f2b8b8}
+  .subtotal{
+    margin-top:10px; text-align:right; font-size:13px; color:var(--muted);
+  }
+  .subtotal b{color:var(--ink); font-size:15px}
+  .transfer{display:none; margin-top:10px; padding:10px; background:#fff;
+    border:1px dashed var(--line); border-radius:8px}
+  .transfer.show{display:block}
+  .radio-row{display:flex; gap:16px; margin-top:4px}
+  .radio-row label{display:flex; align-items:center; gap:6px; font-size:14px; margin:0}
+  .radio-row input{width:auto}
+
+  .addbtn{
+    margin-top:12px; width:100%; padding:10px; border:1px dashed var(--accent);
+    background:var(--accent-soft); color:var(--accent); border-radius:8px;
+    font-weight:700; font-size:14px; cursor:pointer;
+  }
+
+  /* 単価表 */
+  table.rate{width:100%; border-collapse:collapse; font-size:13px; margin-top:4px}
+  table.rate th, table.rate td{border:1px solid var(--line); padding:7px 9px; text-align:left}
+  table.rate th{background:#f3f4f6; font-weight:600}
+  table.rate td.price{text-align:right; font-variant-numeric:tabular-nums}
+
+  /* 合計 */
+  .total-card{
+    background:var(--ink); color:#fff; border-radius:var(--radius);
+    padding:18px; margin-top:16px; display:flex; align-items:center; justify-content:space-between;
+  }
+  .total-card .label{font-size:13px; opacity:.8}
+  .total-card .amt{font-size:26px; font-weight:800; font-variant-numeric:tabular-nums}
+  .total-card .amt small{font-size:14px; font-weight:600; margin-left:2px; opacity:.85}
+
+  /* 虚偽防止・確認 */
+  .attest{
+    margin-top:16px; background:var(--warn-soft); border:1px solid var(--warn-line);
+    border-radius:var(--radius); padding:16px;
+  }
+  .attest h3{margin:0 0 8px; font-size:14px; color:var(--warn)}
+  .attest p{margin:0 0 10px; font-size:13px; color:#7c4a06}
+  .check{display:flex; gap:10px; align-items:flex-start; margin-top:10px}
+  .check input{width:18px; height:18px; margin-top:2px; flex:0 0 auto}
+  .check span{font-size:14px}
+
+  .confirm-amt{margin-top:14px; padding:12px; border:1px solid var(--line);
+    border-radius:8px; background:#fff}
+
+  .submit{
+    margin-top:20px; width:100%; padding:14px; border:none; border-radius:10px;
+    background:var(--accent); color:#fff; font-size:16px; font-weight:700; cursor:pointer;
+  }
+  .submit:disabled{background:#9ca3af; cursor:not-allowed}
+  .note{font-size:12px; color:var(--muted); margin-top:8px; text-align:center}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <span class="company" id="companyBadge">（企業名は URL から自動表示）</span>
+    <h1>申請依頼フォーム</h1>
+    <p class="lead">内容をご入力ください。申請種別に応じて請求金額が自動計算されます。</p>
+    <p style="font-size:11px;color:var(--muted);margin:4px 0 0" id="ver">ver.20260909.01</p>
+  </header>
+
+  <!-- 1. 採用される会社（所属機関） -->
+  <section class="card">
+    <div class="sec-head"><span class="sec-num">1</span><h2>採用される会社（所属機関）</h2></div>
+    <label class="f"><span>所属機関名<span class="req">*</span></span>
+      <input type="text" id="orgName" placeholder="株式会社〇〇"></label>
+    <div class="grid2">
+      <label class="f"><span>担当者名<span class="req">*</span></span>
+        <input type="text" placeholder="山田 太郎"></label>
+      <label class="f"><span>電話番号<span class="req">*</span></span>
+        <input type="tel" placeholder="03-0000-0000"></label>
+    </div>
+    <label class="f"><span>メールアドレス<span class="req">*</span></span>
+      <input type="email" placeholder="tantou@example.com"></label>
+  </section>
+
+  <!-- 2. 派遣先（任意） -->
+  <section class="card">
+    <div class="sec-head"><span class="sec-num">2</span><h2>派遣先</h2>
+      <span class="opt">（ある場合のみ）</span></div>
+    <div class="toggle-row">
+      <input type="checkbox" id="hasDispatch">
+      <label for="hasDispatch" style="margin:0; font-size:14px">派遣先がある</label>
+    </div>
+    <div id="dispatchFields" style="display:none">
+      <label class="f"><span>派遣先名<span class="req">*</span></span>
+        <input type="text" placeholder="株式会社△△"></label>
+      <div class="grid2">
+        <label class="f"><span>担当者名<span class="req">*</span></span><input type="text"></label>
+        <label class="f"><span>電話番号<span class="req">*</span></span><input type="tel"></label>
+      </div>
+      <label class="f"><span>メールアドレス<span class="req">*</span></span><input type="email"></label>
+    </div>
+  </section>
+
+  <!-- 3. 人材（複数可） -->
+  <section class="card">
+    <div class="sec-head"><span class="sec-num">3</span><h2>人材</h2>
+      <span class="opt">（複数登録できます）</span></div>
+    <div id="people"></div>
+    <button type="button" class="addbtn" id="addPerson">＋ 人材を追加</button>
+  </section>
+
+  <!-- 4. 請求書送付先 -->
+  <section class="card">
+    <div class="sec-head"><span class="sec-num">4</span><h2>請求書送付先</h2></div>
+    <label class="f"><span>送付先（宛名・部署など）<span class="req">*</span></span>
+      <input type="text" placeholder="株式会社〇〇 経理部 御中"></label>
+    <label class="f"><span>メールアドレス<span class="req">*</span></span>
+      <input type="email" placeholder="keiri@example.com"></label>
+  </section>
+
+  <!-- 5. 請求金額 -->
+  <section class="card">
+    <div class="sec-head"><span class="sec-num">5</span><h2>請求金額</h2></div>
+    <p style="font-size:13px; color:var(--muted); margin:0 0 8px">単価（税抜）</p>
+    <table class="rate">
+      <thead><tr><th>在留資格</th><th>申請種別</th><th style="text-align:right">単価</th></tr></thead>
+      <tbody>
+        <tr><td>技人国</td><td>認定</td><td class="price">50,000円</td></tr>
+        <tr><td>技人国</td><td>変更</td><td class="price">50,000円</td></tr>
+        <tr><td>技人国</td><td>更新（転職有）</td><td class="price">50,000円</td></tr>
+        <tr><td>技人国</td><td>更新（転職無）</td><td class="price">30,000円</td></tr>
+      </tbody>
+    </table>
+
+    <div class="total-card">
+      <div>
+        <div class="label">合計金額（<span id="cnt">0</span>名）</div>
+      </div>
+      <div class="amt">¥<span id="total">0</span><small>（税抜）</small></div>
+    </div>
+
+    <div class="confirm-amt">
+      <div class="check">
+        <input type="checkbox" id="amtOk">
+        <span>上記の請求金額を確認しました</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 虚偽防止の確認 -->
+  <div class="attest">
+    <h3>ご確認のお願い</h3>
+    <p>本フォームは、実態のある雇用・業務についての申請依頼を受け付けるものです。虚偽の内容や、実態のない業務での申請依頼はできません。</p>
+    <div class="check">
+      <input type="checkbox" id="truthOk">
+      <span>記載内容に虚偽がなく、実態のある業務・雇用であることを確認しました。<span class="req">*</span></span>
+    </div>
+  </div>
+
+  <button type="button" class="submit" id="submitBtn" disabled>依頼を送信する</button>
+  <p class="note">※ これはデザイン確認用のプロトタイプです。送信は行われません。</p>
+
+</div>
+
+<script>
+  // 単価定義：在留資格 → 申請種別 → 金額
+  const RATES = {
+    "技人国": {
+      "認定": 50000,
+      "変更": 50000,
+      "更新_転職有": 50000,
+      "更新_転職無": 30000
+    }
+  };
+
+  // URLパラメータ ?company= で企業名表示（本番想定）
+  const params = new URLSearchParams(location.search);
+  const company = params.get("company");
+  if (company) {
+    document.getElementById("companyBadge").textContent = company + " 様";
+    const org = document.getElementById("orgName");
+    if (org && !org.value) org.value = company;
+  }
+
+  // 派遣先トグル
+  document.getElementById("hasDispatch").addEventListener("change", e=>{
+    document.getElementById("dispatchFields").style.display = e.target.checked ? "block":"none";
+  });
+
+  const peopleEl = document.getElementById("people");
+  let seq = 0;
+
+  function personRow(){
+    seq++;
+    const idx = seq;
+    const div = document.createElement("div");
+    div.className = "person";
+    div.dataset.id = idx;
+    div.innerHTML = `
+      <div class="ptitle">人材 #${idx}</div>
+      <button type="button" class="remove">削除</button>
+      <label class="f"><span>人材名<span class="req">*</span></span>
+        <input type="text" class="p-name" placeholder="氏名"></label>
+      <div class="grid2">
+        <label class="f"><span>在留資格</span>
+          <select class="p-status">
+            <option value="技人国">技人国</option>
+          </select></label>
+        <label class="f"><span>申請種別<span class="req">*</span></span>
+          <select class="p-type">
+            <option value="">選択してください</option>
+            <option value="認定">認定</option>
+            <option value="変更">変更</option>
+            <option value="更新">更新</option>
+          </select></label>
+      </div>
+      <div class="transfer">
+        <span style="font-size:13px; color:var(--muted)">転職の有無（更新のみ）<span class="req">*</span></span>
+        <div class="radio-row">
+          <label><input type="radio" name="tr-${idx}" class="p-transfer" value="有">転職 有</label>
+          <label><input type="radio" name="tr-${idx}" class="p-transfer" value="無">転職 無</label>
+        </div>
+      </div>
+      <div class="grid2">
+        <label class="f"><span>メールアドレス<span class="req">*</span></span><input type="email" class="p-email"></label>
+        <label class="f"><span>電話番号<span class="req">*</span></span><input type="tel" class="p-tel"></label>
+      </div>
+      <div class="subtotal">小計：<b class="p-sub">¥0</b></div>
+    `;
+    peopleEl.appendChild(div);
+
+    const typeSel = div.querySelector(".p-type");
+    const transferBox = div.querySelector(".transfer");
+    typeSel.addEventListener("change", ()=>{
+      transferBox.classList.toggle("show", typeSel.value === "更新");
+      recalc();
+    });
+    div.querySelectorAll(".p-transfer").forEach(r=>r.addEventListener("change", recalc));
+    div.querySelector(".remove").addEventListener("click", ()=>{ div.remove(); recalc(); });
+
+    recalc();
+  }
+
+  function priceOf(person){
+    const status = person.querySelector(".p-status").value;
+    const type = person.querySelector(".p-type").value;
+    if(!type || !RATES[status]) return null;
+    if(type === "更新"){
+      const tr = person.querySelector(".p-transfer:checked");
+      if(!tr) return null; // 転職有無 未選択
+      return RATES[status][tr.value === "有" ? "更新_転職有" : "更新_転職無"];
+    }
+    return RATES[status][type] ?? null;
+  }
+
+  function recalc(){
+    const persons = [...peopleEl.querySelectorAll(".person")];
+    let total = 0;
+    persons.forEach(p=>{
+      const price = priceOf(p);
+      p.querySelector(".p-sub").textContent = price==null ? "¥0" : "¥"+price.toLocaleString();
+    });
+    persons.forEach(p=>{ const v=priceOf(p); if(v) total+=v; });
+    document.getElementById("total").textContent = total.toLocaleString();
+    document.getElementById("cnt").textContent = persons.length;
+    validate();
+  }
+
+  function validate(){
+    let ok = true;
+    // 表示中のすべての入力・選択を必須チェック（＝全項目必須）
+    document.querySelectorAll(".card input[type=text], .card input[type=email], .card input[type=tel], .card select").forEach(el=>{
+      if(el.offsetParent === null) return;      // 非表示（派遣先OFF等）はスキップ
+      if(!el.value.trim()) ok = false;
+    });
+    // 更新の転職有無（表示中のみ、いずれか選択必須）
+    document.querySelectorAll(".transfer.show").forEach(box=>{
+      if(!box.querySelector(".p-transfer:checked")) ok = false;
+    });
+    // 人材は1名以上
+    if(peopleEl.querySelectorAll(".person").length === 0) ok = false;
+    // 確認チェック2つ（虚偽なし・金額）
+    if(!document.getElementById("truthOk").checked) ok = false;
+    if(!document.getElementById("amtOk").checked) ok = false;
+    document.getElementById("submitBtn").disabled = !ok;
+  }
+  document.addEventListener("input", validate);
+  document.addEventListener("change", validate);
+  document.getElementById("addPerson").addEventListener("click", personRow);
+
+  document.getElementById("submitBtn").addEventListener("click", ()=>{
+    alert("プロトタイプのため送信はされません。\n（本番では保存先テーブルへ登録する想定）");
+  });
+
+  personRow(); // 初期1名
+</script>
+</body>
+</html>
