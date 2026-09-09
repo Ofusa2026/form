@@ -115,6 +115,20 @@
   .check{display:flex; gap:10px; align-items:flex-start; margin-top:10px}
   .check input{width:18px; height:18px; margin-top:2px; flex:0 0 auto}
   .check span{font-size:14px}
+  /* チェックリスト（アコーディオン） */
+  .chk-item{border:1px solid var(--line); border-radius:8px; margin-top:10px; background:#fff; overflow:hidden}
+  .chk-item.done{border-color:var(--accent); background:var(--accent-soft)}
+  .chk-item.na{opacity:.5}
+  .chk-head{display:flex; align-items:center; gap:10px; padding:12px 14px}
+  .chk-head input.ck{width:20px; height:20px; flex:0 0 auto; margin:0; cursor:pointer}
+  .chk-title{flex:1; font-size:14px; font-weight:600; cursor:pointer; user-select:none}
+  .chk-toggle{flex:0 0 auto; width:28px; height:28px; border:1px solid var(--line);
+    background:#f6f7f9; border-radius:6px; font-size:16px; line-height:1; cursor:pointer; color:var(--muted)}
+  .chk-body{display:none; padding:2px 14px 12px 44px}
+  .chk-body.open{display:block}
+  .chk-body ul{margin:8px 0 0; padding-left:18px}
+  .chk-body li{font-size:13px; color:#374151; margin:6px 0; line-height:1.7}
+  .chk-na-note{font-size:12px; color:var(--muted); padding:0 14px 12px 44px}
 
   .confirm-amt{margin-top:14px; padding:12px; border:1px solid var(--line);
     border-radius:8px; background:#fff}
@@ -134,7 +148,7 @@
     <span class="company" id="companyBadge">（企業名は URL から自動表示）</span>
     <h1>申請依頼フォーム</h1>
     <p class="lead">内容をご入力ください。申請種別に応じて請求金額が自動計算されます。</p>
-    <p style="font-size:11px;color:var(--muted);margin:4px 0 0" id="ver">ver.20260909.04</p>
+    <p style="font-size:11px;color:var(--muted);margin:4px 0 0" id="ver">ver.20260909.05</p>
   </header>
 
   <!-- 1. 採用される会社（所属機関） -->
@@ -211,7 +225,7 @@
     <p style="font-size:12px; color:var(--muted); margin:10px 0 0; line-height:1.7">
       ※ 表示金額はすべて税抜です。<br>
       ※ 発行手数料、収入印紙代をご負担いただきます。<br>
-      ※ お支払いに関しては、着手月末請求／翌月支払いとなります。
+      ※ お支払いに関しては、着手時請求／7日以内入金となります。
     </p>
 
     <div class="confirm-amt">
@@ -222,15 +236,92 @@
     </div>
   </section>
 
-  <!-- 虚偽防止の確認 -->
-  <div class="attest">
-    <h3>ご確認のお願い</h3>
-    <p>本フォームは、実態のある雇用・業務についての申請依頼を受け付けるものです。虚偽の内容や、実態のない業務での申請依頼はできません。</p>
-    <div class="check">
-      <input type="checkbox" id="truthOk">
-      <span>記載内容に虚偽がなく、実態のある業務・雇用であることを確認しました。<span class="req">*</span></span>
-    </div>
-  </div>
+  <!-- 6. お申し込み前チェックリスト -->
+  <section class="card">
+    <div class="sec-head"><span class="sec-num">6</span><h2>お申し込み前チェックリスト</h2></div>
+    <p style="font-size:13px; color:var(--muted); margin:0 0 6px">各項目をご確認のうえ、チェックをお願いいたします（見出しをタップで詳細を開閉できます）。すべてのチェックで送信できます。</p>
+      <div class="chk-item" id="item-A">
+        <div class="chk-head">
+          <input type="checkbox" class="ck" id="ckA">
+          <span class="chk-title">A　反社会的勢力に該当しないこと</span>
+          <button type="button" class="chk-toggle" aria-label="開閉">＋</button>
+        </div>
+        <div class="chk-body"><ul><li>申請人および受入機関（雇用主）は、暴力団、暴力団員、暴力団準構成員、暴力団関係企業、総会屋、社会運動等標榜ゴロ、特殊知能暴力集団その他これらに準ずる者に該当しません</li><li>申請人および受入機関は、前記の者と社会的に非難されるべき関係を有していません</li><li>自らまたは第三者を利用して、当法人に対し暴力的な要求行為、法的責任を超えた不当な要求行為、脅迫的言動、風説の流布、偽計・威力による業務妨害を行いません</li></ul></div>
+        
+      </div>
+      <div class="chk-item" id="item-B">
+        <div class="chk-head">
+          <input type="checkbox" class="ck" id="ckB">
+          <span class="chk-title">B　申告内容が真実であること</span>
+          <button type="button" class="chk-toggle" aria-label="開閉">＋</button>
+        </div>
+        <div class="chk-body"><ul><li>お申し込みおよびヒアリングフォームに入力する内容は、すべて事実に相違ありません</li><li>提出する資料は、偽造・変造・改ざんされたものではなく、第三者が作成した資料を無断で流用したものでもありません</li><li>学歴（卒業証明書・成績証明書等）および職歴（在職証明書等）は、実際の経歴に基づく真正なものです</li><li>申請後に、申告内容と異なる事実が判明した場合または事情が変更した場合は、速やかに当法人へ申し出ます</li><li>当法人からの照会・確認に対し、誠実に回答します</li></ul></div>
+        
+      </div>
+      <div class="chk-item" id="item-C">
+        <div class="chk-head">
+          <input type="checkbox" class="ck" id="ckC">
+          <span class="chk-title">C　不法就労にあたらないこと</span>
+          <button type="button" class="chk-toggle" aria-label="開閉">＋</button>
+        </div>
+        <div class="chk-body"><ul><li>申請人は現在オーバーステイ（不法残留）の状態にはなく、在留期限内です</li><li>申請人は現在、資格外活動許可の範囲を超えた就労を行っていません</li><li>申請人には、退去強制歴、在留資格取消歴、上陸拒否事由に該当する事実はありません</li><li>在留資格に基づく許可を受ける前に、当該業務に就労させません</li><li>申請人が実際に就労する場所および指揮命令を行う者は、雇用主である受入機関と一致します（偽装請負・無許可派遣ではありません）</li><li>本件の依頼は、不法就労を助長する目的または不法滞在を継続させる目的によるものではありません</li></ul></div>
+        
+      </div>
+      <div class="chk-item" id="item-D">
+        <div class="chk-head">
+          <input type="checkbox" class="ck" id="ckD">
+          <span class="chk-title">D　申請の意思と権限があること</span>
+          <button type="button" class="chk-toggle" aria-label="開閉">＋</button>
+        </div>
+        <div class="chk-body"><ul><li>申請人本人は、本件申請を行う意思を有しており、当法人が申請取次を行うことに同意しています</li><li>お申し込みをする方は、申請人本人または受入機関の権限ある担当者であり、無断で申し込むものではありません</li><li>同一の申請について、他の行政書士・弁護士等に重複して依頼していません</li><li>当法人が作成する書類の内容を確認し、その内容に責任を持ちます</li><li>当法人が作成した書類を、本件申請以外の目的に使用しません</li></ul></div>
+        
+      </div>
+      <div class="chk-item" id="item-E">
+        <div class="chk-head">
+          <input type="checkbox" class="ck" id="ckE">
+          <span class="chk-title">E　技術・人文知識・国際業務に該当する業務であること</span>
+          <button type="button" class="chk-toggle" aria-label="開閉">＋</button>
+        </div>
+        <div class="chk-body"><ul><li>従事する業務は、反復継続的な作業や単純作業を主とするものではありません</li><li>従事する業務は、学問的知識または外国文化に基盤を有する思考・感受性を必要とする業務（いわゆるホワイトカラー職種）です</li><li>申請人の学歴（専攻内容）または実務経験と、従事する業務内容に関連性があります</li><li>受入機関には、当該業務を継続的に行わせるだけの事業実態および業務量があります</li><li>研修期間中に現場作業等に従事させる場合であっても、それは業務全体のうち一時的なものです</li></ul></div>
+        
+      </div>
+      <div class="chk-item" id="item-F">
+        <div class="chk-head">
+          <input type="checkbox" class="ck" id="ckF">
+          <span class="chk-title">F　労働条件が適正であること</span>
+          <button type="button" class="chk-toggle" aria-label="開閉">＋</button>
+        </div>
+        <div class="chk-body"><ul><li>報酬額は、同種の業務に従事する日本人が受ける報酬と同等額以上です</li><li>賃金は、就労地の最低賃金を下回っていません</li><li>雇用契約は既に成立しており、内定取消しや採用中止の予定はありません</li><li>労働時間、休日、社会保険の加入等について、労働関係法令を遵守しています</li><li>申請人から、保証金の徴収、違約金の定め、旅券・在留カードの取り上げは行っていません</li></ul></div>
+        
+      </div>
+      <div class="chk-item" id="item-G">
+        <div class="chk-head">
+          <input type="checkbox" class="ck" id="ckG">
+          <span class="chk-title">G　更新申請に関する事項（更新申請の場合）　<span style="font-size:11px;color:var(--muted);font-weight:400">※更新申請がある場合のみ</span></span>
+          <button type="button" class="chk-toggle" aria-label="開閉">＋</button>
+        </div>
+        <div class="chk-body"><ul><li>申請人に、住民税・所得税の未納はありません</li><li>申請人は、健康保険および厚生年金保険（加入義務がある場合）に加入しています</li><li>前回の許可後に転職している場合、契約機関に関する届出（入管法第19条の16）を済ませています</li><li>前回の許可時に申告した活動内容から実質的な変更がある場合、その内容を当法人に申告します</li></ul></div>
+        <div class="chk-na-note" id="na-G" style="display:none">更新申請がないため対象外です（チェック不要）。</div>
+      </div>
+      <div class="chk-item" id="item-H">
+        <div class="chk-head">
+          <input type="checkbox" class="ck" id="ckH">
+          <span class="chk-title">H　費用および返金に関する同意</span>
+          <button type="button" class="chk-toggle" aria-label="開閉">＋</button>
+        </div>
+        <div class="chk-body"><ul><li>本チェックリストの各項目に反する事実が判明した場合、当法人は受任を辞退し、または受任後であっても業務を中止することができます</li><li>前記により業務を中止した場合、既にお支払いいただいた費用は返金されないことに同意します</li><li>申請人または受入機関の申告内容に虚偽があったことにより不許可となった場合、返金保証および無償再申請の対象外となることに同意します</li><li>入管に納付する手数料および資料取得の実費は、当法人の報酬とは別に負担することを承諾します</li></ul></div>
+        
+      </div>
+      <div class="chk-item" id="item-I">
+        <div class="chk-head">
+          <input type="checkbox" class="ck" id="ckI">
+          <span class="chk-title">I　個人情報の取扱いへの同意</span>
+          <button type="button" class="chk-toggle" aria-label="開閉">＋</button>
+        </div>
+        <div class="chk-body"><ul><li>申請に必要な範囲で、当法人が申請人および受入機関の個人情報を取得・利用し、出入国在留管理庁へ提出することに同意します</li><li>受入機関が申請人の個人情報を当法人に提供することについて、申請人本人の同意を得ています</li></ul></div>
+        
+      </div>
+  </section>
 
   <button type="button" class="submit" id="submitBtn" disabled>依頼を送信する</button>
 
@@ -329,6 +420,11 @@
       row.querySelector(".rcnt").textContent = n+"名";
       row.querySelector(".ramt").textContent = "¥"+(price*n).toLocaleString();
     });
+    // G項目（更新申請の場合のみ）の対象判定
+    const hasUpdate = [...peopleEl.querySelectorAll(".p-type")].some(x=>x.value==="更新_転職有"||x.value==="更新_転職無");
+    const gItem=document.getElementById("item-G"), gck=document.getElementById("ckG"), gna=document.getElementById("na-G");
+    if(hasUpdate){ gItem.classList.remove("na"); gck.disabled=false; gna.style.display="none"; }
+    else { gItem.classList.add("na"); gItem.classList.remove("done"); gck.checked=false; gck.disabled=true; gna.style.display="block"; }
     validate();
   }
 
@@ -342,9 +438,13 @@
     });
     // 人材は1名以上
     if(peopleEl.querySelectorAll(".person").length === 0) ok = false;
-    // 確認チェック2つ（虚偽なし・金額）
-    if(!document.getElementById("truthOk").checked) ok = false;
+    // 金額確認
     if(!document.getElementById("amtOk").checked) ok = false;
+    // チェックリスト（対象外＝disabled はスキップ）
+    document.querySelectorAll(".ck").forEach(ck=>{
+      if(ck.disabled) return;
+      if(!ck.checked) ok = false;
+    });
     document.getElementById("submitBtn").disabled = !ok;
   }
   document.addEventListener("input", validate);
@@ -353,6 +453,23 @@
 
   document.getElementById("submitBtn").addEventListener("click", ()=>{
     alert("送信機能は現在準備中です。\nお手数ですが、記載の弊社担当先までご連絡ください。");
+  });
+
+  // チェックリスト：開閉トグル
+  document.querySelectorAll(".chk-toggle, .chk-title").forEach(el=>{
+    el.addEventListener("click", ()=>{
+      const item=el.closest(".chk-item");
+      const body=item.querySelector(".chk-body");
+      const open=body.classList.toggle("open");
+      const t=item.querySelector(".chk-toggle");
+      if(t) t.textContent = open ? "−" : "＋";
+    });
+  });
+  // チェックリスト：チェックで見た目反映
+  document.querySelectorAll(".ck").forEach(ck=>{
+    ck.addEventListener("change", ()=>{
+      ck.closest(".chk-item").classList.toggle("done", ck.checked);
+    });
   });
 
   personRow(); // 初期1名
