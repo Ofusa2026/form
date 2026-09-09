@@ -148,7 +148,7 @@
     <span class="company" id="companyBadge">（企業名は URL から自動表示）</span>
     <h1>申請依頼フォーム</h1>
     <p class="lead">内容をご入力ください。申請種別に応じて請求金額が自動計算されます。</p>
-    <p style="font-size:11px;color:var(--muted);margin:4px 0 0" id="ver">ver.20260909.06</p>
+    <p style="font-size:11px;color:var(--muted);margin:4px 0 0" id="ver">ver.20260909.07</p>
   </header>
 
   <!-- 1. 採用される会社（所属機関） -->
@@ -200,6 +200,7 @@
       <input type="text" placeholder="株式会社〇〇 経理部 御中"></label>
     <label class="f"><span>メールアドレス<span class="req">*</span></span>
       <input type="email" placeholder="keiri@example.com"></label>
+    <p style="font-size:12px; color:var(--muted); margin:10px 0 0">※ 手続きのご連絡は、所属機関のメールを TO、各申請人のメールを CC としてお送りします。</p>
   </section>
 
   <!-- 5. 請求金額 -->
@@ -374,14 +375,20 @@
       <label class="f"><span>申請人名<span class="req">*</span></span>
         <input type="text" class="p-name" placeholder="氏名"></label>
       <div class="fixed-status">希望在留資格：<b>技術・人文知識・国際業務</b></div>
-      <label class="f"><span>申請種別<span class="req">*</span></span>
-        <select class="p-type">
-          <option value="">選択してください</option>
-          <option value="認定">在留資格認定証明書交付申請</option>
-          <option value="変更">在留資格変更申請</option>
-          <option value="更新_転職有">在留期間更新許可申請（転職有）</option>
-          <option value="更新_転職無">在留期間更新許可申請（転職無）</option>
-        </select></label>
+      <div class="grid2">
+        <label class="f"><span>国籍<span class="req">*</span></span>
+          <input type="text" class="p-nat" placeholder="例：インドネシア"></label>
+        <label class="f"><span>申請種別<span class="req">*</span></span>
+          <select class="p-type">
+            <option value="">選択してください</option>
+            <option value="認定">在留資格認定証明書交付申請</option>
+            <option value="変更">在留資格変更申請</option>
+            <option value="更新_転職有">在留期間更新許可申請（転職有）</option>
+            <option value="更新_転職無">在留期間更新許可申請（転職無）</option>
+          </select></label>
+      </div>
+      <label class="f p-expiry-box" style="display:none"><span>在留期限<span class="req">*</span></span>
+        <input type="date" class="p-expiry"></label>
       <div class="grid2">
         <label class="f"><span>メールアドレス<span class="req">*</span></span><input type="email" class="p-email"></label>
         <label class="f"><span>電話番号<span style="color:var(--muted);font-weight:400">（任意）</span></span><input type="tel" class="p-tel optional"></label>
@@ -406,6 +413,12 @@
 
   function recalc(){
     const persons = [...peopleEl.querySelectorAll(".person")];
+    // 在留期限は 変更／更新 のときだけ表示
+    persons.forEach(p=>{
+      const t=p.querySelector(".p-type").value;
+      const need=(t==="変更"||t==="更新_転職有"||t==="更新_転職無");
+      p.querySelector(".p-expiry-box").style.display = need ? "block" : "none";
+    });
     let total = 0;
     persons.forEach(p=>{
       const price = priceOf(p);
@@ -432,7 +445,7 @@
   function validate(){
     let ok = true;
     // 表示中のすべての入力・選択を必須チェック（＝全項目必須）
-    document.querySelectorAll(".card input[type=text], .card input[type=email], .card input[type=tel], .card select").forEach(el=>{
+    document.querySelectorAll(".card input[type=text], .card input[type=email], .card input[type=tel], .card input[type=date], .card select").forEach(el=>{
       if(el.offsetParent === null) return;      // 非表示（派遣先OFF等）はスキップ
       if(el.classList.contains("optional")) return; // 任意項目はスキップ
       if(!el.value.trim()) ok = false;
