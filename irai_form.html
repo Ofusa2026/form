@@ -53,6 +53,9 @@
   .toggle-row{display:flex; align-items:center; gap:8px; margin-top:2px}
   .toggle-row input{width:auto}
 
+  .fixed-status{font-size:13px; color:var(--muted); margin-top:10px; padding:8px 10px;
+    background:#fff; border:1px solid var(--line); border-radius:8px}
+  .fixed-status b{color:var(--ink); font-weight:700}
   /* 人材カード */
   .person{
     border:1px solid var(--line); border-radius:10px; padding:14px; margin-top:12px;
@@ -126,7 +129,7 @@
     <span class="company" id="companyBadge">（企業名は URL から自動表示）</span>
     <h1>申請依頼フォーム</h1>
     <p class="lead">内容をご入力ください。申請種別に応じて請求金額が自動計算されます。</p>
-    <p style="font-size:11px;color:var(--muted);margin:4px 0 0" id="ver">ver.20260909.02</p>
+    <p style="font-size:11px;color:var(--muted);margin:4px 0 0" id="ver">ver.20260909.03</p>
   </header>
 
   <!-- 1. 採用される会社（所属機関） -->
@@ -187,10 +190,10 @@
     <table class="rate">
       <thead><tr><th>在留資格</th><th>申請種別</th><th style="text-align:right">単価</th></tr></thead>
       <tbody>
-        <tr><td>技人国</td><td>在留資格認定証明書交付申請</td><td class="price">50,000円</td></tr>
-        <tr><td>技人国</td><td>在留資格変更申請</td><td class="price">50,000円</td></tr>
-        <tr><td>技人国</td><td>在留期間更新許可申請（転職有）</td><td class="price">50,000円</td></tr>
-        <tr><td>技人国</td><td>在留期間更新許可申請（転職無）</td><td class="price">30,000円</td></tr>
+        <tr><td>技術・人文知識・国際業務</td><td>在留資格認定証明書交付申請</td><td class="price">50,000円</td></tr>
+        <tr><td>技術・人文知識・国際業務</td><td>在留資格変更申請</td><td class="price">50,000円</td></tr>
+        <tr><td>技術・人文知識・国際業務</td><td>在留期間更新許可申請（転職有）</td><td class="price">50,000円</td></tr>
+        <tr><td>技術・人文知識・国際業務</td><td>在留期間更新許可申請（転職無）</td><td class="price">30,000円</td></tr>
       </tbody>
     </table>
 
@@ -264,26 +267,15 @@
       <button type="button" class="remove">削除</button>
       <label class="f"><span>申請人名<span class="req">*</span></span>
         <input type="text" class="p-name" placeholder="氏名"></label>
-      <div class="grid2">
-        <label class="f"><span>在留資格</span>
-          <select class="p-status">
-            <option value="技人国">技人国</option>
-          </select></label>
-        <label class="f"><span>申請種別<span class="req">*</span></span>
-          <select class="p-type">
-            <option value="">選択してください</option>
-            <option value="認定">在留資格認定証明書交付申請</option>
-            <option value="変更">在留資格変更申請</option>
-            <option value="更新">在留期間更新許可申請</option>
-          </select></label>
-      </div>
-      <div class="transfer">
-        <span style="font-size:13px; color:var(--muted)">転職の有無（更新のみ）<span class="req">*</span></span>
-        <div class="radio-row">
-          <label><input type="radio" name="tr-${idx}" class="p-transfer" value="有">転職 有</label>
-          <label><input type="radio" name="tr-${idx}" class="p-transfer" value="無">転職 無</label>
-        </div>
-      </div>
+      <div class="fixed-status">希望在留資格：<b>技術・人文知識・国際業務</b></div>
+      <label class="f"><span>申請種別<span class="req">*</span></span>
+        <select class="p-type">
+          <option value="">選択してください</option>
+          <option value="認定">在留資格認定証明書交付申請</option>
+          <option value="変更">在留資格変更申請</option>
+          <option value="更新_転職有">在留期間更新許可申請（転職有）</option>
+          <option value="更新_転職無">在留期間更新許可申請（転職無）</option>
+        </select></label>
       <div class="grid2">
         <label class="f"><span>メールアドレス<span class="req">*</span></span><input type="email" class="p-email"></label>
         <label class="f"><span>電話番号<span style="color:var(--muted);font-weight:400">（任意）</span></span><input type="tel" class="p-tel optional"></label>
@@ -293,26 +285,16 @@
     peopleEl.appendChild(div);
 
     const typeSel = div.querySelector(".p-type");
-    const transferBox = div.querySelector(".transfer");
-    typeSel.addEventListener("change", ()=>{
-      transferBox.classList.toggle("show", typeSel.value === "更新");
-      recalc();
-    });
-    div.querySelectorAll(".p-transfer").forEach(r=>r.addEventListener("change", recalc));
+    typeSel.addEventListener("change", recalc);
     div.querySelector(".remove").addEventListener("click", ()=>{ div.remove(); recalc(); });
 
     recalc();
   }
 
   function priceOf(person){
-    const status = person.querySelector(".p-status").value;
+    const status = "技人国"; // 技術・人文知識・国際業務
     const type = person.querySelector(".p-type").value;
-    if(!type || !RATES[status]) return null;
-    if(type === "更新"){
-      const tr = person.querySelector(".p-transfer:checked");
-      if(!tr) return null; // 転職有無 未選択
-      return RATES[status][tr.value === "有" ? "更新_転職有" : "更新_転職無"];
-    }
+    if(!type) return null;
     return RATES[status][type] ?? null;
   }
 
@@ -336,10 +318,6 @@
       if(el.offsetParent === null) return;      // 非表示（派遣先OFF等）はスキップ
       if(el.classList.contains("optional")) return; // 任意項目はスキップ
       if(!el.value.trim()) ok = false;
-    });
-    // 更新の転職有無（表示中のみ、いずれか選択必須）
-    document.querySelectorAll(".transfer.show").forEach(box=>{
-      if(!box.querySelector(".p-transfer:checked")) ok = false;
     });
     // 人材は1名以上
     if(peopleEl.querySelectorAll(".person").length === 0) ok = false;
