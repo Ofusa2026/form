@@ -191,7 +191,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20260902.01';
+var FORM_VERSION = 'ver.20260910.01';
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -228,9 +228,9 @@ var srcParam = params.get('src') || '';  // ver.20260531.02: 流入元（aidem �
 var fieldsFilter = params.get('fields') ? params.get('fields').split(',').map(function(s){return s.trim();}) : null;
 // ver.20260812: 介護分野判定（URLパラメータ ?field=介護 で指定）
 var applicantField = params.get('field') || '';
-// ver.20260821: 推薦票の企業対応（suisen=other）のときだけ、ベトナム技能実習生の追加情報を表示
+// ver.20260910: 推薦票の大房対応（suisen=self）のときだけ、ベトナム技能実習生の追加情報を表示（大房が推薦票を用意するため申請人に本国情報を聞く。旧仕様は企業対応で出しており逆だった）
 var suisenParam = params.get('suisen') || '';
-var isSuisenOther = (suisenParam === 'other');
+var isSuisenSelf = (suisenParam === 'self');
 var isKaigo = applicantField.indexOf('介護') >= 0;
 
 // typeなしでco_始まりのcaseId（所属機関）またはsrc=jaimの場合はjaimをデフォルト
@@ -623,8 +623,8 @@ function blockContact(showResCard, showExtra) {
   h += '</div>';
   h += '</div>';
 
-  // ver.20260821: 企業対応(suisen=other)のとき、ベトナム技能実習生の大使館推薦票に必要な追加情報
-  if (isSuisenOther) {
+  // ver.20260910: 大房対応(suisen=self)のとき、ベトナム技能実習生の大使館推薦票に必要な追加情報
+  if (isSuisenSelf) {
     h += '<div class="card"><div class="section-title">本国の情報（ほんごくのじょうほう）<div class="trans" data-key="suisenVnTitle"></div></div>';
     h += '<div style="font-size:11px;color:#9ca3af;margin-bottom:10px;">大使館推薦票の申請に必要な情報です。</div>';
     h += field('f-vnFamilyAddress', 'ベトナムのご家族の住所（かぞくのじゅうしょ）', 'text', false, '例: 123 Le Loi Street, Hanoi', 'vnFamilyAddress');
@@ -3691,8 +3691,8 @@ function collectData() {
     married: val('f-married'), email: val('f-email')
   };
 
-  // ver.20260821: 推薦票の企業対応（suisen=other）で追加した本国情報
-  if (isSuisenOther) {
+  // ver.20260910: 推薦票の大房対応（suisen=self）で追加した本国情報
+  if (isSuisenSelf) {
     d.vnFamilyAddress = val('f-vnFamilyAddress');
     d.vnFamilyTel = val('f-vnFamilyTel');
     d.vnSendingOrg = val('f-vnSendingOrg');
