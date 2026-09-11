@@ -191,7 +191,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20260911.02';
+var FORM_VERSION = 'ver.20260911.03';
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -4084,6 +4084,16 @@ function validate() {
   }
   if (type === 'support_org') {
     return _soFormValidate();
+  }
+  // ver.20260911.03: 家族滞在フォームは氏名欄が f-kzNameEn のため専用チェック。
+  //   従来は下の f-name 必須チェックに落ち、氏名入力済みでも送信不能だった。
+  if ((type||'').indexOf('kazoku_') === 0) {
+    if (!val('f-kzNationality')) return '国籍は必須です。';
+    if (!val('f-kzBirth')) return '生年月日は必須です。';
+    if (!val('f-kzNameEn')) return '氏名（パスポート表記）は必須です。';
+    if (!val('f-kzTel')) return '電話番号は必須です。';
+    if (!val('f-kzPassport')) return 'パスポート番号は必須です。';
+    return null;
   }
   if (!val('f-name')) return '氏名（パスポート表記）は必須です。';
   if (!val('f-birth')) return '生年月日は必須です。';
