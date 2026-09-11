@@ -191,7 +191,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20260910.01';
+var FORM_VERSION = 'ver.20260911.01';
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -734,7 +734,7 @@ function blockEducation() {
   '</div>';
 }
 
-// 特定技能・認定専用ブロック
+// 認定専用ブロック（特定技能・技人国 共通）
 function blockTokuteiNintei() {
   return '<div class="card"><div class="section-title">来日・在留歴（らいにち・ざいりゅうれき）</div>' +
     field('f-entryCount', '日本に何回来たことがありますか？（なんかいきたことがありますか）', 'number', true, '例: 2', 'entryCount') +
@@ -1249,7 +1249,8 @@ function buildForm(t) {
     case 'tokutei_henkou':
       return blockBasic() + blockMarried() + blockTokuteiKoushin() + blockSkillProof() + blockJapaneseProof() + blockContact(false, true);
     case 'gijinkoku_nintei':
-      return blockBasic() + blockMarried() + blockEducation() + blockGijinkokuExtra() + blockContact(false, false);
+      // ver.20260911.01: 技人国・認定にも特定技能・認定と同じ来日・在留歴（来日回数/COE申請回数/不許可回数/最終来日・帰国日）を表示
+      return blockBasic() + blockMarried() + blockEducation() + blockGijinkokuExtra() + blockTokuteiNintei() + blockContact(false, false);
     case 'gijinkoku_koushin':
     case 'gijinkoku_henkou':
       return blockBasic() + blockMarried() + blockEducation() + blockGijinkokuExtra() + blockContact(false, true);
@@ -4033,8 +4034,8 @@ function validate() {
     return {key:'addrPref', field:'f-address', fixes:_computeAddressFixes(_addr)};
   }
   if (!val('f-married')) return '結婚しているかどうかを選択してください。';
-  if (type==='tokutei_nintei' && !val('f-entryCount')) return '来日回数を入力してください。';
-  if (type==='tokutei_nintei' && !val('f-coeCount')) return 'COE申請回数を入力してください。';
+  if ((type==='tokutei_nintei' || type==='gijinkoku_nintei') && !val('f-entryCount')) return '来日回数を入力してください。';
+  if ((type==='tokutei_nintei' || type==='gijinkoku_nintei') && !val('f-coeCount')) return 'COE申請回数を入力してください。';
 
   // 特定技能：在留カード・現住所・一時帰国の必須チェック（認定は日本国外のため対象外）
   if (isTokutei && type !== 'tokutei_nintei') {
