@@ -191,7 +191,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20260911.01';
+var FORM_VERSION = 'ver.20260911.02';
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -722,14 +722,14 @@ function blockMarried() { return ''; }
 function blockEducation() {
   return '<div class="card"><div class="section-title">最終学歴（さいしゅうがくれき）</div>' +
     '<div class="grid2">' +
-      field('f-eduCountry', '出身国（しゅっしんこく）', 'text', false, '例: ベトナム', 'eduCountry') +
-      field('f-education', '最終学歴（さいしゅうがくれき）', 'select', false, '', 'education',
-        ['','中学校','高等学校','専門学校','大学','大学院']) +
+      field('f-eduCountry', '卒業した学校の国（そつぎょうしたがっこうのくに）', 'text', true, '例: ベトナム', 'eduCountry') +
+      field('f-education', '最終学歴（さいしゅうがくれき）', 'select', true, '', 'education',
+        ['','中学校','高等学校','専門学校','短期大学','大学','大学院']) +
     '</div>' +
-    field('f-schoolName', '学校名（がっこうめい）', 'text', false, '例: ハノイ工科大学', 'schoolName') +
+    field('f-schoolName', '学校名（がっこうめい）', 'text', true, '例: ハノイ工科大学', 'schoolName') +
     '<div class="grid2">' +
       field('f-completionDate', '卒業年月日（そつぎょうねんがっぴ）', 'date', true, '', 'completionDate') +
-      field('f-major', '専攻（せんこう）', 'text', false, '例: 機械工学', 'major') +
+      field('f-major', '専攻（せんこう）', 'text', true, '例: 機械工学', 'major') +
     '</div>' +
   '</div>';
 }
@@ -1205,8 +1205,8 @@ function blockGijinkokuExtra() {
 
   // ③ 技人国の実務経験年数
   h += '<div class="field">';
-  h += '<label>技人国の実務経験年数の有無（ぎじんこくの じつむけいけんねんすうのうむ） <span class="req">*</span></label>';
-  h += '<div style="font-size:11px;color:#6b7280;margin-bottom:6px;">Do you have practical work experience related to this engineer/specialist visa?</div>';
+  h += '<label>日本で行う仕事と同じ分野の仕事の経験はありますか？（しごとのけいけん） <span class="req">*</span></label>';
+  h += '<div style="font-size:11px;color:#6b7280;margin-bottom:6px;">Do you have work experience in the same field as the job you will do in Japan?</div>';
   h += '<select id="f-gijinkokuExpStatus" onchange="toggleGijinkokuExp(this.value)">';
   h += '<option value="">---</option>';
   h += '<option value="あり">あり / Yes</option>';
@@ -1218,6 +1218,10 @@ function blockGijinkokuExtra() {
   h += '<div class="grid2">';
   h += '<div class="field"><label style="font-size:12px;font-weight:600;">年（ねん） / Years</label><input type="number" id="f-gijinkokuExpYears" placeholder="例: 3" min="0" max="50"></div>';
   h += '<div class="field"><label style="font-size:12px;font-weight:600;">か月 / Months</label><input type="number" id="f-gijinkokuExpMonths" placeholder="例: 6" min="0" max="11"></div>';
+  h += '</div>';
+  // ver.20260911.02: 雇用理由書・申請書の職歴欄用
+  h += '<div class="field"><label>職歴（しょくれき）会社名・期間・仕事の内容 / Work history <span class="req">*</span></label>';
+  h += '<textarea id="f-gijinkokuWorkHistory" rows="3" placeholder="例: ABC Software Co., Ltd.（2021年4月〜2024年3月）Webシステムの開発"></textarea>';
   h += '</div>';
   h += '</div>';
 
@@ -1865,7 +1869,7 @@ function field(id, label, inputType, required, placeholder, transKey, options) {
   h += '<label>' + label + (required ? '<span class="req">*</span>' : '') + '</label>';
   if (transKey) h += '<div class="trans" data-key="' + transKey + '"></div>';
   if (inputType === 'select') {
-    var _onchange = (id === 'f-nationality') ? ' onchange="toggleNationalityOther(this.value)"' : (id === 'f-flexFlg') ? ' onchange="toggleFlexType(this.value)"' : (id === 'f-holidayType') ? ' onchange="toggleHolidayType(this.value)"' : (id === 'f-gjHasStore') ? ' onchange="toggleStoreBlock(this.value)"' : (id === 'f-gjHaken') ? ' onchange="toggleHakenBlock(this.value)"' : '';
+    var _onchange = (id === 'f-nationality') ? ' onchange="toggleNationalityOther(this.value)"' : (id === 'f-flexFlg') ? ' onchange="toggleFlexType(this.value)"' : (id === 'f-holidayType') ? ' onchange="toggleHolidayType(this.value)"' : (id === 'f-gjHasStore') ? ' onchange="toggleStoreBlock(this.value)"' : (id === 'f-gjHaken') ? ' onchange="toggleHakenBlock(this.value)"' : (id === 'f-gjCompExists') ? ' onchange="toggleGjComp(this.value)"' : (id === 'f-gjContractTermFlg') ? ' onchange="toggleGjContractTerm(this.value)"' : '';
     h += '<select id="' + id + '"' + _onchange + '>';
     (options||[]).forEach(function(o) {
       h += '<option value="' + o + '">' + (o === '' ? '---' : o) + '</option>';
@@ -2576,51 +2580,51 @@ function buildCompanyGijinkokuForm() {
   return (
   '<div class="info-box" style="background:#ecfdf5;color:#047857;border-color:#a7f3d0;">' +
     '<span class="case-name">技術・人文知識・国際業務</span>' +
-    'このフォームは「技術・人文知識・国際業務」の在留資格申請にあたり、貴社の情報をお伺いするものです。判明している範囲でご入力ください（途中保存できます）。' +
+    'このフォームは「技術・人文知識・国際業務」の在留資格申請にあたり、貴社の情報をお伺いするものです。<span style="color:#dc2626;font-weight:700;">*</span> の項目は必須です（途中保存できます）。' +
   '</div>' +
 
   '<div class="card"><div class="section-title">企業基本情報</div>' +
     '<div class="field"><label>会社名<span class="req">*</span></label><input type="text" id="f-coName" placeholder="例: 株式会社〇〇" oninput="coNameKanaHelper(this.value)"></div>' +
-    '<div class="field"><label>会社名（ひらがな）</label><input type="text" id="f-coNameKana" placeholder="例: かぶしきかいしゃ〇〇"><div id="co-kana-suggestion" style="font-size:11px;color:#6b7280;margin-top:3px;"></div></div>' +
-    field('f-coNameEn','会社名（英語）','text',false,'例: OO Co., Ltd.') +
-    field('f-coCorpNo','法人番号（13桁）','text',false,'例: 1234567890123') +
-    field('f-coEmpInsNo','雇用保険適用事業所番号','text',false,'例: 1234-567890-1') +
+    '<div class="field"><label>会社名（ひらがな）<span class="req">*</span></label><input type="text" id="f-coNameKana" placeholder="例: かぶしきかいしゃ〇〇"><div id="co-kana-suggestion" style="font-size:11px;color:#6b7280;margin-top:3px;"></div></div>' +
+    field('f-coNameEn','会社名（英語）','text',true,'例: OO Co., Ltd.') +
+    field('f-coCorpNo','法人番号（13桁）','text',true,'例: 1234567890123') +
+    field('f-coEmpInsNo','雇用保険適用事業所番号','text',true,'例: 1234-567890-1') +
     field('f-coHomepage','企業ホームページ（URL）','text',false,'例: https://www.example.co.jp') +
-    field('f-gjEstablished','設立年月日','date',false,'') +
+    field('f-gjEstablished','設立年月日','date',true,'') +
     '<div class="grid2">' +
-      field('f-coCapital','資本金（円）','number',false,'例: 10000000') +
-      field('f-coAnnualSales','年間売上金額（円）','number',false,'例: 500000000') +
+      field('f-coCapital','資本金（円）','number',true,'例: 10000000') +
+      field('f-coAnnualSales','年間売上金額（円）','number',true,'例: 500000000') +
     '</div>' +
     '<div class="grid2">' +
-      field('f-coEmployees','常勤職員数','number',false,'例: 50') +
-      field('f-coForeignEmployees','うち外国人職員数','number',false,'例: 5') +
+      field('f-coEmployees','常勤職員数','number',true,'例: 50') +
+      field('f-coForeignEmployees','うち外国人職員数','number',true,'例: 5') +
     '</div>' +
-    field('f-coTrainees','技能実習生数','number',false,'例: 0') +
-    field('f-gjListedCategory','企業区分（所属機関カテゴリ）','select',false,'',null,['','上場企業等（カテゴリ1）','源泉徴収税額1000万円以上（カテゴリ2）','源泉徴収の法定調書提出あり（カテゴリ3）','その他（カテゴリ4）','不明']) +
-    field('f-gjBusiness','事業内容（主な取扱商品・サービス）','textarea',false,'例: 業務用ソフトウェアの受託開発および保守') +
+    field('f-coTrainees','技能実習生数','number',true,'例: 0') +
+    field('f-gjListedCategory','企業区分（所属機関カテゴリ）','select',true,'',null,['','上場企業等（カテゴリ1）','源泉徴収税額1000万円以上（カテゴリ2）','源泉徴収の法定調書提出あり（カテゴリ3）','その他（カテゴリ4）','不明']) +
+    field('f-gjBusiness','事業内容（主な取扱商品・サービス）','textarea',true,'例: 業務用ソフトウェアの受託開発および保守') +
   '</div>' +
 
   '<div class="card"><div class="section-title">所在地</div>' +
     '<div class="grid2">' +
-      field('f-coPref','都道府県','text',false,'例: 東京都') +
-      field('f-coCity','市区町村','text',false,'例: 新宿区') +
+      field('f-coPref','都道府県','text',true,'例: 東京都') +
+      field('f-coCity','市区町村','text',true,'例: 新宿区') +
     '</div>' +
-    field('f-coAddress','町名番地','text',false,'例: 新宿2丁目1番1号 〇〇ビル3F') +
-    field('f-coAddressEn','住所（英語）','text',false,'例: 3F OO Bldg., 2-1-1 Shinjuku, Shinjuku-ku, Tokyo') +
-    field('f-coTel','電話番号','text',false,'例: 03-1234-5678') +
+    field('f-coAddress','町名番地','text',true,'例: 新宿2丁目1番1号 〇〇ビル3F') +
+    field('f-coAddressEn','住所（英語）','text',true,'例: 3F OO Bldg., 2-1-1 Shinjuku, Shinjuku-ku, Tokyo') +
+    field('f-coTel','電話番号','text',true,'例: 03-1234-5678') +
   '</div>' +
 
   '<div class="card"><div class="section-title">就業場所（配属先事業所）</div>' +
     '<div style="margin-bottom:10px;">' +
       '<button type="button" onclick="copyHQToOffice()" style="padding:8px 16px;background:#f0fdf4;color:#15803d;border:1.5px solid #86efac;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;">🏢 本社と同じ住所を転記</button>' +
     '</div>' +
-    field('f-officeName','事業所名','text',false,'例: 株式会社〇〇 本社') +
-    field('f-officeAddress','事業所住所','text',false,'例: 東京都新宿区新宿2丁目1番1号') +
-    field('f-officeTel','事業所電話番号','text',false,'例: 03-1234-5678') +
+    field('f-officeName','事業所名','text',true,'例: 株式会社〇〇 本社') +
+    field('f-officeAddress','事業所住所','text',true,'例: 東京都新宿区新宿2丁目1番1号') +
+    field('f-officeTel','事業所電話番号','text',true,'例: 03-1234-5678') +
   '</div>' +
 
   '<div class="card"><div class="section-title">管理する店舗情報</div>' +
-    field('f-gjHasStore','管理・担当する店舗の有無','select',false,'',null,['','なし','あり']) +
+    field('f-gjHasStore','管理・担当する店舗の有無','select',true,'',null,['','なし','あり']) +
     '<div id="storeBlock" style="display:none;">' +
       '<div style="font-size:11px;color:#9ca3af;margin:10px 0;">申請人が管理・担当する店舗の店名・住所・電話番号をご記入ください（複数可）。</div>' +
       '<div id="storeRows">' + storeRow(1) + '</div>' +
@@ -2630,67 +2634,67 @@ function buildCompanyGijinkokuForm() {
 
   '<div class="card"><div class="section-title">代表者・作成責任者</div>' +
     '<div class="grid2">' +
-      field('f-coRepName','代表者氏名','text',false,'例: 山田 太郎') +
-      field('f-coRepTitle','代表者役職','text',false,'例: 代表取締役') +
+      field('f-coRepName','代表者氏名','text',true,'例: 山田 太郎') +
+      field('f-coRepTitle','代表者役職','text',true,'例: 代表取締役') +
     '</div>' +
     '<div class="grid2">' +
-      field('f-coRepNameEn','代表者氏名（英語）','text',false,'例: YAMADA TARO') +
-      field('f-coRepTitleEn','代表者役職（英語）','text',false,'例: President') +
+      field('f-coRepNameEn','代表者氏名（英語）','text',true,'例: YAMADA TARO') +
+      field('f-coRepTitleEn','代表者役職（英語）','text',true,'例: President') +
     '</div>' +
     // ver.20260819: 代表者の国籍（日本以外は在留カード番号・氏名英語を追加表示）
-    '<div class="field"><label>代表者の国籍</label>' +
+    '<div class="field"><label>代表者の国籍<span class="req">*</span></label>' +
       '<select id="f-gjRepNationality" onchange="toggleGjRepNationality(this.value)">' +
         '<option value="">---</option>' +
         '<option value="日本">日本</option>' +
         '<option value="日本以外">日本以外</option>' +
       '</select></div>' +
     '<div id="gjRepForeignWrap" style="display:none;">' +
-      field('f-gjRepResidenceCard','代表者 在留カード番号','text',false,'例: AB12345678CD') +
-      field('f-gjRepNameEnForeign','代表者 氏名（英語表記）','text',false,'例: NGUYEN VAN A') +
+      field('f-gjRepResidenceCard','代表者 在留カード番号','text',true,'例: AB12345678CD') +
+      field('f-gjRepNameEnForeign','代表者 氏名（英語表記）','text',true,'例: NGUYEN VAN A') +
     '</div>' +
     '<div class="grid2">' +
-      field('f-coAuthorName','作成責任者氏名','text',false,'例: 佐藤 花子') +
-      field('f-coAuthorTitle','作成責任者役職','text',false,'例: 人事部長') +
+      field('f-coAuthorName','作成責任者氏名','text',true,'例: 佐藤 花子') +
+      field('f-coAuthorTitle','作成責任者役職','text',true,'例: 人事部長') +
     '</div>' +
   '</div>' +
 
   '<div class="card"><div class="section-title">配属部署・職務内容</div>' +
     '<div style="font-size:11px;color:#9ca3af;margin-bottom:10px;">雇用理由書の中心となる項目です。できるだけ具体的にご記入ください。</div>' +
     '<div class="grid2">' +
-      field('f-gjDept','配属部署名','text',false,'例: システム開発部') +
-      field('f-gjPosition','役職・肩書','text',false,'例: システムエンジニア') +
+      field('f-gjDept','配属部署名','text',true,'例: システム開発部') +
+      field('f-gjPosition','役職・肩書','text',true,'例: システムエンジニア') +
     '</div>' +
-    field('f-gjSupervisor','直属の上司（指揮命令者）','text',false,'例: 開発部長 鈴木 一郎') +
-    field('f-gjJobType','職種','select',false,'',null,['','システムエンジニア・プログラマー','翻訳・通訳','海外業務・貿易','営業','マーケティング・企画','経理・総務','設計・技術開発','デザイナー','語学教師','その他']) +
-    field('f-gjJobDesc','業務内容の詳細（具体的な作業を箇条書きで）','textarea',false,'例: ・自社Webシステムの設計/開発\n・要件定義および顧客折衝\n・保守運用') +
-    field('f-gjMajorRelation','必要な専門知識・技術（大学等での専攻・学んだ内容との関連性）','textarea',false,'例: 大学の情報工学専攻で学んだプログラミング/データベース設計の知識を、自社システム開発に直接活用する') +
-    field('f-gjLangSkill','使用する語学・スキル','text',false,'例: 英語（対外折衝）、中国語（現地法人との連絡）') +
-    field('f-gjSimpleWork','単純作業の有無・割合','text',false,'例: なし（専門業務が中心）') +
+    field('f-gjSupervisor','直属の上司（指揮命令者）','text',true,'例: 開発部長 鈴木 一郎') +
+    field('f-gjJobType','職種','select',true,'',null,['','システムエンジニア・プログラマー','翻訳・通訳','海外業務・貿易','営業','マーケティング・企画','経理・総務','設計・技術開発','デザイナー','語学教師','その他']) +
+    field('f-gjJobDesc','業務内容の詳細（具体的な作業を箇条書きで）','textarea',true,'例: ・自社Webシステムの設計/開発\n・要件定義および顧客折衝\n・保守運用') +
+    field('f-gjMajorRelation','必要な専門知識・技術（大学等での専攻・学んだ内容との関連性）','textarea',true,'例: 大学の情報工学専攻で学んだプログラミング/データベース設計の知識を、自社システム開発に直接活用する') +
+    field('f-gjLangSkill','使用する語学・スキル','text',true,'例: 英語（対外折衝）、中国語（現地法人との連絡）') +
+    field('f-gjSimpleWork','単純作業の有無・割合','text',true,'例: なし（専門業務が中心）') +
   '</div>' +
 
   '<div class="card"><div class="section-title">派遣雇用の場合</div>' +
-    field('f-gjHaken','派遣雇用ですか','select',false,'',null,['','いいえ（直接雇用）','はい（派遣雇用）']) +
+    field('f-gjHaken','派遣雇用ですか','select',true,'',null,['','いいえ（直接雇用）','はい（派遣雇用）']) +
     '<div id="hakenBlock" style="display:none;">' +
       '<div style="font-size:11px;color:#9ca3af;margin:10px 0;">派遣先の情報をご記入ください。</div>' +
-      field('f-hakenName','派遣先の名称','text',false,'例: 株式会社△△') +
-      field('f-hakenCorpNo','派遣先の法人番号（13桁）','text',false,'例: 9876543210987') +
-      field('f-hakenBusiness','派遣先の主たる業種','text',false,'例: 情報通信業（システム開発）') +
+      field('f-hakenName','派遣先の名称','text',true,'例: 株式会社△△') +
+      field('f-hakenCorpNo','派遣先の法人番号（13桁）','text',true,'例: 9876543210987') +
+      field('f-hakenBusiness','派遣先の主たる業種','text',true,'例: 情報通信業（システム開発）') +
       '<div class="grid2">' +
-        field('f-hakenCapital','派遣先資本金（円）','number',false,'例: 30000000') +
-        field('f-hakenAnnualSales','派遣先の年間売上高（直近年度・円）','number',false,'例: 800000000') +
+        field('f-hakenCapital','派遣先資本金（円）','number',true,'例: 30000000') +
+        field('f-hakenAnnualSales','派遣先の年間売上高（直近年度・円）','number',true,'例: 800000000') +
       '</div>' +
-      field('f-hakenAddress','派遣先住所','text',false,'例: 東京都港区△△1-2-3') +
-      field('f-hakenTel','派遣先の電話番号','text',false,'例: 03-9999-8888') +
-      field('f-hakenPeriod','派遣先の派遣予定期間','text',false,'例: 2026年4月1日〜2027年3月31日') +
+      field('f-hakenAddress','派遣先住所','text',true,'例: 東京都港区△△1-2-3') +
+      field('f-hakenTel','派遣先の電話番号','text',true,'例: 03-9999-8888') +
+      field('f-hakenPeriod','派遣先の派遣予定期間','text',true,'例: 2026年4月1日〜2027年3月31日') +
     '</div>' +
   '</div>' +
 
   '<div class="card"><div class="section-title">雇用条件</div>' +
-    field('f-gjEmployType','雇用形態','select',false,'',null,['','正社員','契約社員','その他']) +
+    field('f-gjEmployType','雇用形態','select',true,'',null,['','正社員','契約社員','その他']) +
     '<div class="sub-label">【給与】</div>' +
     '<div class="grid2">' +
-      field('f-salaryType','給与形態','select',false,'',null,['','月給','時給','日給','年俸']) +
-      field('f-salaryMonthly','基本給（月額・円）','number',false,'例: 250000') +
+      field('f-salaryType','給与形態','select',true,'',null,['','月給','時給','日給','年俸']) +
+      field('f-salaryMonthly','基本給（月額・円）','number',true,'例: 250000') +
     '</div>' +
 
     '<div class="sub-label">【手当】</div>' +
@@ -2699,65 +2703,65 @@ function buildCompanyGijinkokuForm() {
 
     '<div class="sub-label">【社会保険】</div>' +
     '<div class="grid2">' +
-      field('f-insKenpo','健康保険 加入','select',false,'',null,['','加入','未加入']) +
-      field('f-insPension','厚生年金 加入','select',false,'',null,['','加入','未加入']) +
+      field('f-insKenpo','健康保険 加入','select',true,'',null,['','加入','未加入']) +
+      field('f-insPension','厚生年金 加入','select',true,'',null,['','加入','未加入']) +
     '</div>' +
     '<div class="grid2">' +
-      field('f-insEmp','雇用保険 加入','select',false,'',null,['','加入','未加入']) +
-      field('f-insLabor','労災保険 加入','select',false,'',null,['','加入','未加入']) +
+      field('f-insEmp','雇用保険 加入','select',true,'',null,['','加入','未加入']) +
+      field('f-insLabor','労災保険 加入','select',true,'',null,['','加入','未加入']) +
     '</div>' +
 
     '<div class="sub-label">【支払方法・締め日】</div>' +
-    field('f-payMethod','支払方法','select',false,'',null,['','口座振込','現金','その他']) +
+    field('f-payMethod','支払方法','select',true,'',null,['','口座振込','現金','その他']) +
     buildPayDateFields() +
 
     '<div class="sub-label">【契約期間】</div>' +
-    field('f-gjContractTermFlg','契約期間の定めの有無','select',false,'',null,['','定めなし（無期）','定めあり（有期）']) +
+    field('f-gjContractTermFlg','契約期間の定めの有無','select',true,'',null,['','定めなし（無期）','定めあり（有期）']) +
     '<div class="grid2">' +
-      field('f-contractStart','契約開始日','date',false,'') +
-      field('f-contractEnd','契約終了日','date',false,'') +
+      field('f-contractStart','契約開始日','date',true,'') +
+      '<div id="gjContractEndWrap" style="display:none;">' + field('f-contractEnd','契約終了日','date',true,'') + '</div>' +
     '</div>' +
-    field('f-contractRenewal','契約更新の有無','select',false,'',null,['','期間の定めなし','更新する場合があり得る','更新しない','自動更新']) +
+    field('f-contractRenewal','契約更新の有無','select',true,'',null,['','期間の定めなし','更新する場合があり得る','更新しない','自動更新']) +
   '</div>' +
 
   '<div class="card"><div class="section-title">労働時間・休日</div>' +
     '<div class="sub-label">【所定労働時間】</div>' +
     '<div class="grid2">' +
-      field('f-startTime','始業時刻','time',false,'') +
-      field('f-endTime','終業時刻','time',false,'') +
+      field('f-startTime','始業時刻','time',true,'') +
+      field('f-endTime','終業時刻','time',true,'') +
     '</div>' +
     '<div class="grid2">' +
-      field('f-breakTime','休憩時間（分）','number',false,'例: 60') +
-      field('f-dailyHours','1日所定労働時間（時間）','number',false,'例: 8') +
+      field('f-breakTime','休憩時間（分）','number',true,'例: 60') +
+      field('f-dailyHours','1日所定労働時間（時間）','number',true,'例: 8') +
     '</div>' +
     '<div class="grid2">' +
-      field('f-weeklyDays','週所定労働日数','number',false,'例: 5') +
-      field('f-weeklyH','週所定労働時間','number',false,'例: 40') +
+      field('f-weeklyDays','週所定労働日数','number',true,'例: 5') +
+      field('f-weeklyH','週所定労働時間','number',true,'例: 40') +
     '</div>' +
     '<div class="sub-label">【休日】</div>' +
-    field('f-holidayType','休日の種類','select',false,'',null,['','定例日','非定例日','定例日＋非定例日']) +
+    field('f-holidayType','休日の種類','select',true,'',null,['','定例日','非定例日','定例日＋非定例日']) +
     '<div id="holiday-fixed-area" style="display:none;">' +
     '<div class="grid2">' +
-      field('f-fixedHolidayMon','月曜日','select',false,'',null,['','休み','出勤']) +
-      field('f-fixedHolidayTue','火曜日','select',false,'',null,['','休み','出勤']) +
+      field('f-fixedHolidayMon','月曜日','select',true,'',null,['','休み','出勤']) +
+      field('f-fixedHolidayTue','火曜日','select',true,'',null,['','休み','出勤']) +
     '</div>' +
     '<div class="grid2">' +
-      field('f-fixedHolidayWed','水曜日','select',false,'',null,['','休み','出勤']) +
-      field('f-fixedHolidayThu','木曜日','select',false,'',null,['','休み','出勤']) +
+      field('f-fixedHolidayWed','水曜日','select',true,'',null,['','休み','出勤']) +
+      field('f-fixedHolidayThu','木曜日','select',true,'',null,['','休み','出勤']) +
     '</div>' +
     '<div class="grid2">' +
-      field('f-fixedHolidayFri','金曜日','select',false,'',null,['','休み','出勤']) +
-      field('f-fixedHolidaySat','土曜日','select',false,'',null,['','休み','出勤']) +
+      field('f-fixedHolidayFri','金曜日','select',true,'',null,['','休み','出勤']) +
+      field('f-fixedHolidaySat','土曜日','select',true,'',null,['','休み','出勤']) +
     '</div>' +
     '<div class="grid2">' +
-      field('f-fixedHolidaySun','日曜日','select',false,'',null,['','休み','出勤']) +
-      field('f-fixedHolidayHol','祝日','select',false,'',null,['','休み','出勤']) +
+      field('f-fixedHolidaySun','日曜日','select',true,'',null,['','休み','出勤']) +
+      field('f-fixedHolidayHol','祝日','select',true,'',null,['','休み','出勤']) +
     '</div>' +
     '</div>' +
     '<div id="holiday-nonreg-area" style="display:none;">' +
     '<div class="grid2">' +
-      field('f-nonRegWeeklyDays','週あたりの休日日数','number',false,'例: 2') +
-      field('f-nonRegMonthlyDays','月あたりの休日日数','number',false,'例: 8') +
+      field('f-nonRegWeeklyDays','週あたりの休日日数','number',true,'例: 2') +
+      field('f-nonRegMonthlyDays','月あたりの休日日数','number',true,'例: 8') +
     '</div>' +
     '</div>' +
     field('f-otherHoliday','その他休日（夏季・年末年始等）','text',false,'例: GW・夏季・年末年始') +
@@ -2765,20 +2769,24 @@ function buildCompanyGijinkokuForm() {
 
   '<div class="card"><div class="section-title">報酬の同等性</div>' +
     '<div style="font-size:11px;color:#9ca3af;margin-bottom:10px;">日本人が従事する場合に受ける報酬と同等額以上であることの確認（審査で重視されます）。</div>' +
-    field('f-gjCompExists','同種の業務を行う日本人従業員の有無','select',false,'',null,['','いる','いない']) +
-    '<div class="sub-label">【いる場合：当該日本人従業員の情報】</div>' +
-    field('f-jpCompExp','経験年数','text',false,'例: 5年') +
-    field('f-jpCompJobDesc','職務内容','text',false,'例: 自社システムの設計・開発') +
-    field('f-jpCompSalary','月額報酬（円）','number',false,'例: 260000') +
-    '<div class="sub-label">【いない場合：報酬額の設定根拠】</div>' +
-    field('f-salaryRuleFlg','賃金規程の有無','select',false,'',null,['','有','無']) +
-    field('f-gjCompBasis','報酬額の設定根拠（賃金規程・給与テーブル等）','textarea',false,'例: 当社賃金規程の総合職初任給テーブルに基づき設定') +
-    field('f-jpCompReason','同等額以上であることの理由','textarea',false,'例: 同一部署の日本人正社員と同一の給与テーブルを適用しているため') +
+    field('f-gjCompExists','同種の業務を行う日本人従業員の有無','select',true,'',null,['','いる','いない']) +
+    '<div id="gjCompYes" style="display:none;">' +
+    '<div class="sub-label">【当該日本人従業員の情報】</div>' +
+    field('f-jpCompExp','経験年数','text',true,'例: 5年') +
+    field('f-jpCompJobDesc','職務内容','text',true,'例: 自社システムの設計・開発') +
+    field('f-jpCompSalary','月額報酬（円）','number',true,'例: 260000') +
+    '</div>' +
+    '<div id="gjCompNo" style="display:none;">' +
+    '<div class="sub-label">【報酬額の設定根拠】</div>' +
+    field('f-salaryRuleFlg','賃金規程の有無','select',true,'',null,['','有','無']) +
+    field('f-gjCompBasis','報酬額の設定根拠（賃金規程・給与テーブル等）','textarea',true,'例: 当社賃金規程の総合職初任給テーブルに基づき設定') +
+    '</div>' +
+    field('f-jpCompReason','同等額以上であることの理由','textarea',true,'例: 同一部署の日本人正社員と同一の給与テーブルを適用しているため') +
   '</div>' +
 
   '<div class="card"><div class="section-title">採用理由・その他</div>' +
-    field('f-gjHireReason','採用の経緯・理由（なぜこの人材が必要か）','textarea',false,'例: 海外展開の強化にあたり、〇〇語対応と情報工学の専門知識を併せ持つ人材が必要なため') +
-    field('f-gjExpectation','今後の事業展開・本人への期待','textarea',false,'例: 将来的に海外拠点の技術責任者として活躍を期待') +
+    field('f-gjHireReason','採用の経緯・理由（なぜこの人材が必要か）','textarea',true,'例: 海外展開の強化にあたり、〇〇語対応と情報工学の専門知識を併せ持つ人材が必要なため') +
+    field('f-gjExpectation','今後の事業展開・本人への期待','textarea',true,'例: 将来的に海外拠点の技術責任者として活躍を期待') +
     field('f-gjRemarks','その他 申請上の特記事項','textarea',false,'') +
   '</div>'
   );
@@ -3126,6 +3134,17 @@ function toggleGjRepNationality(v) {
     var rc = document.getElementById('f-gjRepResidenceCard'); if (rc) rc.value = '';
     var ne = document.getElementById('f-gjRepNameEnForeign'); if (ne) ne.value = '';
   }
+}
+// ver.20260911.02: 技人国企業 報酬の同等性（いる/いない）・契約期間（有期のみ終了日）の表示切替
+function toggleGjComp(v) {
+  var y = document.getElementById('gjCompYes'), n = document.getElementById('gjCompNo');
+  if (y) y.style.display = (v === 'いる') ? 'block' : 'none';
+  if (n) n.style.display = (v === 'いない') ? 'block' : 'none';
+}
+function toggleGjContractTerm(v) {
+  var w = document.getElementById('gjContractEndWrap');
+  if (w) w.style.display = (v === '定めあり（有期）') ? 'block' : 'none';
+  if (v !== '定めあり（有期）') { var e = document.getElementById('f-contractEnd'); if (e) e.value = ''; }
 }
 function toggleHakenBlock(v) {
   var blk = document.getElementById('hakenBlock');
@@ -3772,6 +3791,7 @@ function collectData() {
     if (d.gijinkokuExpStatus === 'あり') {
       d.gijinkokuExpYears  = val('f-gijinkokuExpYears');
       d.gijinkokuExpMonths = val('f-gijinkokuExpMonths');
+      d.gijinkokuWorkHistory = val('f-gijinkokuWorkHistory');
     }
   }
 
@@ -3963,6 +3983,53 @@ function _renderRichError(err){
   return html;
 }
 
+// ver.20260911.01: 技人国（＋告示46号）企業フォームは基本必須。
+//   表示中の「*」付き項目が未入力なら送信不可（非表示の条件項目は対象外）。途中保存は従来どおり可能。
+function _gjCompanyValidate() {
+  var root = document.getElementById('formBody') || document;
+  var labels = root.querySelectorAll('.field label');
+  for (var i = 0; i < labels.length; i++) {
+    var lb = labels[i];
+    if (!lb.querySelector('span.req')) continue;
+    var fld = lb.parentNode;
+    if (!fld || fld.offsetParent === null) continue; // 非表示ブロック
+    var inp = fld.querySelector('input,select,textarea');
+    if (!inp || inp.offsetParent === null) continue;
+    if (!(inp.value || '').trim()) {
+      var name = lb.textContent.replace(/\*/g, '').trim();
+      try { inp.focus(); } catch(e) {}
+      return '「' + name + '」は必須です。';
+    }
+  }
+  // 契約期間：有期なら契約終了日必須
+  if (val('f-gjContractTermFlg') === '定めあり（有期）' && !val('f-contractEnd')) return '「契約終了日」は必須です（有期契約のため）。';
+  // 締め日・支払日
+  if (!val('f-payCutoffMonth') || !val('f-payCutoffDay')) return '「締め日」は必須です。';
+  if (!val('f-payDayMonth') || !val('f-payDayDay')) return '「支払日」は必須です。';
+  // 報酬の同等性：いる／いないで必須項目を切替
+  var ex = val('f-gjCompExists');
+  if (ex === 'いる') {
+    var _own = parseInt(val('f-salaryMonthly')||'0',10), _jp = parseInt(val('f-jpCompSalary')||'0',10);
+    if (_own && _jp && _own < _jp && !window._gjSalaryAck) {
+      window._gjSalaryAck = true;
+      return '基本給（' + _own.toLocaleString() + '円）が同種業務の日本人（' + _jp.toLocaleString() + '円）より低くなっています。技人国は日本人と同等額以上が要件です。経験年数の差など理由がある場合は「同等額以上であることの理由」に記入のうえ、もう一度送信してください。';
+    }
+    if (!val('f-jpCompExp')) return '「日本人従業員の経験年数」は必須です。';
+    if (!val('f-jpCompJobDesc')) return '「日本人従業員の職務内容」は必須です。';
+    if (!val('f-jpCompSalary')) return '「日本人従業員の月額報酬」は必須です。';
+  } else if (ex === 'いない') {
+    if (!val('f-salaryRuleFlg')) return '「賃金規程の有無」は必須です。';
+    if (!val('f-gjCompBasis')) return '「報酬額の設定根拠」は必須です。';
+  }
+  // 管理店舗「あり」なら店舗を1件以上
+  if (val('f-gjHasStore') === 'あり') {
+    var st = document.querySelectorAll('#storeRows input');
+    var any = false; st.forEach(function(e){ if ((e.value||'').trim()) any = true; });
+    if (!any) return '管理・担当する店舗の情報を1件以上ご入力ください。';
+  }
+  return null;
+}
+
 function validate() {
   // ver.20260822: 特定技能2号 企業フォームの誓約書チェック（分野別の必要人数）
   if (type === 'company_tokutei2' || type === 'tokutei2_pledge') {
@@ -4000,6 +4067,9 @@ function validate() {
     //   誓約書チェックを通過したらここで完了させ、下の f-name 必須チェックに落ちて
     //   「氏名（パスポート表記）は必須です」で送信不能になるバグを修正。
     if (type === 'tokutei2_pledge') return null;
+  }
+    if (type === 'company_gijinkoku' || type === 'company_designated46') {
+    return _gjCompanyValidate();
   }
     if (type === 'company' || type === 'company_tokutei2' || type === 'company_gijinkoku' || type === 'company_designated46' || type === 'company_designated9') {
     if (!val('f-coName')) return '会社名は必須です。';
@@ -4058,7 +4128,11 @@ function validate() {
 
   // 技人国：新3項目の必須チェック（技能水準・日本語能力チェックは行わない）
   if (isGijinkoku) {
+    if (!val('f-eduCountry')) return '卒業した学校の国を入力してください。';
+    if (!val('f-education')) return '最終学歴を選択してください。';
+    if (!val('f-schoolName')) return '学校名を入力してください。';
     if (!val('f-completionDate')) return '卒業年月日を入力してください。';
+    if (!val('f-major')) return '専攻を入力してください。';
     if (!val('f-gijinkokuJpTest')) return '日本語能力（JLPT N2またはBJT 400点以上）の有無を選択してください。';
 
     var titleSt = val('f-gijinkokuTitleStatus');
@@ -4071,6 +4145,7 @@ function validate() {
       var yy = val('f-gijinkokuExpYears');
       var mm = val('f-gijinkokuExpMonths');
       if (!yy && !mm) return '実務経験の年数または月数を入力してください。';
+      if (!val('f-gijinkokuWorkHistory')) return '職歴（会社名・期間・仕事の内容）を入力してください。';
     }
   } else {
     // 特定技能：従来通りの技能水準・日本語能力のチェック
