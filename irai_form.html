@@ -145,10 +145,10 @@
 <div class="wrap">
 
   <header class="top">
-    <span class="company" id="companyBadge">（企業名は URL から自動表示）</span>
+    <span class="company" id="companyBadge" style="display:none"></span>
     <h1>申請依頼フォーム</h1>
     <p class="lead">内容をご入力ください。申請種別に応じて請求金額が自動計算されます。</p>
-    <p style="font-size:11px;color:var(--muted);margin:4px 0 0" id="ver">ver.20260909.10</p>
+    <p style="font-size:11px;color:var(--muted);margin:4px 0 0" id="ver">ver.20260909.11</p>
   </header>
 
   <!-- 1. 採用される会社（所属機関） -->
@@ -350,7 +350,9 @@
   const params = new URLSearchParams(location.search);
   const company = params.get("company");
   if (company) {
-    document.getElementById("companyBadge").textContent = company + " 様";
+    const b = document.getElementById("companyBadge");
+    b.textContent = company + " 様";
+    b.style.display = "";
     const org = document.getElementById("orgName");
     if (org && !org.value) org.value = company;
   }
