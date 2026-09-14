@@ -148,7 +148,7 @@
   <header class="top">
     <h1>申請依頼フォーム</h1>
     <p class="lead">内容をご入力ください。申請種別に応じて請求金額が自動計算されます。</p>
-    <p style="font-size:11px;color:var(--muted);margin:4px 0 0" id="ver">ver.20260909.12</p>
+    <p style="font-size:11px;color:var(--muted);margin:4px 0 0" id="ver">ver.20260909.13</p>
   </header>
 
   <!-- 1. 採用される会社（所属機関） -->
@@ -167,7 +167,7 @@
   </section>
 
   <!-- 2. 派遣先（任意） -->
-  <section class="card">
+  <section class="card" id="sec-dispatch">
     <div class="sec-head"><span class="sec-num">2</span><h2>派遣先</h2>
       <span class="opt">（ある場合のみ）</span></div>
     <div class="toggle-row">
@@ -354,6 +354,28 @@
     if (org) { org.value = company; org.readOnly = true; org.classList.add("locked"); }
   }
 
+  // URLパラメータ ?dispatch=off で派遣先セクションを非表示（会社専用リンク用）
+  const dispatchParam = (params.get("dispatch") || "").toLowerCase();
+  if (["off","no","0","hide","none"].includes(dispatchParam)) {
+    const sd = document.getElementById("sec-dispatch");
+    if (sd) sd.style.display = "none";
+  }
+  // ?simple=1 で「所属機関だけ」フォームにする（派遣先より下を全部非表示）
+  const simpleMode = ["1","true","yes","on"].includes((params.get("simple") || "").toLowerCase());
+  if (simpleMode) {
+    window.__SIMPLE__ = true;
+    document.querySelectorAll("section.card").forEach((sec,i)=>{ if (i>0) sec.style.display = "none"; });
+  }
+  // 表示中セクションの番号を1から振り直す
+  (function renumberSections(){
+    let n = 0;
+    document.querySelectorAll("section.card").forEach(sec=>{
+      if (sec.offsetParent === null) return; // 非表示はスキップ
+      const num = sec.querySelector(".sec-num");
+      if (num) { n++; num.textContent = n; }
+    });
+  })();
+
   // 派遣先トグル
   document.getElementById("hasDispatch").addEventListener("change", e=>{
     document.getElementById("dispatchFields").style.display = e.target.checked ? "block":"none";
@@ -442,6 +464,16 @@
   }
 
   function validate(){
+    if (window.__SIMPLE__) {
+      let sok = true;
+      document.querySelectorAll(".card input[type=text], .card input[type=email], .card input[type=tel]").forEach(el=>{
+        if (el.offsetParent === null) return;
+        if (el.classList.contains("optional")) return;
+        if (!el.value.trim()) sok = false;
+      });
+      document.getElementById("submitBtn").disabled = !sok;
+      return;
+    }
     let ok = true;
     // 表示中のすべての入力・選択を必須チェック（＝全項目必須）
     document.querySelectorAll(".card input[type=text], .card input[type=email], .card input[type=tel], .card input[type=date], .card select").forEach(el=>{
@@ -470,6 +502,13 @@
   document.getElementById("submitBtn").addEventListener("click", async ()=>{
     if (submitLocked) return;
     const btn = document.getElementById("submitBtn");
+    // simpleモード（所属機関だけ）は送信せず thanks.html へ遷移するだけ
+    if (window.__SIMPLE__) {
+      submitLocked = true;
+      btn.disabled = true; btn.textContent = "送信中…";
+      window.location.href = "thanks.html";
+      return;
+    }
     const applicants = [...peopleEl.querySelectorAll(".person")].map(p=>({
       name: p.querySelector(".p-name").value.trim(),
       nationality: p.querySelector(".p-nat").value.trim(),
