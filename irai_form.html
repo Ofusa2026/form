@@ -47,6 +47,7 @@
     font-size:15px; font-family:inherit; background:#fff; color:var(--ink);
   }
   input:focus, select:focus{outline:2px solid var(--accent-soft); border-color:var(--accent)}
+  input[readonly]{background:#f3f4f6; color:#374151; cursor:not-allowed}
   .grid2{display:grid; grid-template-columns:1fr 1fr; gap:12px}
   @media(max-width:520px){.grid2{grid-template-columns:1fr}}
 
@@ -145,10 +146,9 @@
 <div class="wrap">
 
   <header class="top">
-    <span class="company" id="companyBadge" style="display:none"></span>
     <h1>申請依頼フォーム</h1>
     <p class="lead">内容をご入力ください。申請種別に応じて請求金額が自動計算されます。</p>
-    <p style="font-size:11px;color:var(--muted);margin:4px 0 0" id="ver">ver.20260909.11</p>
+    <p style="font-size:11px;color:var(--muted);margin:4px 0 0" id="ver">ver.20260909.12</p>
   </header>
 
   <!-- 1. 採用される会社（所属機関） -->
@@ -346,15 +346,12 @@
     }
   };
 
-  // URLパラメータ ?company= で企業名表示（本番想定）
+  // URLパラメータ ?company= があれば、この会社専用フォームにする（所属機関名を固定）
   const params = new URLSearchParams(location.search);
   const company = params.get("company");
   if (company) {
-    const b = document.getElementById("companyBadge");
-    b.textContent = company + " 様";
-    b.style.display = "";
     const org = document.getElementById("orgName");
-    if (org && !org.value) org.value = company;
+    if (org) { org.value = company; org.readOnly = true; org.classList.add("locked"); }
   }
 
   // 派遣先トグル
