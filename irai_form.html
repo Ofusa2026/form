@@ -148,7 +148,7 @@
   <header class="top">
     <h1>申請依頼フォーム</h1>
     <p class="lead">内容をご入力ください。申請種別に応じて請求金額が自動計算されます。</p>
-    <p style="font-size:11px;color:var(--muted);margin:4px 0 0" id="ver">ver.20260909.13</p>
+    <p style="font-size:11px;color:var(--muted);margin:4px 0 0" id="ver">ver.20260916.02</p>
   </header>
 
   <!-- 1. 採用される会社（所属機関） -->
@@ -533,7 +533,8 @@
       },
       applicants: applicants,
       totalYen: parseInt((document.getElementById("total").textContent||"0").replace(/[^0-9]/g,"")) || 0,
-      checklist: ckDone + "/" + ckAll.length + "項目 確認済み"
+      checklist: ckDone + "/" + ckAll.length + "項目 確認済み",
+      dedicated: !!company
     };
     const orig = btn.textContent;
     submitLocked = true;
@@ -543,7 +544,14 @@
       const j = await r.json().catch(()=>({ok:r.ok}));
       if (j && j.ok) {
         btn.textContent = "送信しました";
-        alert("送信しました。担当者よりご連絡いたします。");
+        if (company) {
+          // 本登録（専用リンク）の送信完了
+          alert("本登録を受け付けました。担当者よりご連絡いたします。");
+        } else {
+          // 仮登録完了 → 本登録の専用リンクを発行して表示（コピー可）
+          const regLink = location.origin + location.pathname + "?company=" + encodeURIComponent(payload.company.name);
+          showRegLink(regLink);
+        }
       } else {
         throw new Error((j && j.error) || ("HTTP "+r.status));
       }
@@ -570,6 +578,31 @@
       ck.closest(".chk-item").classList.toggle("done", ck.checked);
     });
   });
+
+  // 仮登録完了時：本登録の専用リンクを発行して表示（コピー可・メール不要）
+  function showRegLink(link){
+    const ov = document.createElement("div");
+    ov.setAttribute("style","position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;z-index:9999;padding:16px");
+    const card = document.createElement("div");
+    card.setAttribute("style","background:#fff;max-width:520px;width:100%;border-radius:14px;padding:24px;box-shadow:0 12px 40px rgba(0,0,0,.25);font-family:inherit");
+    card.innerHTML =
+      '<div style="font-size:18px;font-weight:700;margin-bottom:8px">仮登録が完了しました</div>'+
+      '<div style="font-size:13px;color:#555;line-height:1.7;margin-bottom:14px">続いて<b>本登録</b>をお願いします。下記の貴社専用リンクから、所属機関名が入力済みのフォームが開きます。<br>担当者の円滑な手続きのため、<b>2日以内</b>のご入力をお願いいたします。</div>'+
+      '<input id="regLinkInput" readonly value="'+link+'" style="width:100%;box-sizing:border-box;padding:10px;border:1px solid #ccc;border-radius:8px;font-size:12px;margin-bottom:10px">'+
+      '<div style="display:flex;gap:8px;flex-wrap:wrap">'+
+        '<button id="regCopyBtn" type="button" style="flex:1;min-width:130px;padding:11px;border:0;border-radius:8px;background:#2b6cb0;color:#fff;font-weight:700;cursor:pointer">リンクをコピー</button>'+
+        '<a href="'+link+'" style="flex:1;min-width:130px;text-align:center;padding:11px;border-radius:8px;background:#38a169;color:#fff;font-weight:700;text-decoration:none">本登録フォームを開く</a>'+
+      '</div>'+
+      '<button id="regCloseBtn" type="button" style="margin-top:12px;width:100%;padding:8px;border:0;background:transparent;color:#888;cursor:pointer;font-size:12px">閉じる</button>';
+    ov.appendChild(card); document.body.appendChild(ov);
+    const inp = card.querySelector("#regLinkInput");
+    card.querySelector("#regCopyBtn").addEventListener("click", async ()=>{
+      try { await navigator.clipboard.writeText(link); }
+      catch(_) { inp.focus(); inp.select(); try{ document.execCommand("copy"); }catch(e){} }
+      const b=card.querySelector("#regCopyBtn"); const t=b.textContent; b.textContent="コピーしました"; setTimeout(()=>{ b.textContent=t; },1500);
+    });
+    card.querySelector("#regCloseBtn").addEventListener("click", ()=> ov.remove());
+  }
 
   personRow(); // 初期1名
 </script>
