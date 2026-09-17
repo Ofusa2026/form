@@ -191,7 +191,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20260917.01';
+var FORM_VERSION = 'ver.20260917.02';
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -206,6 +206,7 @@ if (!caseId) {
   if (_companyParam) caseId = (_companyParam.indexOf('co_') === 0) ? _companyParam : ('co_' + _companyParam);
 }
 var type    = params.get('type') || '';   // tokutei_nintei / tokutei_koushin / tokutei_henkou / gijinkoku_nintei / gijinkoku_koushin / gijinkoku_henkou / company
+var view    = params.get('view') || '';   // ver.20260917.02: view=upload で「カテゴリー判定＋必要書類アップロード」だけ表示
 var caseName = params.get('name') ? decodeURIComponent(params.get('name')) : '';
 // ver.20260812: 企業系フォームは翻訳不要（日本人担当者が入力）
 var _isCompanyForm = (type === 'company' || type === 'support_org' || type === 'tokutei2_pledge' || (type||'').indexOf('jaim') >= 0 || (type||'').indexOf('company_') === 0);
@@ -1890,6 +1891,38 @@ function field(id, label, inputType, required, placeholder, transKey, options) {
   }
   h += '</div>';
   return h;
+}
+
+
+// ver.20260917.02: view=upload モード（所属機関カテゴリー判定＋必要書類アップロードだけを表示）
+function buildIraiUpload(){
+  return '<div class="card"><div class="section-title">必要書類のアップロード（所属機関）</div>'
+      + '<div style="font-size:12px;color:#6b7280;line-height:1.7;">下の質問にお答えいただくと、所属機関カテゴリー（1〜4）と必要書類が表示されます。表示された書類をこちらからアップロードしてください。</div></div>'
+      + '<div class="card">' +
+    '<div class="field">' +
+      '<label>所属機関カテゴリー判定<span class="req">*</span></label>' +
+      '<div style="font-size:12px;color:#6b7280;line-height:1.7;margin-bottom:8px;">下記にお答えいただくと、カテゴリー（1〜4）と必要書類が自動で表示されます。</div>' +
+      '<div style="margin-bottom:10px;"><div style="font-size:12px;font-weight:700;color:#374151;line-height:1.6;margin-bottom:4px;">Q1. 四季報の写し、または証券取引所に上場していることを証明できますか？<br><span style="font-weight:400;color:#6b7280;">または「一定の条件を満たす企業等」（<a href="https://www.moj.go.jp/isa/content/930004712.pdf" target="_blank" rel="noopener">対象一覧PDF</a>：ユースエール／くるみん／えるぼし／健康経営優良法人 等）に該当しますか？</span></div>' +
+        '<select id="f-gjCat1" onchange="computeGjCategory()"><option value="">選択してください</option><option value="yes">はい</option><option value="no">いいえ</option></select></div>' +
+      '<div id="gjCatQ2w" style="margin-bottom:10px;display:none;"><div style="font-size:12px;font-weight:700;color:#374151;line-height:1.6;margin-bottom:4px;">Q2. 前年分の法定調書合計表の「源泉徴収税額」が1,000万円以上ありますか？</div>' +
+        '<select id="f-gjCat2" onchange="computeGjCategory()"><option value="">選択してください</option><option value="yes">はい</option><option value="no">いいえ（1,000万円未満）</option></select></div>' +
+      '<div id="gjCatQ3w" style="margin-bottom:10px;display:none;"><div style="font-size:12px;font-weight:700;color:#374151;line-height:1.6;margin-bottom:4px;">Q3. 前年分の職員の給与所得の源泉徴収票等の法定調書合計表を提出していますか？</div>' +
+        '<select id="f-gjCat3" onchange="computeGjCategory()"><option value="">選択してください</option><option value="yes">はい</option><option value="no">いいえ（いずれにも該当しない）</option></select></div>' +
+      '<div id="gjCatResult" style="display:none;padding:12px;border-radius:10px;background:#eff6ff;border:1px solid #bfdbfe;"></div>' +
+      '<input type="hidden" id="f-gjListedCategory" value="">' +
+    '</div>'
+      + '</div>' +
+  '<div class="card" id="iraiUpCard" style="display:none;">' +
+    '<div class="section-title">必要書類のアップロード</div>' +
+    '<div style="font-size:12px;color:#6b7280;line-height:1.7;margin-bottom:10px;">上で表示された必要書類をこちらからアップロードしてください。（PDF・画像、20MBまで、複数選択できます）</div>' +
+    '<div style="border:2px dashed #bfdbfe;border-radius:10px;padding:16px;text-align:center;background:#f8fbff;">' +
+      '<label for="f-iraiUpFile" style="display:inline-block;background:#2563eb;color:#fff;font-size:14px;font-weight:700;padding:11px 18px;border-radius:8px;cursor:pointer;">ファイルを選択</label>' +
+      '<input type="file" id="f-iraiUpFile" multiple accept=".pdf,image/*" style="display:none;" onchange="iraiUpload(this.files)">' +
+      '<div style="font-size:11px;color:#9ca3af;margin-top:8px;">PDF・JPG・PNG／20MBまで／複数可</div>' +
+    '</div>' +
+    '<div id="iraiUpList" style="margin-top:12px;"></div>' +
+  '</div>'
+  ;
 }
 
 // ===== 所属機関カテゴリー判定（Q1〜Q3で自動判定）+ 必要書類表示 =====
@@ -4588,6 +4621,11 @@ function confirmName(isMatch){
 }
 
 (function init() {
+  if (view === 'upload') {   // ver.20260917.02: アップロード専用モード
+    document.getElementById('formBody').innerHTML = buildIraiUpload();
+    var _vv = document.getElementById('ver-display'); if (_vv) _vv.textContent = FORM_VERSION;
+    return;
+  }
   if (caseName) {
     var _escName = String(caseName).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
     document.getElementById('infoBox').innerHTML = '<span class="case-name">' + _escName + '</span>大房行政書士法人よりご依頼の情報をご入力ください。';
