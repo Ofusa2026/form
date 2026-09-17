@@ -191,7 +191,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20260917.05';
+var FORM_VERSION = 'ver.20260917.06';
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -1904,6 +1904,8 @@ function buildIraiUpload(){
     ? '<div class="iu-cobox">所属機関：<b>'+_co+'</b></div>'
     : '<div class="iu-note">これは <b>?view=upload</b>（書類アップロード独立ページ）のサンプル表示です。専用リンク（<b>&name=会社名&case=案件ID</b>）から開くと会社名が入り、アップロードが保存されます。</div><div class="iu-cobox">所属機関：<b>株式会社サンプル</b><br><span style="color:#2563eb">※ 専用リンクから開くと会社名が入った状態で表示されます</span></div>';
   var css = '<style>'
+    +'#iuRoot select{width:100%;padding:13px 14px;border:1.5px solid #e5e7eb;border-radius:10px;font-size:16px;outline:none;background:#fff;-webkit-appearance:none;appearance:none;min-height:50px;background-image:url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'12\' height=\'8\' viewBox=\'0 0 12 8\'%3E%3Cpath d=\'M1 1l5 5 5-5\' stroke=\'%236b7280\' stroke-width=\'1.5\' fill=\'none\' stroke-linecap=\'round\'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;padding-right:36px;}'
+    +'#iuRoot select:focus{border-color:#2563eb;box-shadow:0 0 0 3px rgba(37,99,235,.1);}'
     +'#iuRoot .iu-cobox{background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:10px 12px;margin-bottom:12px;font-size:12px;color:#1e3a8a;}'
     +'#iuRoot .iu-cobox b{font-size:15px;}'
     +'#iuRoot .iu-note{font-size:12px;color:#92400e;background:#fffbeb;border:1px solid #fcd34d;border-radius:8px;padding:10px 12px;margin-bottom:12px;line-height:1.6;}'
