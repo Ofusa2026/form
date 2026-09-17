@@ -191,7 +191,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20260911.04';
+var FORM_VERSION = 'ver.20260917.01';
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -1892,6 +1892,70 @@ function field(id, label, inputType, required, placeholder, transKey, options) {
   return h;
 }
 
+// ===== 所属機関カテゴリー判定（Q1〜Q3で自動判定）+ 必要書類表示 =====
+var GJ_CAT_VALUE = {1:'上場企業等（カテゴリ1）',2:'源泉徴収税額1000万円以上（カテゴリ2）',3:'源泉徴収の法定調書提出あり（カテゴリ3）',4:'その他（カテゴリ4）'};
+function computeGjCategory(){
+  var L='https://www.moj.go.jp/isa/content/';
+  var houtei='前年分の職員の給与所得の源泉徴収票等の法定調書合計表（写し）　1通';
+  var riyu='前年分の職員の給与所得の源泉徴収票等の法定調書合計表を提出できない理由を明らかにする、次のいずれかの資料'+
+    '<ul><li>(1) 源泉徴収の免除を受ける機関の場合：外国法人の源泉徴収に対する免除証明書その他の源泉徴収を要しないことを明らかにする資料　1通</li>'+
+    '<li>(2) 上記(1)を除く機関の場合：<ul><li>給与支払事務所等の開設届出書の写し　1通</li>'+
+    '<li>次のいずれかの資料：<br>（ア）直近3か月分の給与所得・退職所得等の所得税徴収高計算書（領収日付印のあるものの写し）　1通<br>（イ）納期の特例を受けている場合は、その承認を受けていることを明らかにする資料　1通</li></ul></li></ul>';
+  var detail=[
+    '申請人の活動の内容等を明らかにする次のいずれかの資料<ul><li>(1) 労働契約を締結する場合：労働基準法第15条第1項及び同法施行規則第5条に基づき交付される労働条件を明示する文書　1通</li>'+
+    '<li>(2) 日本法人である会社の役員に就任する場合：役員報酬を定める定款の写し、又は役員報酬を決議した株主総会の議事録（報酬委員会設置会社は同委員会の議事録）の写し　1通</li>'+
+    '<li>(3) 外国法人内の日本支店に転勤する場合／会社以外の団体の役員に就任する場合：地位（担当業務）・期間・支払われる報酬額を明らかにする所属団体の文書　1通</li></ul>',
+    '登記事項証明書　1通',
+    '事業内容を明らかにする次のいずれかの資料<ul><li>(1) 勤務先等の沿革・役員・組織・事業内容（主要取引先と取引実績を含む）等が詳細に記載された案内書　1通</li><li>(2) その他の勤務先等が作成した上記(1)に準ずる文書　1通</li></ul>',
+    '直近の年度の決算文書の写し（新規事業の場合は事業計画書）　1通',
+    '所属機関の代表者に関する申告書（参考様式）（<a href="'+L+'001460262.pdf" target="_blank" rel="noopener">様式PDF</a>）　1通',
+    '（言語能力を用いて対人業務に従事する場合）業務上使用する言語について、CEFR B2相当の言語能力を有することを証する資料　1通'
+  ];
+  var docs={1:['四季報の写し 又は 証券取引所に上場していることを証明する文書（写し）　1通','または「一定の条件を満たす企業等」の認定証等の写し（<a href="'+L+'930004712.pdf" target="_blank" rel="noopener">対象一覧PDF</a>）　1通'],2:[houtei],3:[houtei].concat(detail),4:[riyu].concat(detail)};
+  var haken='<div style="margin-top:12px;padding-top:10px;border-top:1px dashed #bfdbfe;"><div style="font-size:12px;font-weight:700;color:#2563eb;margin-bottom:4px;">派遣雇用の場合の共通書類</div><ul style="margin:0;padding-left:18px;font-size:12px;line-height:1.8;color:#374151;"><li>申請人の派遣労働に関する誓約書：<a href="'+L+'001457161.docx" target="_blank" rel="noopener">所属機関（派遣元）用</a> ／ <a href="'+L+'001457162.docx" target="_blank" rel="noopener">派遣先用</a></li><li>労働条件通知書（雇用契約書）の写し</li><li>労働者派遣個別契約書の写し</li></ul></div>';
+  function _g(id){return document.getElementById(id);}
+  function _sh(id,on){var e=_g(id);if(e)e.style.display=on?'block':'none';}
+  var q1=_g('f-gjCat1')?_g('f-gjCat1').value:'', q2=_g('f-gjCat2')?_g('f-gjCat2').value:'', q3=_g('f-gjCat3')?_g('f-gjCat3').value:'', cat=0;
+  _sh('gjCatQ2w', q1==='no'); if(q1!=='no' && _g('f-gjCat2')){_g('f-gjCat2').value='';}
+  _sh('gjCatQ3w', q1==='no'&&q2==='no'); if(!(q1==='no'&&q2==='no') && _g('f-gjCat3')){_g('f-gjCat3').value='';}
+  if(q1==='yes')cat=1; else if(q1==='no'&&q2==='yes')cat=2; else if(q1==='no'&&q2==='no'&&q3==='yes')cat=3; else if(q1==='no'&&q2==='no'&&q3==='no')cat=4;
+  var hid=_g('f-gjListedCategory'); if(hid) hid.value = cat?GJ_CAT_VALUE[cat]:'';
+  var r=_g('gjCatResult');
+  _sh('iraiUpCard', !!cat);
+  if(!r) return;
+  if(!cat){ r.style.display='none'; return; }
+  var li=docs[cat].map(function(x){return '<li style="margin:5px 0;">'+x+'</li>';}).join('');
+  r.innerHTML='<div style="font-size:15px;font-weight:800;color:#1e3a8a;margin-bottom:8px;">→ 所属機関カテゴリー '+cat+'</div><div style="font-size:12px;font-weight:700;color:#2563eb;margin-bottom:4px;">必要書類</div><ul style="margin:0;padding-left:18px;font-size:12px;line-height:1.8;color:#374151;">'+li+'</ul>'+haken;
+  r.style.display='block';
+}
+
+// ===== 必要書類アップロード（irai-docs バケットへ caseId 単位で保存）=====
+function _iraiRow(name){
+  var wrap=document.getElementById('iraiUpList');
+  var el=document.createElement('div');
+  el.style.cssText='display:flex;justify-content:space-between;align-items:center;font-size:12px;background:#f9fafb;border:1px solid #eef0f3;border-radius:8px;padding:8px 10px;margin-bottom:6px;';
+  el.innerHTML='<span style="color:#374151;word-break:break-all;"></span><span class="st" style="color:#6b7280;white-space:nowrap;margin-left:8px;"></span>';
+  el.firstChild.textContent=name;
+  wrap.appendChild(el);
+  return { set:function(msg,err,ok){ var s=el.querySelector('.st'); s.textContent=msg; s.style.color=err?'#dc2626':(ok?'#16a34a':'#6b7280'); } };
+}
+function iraiUpload(files){
+  if(!files||!files.length) return;
+  if(!caseId){ alert('案件情報（case）が特定できないためアップロードできません。担当者にご連絡ください。'); return; }
+  var safeCase=String(caseId).replace(/[^\w\-]+/g,'_');
+  Array.prototype.forEach.call(files,function(f){
+    var row=_iraiRow(f.name);
+    if(f.size>20*1024*1024){ row.set('サイズ超過（20MB以下にしてください）',true); return; }
+    row.set('アップロード中…',false);
+    var safe=f.name.replace(/[^\w.\-]+/g,'_');
+    var path=safeCase+'/'+Date.now()+'_'+safe;
+    fetch(SUPABASE_URL+'/storage/v1/object/irai-docs/'+path,{method:'POST',headers:{'apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY,'Content-Type':f.type||'application/octet-stream','x-upsert':'true'},body:f})
+      .then(function(res){ if(res.ok){ row.set('アップロード完了',false,true); } else { return res.text().then(function(t){ row.set('失敗しました（'+res.status+'）',true); }); } })
+      .catch(function(){ row.set('通信エラー。再度お試しください',true); });
+  });
+  var inp=document.getElementById('f-iraiUpFile'); if(inp) inp.value='';
+}
+
 // ===== 企業フォーム 入力補助 =====
 
 // ① 郵便番号 → 住所自動入力（zipcloud API）
@@ -2600,8 +2664,30 @@ function buildCompanyGijinkokuForm() {
       field('f-coForeignEmployees','うち外国人職員数','number',true,'例: 5') +
     '</div>' +
     field('f-coTrainees','技能実習生数','number',true,'例: 0') +
-    field('f-gjListedCategory','企業区分（所属機関カテゴリ）','select',true,'',null,['','上場企業等（カテゴリ1）','源泉徴収税額1000万円以上（カテゴリ2）','源泉徴収の法定調書提出あり（カテゴリ3）','その他（カテゴリ4）','不明']) +
+    '<div class="field">' +
+      '<label>所属機関カテゴリー判定<span class="req">*</span></label>' +
+      '<div style="font-size:12px;color:#6b7280;line-height:1.7;margin-bottom:8px;">下記にお答えいただくと、カテゴリー（1〜4）と必要書類が自動で表示されます。</div>' +
+      '<div style="margin-bottom:10px;"><div style="font-size:12px;font-weight:700;color:#374151;line-height:1.6;margin-bottom:4px;">Q1. 四季報の写し、または証券取引所に上場していることを証明できますか？<br><span style="font-weight:400;color:#6b7280;">または「一定の条件を満たす企業等」（<a href="https://www.moj.go.jp/isa/content/930004712.pdf" target="_blank" rel="noopener">対象一覧PDF</a>：ユースエール／くるみん／えるぼし／健康経営優良法人 等）に該当しますか？</span></div>' +
+        '<select id="f-gjCat1" onchange="computeGjCategory()"><option value="">選択してください</option><option value="yes">はい</option><option value="no">いいえ</option></select></div>' +
+      '<div id="gjCatQ2w" style="margin-bottom:10px;display:none;"><div style="font-size:12px;font-weight:700;color:#374151;line-height:1.6;margin-bottom:4px;">Q2. 前年分の法定調書合計表の「源泉徴収税額」が1,000万円以上ありますか？</div>' +
+        '<select id="f-gjCat2" onchange="computeGjCategory()"><option value="">選択してください</option><option value="yes">はい</option><option value="no">いいえ（1,000万円未満）</option></select></div>' +
+      '<div id="gjCatQ3w" style="margin-bottom:10px;display:none;"><div style="font-size:12px;font-weight:700;color:#374151;line-height:1.6;margin-bottom:4px;">Q3. 前年分の職員の給与所得の源泉徴収票等の法定調書合計表を提出していますか？</div>' +
+        '<select id="f-gjCat3" onchange="computeGjCategory()"><option value="">選択してください</option><option value="yes">はい</option><option value="no">いいえ（いずれにも該当しない）</option></select></div>' +
+      '<div id="gjCatResult" style="display:none;padding:12px;border-radius:10px;background:#eff6ff;border:1px solid #bfdbfe;"></div>' +
+      '<input type="hidden" id="f-gjListedCategory" value="">' +
+    '</div>' +
     field('f-gjBusiness','事業内容（主な取扱商品・サービス）','textarea',true,'例: 業務用ソフトウェアの受託開発および保守') +
+  '</div>' +
+
+  '<div class="card" id="iraiUpCard" style="display:none;">' +
+    '<div class="section-title">必要書類のアップロード</div>' +
+    '<div style="font-size:12px;color:#6b7280;line-height:1.7;margin-bottom:10px;">上で表示された必要書類をこちらからアップロードしてください。（PDF・画像、20MBまで、複数選択できます）</div>' +
+    '<div style="border:2px dashed #bfdbfe;border-radius:10px;padding:16px;text-align:center;background:#f8fbff;">' +
+      '<label for="f-iraiUpFile" style="display:inline-block;background:#2563eb;color:#fff;font-size:14px;font-weight:700;padding:11px 18px;border-radius:8px;cursor:pointer;">ファイルを選択</label>' +
+      '<input type="file" id="f-iraiUpFile" multiple accept=".pdf,image/*" style="display:none;" onchange="iraiUpload(this.files)">' +
+      '<div style="font-size:11px;color:#9ca3af;margin-top:8px;">PDF・JPG・PNG／20MBまで／複数可</div>' +
+    '</div>' +
+    '<div id="iraiUpList" style="margin-top:12px;"></div>' +
   '</div>' +
 
   '<div class="card"><div class="section-title">所在地</div>' +
