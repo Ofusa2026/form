@@ -191,7 +191,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20260917.06';
+var FORM_VERSION = 'ver.20260917.07';
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -207,6 +207,8 @@ if (!caseId) {
 }
 var type    = params.get('type') || '';   // tokutei_nintei / tokutei_koushin / tokutei_henkou / gijinkoku_nintei / gijinkoku_koushin / gijinkoku_henkou / company
 var view    = params.get('view') || '';   // ver.20260917.02: view=upload で「カテゴリー判定＋必要書類アップロード」だけ表示
+var cofolder = params.get('cofolder') || '';   // ver.20260917.07: 会社DriveフォルダID（あればGAS経由でDriveへコピー）
+var IU_GAS_URL = 'https://script.google.com/macros/s/AKfycbxxBta5g1jXVzTf-s4EgaIbMc3No42aaH8guMOorQQ8HZl2SlNu-8vpu0fCFj_rjKsalQ/exec';
 var caseName = params.get('name') ? decodeURIComponent(params.get('name')) : '';
 // ver.20260812: 企業系フォームは翻訳不要（日本人担当者が入力）
 var _isCompanyForm = (type === 'company' || type === 'support_org' || type === 'tokutei2_pledge' || (type||'').indexOf('jaim') >= 0 || (type||'').indexOf('company_') === 0);
@@ -1995,6 +1997,16 @@ function iuRenderPerDoc(list){
     box.appendChild(it);
   });
 }
+// ver.20260917.07: GASをJSONPで呼ぶ（ブラウザ→Drive直接不可のためGAS経由でコピー）
+var _iuGasN=0;
+function _iuGas(payload, cb){
+  var cbName='_iuGasCb'+(_iuGasN++);
+  window[cbName]=function(r){ try{ if(cb) cb(r); } finally { try{ delete window[cbName]; }catch(e){} var sc=document.getElementById(cbName); if(sc&&sc.parentNode) sc.parentNode.removeChild(sc); } };
+  var sc=document.createElement('script'); sc.id=cbName;
+  sc.src=IU_GAS_URL+'?jsonpPost='+encodeURIComponent(JSON.stringify(payload))+'&callback='+cbName;
+  sc.onerror=function(){ if(window[cbName]) window[cbName]({status:'error',msg:'GAS通信エラー'}); };
+  document.body.appendChild(sc);
+}
 // 実アップロード：irai-docs/<caseId>/<書類名>/<timestamp_ファイル名>
 function iuUpload(files, docLabel, ul, badge){
   if(!files||!files.length) return;
@@ -2013,7 +2025,21 @@ function iuUpload(files, docLabel, ul, badge){
     var safe=f.name.replace(/[^\w.\-]+/g,'_');
     var path=safeCase+'/'+safeDoc+'/'+Date.now()+'_'+safe;
     fetch(SUPABASE_URL+'/storage/v1/object/irai-docs/'+path,{method:'POST',headers:{'apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY,'Content-Type':f.type||'application/octet-stream','x-upsert':'true'},body:f})
-      .then(function(res){ if(res.ok){ st.textContent='アップロード完了'; st.style.color='#16a34a'; okCount++; if(okCount===total&&badge){ badge.textContent='提出済み'; badge.className='iu-pdbadge done'; } } else { st.textContent='失敗（'+res.status+'）'; st.style.color='#dc2626'; } })
+      .then(function(res){
+        if(res.ok){
+          if(cofolder){
+            st.textContent='Driveへ保存中…'; st.style.color='#6b7280';
+            _iuGas({action:'iraiDocToDrive', data:{ path:path, folderId:cofolder, docName:docLabel, fileName:f.name }}, function(r){
+              if(r && r.status==='ok'){ st.textContent='保存完了（Drive）'; st.style.color='#16a34a'; }
+              else { st.textContent='バケット保存OK・Drive転送失敗'; st.style.color='#ea580c'; }
+              okCount++; if(okCount===total&&badge){ badge.textContent='提出済み'; badge.className='iu-pdbadge done'; }
+            });
+          } else {
+            st.textContent='アップロード完了'; st.style.color='#16a34a';
+            okCount++; if(okCount===total&&badge){ badge.textContent='提出済み'; badge.className='iu-pdbadge done'; }
+          }
+        } else { st.textContent='失敗（'+res.status+'）'; st.style.color='#dc2626'; }
+      })
       .catch(function(){ st.textContent='通信エラー'; st.style.color='#dc2626'; });
   });
 }
