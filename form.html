@@ -191,7 +191,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20260917.10';
+var FORM_VERSION = 'ver.20260917.11';
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -2013,7 +2013,7 @@ function iuUpload(files, docLabel, ul, badge){
   if(!files||!files.length) return;
   var isSample = !caseId;
   var safeCase = String(caseId||'sample').replace(/[^\w\-]+/g,'_');
-  var safeDoc  = String(docLabel||'書類').replace(/[^\w\u3040-\u30ff\u4e00-\u9fff\-]+/g,'_').slice(0,60);
+  var safeDoc  = 'docs';   // ver.20260917.11: バケットキーは非ASCII不可のため固定ASCII。書類名の識別はGASのdocNameで行う
   var okCount=0, total=files.length;
   Array.prototype.forEach.call(files, function(f){
     var li=document.createElement('li');
