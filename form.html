@@ -191,7 +191,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20260917.02';
+var FORM_VERSION = 'ver.20260917.03';
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -1894,36 +1894,128 @@ function field(id, label, inputType, required, placeholder, transKey, options) {
 }
 
 
-// ver.20260917.02: view=upload モード（所属機関カテゴリー判定＋必要書類アップロードだけを表示）
+// ver.20260917.03: view=upload モード（アーティファクト設計に合わせた独立ページ。実アップロードは irai-docs へ保存）
+function _iuG(id){ return document.getElementById(id); }
+function _iuSh(id,on){ var e=_iuG(id); if(e) e.style.display=on?'block':'none'; }
+function _iuEsc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
 function buildIraiUpload(){
-  return '<div class="card"><div class="section-title">必要書類のアップロード（所属機関）</div>'
-      + '<div style="font-size:12px;color:#6b7280;line-height:1.7;">下の質問にお答えいただくと、所属機関カテゴリー（1〜4）と必要書類が表示されます。表示された書類をこちらからアップロードしてください。</div></div>'
-      + '<div class="card">' +
-    '<div class="field">' +
-      '<label>所属機関カテゴリー判定<span class="req">*</span></label>' +
-      '<div style="font-size:12px;color:#6b7280;line-height:1.7;margin-bottom:8px;">下記にお答えいただくと、カテゴリー（1〜4）と必要書類が自動で表示されます。</div>' +
-      '<div style="margin-bottom:10px;"><div style="font-size:12px;font-weight:700;color:#374151;line-height:1.6;margin-bottom:4px;">Q1. 四季報の写し、または証券取引所に上場していることを証明できますか？<br><span style="font-weight:400;color:#6b7280;">または「一定の条件を満たす企業等」（<a href="https://www.moj.go.jp/isa/content/930004712.pdf" target="_blank" rel="noopener">対象一覧PDF</a>：ユースエール／くるみん／えるぼし／健康経営優良法人 等）に該当しますか？</span></div>' +
-        '<select id="f-gjCat1" onchange="computeGjCategory()"><option value="">選択してください</option><option value="yes">はい</option><option value="no">いいえ</option></select></div>' +
-      '<div id="gjCatQ2w" style="margin-bottom:10px;display:none;"><div style="font-size:12px;font-weight:700;color:#374151;line-height:1.6;margin-bottom:4px;">Q2. 前年分の法定調書合計表の「源泉徴収税額」が1,000万円以上ありますか？</div>' +
-        '<select id="f-gjCat2" onchange="computeGjCategory()"><option value="">選択してください</option><option value="yes">はい</option><option value="no">いいえ（1,000万円未満）</option></select></div>' +
-      '<div id="gjCatQ3w" style="margin-bottom:10px;display:none;"><div style="font-size:12px;font-weight:700;color:#374151;line-height:1.6;margin-bottom:4px;">Q3. 前年分の職員の給与所得の源泉徴収票等の法定調書合計表を提出していますか？</div>' +
-        '<select id="f-gjCat3" onchange="computeGjCategory()"><option value="">選択してください</option><option value="yes">はい</option><option value="no">いいえ（いずれにも該当しない）</option></select></div>' +
-      '<div id="gjCatResult" style="display:none;padding:12px;border-radius:10px;background:#eff6ff;border:1px solid #bfdbfe;"></div>' +
-      '<input type="hidden" id="f-gjListedCategory" value="">' +
-    '</div>'
-      + '</div>' +
-  '<div class="card" id="iraiUpCard" style="display:none;">' +
-    '<div class="section-title">必要書類のアップロード</div>' +
-    '<div style="font-size:12px;color:#6b7280;line-height:1.7;margin-bottom:10px;">上で表示された必要書類をこちらからアップロードしてください。（PDF・画像、20MBまで、複数選択できます）</div>' +
-    '<div style="border:2px dashed #bfdbfe;border-radius:10px;padding:16px;text-align:center;background:#f8fbff;">' +
-      '<label for="f-iraiUpFile" style="display:inline-block;background:#2563eb;color:#fff;font-size:14px;font-weight:700;padding:11px 18px;border-radius:8px;cursor:pointer;">ファイルを選択</label>' +
-      '<input type="file" id="f-iraiUpFile" multiple accept=".pdf,image/*" style="display:none;" onchange="iraiUpload(this.files)">' +
-      '<div style="font-size:11px;color:#9ca3af;margin-top:8px;">PDF・JPG・PNG／20MBまで／複数可</div>' +
-    '</div>' +
-    '<div id="iraiUpList" style="margin-top:12px;"></div>' +
-  '</div>'
-  ;
+  var _co = caseName ? _iuEsc(caseName) : '';
+  var coBlock = _co
+    ? '<div class="iu-cobox">所属機関：<b>'+_co+'</b></div>'
+    : '<div class="iu-note">これは <b>?view=upload</b>（書類アップロード独立ページ）のサンプル表示です。専用リンク（<b>&name=会社名&case=案件ID</b>）から開くと会社名が入り、アップロードが保存されます。</div><div class="iu-cobox">所属機関：<b>株式会社サンプル</b><br><span style="color:#2563eb">※ 専用リンクから開くと会社名が入った状態で表示されます</span></div>';
+  var css = '<style>'
+    +'#iuRoot .iu-cobox{background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:10px 12px;margin-bottom:12px;font-size:12px;color:#1e3a8a;}'
+    +'#iuRoot .iu-cobox b{font-size:15px;}'
+    +'#iuRoot .iu-note{font-size:12px;color:#92400e;background:#fffbeb;border:1px solid #fcd34d;border-radius:8px;padding:10px 12px;margin-bottom:12px;line-height:1.6;}'
+    +'#iuRoot .iu-hd{background:#0f2040;color:#fff;border-radius:12px;padding:14px 16px;margin-bottom:12px;}'
+    +'#iuRoot .iu-hd h1{font-size:16px;font-weight:800;margin:0 0 3px;}'
+    +'#iuRoot .iu-hd .iu-badge{display:inline-block;font-size:11px;font-weight:700;padding:2px 10px;border-radius:20px;margin-top:4px;background:#10b981;color:#fff;}'
+    +'#iuRoot .iu-q{margin-bottom:12px;}'
+    +'#iuRoot .iu-ql{font-size:12px;font-weight:700;color:#374151;line-height:1.6;margin-bottom:4px;}'
+    +'#iuRoot .iu-qs{font-weight:400;color:#6b7280;}'
+    +'#iuRoot .iu-res{display:none;margin-top:4px;padding:14px;border-radius:10px;background:#eff6ff;border:1px solid #bfdbfe;}'
+    +'#iuRoot .iu-res .iu-cat{font-size:16px;font-weight:800;color:#1e3a8a;margin-bottom:8px;}'
+    +'#iuRoot .iu-res .iu-dl{font-size:12px;font-weight:700;color:#2563eb;margin:0 0 4px;}'
+    +'#iuRoot .iu-res ul{margin:0 0 4px;padding-left:18px;font-size:12px;line-height:1.8;color:#374151;}'
+    +'#iuRoot .iu-res .iu-grp{margin-top:12px;padding-top:10px;border-top:1px dashed #bfdbfe;}'
+    +'#iuRoot .iu-drop{border:2px dashed #bfdbfe;border-radius:10px;padding:18px 14px;text-align:center;background:#f8fbff;}'
+    +'#iuRoot .iu-drop label{display:inline-block;background:#2563eb;color:#fff;font-size:14px;font-weight:700;padding:11px 18px;border-radius:8px;cursor:pointer;}'
+    +'#iuRoot .iu-drop .iu-hint{font-size:11px;color:#9ca3af;margin-top:8px;}'
+    +'#iuRoot .iu-perdoc{margin-top:14px;}'
+    +'#iuRoot .iu-pd{border:1px solid #eef0f3;border-radius:10px;padding:10px 12px;margin-bottom:8px;}'
+    +'#iuRoot .iu-pdname{font-size:12px;font-weight:700;color:#374151;margin-bottom:6px;display:flex;align-items:center;gap:6px;}'
+    +'#iuRoot .iu-pdbadge{font-size:10px;font-weight:700;padding:1px 7px;border-radius:10px;background:#fee2e2;color:#b91c1c;}'
+    +'#iuRoot .iu-pdbadge.done{background:#dcfce7;color:#166534;}'
+    +'#iuRoot .iu-pdbtn{font-size:12px;color:#2563eb;border:1px solid #bfdbfe;background:#f8fbff;border-radius:8px;padding:6px 10px;cursor:pointer;}'
+    +'#iuRoot .iu-uplist{list-style:none;padding:0;margin:8px 0 0;}'
+    +'#iuRoot .iu-uplist li{display:flex;align-items:center;justify-content:space-between;font-size:12px;color:#374151;background:#f9fafb;border:1px solid #eef0f3;border-radius:8px;padding:7px 10px;margin-bottom:5px;}'
+    +'#iuRoot .iu-uplist .st{white-space:nowrap;margin-left:8px;}'
+    +'</style>';
+  return css
+    + '<div id="iuRoot">'
+    + '<div class="iu-hd"><h1>書類アップロード</h1><span class="iu-badge">技術・人文知識・国際業務</span></div>'
+    + coBlock
+    + '<div class="card"><div class="section-title">所属機関カテゴリー判定</div>'
+    +   '<div style="font-size:12px;color:#6b7280;line-height:1.7;margin-bottom:14px;">下記にお答えいただくと、カテゴリー（1〜4）と必要書類が表示されます。</div>'
+    +   '<div class="iu-q"><div class="iu-ql">Q1. 四季報の写し、または上場を証明できますか？<br><span class="iu-qs">または「一定の条件を満たす企業等」（<a href="https://www.moj.go.jp/isa/content/930004712.pdf" target="_blank" rel="noopener">対象一覧PDF</a>）に該当しますか？</span></div>'
+    +     '<select id="iu-q1" onchange="iuCalc()"><option value="">選択してください</option><option value="yes">はい</option><option value="no">いいえ</option></select></div>'
+    +   '<div class="iu-q" id="iu-q2w" style="display:none;"><div class="iu-ql">Q2. 前年分の法定調書合計表の源泉徴収税額が1,000万円以上ですか？</div>'
+    +     '<select id="iu-q2" onchange="iuCalc()"><option value="">選択してください</option><option value="yes">はい</option><option value="no">いいえ（1,000万円未満）</option></select></div>'
+    +   '<div class="iu-q" id="iu-q3w" style="display:none;"><div class="iu-ql">Q3. 前年分の法定調書合計表を提出していますか？</div>'
+    +     '<select id="iu-q3" onchange="iuCalc()"><option value="">選択してください</option><option value="yes">はい</option><option value="no">いいえ（いずれにも該当しない）</option></select></div>'
+    +   '<div class="iu-res" id="iu-res"></div>'
+    + '</div>'
+    + '<div class="card" id="iu-upcard" style="display:none;"><div class="section-title">必要書類のアップロード</div>'
+    +   '<div style="font-size:12px;color:#6b7280;line-height:1.7;margin-bottom:14px;">下の各書類ごとにファイルを選んでアップロードしてください。（PDF・画像、20MBまで）</div>'
+    +   '<div class="iu-perdoc" id="iu-perdoc"></div>'
+    + '</div>'
+    + '</div>';
 }
+var _IU_L='https://www.moj.go.jp/isa/content/';
+var _IU_HOUTEI='前年分の職員の給与所得の源泉徴収票等の法定調書合計表（写し）';
+var _IU_RIYU='法定調書合計表を提出できない理由を明らかにする資料（免除証明書、または開設届出書＋徴収高計算書/納期特例承認）';
+var _IU_DETAIL=[
+  '申請人の活動の内容等を明らかにする資料（労働条件通知書／役員報酬の定款・議事録 等）',
+  '登記事項証明書',
+  '事業内容を明らかにする資料（会社案内 等）',
+  '直近年度の決算文書の写し（新規事業は事業計画書）',
+  '所属機関の代表者に関する申告書（<a href="'+_IU_L+'001460262.pdf" target="_blank" rel="noopener">様式</a>）',
+  '（対人業務で言語使用の場合）CEFR B2相当の言語能力を証する資料'
+];
+var _IU_DOCS={1:['四季報の写し 又は 上場証明（写し）','または「一定の条件を満たす企業等」の認定証等の写し'],2:[_IU_HOUTEI],3:[_IU_HOUTEI].concat(_IU_DETAIL),4:[_IU_RIYU].concat(_IU_DETAIL)};
+var _IU_HAKEN=['申請人の派遣労働に関する誓約書（<a href="'+_IU_L+'001457161.docx" target="_blank" rel="noopener">派遣元</a>／<a href="'+_IU_L+'001457162.docx" target="_blank" rel="noopener">派遣先</a>）','労働条件通知書の写し','労働者派遣個別契約書の写し'];
+function iuCalc(){
+  var q1=_iuG('iu-q1').value, q2=_iuG('iu-q2')?_iuG('iu-q2').value:'', q3=_iuG('iu-q3')?_iuG('iu-q3').value:'', cat=0;
+  _iuSh('iu-q2w', q1==='no'); if(q1!=='no' && _iuG('iu-q2')) _iuG('iu-q2').value='';
+  _iuSh('iu-q3w', q1==='no'&&q2==='no'); if(!(q1==='no'&&q2==='no') && _iuG('iu-q3')) _iuG('iu-q3').value='';
+  if(q1==='yes')cat=1; else if(q1==='no'&&q2==='yes')cat=2; else if(q1==='no'&&q2==='no'&&q3==='yes')cat=3; else if(q1==='no'&&q2==='no'&&q3==='no')cat=4;
+  var r=_iuG('iu-res');
+  if(!cat){ if(r) r.style.display='none'; _iuSh('iu-upcard', false); return; }
+  var li=_IU_DOCS[cat].map(function(x){return '<li>'+x+'</li>';}).join('');
+  var hk=_IU_HAKEN.map(function(x){return '<li>'+x+'</li>';}).join('');
+  r.innerHTML='<div class="iu-cat">→ 所属機関カテゴリー '+cat+'</div><div class="iu-dl">必要書類</div><ul>'+li+'</ul><div class="iu-grp"><div class="iu-dl">派遣雇用の場合</div><ul>'+hk+'</ul></div>';
+  r.style.display='block';
+  _iuSh('iu-upcard', true);
+  iuRenderPerDoc(_IU_DOCS[cat].concat(_IU_HAKEN));
+}
+function iuRenderPerDoc(list){
+  var box=_iuG('iu-perdoc'); if(!box) return; box.innerHTML='';
+  list.forEach(function(label){
+    var plain=String(label).replace(/<[^>]+>/g,'');
+    var it=document.createElement('div'); it.className='iu-pd';
+    it.innerHTML='<div class="iu-pdname"><span class="iu-pdbadge" data-b>未提出</span><span>'+_iuEsc(plain)+'</span></div>'
+      +'<button type="button" class="iu-pdbtn">この書類を選択</button><ul class="iu-uplist"></ul>';
+    var btn=it.querySelector('.iu-pdbtn'), ul=it.querySelector('.iu-uplist'), badge=it.querySelector('[data-b]');
+    var fi=document.createElement('input'); fi.type='file'; fi.multiple=true; fi.accept='.pdf,image/*'; fi.style.display='none';
+    it.appendChild(fi);
+    btn.addEventListener('click', function(){ fi.click(); });
+    fi.addEventListener('change', function(){ iuUpload(fi.files, plain, ul, badge); fi.value=''; });
+    box.appendChild(it);
+  });
+}
+// 実アップロード：irai-docs/<caseId>/<書類名>/<timestamp_ファイル名>
+function iuUpload(files, docLabel, ul, badge){
+  if(!files||!files.length) return;
+  var isSample = !caseId;
+  var safeCase = String(caseId||'sample').replace(/[^\w\-]+/g,'_');
+  var safeDoc  = String(docLabel||'書類').replace(/[^\w\u3040-\u30ff\u4e00-\u9fff\-]+/g,'_').slice(0,60);
+  var okCount=0, total=files.length;
+  Array.prototype.forEach.call(files, function(f){
+    var li=document.createElement('li');
+    var nameSpan=document.createElement('span'); nameSpan.textContent=f.name;
+    var st=document.createElement('span'); st.className='st';
+    li.appendChild(nameSpan); li.appendChild(st); ul.appendChild(li);
+    if(f.size>20*1024*1024){ st.textContent='サイズ超過（20MB以下に）'; st.style.color='#dc2626'; return; }
+    if(isSample){ st.textContent='選択済み（サンプル・未保存）'; st.style.color='#16a34a'; okCount++; if(okCount===total&&badge){ badge.textContent='提出済み'; badge.className='iu-pdbadge done'; } return; }
+    st.textContent='アップロード中…'; st.style.color='#6b7280';
+    var safe=f.name.replace(/[^\w.\-]+/g,'_');
+    var path=safeCase+'/'+safeDoc+'/'+Date.now()+'_'+safe;
+    fetch(SUPABASE_URL+'/storage/v1/object/irai-docs/'+path,{method:'POST',headers:{'apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY,'Content-Type':f.type||'application/octet-stream','x-upsert':'true'},body:f})
+      .then(function(res){ if(res.ok){ st.textContent='アップロード完了'; st.style.color='#16a34a'; okCount++; if(okCount===total&&badge){ badge.textContent='提出済み'; badge.className='iu-pdbadge done'; } } else { st.textContent='失敗（'+res.status+'）'; st.style.color='#dc2626'; } })
+      .catch(function(){ st.textContent='通信エラー'; st.style.color='#dc2626'; });
+  });
+}
+
 
 // ===== 所属機関カテゴリー判定（Q1〜Q3で自動判定）+ 必要書類表示 =====
 var GJ_CAT_VALUE = {1:'上場企業等（カテゴリ1）',2:'源泉徴収税額1000万円以上（カテゴリ2）',3:'源泉徴収の法定調書提出あり（カテゴリ3）',4:'その他（カテゴリ4）'};
