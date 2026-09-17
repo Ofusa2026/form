@@ -191,7 +191,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20260917.04';
+var FORM_VERSION = 'ver.20260917.05';
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -4715,7 +4715,9 @@ function confirmName(isMatch){
 (function init() {
   if (view === 'upload') {   // ver.20260917.02: アップロード専用モード
     try{ document.title = '書類アップロード'; }catch(e){}   // ver.20260917.04: タブ名も切替（ヒアリングと紛らわしいため）
+    try{ var _pt=document.getElementById('page-title'); if(_pt) _pt.innerHTML='📄 書類アップロード'; }catch(e){}   // ver.20260917.05: ヘッダー文言も切替
     document.getElementById('formBody').innerHTML = buildIraiUpload();
+    try{ var _mc=document.getElementById('mainContent'); if(_mc) _mc.style.display='block'; }catch(e){}   // ver.20260917.05: 本体(mainContent)を表示（初期は非表示のため必須）
     var _vv = document.getElementById('ver-display'); if (_vv) _vv.textContent = FORM_VERSION;
     return;
   }
