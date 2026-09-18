@@ -148,7 +148,7 @@
   <header class="top">
     <h1>申請依頼フォーム</h1>
     <p class="lead">内容をご入力ください。申請種別に応じて請求金額が自動計算されます。</p>
-    <p style="font-size:11px;color:var(--muted);margin:4px 0 0" id="ver">ver.20260916.02</p>
+    <p style="font-size:11px;color:var(--muted);margin:4px 0 0" id="ver">ver.20260918.01</p>
   </header>
 
   <!-- 1. 採用される会社（所属機関） -->
@@ -502,11 +502,30 @@
   document.getElementById("submitBtn").addEventListener("click", async ()=>{
     if (submitLocked) return;
     const btn = document.getElementById("submitBtn");
-    // simpleモード（所属機関だけ）は送信せず thanks.html へ遷移するだけ
+    // simpleモード（所属機関の4項目だけ）：受信トレイ登録はせず、会社宛に案内メールだけ送る（dedicated:false）
     if (window.__SIMPLE__) {
       submitLocked = true;
       btn.disabled = true; btn.textContent = "送信中…";
-      window.location.href = "thanks.html";
+      const payloadSimple = {
+        company: {
+          name: document.getElementById("orgName").value.trim(),
+          contact: (document.querySelector(".co-contact")||{}).value?.trim() || "",
+          tel: (document.querySelector(".co-tel")||{}).value?.trim() || "",
+          email: (document.querySelector(".co-email")||{}).value?.trim() || ""
+        },
+        applicants: [],   // 初回は申請人なし（案内メールのみ）
+        dedicated: false  // 受信トレイ登録なし・会社宛の案内メールのみ
+      };
+      try {
+        const r = await fetch(FN_URL, { method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify(payloadSimple) });
+        const j = await r.json().catch(()=>({ok:r.ok}));
+        if (!(j && j.ok)) throw new Error((j && j.error) || ("HTTP "+r.status));
+        window.location.href = "thanks.html";
+      } catch (e) {
+        submitLocked = false;
+        btn.disabled = false; btn.textContent = "依頼を送信する";
+        alert("送信に失敗しました。お手数ですが、記載の弊社担当先までご連絡ください。");
+      }
       return;
     }
     const applicants = [...peopleEl.querySelectorAll(".person")].map(p=>({
