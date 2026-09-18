@@ -147,8 +147,8 @@
 
   <header class="top">
     <h1>申請依頼フォーム</h1>
-    <p class="lead">内容をご入力ください。申請種別に応じて請求金額が自動計算されます。</p>
-    <p style="font-size:11px;color:var(--muted);margin:4px 0 0" id="ver">ver.20260918.02</p>
+    <p class="lead" id="leadText">内容をご入力ください。申請種別に応じて請求金額が自動計算されます。</p>
+    <p style="font-size:11px;color:var(--muted);margin:4px 0 0" id="ver">ver.20260918.03</p>
   </header>
 
   <!-- 1. 採用される会社（所属機関） -->
@@ -352,6 +352,10 @@
   if (company) {
     const org = document.getElementById("orgName");
     if (org) { org.value = company; org.readOnly = true; org.classList.add("locked"); }
+    // 仮登録から引き継いだ担当者・電話・メールを自動入力
+    const _ct = params.get("contact"); const _tl = params.get("tel"); const _em = params.get("email");
+    const setVal = (sel, v)=>{ const el = document.querySelector(sel); if (el && v) el.value = v; };
+    setVal(".co-contact", _ct); setVal(".co-tel", _tl); setVal(".co-email", _em);
   }
 
   // URLパラメータ ?dispatch=off で派遣先セクションを非表示（会社専用リンク用）
@@ -365,6 +369,8 @@
   if (simpleMode) {
     window.__SIMPLE__ = true;
     document.querySelectorAll("section.card").forEach((sec,i)=>{ if (i>0) sec.style.display = "none"; });
+    const lead = document.getElementById("leadText");
+    if (lead) lead.textContent = "所属機関の情報をご入力ください。";
   }
   // 表示中セクションの番号を1から振り直す
   (function renumberSections(){
@@ -508,7 +514,12 @@
       if (!orgName) { alert("所属機関名を入力してください。"); return; }
       submitLocked = true;
       btn.disabled = true; btn.textContent = "仮登録しました";
-      const regLink = location.origin + location.pathname.replace(/[^\/]*$/, "irai_form.html") + "?company=" + encodeURIComponent(orgName);
+      const _c = encodeURIComponent(orgName);
+      const _ct = encodeURIComponent((document.querySelector(".co-contact")||{}).value?.trim() || "");
+      const _tl = encodeURIComponent((document.querySelector(".co-tel")||{}).value?.trim() || "");
+      const _em = encodeURIComponent((document.querySelector(".co-email")||{}).value?.trim() || "");
+      const regLink = location.origin + location.pathname.replace(/[^\/]*$/, "irai_form.html")
+        + "?company=" + _c + "&contact=" + _ct + "&tel=" + _tl + "&email=" + _em;
       showRegLink(regLink);
       return;
     }
