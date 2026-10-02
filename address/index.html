@@ -68,6 +68,15 @@
   .success .ic{ font-size:54px; }
   .success h2{ color:var(--navy); margin:10px 0 6px; }
   .success p{ color:#334155; font-size:14px; }
+  .edit-box{
+    display:none; background:#eff6ff; border:1px solid #bfdbfe; color:#1e3a8a;
+    border-radius:12px; padding:12px 14px; font-size:13.5px; margin-bottom:14px;
+  }
+  .edit-box .dt{ font-size:12px; color:#475569; }
+  button.btn-edit{
+    margin-top:18px; padding:13px 22px; border:1.5px solid var(--navy); border-radius:12px;
+    background:#fff; color:var(--navy); font-size:15px; font-weight:700; cursor:pointer;
+  }
   .ver{ text-align:center; font-size:10px; color:#94a3b8; margin-top:24px; }
 </style>
 </head>
@@ -81,6 +90,7 @@
 
   <div id="main" class="body">
     <div id="caseBox" class="case-box" style="display:none;"></div>
+    <div id="editBox" class="edit-box"></div>
 
     <p class="intro">
       <ruby>在留<rt>ざいりゅう</rt></ruby><ruby>資格<rt>しかく</rt></ruby>の<ruby>許可<rt>きょか</rt></ruby>が<ruby>下<rt>お</rt></ruby>りました。<ruby>新<rt>あたら</rt></ruby>しい<ruby>在留<rt>ざいりゅう</rt></ruby>カードを<ruby>郵送<rt>ゆうそう</rt></ruby>します。<br>
@@ -127,7 +137,7 @@
 </div>
 
 <script>
-var ADDRESS_VERSION = 'ver.20260616.01';
+var ADDRESS_VERSION = 'ver.20261002.01';
 
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -135,6 +145,10 @@ var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
 var GAS_GEO_URL = 'https://script.google.com/macros/s/AKfycbwOcaCf_Q_m6NMIYEOc-smyY_9pho_2cqZq4fhJB_YC9LtSY2EwPekmXSrMKWY4pDAA2A/exec';
 
 var FORM_TYPE = 'card_delivery';
+var responseId = '';   // 既存回答のID（あれば送信時に上書き保存）
+var SUBMIT_LABEL_NEW  = '<ruby>送信<rt>そうしん</rt></ruby>する / Submit';
+var SUBMIT_LABEL_EDIT = '<ruby>修正<rt>しゅうせい</rt></ruby>して<ruby>上書<rt>うわが</rt></ruby>き<ruby>保存<rt>ほぞん</rt></ruby> / Update';
+function submitLabel(){ return responseId ? SUBMIT_LABEL_EDIT : SUBMIT_LABEL_NEW; }
 
 var params = new URLSearchParams(location.search);
 var caseId   = params.get('case') || '';
@@ -186,6 +200,45 @@ function estimateZip(force){
 }
 
 // ===== 自動入力（お名前=URL、住所等=RPC） =====
+function fmtDate(iso){
+  var d = new Date(iso); if (isNaN(d.getTime())) return '';
+  var p = function(n){ return (n<10?'0':'') + n; };
+  return d.getFullYear() + '/' + p(d.getMonth()+1) + '/' + p(d.getDate()) + ' ' + p(d.getHours()) + ':' + p(d.getMinutes());
+}
+
+// 編集モードの表示（前回回答あり）
+function showEditMode(submittedAt){
+  var box = $('editBox');
+  var dt = submittedAt ? fmtDate(submittedAt) : '';
+  box.innerHTML = '✏️ <b><ruby>前回<rt>ぜんかい</rt></ruby>の<ruby>回答<rt>かいとう</rt></ruby>を<ruby>表示<rt>ひょうじ</rt></ruby>しています。</b><br>' +
+    '<ruby>直<rt>なお</rt></ruby>して<ruby>送信<rt>そうしん</rt></ruby>すると、<ruby>前回<rt>ぜんかい</rt></ruby>の<ruby>内容<rt>ないよう</rt></ruby>に<ruby>上書<rt>うわが</rt></ruby>きされます。<br>' +
+    '<span class="dt">Your previous answer is shown. Submitting again will overwrite it.' +
+    (dt ? '（' + esc(dt) + ' 送信）' : '') + '</span>';
+  box.style.display = 'block';
+  var btn = $('btn-submit'); if (btn && !btn.disabled) btn.innerHTML = submitLabel();
+}
+
+// 既存回答があればそれを表示（上書き保存用）。なければ案件情報から自動入力。
+function loadExisting(){
+  if (caseName && !$('f-name').value) $('f-name').value = caseName;
+  if (!caseId) return;
+  callRpc('form_load', { p_case_id: caseId, p_form_type: FORM_TYPE, p_response_id: '', p_exclude_imported: false })
+    .then(function(r){ return r.ok ? r.json() : null; })
+    .then(function(d){
+      if (!d || !d.id || !d.response || typeof d.response !== 'object'){ prefill(); return; }
+      responseId = d.id;
+      var r = d.response;
+      // 利用者がすでに入力を始めていた欄は上書きしない（お名前はURL由来なので前回回答を優先）
+      var setIf = function(id, v){ var e=$(id); if(e && !e.value) e.value = v || ''; };
+      if (r.recipientName) $('f-name').value = r.recipientName;
+      setIf('f-address', r.jpAddress);
+      setIf('f-zip',     r.jpPostalCode);
+      setIf('f-phone',   r.phone);
+      showEditMode(d.submitted_at);
+    })
+    .catch(function(){ prefill(); });
+}
+
 function prefill(){
   if (caseName && !$('f-name').value) $('f-name').value = caseName;
   if (!caseId) return;
@@ -230,7 +283,7 @@ function submitForm(){
   var btn = $('btn-submit');
   btn.disabled = true; btn.textContent = '送信中... / Sending...';
 
-  callRpc('form_save', { p_case_id: caseId, p_form_type: FORM_TYPE, p_response_id: '', p_response: response, p_submit: true })
+  callRpc('form_save', { p_case_id: caseId, p_form_type: FORM_TYPE, p_response_id: responseId, p_response: response, p_submit: true })
     .then(function(res){
       if (!res.ok){
         return res.text().then(function(t){
@@ -240,25 +293,40 @@ function submitForm(){
       }
       return res.json();
     })
-    .then(function(){
+    .then(function(d){
+      if (d && d.error) throw new Error(d.error);
+      var wasEdit = !!responseId;
+      if (d && d.id) responseId = d.id;   // 以降の再送信は同じ回答を上書き
+      btn.disabled = false; btn.innerHTML = submitLabel();
       $('main').style.display = 'none';
       $('submitWrap').style.display = 'none';
       $('errmsg').style.display = 'none';
       var s = document.createElement('div');
       s.className = 'success';
-      s.innerHTML = '<div class="ic">✅</div><h2>送信完了 / Done</h2>' +
+      s.id = 'successBox';
+      s.innerHTML = '<div class="ic">✅</div><h2>' + (wasEdit ? '上書き保存しました / Updated' : '送信完了 / Done') + '</h2>' +
         '<p>ご回答ありがとうございました。<br>担当者が内容を確認いたします。<br>' +
-        '<span style="color:#64748b;font-size:12px;">Thank you. We will send your residence card to this address.</span></p>';
+        '<span style="color:#64748b;font-size:12px;">Thank you. We will send your residence card to this address.</span></p>' +
+        '<button type="button" class="btn-edit" onclick="backToEdit()">✏️ <ruby>内容<rt>ないよう</rt></ruby>を<ruby>修正<rt>しゅうせい</rt></ruby>する / Edit</button>';
       $('main').parentNode.insertBefore(s, $('main'));
     })
     .catch(function(e){
-      btn.disabled = false; btn.textContent = '送信する / Submit';
+      btn.disabled = false; btn.innerHTML = submitLabel();
       if (e.message === 'SERVER_VALIDATION_FAILED'){
         showErr('⚠️ 入力内容に不備がありました。ページを再読み込み（リロード）して、もう一度入力してください。');
       } else {
         showErr('送信に失敗しました。通信環境をご確認のうえ、もう一度お試しください。(' + e.message + ')');
       }
     });
+}
+
+// 完了画面 → 入力画面に戻って修正（同じ回答を上書き）
+function backToEdit(){
+  var s = $('successBox'); if (s && s.parentNode) s.parentNode.removeChild(s);
+  $('main').style.display = '';
+  $('submitWrap').style.display = '';
+  showEditMode(new Date().toISOString());
+  window.scrollTo(0, 0);
 }
 
 // ===== init =====
@@ -269,7 +337,7 @@ function submitForm(){
     box.innerHTML = '<span class="cn">' + esc(caseName) + '</span> 様<br><span style="color:#64748b;font-size:12px;">大房行政書士法人よりご依頼の情報です。</span>';
   }
   var v = $('ver'); if (v) v.textContent = ADDRESS_VERSION;
-  prefill();
+  loadExisting();
 })();
 </script>
 </body>
