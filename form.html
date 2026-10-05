@@ -191,7 +191,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20261005.01';
+var FORM_VERSION = 'ver.20261005.02';
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -2583,6 +2583,7 @@ function blockT2Pledge() {
   // ver.20260825.04: 単独の氏名欄は廃止。2号ごとに氏名＋指導対象者を t2TargetContainer にネスト生成する
 
   h += '<div class="sub-label" style="background:#eff6ff;color:#1d4ed8;border-radius:6px;padding:6px 10px;margin:12px 0 8px;font-size:12px;font-weight:700;">【当該２号特定技能外国人の業務内容】</div>';
+  h += '<div id="t2CopyJobWrap" style="display:none;"></div>';   // ver.20261005.02: 新しい申請のとき「前回と同じ業務内容をコピー」を出す
   h += field('f-t2Dept', '① 所属部署名', 'text', false, '例: 製造部 第一課', '');
   h += field('f-t2Position', '② 役職又は地位', 'text', false, '例: 班長', '');
   h += field('f-t2JobDetail', '③ 具体的な職務内容（製造物・収穫物・作業工程など）', 'textarea', false, '具体的にご記入ください', '');
@@ -2832,6 +2833,22 @@ function _t2StartNew(){
   });
   ['f-t2Dept','f-t2Position','f-t2JobDetail','f-t2JobDiff'].forEach(function(id){ setV(id,''); });
   var cb=document.getElementById('f-t2Confirm'); if(cb) cb.checked=false;
+  // ver.20261005.02: 仕事内容が前回と同じなら、ボタン1つでコピーできるようにする
+  var cw=document.getElementById('t2CopyJobWrap');
+  if(cw && (resp.t2Dept||resp.t2Position||resp.t2JobDetail||resp.t2JobDiff)){
+    var pv=[resp.t2Dept, resp.t2Position].filter(Boolean).join(' ／ ');
+    var _pnArr=(resp.t2NamesThis&&resp.t2NamesThis.length)?resp.t2NamesThis:[].concat(resp.t2NamesNow||[]);   // 前回の２号の方の氏名
+    var _pn=_pnArr.filter(Boolean).join('さん・');
+    var jd=String(resp.t2JobDetail||''); if(jd.length>60) jd=jd.slice(0,60)+'…';
+    cw.style.display='block';
+    cw.innerHTML='<div style="background:#f0fdf4;border:1.5px solid #86efac;border-radius:10px;padding:10px 12px;margin-bottom:12px;line-height:1.6;">'
+      +'<div style="font-size:12.5px;color:#166534;font-weight:800;">仕事内容が前回'+(_pn?('の'+_t2esc(_pn)+'さん'):'')+'と同じですか？</div>'
+      +'<div style="font-size:12px;color:#334155;margin:2px 0 8px;">前回：'+_t2esc(pv||'（部署・役職なし）')+(jd?('<br>'+_t2esc(jd)):'')+'</div>'
+      +'<button type="button" onclick="_t2CopyPrevJob()" style="padding:9px 14px;border-radius:9px;border:none;background:#16a34a;color:#fff;font-size:13.5px;font-weight:800;cursor:pointer;">📋 前回と同じ業務内容をコピー</button>'
+      +'<span id="t2CopyJobDone" style="margin-left:8px;font-size:12px;font-weight:700;color:#16a34a;"></span>'
+      +'<div style="font-size:11px;color:#64748b;margin-top:6px;">①〜④の業務内容と、今回の２号の指導対象者の「事業所及び所属部署名」「役職又は地位」「指導を受ける職務内容」の空欄に、前回の内容を入れます（入れたあとも直せます）。</div>'
+      +'</div>';
+  }
   var infoEl=document.getElementById('infoBox');
   if(infoEl){ infoEl.style.background='#eef2ff'; infoEl.style.borderColor='#a5b4fc'; infoEl.style.color='#3730a3'; infoEl.textContent='🆕 新しい申請として入力しています。今回の２号の氏名・業務内容・指導を受ける対象者を入力して送信してください（前回の回答は残ります）。'; }
   var btnEl=document.getElementById('btn-submit'); if(btnEl) btnEl.textContent='送信する';
@@ -2839,6 +2856,20 @@ function _t2StartNew(){
   if(bar) bar.innerHTML='<div style="font-size:14px;font-weight:800;color:#3730a3;">🆕 新しい申請として入力中</div><div style="font-size:12.5px;color:#334155;margin-top:4px;">前回の２号の方は「現在の２号」に入っています。「今回の２号」の氏名・業務内容・指導を受ける対象者を入力してください。対象者が「現在の２号」の対象者と重複していると、送信前にお知らせします。</div>';
   try{ _t2DupCheck(); }catch(e){}
   try{ var tc=document.getElementById('t2TargetContainer'); if(tc) tc.scrollIntoView({behavior:'smooth',block:'start'}); }catch(e){}
+}
+function _t2CopyPrevJob(){
+  var resp=window._t2PrevResp||{};
+  var setV=function(id,v){ var el=document.getElementById(id); if(el && v!=null && v!=='') el.value=v; };
+  setV('f-t2Dept', resp.t2Dept); setV('f-t2Position', resp.t2Position); setV('f-t2JobDetail', resp.t2JobDetail); setV('f-t2JobDiff', resp.t2JobDiff);
+  // 今回の２号の指導対象者の空欄（部署・役職・職務内容）に、前回の対象者の内容を入れる（氏名・在留カード番号は入れない）
+  var src=(resp.t2Targets||[]).filter(function(t){ return t && (t.group||'this')==='this'; });
+  if(!src.length) src=(resp.t2Targets||[]).filter(Boolean);
+  var rows=document.querySelectorAll('#t2TargetContainer .t2-target-row[data-group="this"]');
+  [].forEach.call(rows, function(row, i){
+    var t=src[i] || src[src.length-1]; if(!t) return;
+    ['dept','position','job'].forEach(function(sfx){ var el=row.querySelector('[data-fld="'+sfx+'"]'); if(el && !String(el.value||'').trim() && t[sfx]) el.value=t[sfx]; });
+  });
+  var d=document.getElementById('t2CopyJobDone'); if(d) d.textContent='✓ コピーしました';
 }
 // 必要数分の対象者枠を確保（現在の枠数が足りなければ追加）
 function _ensureT2TargetRows(need){
