@@ -191,7 +191,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20260925.01';
+var FORM_VERSION = 'ver.20261005.01';
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -2741,6 +2741,105 @@ function recalcT2Targets(){
     confirmWrap.style.opacity = (perPerson === 0) ? '0.7' : '1';
   }
 }
+// ===== ver.20261005.01: 指導対象者の重複チェック（現在の２号・今回の２号をまたいで、同じ人が2回出てこないか） =====
+function _t2NormName(v){ var x=String(v||''); try{ x=x.normalize('NFKC'); }catch(e){} return x.replace(/[\s\u3000・．.,，、]/g,'').toUpperCase(); }
+function _t2NormCard(v){ var x=String(v||''); try{ x=x.normalize('NFKC'); }catch(e){} return x.replace(/[^0-9A-Za-z]/g,'').toUpperCase(); }
+function _t2RowLabel(row){
+  var g=row.dataset.group, p=row.dataset.person;
+  var nmEl=document.getElementById('f-t2Name'+(g==='now'?'Now':'This')+'_'+p);
+  var nm=nmEl?(nmEl.value||'').trim():'';
+  return (g==='now'?'現在の２号 ':'今回の２号 ')+p+'人目'+(nm?('（'+nm+'）'):'');
+}
+function _t2DupCheck(){
+  var rows=[].slice.call(document.querySelectorAll('#t2TargetContainer .t2-target-row'));
+  var byKey={}, msgs=[];
+  rows.forEach(function(row){
+    var m=row.querySelector('.t2-dup-msg'); if(m) m.remove();
+    row.style.borderColor='#e5e7eb'; row.style.background='#fafafa';
+    var nmEl=row.querySelector('[data-fld="name"]'), cdEl=row.querySelector('[data-fld="card"]');
+    var nk=_t2NormName(nmEl?nmEl.value:''), ck=_t2NormCard(cdEl?cdEl.value:'');
+    var keys=[]; if(nk) keys.push('n:'+nk); if(ck.length>=6) keys.push('c:'+ck);
+    keys.forEach(function(k){ (byKey[k]=byKey[k]||[]).push(row); });
+  });
+  var flagged=[];
+  Object.keys(byKey).forEach(function(k){
+    var rs=byKey[k]; if(rs.length<2) return;
+    rs.forEach(function(row){
+      if(flagged.indexOf(row)>=0) return; flagged.push(row);
+      var others=rs.filter(function(r){ return r!==row; }).map(_t2RowLabel);
+      row.style.borderColor='#ef4444'; row.style.background='#fef2f2';
+      var d=document.createElement('div'); d.className='t2-dup-msg';
+      d.style.cssText='margin-top:6px;font-size:12px;font-weight:800;color:#b91c1c;line-height:1.6;';
+      d.textContent='⚠️ 「'+others.join('」「')+'」の指導対象者と重複しています。別の対象者を選定する必要があります。';
+      row.appendChild(d);
+    });
+    var nm=(rs[0].querySelector('[data-fld="name"]')||{}).value||'';
+    msgs.push('「'+String(nm).trim()+'」さん（'+rs.map(_t2RowLabel).join('・')+'）');
+  });
+  if(!msgs.length) return '';
+  return '⚠️ 指導を受ける対象者が重複しています：'+msgs.join('、')+'。１人の対象者を複数の２号特定技能外国人が指導することはできないため、別の対象者を選定する必要があります。';
+}
+// 入力のたびに重複を確認（少し待ってから）
+document.addEventListener('input', function(e){
+  var t=e.target; if(!t || !t.closest || !t.closest('#t2TargetContainer')) return;
+  clearTimeout(window._t2DupTimer); window._t2DupTimer=setTimeout(function(){ try{ _t2DupCheck(); }catch(_){ } }, 300);
+});
+// ===== ver.20261005.01: 2回目以降の申請（前回の回答は残し、新しい申請として入力する） =====
+function _t2OfferNew(resp, row){
+  var host=document.getElementById('mainContent'); if(!host) return;
+  if(document.getElementById('t2NewBar')) return;
+  var at=row && row.submitted_at ? new Date(row.submitted_at) : null;
+  var atStr=at?(at.getFullYear()+'/'+(at.getMonth()+1)+'/'+at.getDate()):'';
+  var prevNames=[].concat(resp.t2NamesNow||[], resp.t2NamesThis||[]).filter(Boolean);
+  var bar=document.createElement('div'); bar.id='t2NewBar';
+  bar.style.cssText='background:#eef2ff;border:1.5px solid #a5b4fc;border-radius:12px;padding:14px 16px;margin:0 0 14px;line-height:1.7;';
+  bar.innerHTML='<div style="font-size:14px;font-weight:800;color:#3730a3;">📝 前回の回答'+(atStr?('（'+atStr+' 送信）'):'')+'を表示しています</div>'
+    +'<div style="font-size:12.5px;color:#334155;margin-top:4px;">別の２号の方の申請で、<b>業務内容や指導を受ける対象者が変わる</b>ときは「新しい申請として入力する」を押してください。前回の回答は残ったまま、新しい回答として送信されます。'
+    +(prevNames.length?('<br>前回の２号（'+_t2esc(prevNames.join('、'))+'）は「現在の２号」に移し、その指導対象者もそのまま入れます。今回の２号の対象者が重複していないかを自動で確認します。'):'')+'</div>'
+    +'<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;">'
+    +'<button type="button" onclick="_t2StartNew()" style="padding:10px 16px;border-radius:10px;border:none;background:#4f46e5;color:#fff;font-size:14px;font-weight:800;cursor:pointer;">＋ 新しい申請として入力する</button>'
+    +'<button type="button" onclick="var b=document.getElementById(\'t2NewBar\');if(b)b.remove();" style="padding:10px 16px;border-radius:10px;border:1.5px solid #c7d2fe;background:#fff;color:#4338ca;font-size:13px;font-weight:700;cursor:pointer;">前回の内容を修正する</button>'
+    +'</div>';
+  host.insertBefore(bar, host.firstChild);
+  window._t2PrevResp=resp;
+  if(params.get('t2new')==='1') _t2StartNew();
+}
+function _t2StartNew(){
+  var resp=window._t2PrevResp||{};
+  var namesNow=[].concat(resp.t2NamesNow||[], resp.t2NamesThis||[]).filter(Boolean);
+  var nNowOld=(resp.t2NamesNow||[]).length || parseInt(resp.t2CountNow||'0',10) || 0;
+  var cntNow=Math.max(namesNow.length, nNowOld + (parseInt(resp.t2CountThis||'0',10)||0));
+  if(cntNow>20) cntNow=20;
+  // 新しい回答として送る（前回の行は上書きしない）
+  _draftResponseId='';
+  var setV=function(id,v){ var el=document.getElementById(id); if(el) el.value=(v==null?'':v); };
+  if(resp.t2Field) setV('f-t2Field', resp.t2Field);
+  setV('f-t2CountNow', String(cntNow));
+  setV('f-t2CountThis', '1');
+  // 2号の氏名・指導対象者の欄を一度空にしてから作り直す
+  var c=document.getElementById('t2TargetContainer'); if(c) c.innerHTML='';
+  if(typeof recalcT2Targets==='function') recalcT2Targets();
+  namesNow.forEach(function(nm,i){ setV('f-t2NameNow_'+(i+1), nm); });
+  // 前回の対象者を「現在の２号」の枠へ（前回の今回の２号 j人目 → 現在の２号 (前回の現在の人数+j)人目）
+  var tg=resp.t2Targets||[], ptr={};
+  tg.forEach(function(t){
+    if(!t) return;
+    var g=t.group||'now', p=parseInt(t.person||'0',10)||0; if(!p) return;
+    var np=(g==='this')?(nNowOld+p):p;
+    var k=np; ptr[k]=(ptr[k]||0)+1;
+    var base='f-t2tgt_now'+np+'_'+ptr[k];
+    ['name','card','dept','position','job'].forEach(function(sfx){ var el=document.getElementById(base+'_'+sfx); if(el && t[sfx]!=null) el.value=t[sfx]; });
+  });
+  ['f-t2Dept','f-t2Position','f-t2JobDetail','f-t2JobDiff'].forEach(function(id){ setV(id,''); });
+  var cb=document.getElementById('f-t2Confirm'); if(cb) cb.checked=false;
+  var infoEl=document.getElementById('infoBox');
+  if(infoEl){ infoEl.style.background='#eef2ff'; infoEl.style.borderColor='#a5b4fc'; infoEl.style.color='#3730a3'; infoEl.textContent='🆕 新しい申請として入力しています。今回の２号の氏名・業務内容・指導を受ける対象者を入力して送信してください（前回の回答は残ります）。'; }
+  var btnEl=document.getElementById('btn-submit'); if(btnEl) btnEl.textContent='送信する';
+  var bar=document.getElementById('t2NewBar');
+  if(bar) bar.innerHTML='<div style="font-size:14px;font-weight:800;color:#3730a3;">🆕 新しい申請として入力中</div><div style="font-size:12.5px;color:#334155;margin-top:4px;">前回の２号の方は「現在の２号」に入っています。「今回の２号」の氏名・業務内容・指導を受ける対象者を入力してください。対象者が「現在の２号」の対象者と重複していると、送信前にお知らせします。</div>';
+  try{ _t2DupCheck(); }catch(e){}
+  try{ var tc=document.getElementById('t2TargetContainer'); if(tc) tc.scrollIntoView({behavior:'smooth',block:'start'}); }catch(e){}
+}
 // 必要数分の対象者枠を確保（現在の枠数が足りなければ追加）
 function _ensureT2TargetRows(need){
   var c = document.getElementById('t2TargetContainer');
@@ -4297,6 +4396,9 @@ function validate() {
     if (_need > 0 && _filled < _need) {
       return '指導を受ける対象者を' + _need + '名以上ご入力ください（２号' + _total + '名×' + _t2per + '名／人）。氏名が必要です。他の2号特定技能外国人と重複しない方を選定してください。';
     }
+    // ver.20261005.01: 指導対象者の重複（同じ人を2人以上の2号が指導）は送信できない
+    var _dupMsg = (typeof _t2DupCheck === 'function') ? _t2DupCheck() : '';
+    if (_dupMsg) return _dupMsg;
     // 対象者不要の分野(per=0)ではチェック必須にしない
     if (_need > 0) {
       var _cb = document.getElementById('f-t2Confirm');
@@ -4820,6 +4922,8 @@ function confirmName(isMatch){
           } catch (prefillErr) {
             console.error('prefillForm error (ignored to keep form usable):', prefillErr);
           }
+          // ver.20261005.01: 2号誓約書は「前回の修正」か「新しい申請として入力」を選べる（前回の回答は残す）
+          try { if (type === 'tokutei2_pledge' && (isImported || isSubmitted)) _t2OfferNew(resp, row); } catch(_t2e){ console.error('t2 new offer error (ignored):', _t2e); }
         }
       } catch (innerErr) {
         console.error('prefill .then handler error (ignored):', innerErr);
