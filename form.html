@@ -191,7 +191,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20261005.02';
+var FORM_VERSION = 'ver.20261005.03';
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -777,8 +777,8 @@ function blockTokuteiKoushin() {
 }
 
 // ===== 選択肢（indexと完全一致） =====
-var SKILL_EVAL_TYPES = ['分野別運用方針に定める評価方法による証明','技能実習２号を良好に修了'];
-var SKILL_EVAL_LABELS = {'分野別運用方針に定める評価方法による証明':'試験合格','技能実習２号を良好に修了':'技能実習２号を良好に修了'};
+var SKILL_EVAL_TYPES = ['分野別運用方針に定める評価方法による証明','技能実習２号を良好に修了','ＥＰＡ介護福祉士候補者'];
+var SKILL_EVAL_LABELS = {'分野別運用方針に定める評価方法による証明':'試験合格','技能実習２号を良好に修了':'技能実習２号を良好に修了','ＥＰＡ介護福祉士候補者':'ＥＰＡ介護福祉士候補者'};
 
 // ver.20260803.04: 技能水準ブロック専用の選択肢（日本語ブロックは上のSKILL_EVAL_TYPESのまま）
 // 送信値(value)は案シスと一致。技能実習3号は表示のみ分け、送信値は2号と同じ（案シス取込は2号扱いでOK）
@@ -802,7 +802,15 @@ var SKILL_PROOF_OPTIONS = [
     my:'နည်းပညာ အလုပ်သင်သင်တန်း အဆင့် ၃ ပြီးမြောက် (Senmonkyu, 3 Kyu, Hyoka choso)',
     km:'បញ្ចប់វគ្គបណ្តុះបណ្តាលជំនាញ លេខ ៣ (Senmonkyu, 3 Kyu, Hyoka choso)',
     ne:'प्राविधिक इन्टर्न तालिम नं. ३ पूरा (Senmonkyu, 3 Kyu, Hyoka choso)',
-    zh:'技能实习3号修了 (Senmonkyu, 3 Kyu, Hyoka choso)'}}
+    zh:'技能实习3号修了 (Senmonkyu, 3 Kyu, Hyoka choso)'}},
+  {value:'ＥＰＡ介護福祉士候補者', label:'ＥＰＡ介護福祉士候補者', i18n:{
+    en:'EPA-certified care worker candidates',
+    vi:'Ứng viên điều dưỡng viên theo EPA',
+    id:'Kandidat perawat (care worker) bersertifikat EPA',
+    my:'EPA အသိအမှတ်ပြု ပြုစုစောင့်ရှောက်သူ လောင်း',
+    km:'បេក្ខជនបុគ្គលិកថែទាំ EPA',
+    ne:'EPA प्रमाणित हेरचाहकर्ता उम्मेदवार',
+    zh:'EPA护理福祉士候选人'}}
 ];
 function makeProofOptions(list) {
   return list.map(function(o, i){ return '<option value="' + o.value + '" data-optidx="' + i + '">' + o.label + '</option>'; }).join('');
