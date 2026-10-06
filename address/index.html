@@ -78,6 +78,13 @@
     background:#fff; color:var(--navy); font-size:15px; font-weight:700; cursor:pointer;
   }
   .ver{ text-align:center; font-size:10px; color:#94a3b8; margin-top:24px; }
+  /* ver.20261006.01: 住所の確認（はい／違うので入力する） */
+  .ask-q{font-size:15px;font-weight:700;color:var(--navy);line-height:1.8;margin-bottom:10px;}
+  .ask-q .en{display:block;font-size:12px;font-weight:400;color:var(--muted);}
+  .ask-addr{white-space:pre-line;word-break:break-word;background:#f8fafc;border:1px solid var(--line);border-radius:10px;padding:12px 14px;font-size:16px;line-height:1.7;color:#0f172a;margin-bottom:14px;}
+  .ask-yes{display:block;width:100%;padding:15px 12px;font-size:16px;font-weight:800;color:#fff;background:var(--ok);border:none;border-radius:12px;cursor:pointer;}
+  .ask-yes:disabled{opacity:.6;}
+  .ask-no{display:block;width:100%;margin-top:10px;padding:13px 12px;font-size:14px;font-weight:700;color:var(--navy);background:#fff;border:1.5px solid #cbd5e1;border-radius:12px;cursor:pointer;}
 </style>
 </head>
 <body>
@@ -92,13 +99,21 @@
     <div id="caseBox" class="case-box" style="display:none;"></div>
     <div id="editBox" class="edit-box"></div>
 
-    <p class="intro">
+    <!-- ver.20261006.01: 住所が分かっているときは、まず「合っていますか？」と聞く -->
+    <div id="askBox" class="card" style="display:none;">
+      <div class="ask-q">この<ruby>住所<rt>じゅうしょ</rt></ruby>へ、<ruby>新<rt>あたら</rt></ruby>しい<ruby>在留<rt>ざいりゅう</rt></ruby>カードを<ruby>送<rt>おく</rt></ruby>ります。<ruby>合<rt>あ</rt></ruby>っていますか？<span class="en">We will send your new residence card to this address. Is it correct?</span></div>
+      <div id="askAddr" class="ask-addr"></div>
+      <button type="button" class="ask-yes" id="btn-yes" onclick="answerYes()">はい、<ruby>合<rt>あ</rt></ruby>っています / Yes, correct</button>
+      <button type="button" class="ask-no" id="btn-no" onclick="answerNo()"><ruby>違<rt>ちが</rt></ruby>うので、<ruby>入力<rt>にゅうりょく</rt></ruby>する / No, I will enter it</button>
+    </div>
+
+    <p class="intro" id="introP">
       <ruby>在留<rt>ざいりゅう</rt></ruby><ruby>資格<rt>しかく</rt></ruby>の<ruby>許可<rt>きょか</rt></ruby>が<ruby>下<rt>お</rt></ruby>りました。<ruby>新<rt>あたら</rt></ruby>しい<ruby>在留<rt>ざいりゅう</rt></ruby>カードを<ruby>郵送<rt>ゆうそう</rt></ruby>します。<br>
       <b>お<ruby>名前<rt>なまえ</rt></ruby>とご<ruby>住所<rt>じゅうしょ</rt></ruby>は、あらかじめ<ruby>入力<rt>にゅうりょく</rt></ruby>されています。</b><ruby>違<rt>ちが</rt></ruby>うときは<ruby>直<rt>なお</rt></ruby>してください。<br>
       <span style="color:#64748b;font-size:12px;">Your name and address are pre-filled. Please correct them if needed.</span>
     </p>
 
-    <div class="card">
+    <div class="card" id="inputCard">
       <div class="field">
         <label>お<ruby>名前<rt>なまえ</rt></ruby>（<ruby>受取人<rt>うけとりにん</rt></ruby>）<span class="req">*</span> <span class="en">/ Recipient name</span></label>
         <input type="text" id="f-name" placeholder="例: NGUYEN VAN A">
@@ -137,7 +152,7 @@
 </div>
 
 <script>
-var ADDRESS_VERSION = 'ver.20261002.01';
+var ADDRESS_VERSION = 'ver.20261006.01';
 
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -235,6 +250,8 @@ function loadExisting(){
       setIf('f-zip',     r.jpPostalCode);
       setIf('f-phone',   r.phone);
       showEditMode(d.submitted_at);
+      addrFrom = val('f-address') ? 'answer' : '';
+      showAsk();
     })
     .catch(function(){ prefill(); });
 }
@@ -252,9 +269,49 @@ function prefill(){
       setIf('f-address', d.jpAddress);
       setIf('f-phone', d.phone);
       if (val('f-address') && !val('f-zip')) estimateZip(false);  // 住所あり・郵便番号なし→推定
+      addrFrom = val('f-address') ? 'application' : '';
+      showAsk();
     })
     .catch(function(){});
 }
+
+// ===== ver.20261006.01: 住所の確認（はい／違うので入力する）=====
+var askAddr = '';     // 画面に出して「合っていますか？」と聞いた住所
+var addrFrom = '';    // 'answer'＝前に回答した住所 ／ 'application'＝申請時の住所
+var askMode = false;
+function askLine(){ var z = val('f-zip'), a = val('f-address'); return (z ? ('〒' + z + '\n') : '') + a; }
+function showAsk(){
+  if (!val('f-address')){ showInput(); return; }      // 住所が分からないときは、最初から入力
+  askAddr = val('f-address'); askMode = true;
+  $('askAddr').textContent = askLine();
+  $('askBox').style.display = 'block';
+  $('inputCard').style.display = 'none';
+  $('introP').style.display = 'none';
+  $('submitWrap').style.display = 'none';
+  $('editBox').style.display = 'none';
+  // 郵便番号があとから入ることがあるので、少しして出し直す
+  [1500, 4000].forEach(function(ms){ setTimeout(function(){ if (askMode) $('askAddr').textContent = askLine(); }, ms); });
+}
+function showInput(){
+  askMode = false;
+  $('askBox').style.display = 'none';
+  $('inputCard').style.display = '';
+  $('introP').style.display = '';
+  $('submitWrap').style.display = '';
+}
+function answerYes(){
+  $('errmsg').style.display = 'none';
+  var by = $('btn-yes'); by.disabled = true;
+  if (!val('f-zip') && val('f-address')) estimateZip(false);
+  var tries = 0;
+  (function go(){
+    if (!val('f-zip') && _zipEstimating && tries < 20){ tries++; setTimeout(go, 300); return; }   // 郵便番号の取得を少し待つ
+    by.disabled = false;
+    if (validate()){ showInput(); showErr('郵便番号が分かりませんでした。郵便番号を入力して、送信してください。 / Please enter your postal code and submit.'); return; }
+    submitForm();
+  })();
+}
+function answerNo(){ showInput(); try{ $('f-address').focus(); }catch(e){} }
 
 function validate(){
   if (!val('f-name')) return 'お名前を入力してください。';
@@ -279,6 +336,9 @@ function submitForm(){
     phone:         val('f-phone')
   };
   Object.keys(response).forEach(function(k){ if(!response[k]) delete response[k]; });
+  // ver.20261006.01: どう答えたか（出した住所のまま＝yes／入力し直した＝edited）と、出した住所の出どころ
+  response.addrConfirm = (askAddr && val('f-address') === askAddr) ? 'yes' : 'edited';
+  if (addrFrom) response.addrFrom = addrFrom;
 
   var btn = $('btn-submit');
   btn.disabled = true; btn.textContent = '送信中... / Sending...';
@@ -325,6 +385,7 @@ function backToEdit(){
   var s = $('successBox'); if (s && s.parentNode) s.parentNode.removeChild(s);
   $('main').style.display = '';
   $('submitWrap').style.display = '';
+  showInput();
   showEditMode(new Date().toISOString());
   window.scrollTo(0, 0);
 }
