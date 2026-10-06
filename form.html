@@ -185,13 +185,14 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <div class="btn-wrap" id="btnWrap" style="display:none;">
+  <div id="reqRemain" onclick="_reqJumpFirst()" style="display:none;margin-bottom:8px;padding:6px 10px;border-radius:8px;font-size:12px;font-weight:700;line-height:1.5;text-align:center;cursor:pointer;"></div>
   <button class="btn-draft" onclick="saveDraft()" id="btn-draft">💾 途中保存する</button>
   <button class="btn-submit" onclick="submitForm()" id="btn-submit">送信する</button>
   <div class="draft-saved-msg" id="draftSavedMsg">✅ 途中保存しました</div>
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20261005.03';
+var FORM_VERSION = 'ver.20261006.01';
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -4684,6 +4685,7 @@ async function submitForm() {
     try { okBanner.scrollIntoView({ behavior:'smooth', block:'start' }); } catch(_) {}
     // ver.20260821: 送信完了をモーダルで大きく表示（保存できたことが明確に伝わるように）
     showSubmitDoneModal();
+    _formSentClean = true; _formDirty = false; _updateReqRemain();
     btn.disabled = false;
     // ボタンは緑の「送信済み ✓」状態に（押せば修正再送信できる）
     btn.textContent = '✅ 送信済み（修正する場合はもう一度押す）';
@@ -4771,8 +4773,8 @@ async function saveDraft(auto) {
     }
 
     if (!res.ok) throw new Error('HTTP ' + res.status);
-    if (msg) { msg.style.display = 'block'; setTimeout(function(){ msg.style.display = 'none'; }, 3000); }
-    if (!auto) showAlert('✅ 途中保存しました。同じURLから続きを入力できます。', 'success');
+    if (msg) { msg.innerHTML = '✅ 途中保存しました<div style="color:#b45309;margin-top:2px;">'+_reqT('notSent',0)+'</div>'; msg.style.display = 'block'; setTimeout(function(){ msg.style.display = 'none'; }, 6000); }
+    if (!auto) showAlert('✅ 途中保存しました。同じURLから続きを入力できます。\n※まだ送信されていません。入力が終わったら、最後に「送信する」を押してください。', 'success');
   } catch(e) {
     if (!auto) showAlert('❌ 保存に失敗しました: ' + e.message, 'error');
   } finally {
@@ -4784,12 +4786,71 @@ function showAlert(msg, type) {
   var el = document.getElementById('errorMsg');
   if (!el) return;
   el.textContent = msg;
+  el.style.whiteSpace = 'pre-line';
   el.style.display = 'block';
   el.style.background = type === 'success' ? '#f0fdf4' : '#fef2f2';
   el.style.color = type === 'success' ? '#15803d' : '#dc2626';
   el.style.borderColor = type === 'success' ? '#86efac' : '#fca5a5';
   setTimeout(function(){ el.style.display = 'none'; }, 4000);
 }
+
+
+// ver.20261006.01: 送信までたどり着いてもらう工夫（追完対策）
+//   ① 送信ボタンの下に「あと○項目で送信できます」（押すと最初の未入力の必須項目へ）
+//   ② 送信していないままページを閉じようとしたら、ブラウザの確認を出す
+//   ③ 途中保存したときに「まだ送信されていません」と出す
+var REQ_I18N = {
+  remain:{ja:'あと {n} 項目（* の項目）で送信できます。ここを押すと未入力の項目へ移動します。',fr:'あと {n} こうもく（* の こうもく）で そうしん できます。',en:'{n} more required item(s) (*) to fill before you can submit. Tap here to jump to it.',vi:'Còn {n} mục bắt buộc (*) cần nhập để gửi. Nhấn vào đây để chuyển đến mục đó.',id:'Masih ada {n} isian wajib (*) sebelum bisa dikirim. Ketuk di sini untuk menuju isian tersebut.',my:'ပေးပို့ရန် မဖြစ်မနေဖြည့်ရမည့်အချက် (*) {n} ခု ကျန်ပါသည်။ ဤနေရာကိုနှိပ်ပါက ထိုအချက်သို့ သွားပါမည်။',km:'នៅសល់ {n} ចំណុចចាំបាច់ (*) ដែលត្រូវបំពេញ មុនពេលផ្ញើ។ ចុចទីនេះដើម្បីទៅកាន់ចំណុចនោះ។',ne:'पठाउनु अघि अझै {n} अनिवार्य विवरण (*) भर्न बाँकी छ। त्यहाँ जान यहाँ थिच्नुहोस्।',zh:'还有 {n} 个必填项（*）未填写，填写后才能提交。点击此处跳转。'},
+  done:{ja:'必須項目はすべて入力しました。最後に「送信する」を押してください。',fr:'ひっす こうもくは すべて にゅうりょく しました。さいごに「送信する」を おして ください。',en:'All required items are filled. Please press “送信する (Submit)” at the end.',vi:'Đã nhập đủ các mục bắt buộc. Cuối cùng hãy nhấn “送信する (Gửi)”.',id:'Semua isian wajib sudah diisi. Terakhir, tekan “送信する (Kirim)”.',my:'မဖြစ်မနေဖြည့်ရမည့်အချက်များ အားလုံးဖြည့်ပြီးပါပြီ။ နောက်ဆုံးတွင် “送信する (ပေးပို့ရန်)” ကိုနှိပ်ပါ။',km:'បានបំពេញចំណុចចាំបាច់ទាំងអស់ហើយ។ ចុងក្រោយសូមចុច “送信する (ផ្ញើ)”។',ne:'सबै अनिवार्य विवरण भरिसकियो। अन्त्यमा “送信する (पठाउनुहोस्)” थिच्नुहोस्।',zh:'必填项已全部填写。最后请点击“送信する（提交）”。'},
+  notSent:{ja:'※まだ送信されていません。入力が終わったら、最後に「送信する」を押してください。',fr:'※まだ そうしん されて いません。にゅうりょくが おわったら、さいごに「送信する」を おして ください。',en:'※Not submitted yet. When you finish, please press “送信する (Submit)” at the end.',vi:'※Chưa được gửi. Khi nhập xong, hãy nhấn “送信する (Gửi)” ở cuối.',id:'※Belum terkirim. Setelah selesai, tekan “送信する (Kirim)” di bagian akhir.',my:'※မပေးပို့ရသေးပါ။ ဖြည့်ပြီးပါက နောက်ဆုံးတွင် “送信する (ပေးပို့ရန်)” ကိုနှိပ်ပါ။',km:'※មិនទាន់បានផ្ញើទេ។ ពេលបំពេញរួច សូមចុច “送信する (ផ្ញើ)” នៅចុងក្រោយ។',ne:'※अझै पठाइएको छैन। भरिसकेपछि अन्त्यमा “送信する (पठाउनुहोस्)” थिच्नुहोस्।',zh:'※尚未提交。填写完成后，请在最后点击“送信する（提交）”。'}
+};
+function _reqT(key, n){
+  var m=REQ_I18N[key]||{}; var L=currentLang||'';
+  var main=(L&&m[L])?m[L]:m.ja; var out=String(main||'').replace('{n}', n);
+  if(!L && m.fr) out+='<div style="font-size:11px;font-weight:400;margin-top:2px;">'+String(m.fr).replace('{n}', n)+'</div>';
+  else if(L && m.ja && L!=='fr') out+='<div style="font-size:11px;font-weight:400;margin-top:2px;opacity:.8;">'+String(m.ja).replace('{n}', n)+'</div>';
+  return out;
+}
+// 表示中の「*」付き項目のうち、まだ入っていないもの
+function _reqEmptyFields(){
+  var root=document.getElementById('formBody'); if(!root) return [];
+  var out=[];
+  root.querySelectorAll('.field label').forEach(function(lb){
+    if(!lb.querySelector('span.req')) return;
+    var fld=lb.parentNode; if(!fld || fld.offsetParent===null) return;
+    var inps=fld.querySelectorAll('input,select,textarea'); if(!inps.length) return;
+    var vis=[].filter.call(inps, function(i){ return i.offsetParent!==null && i.type!=='hidden'; }); if(!vis.length) return;
+    var filled=vis.some(function(i){ if(i.type==='radio'||i.type==='checkbox') return i.checked; return String(i.value||'').trim()!==''; });
+    if(!filled) out.push(vis[0]);
+  });
+  return out;
+}
+var _reqTimer=null, _formSentClean=false, _formDirty=false;
+function _updateReqRemain(){
+  clearTimeout(_reqTimer);
+  _reqTimer=setTimeout(function(){
+    var el=document.getElementById('reqRemain'); if(!el) return;
+    var wrap=document.getElementById('btnWrap'); if(!wrap || wrap.style.display==='none'){ el.style.display='none'; return; }
+    var n=_reqEmptyFields().length;
+    el.style.display='block';
+    if(n>0){ el.style.background='#fff7ed'; el.style.color='#9a3412'; el.style.border='1px solid #fed7aa'; el.innerHTML='📝 '+_reqT('remain', n); }
+    else { el.style.background='#eff6ff'; el.style.color='#1d4ed8'; el.style.border='1px solid #bfdbfe'; el.innerHTML='✅ '+_reqT('done', 0); }
+  }, 300);
+}
+function _reqJumpFirst(){
+  var f=_reqEmptyFields()[0]; if(!f) return;
+  try{ f.scrollIntoView({behavior:'smooth', block:'center'}); setTimeout(function(){ try{ f.focus(); }catch(e){} }, 400); }catch(e){}
+}
+document.addEventListener('input', function(){ _formDirty=true; _formSentClean=false; _updateReqRemain(); });
+document.addEventListener('change', function(){ _formDirty=true; _formSentClean=false; _updateReqRemain(); });
+document.addEventListener('click', function(){ _updateReqRemain(); });
+setTimeout(_updateReqRemain, 1500);
+// 送信していないまま閉じようとしたとき（入力があったときだけ）
+window.addEventListener('beforeunload', function(e){
+  if(!_formDirty || _formSentClean) return;
+  try{ saveDraft(true); }catch(_){}
+  e.preventDefault(); e.returnValue=''; return '';
+});
 
 var _hasInput = false;
 document.addEventListener('input', function(){ _hasInput = true; });
@@ -4802,6 +4863,7 @@ setInterval(function(){
 
 function setLang(l) {
   currentLang = l;
+  try{ _updateReqRemain(); }catch(_){}
   document.querySelectorAll('.lang-btn').forEach(function(b) {
     var bl = b.getAttribute('data-lang');
     b.classList.remove('active','off');
