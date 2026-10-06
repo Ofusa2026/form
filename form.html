@@ -192,7 +192,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20261006.01';
+var FORM_VERSION = 'ver.20261006.02';
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -2284,9 +2284,9 @@ function buildCompanyForm() {
     field('f-coNameEn','会社名（英語）','text',false,'例: OO Foods Co., Ltd.') +
     '<div class="grid2">' +
       field('f-coCorpNo','法人番号（13桁）','text',false,'例: 1234567890123') +
-      field('f-coEmpInsNo','雇用保険適用事業所番号','text',false,'例: 12-345678-9') +
+      field('f-coEmpInsNo','雇用保険適用事業所番号（11桁）','text',false,'例: 1234-567890-1') +
     '</div>' +
-    field('f-coLaborInsNo','労働保険番号','text',false,'例: 12-3456-789012-000') +
+    field('f-coLaborInsNo','労働保険番号（14桁）','text',false,'例: 12-3-45-678901-000') +
     '<div class="grid2">' +
       field('f-coEmployees','常勤職員数','number',false,'例: 25') +
       field('f-coForeignEmployees','うち外国人職員数','number',false,'例: 3') +
@@ -2946,7 +2946,7 @@ function buildCompanyGijinkokuForm() {
     '<div class="field"><label>会社名（ひらがな）<span class="req">*</span></label><input type="text" id="f-coNameKana" placeholder="例: かぶしきかいしゃ〇〇"><div id="co-kana-suggestion" style="font-size:11px;color:#6b7280;margin-top:3px;"></div></div>' +
     field('f-coNameEn','会社名（英語）','text',true,'例: OO Co., Ltd.') +
     field('f-coCorpNo','法人番号（13桁）','text',true,'例: 1234567890123') +
-    field('f-coEmpInsNo','雇用保険適用事業所番号','text',true,'例: 1234-567890-1') +
+    field('f-coEmpInsNo','雇用保険適用事業所番号（11桁）','text',true,'例: 1234-567890-1') +
     field('f-coHomepage','企業ホームページ（URL）','text',false,'例: https://www.example.co.jp') +
     field('f-gjEstablished','設立年月日','date',true,'') +
     '<div class="grid2">' +
@@ -4410,6 +4410,28 @@ function _gjCompanyValidate() {
   return null;
 }
 
+// ver.20261006.02: 番号の桁数チェック（法人番号13桁・雇用保険適用事業所番号11桁・労働保険番号14桁）。空欄はここでは見ない
+var _CO_NUM_RULES = [
+  {id:'f-coCorpNo',     label:'法人番号',             len:13},
+  {id:'f-coEmpInsNo',   label:'雇用保険適用事業所番号', len:11},
+  {id:'f-coLaborInsNo', label:'労働保険番号',          len:14},
+  {id:'f-hakenCorpNo',  label:'派遣先の法人番号',       len:13}
+];
+function _coNumCheck(){
+  for (var i=0;i<_CO_NUM_RULES.length;i++){
+    var r=_CO_NUM_RULES[i], el=document.getElementById(r.id);
+    if(!el || el.offsetParent===null) continue;
+    var v=String(el.value||'').trim(); if(!v) continue;
+    var z=v.replace(/[０-９]/g,function(c){ return String.fromCharCode(c.charCodeAt(0)-0xFEE0); });
+    var digits=z.replace(/[^0-9]/g,'');
+    var bad=/[^0-9\-－ー‐ 　]/.test(z) || digits.length!==r.len;
+    if(bad){
+      try{ el.style.borderColor='#dc2626'; el.style.background='#fef2f2'; el.scrollIntoView({behavior:'smooth',block:'center'}); setTimeout(function(){ try{ el.focus(); }catch(e){} }, 400); }catch(e){}
+      return r.label+'は'+r.len+'桁の番号を入れてください（いま入っている数字は'+digits.length+'桁です）。';
+    }
+  }
+  return null;
+}
 function validate() {
   // ver.20260822: 特定技能2号 企業フォームの誓約書チェック（分野別の必要人数）
   if (type === 'company_tokutei2' || type === 'tokutei2_pledge') {
@@ -4450,6 +4472,9 @@ function validate() {
     //   誓約書チェックを通過したらここで完了させ、下の f-name 必須チェックに落ちて
     //   「氏名（パスポート表記）は必須です」で送信不能になるバグを修正。
     if (type === 'tokutei2_pledge') return null;
+  }
+    if (type === 'company' || type === 'company_tokutei2' || type === 'company_gijinkoku' || type === 'company_designated46' || type === 'company_designated9') {
+    var _numErr = _coNumCheck(); if (_numErr) return _numErr;   // ver.20261006.02
   }
     if (type === 'company_gijinkoku' || type === 'company_designated46') {
     return _gjCompanyValidate();
