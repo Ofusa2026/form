@@ -192,7 +192,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20261006.02';
+var FORM_VERSION = 'ver.20261008.01'; // 役員情報：氏名を入力した役員は「ふりがな」も必須に（代表者以外も含む）。 ／ ver.20261006.02
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -3414,7 +3414,7 @@ function officerRow(n) {
       '<div class="field"><label>役職</label><input type="text" id="f-officer' + n + 'Title" placeholder="例: 代表取締役"></div>' +
       '<div class="field"><label>氏名</label><input type="text" id="f-officer' + n + 'Name" placeholder="例: 山田 太郎"></div>' +
     '</div>' +
-    '<div class="field"><label>ふりがな</label><input type="text" id="f-officer' + n + 'Kana" placeholder="例: やまだ たろう"></div>' +
+    '<div class="field"><label>ふりがな<span class="req">*</span></label><input type="text" id="f-officer' + n + 'Kana" placeholder="例: やまだ たろう"></div>' +
   '</div>';
 }
 
@@ -4481,6 +4481,20 @@ function validate() {
   }
     if (type === 'company' || type === 'company_tokutei2' || type === 'company_gijinkoku' || type === 'company_designated46' || type === 'company_designated9') {
     if (!val('f-coName')) return '会社名は必須です。';
+    // ver.20261008.01: 役員情報では、氏名を入力した人は「ふりがな」も必須（代表者以外も含む）
+    var _offNames = document.querySelectorAll('#officers-container input[id^="f-officer"][id$="Name"]');
+    for (var _oi = 0; _oi < _offNames.length; _oi++) {
+      var _nEl = _offNames[_oi];
+      if (_nEl.id.indexOf('NameEn') >= 0) continue; // 念のため英語名は対象外
+      var _nm = (_nEl.value || '').trim();
+      if (!_nm) continue;
+      var _kId = _nEl.id.replace(/Name$/, 'Kana');
+      var _kEl = document.getElementById(_kId);
+      if (!_kEl || !(_kEl.value || '').trim()) {
+        try { if (_kEl) _kEl.focus(); } catch (e) {}
+        return '役員「' + _nm + '」のふりがなを入力してください（氏名を入力した方はふりがなが必須です）。';
+      }
+    }
     return null;
   }
   if (type === 'jaim') {
