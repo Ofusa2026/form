@@ -192,7 +192,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20261008.01'; // 役員情報：氏名を入力した役員は「ふりがな」も必須に（代表者以外も含む）。 ／ ver.20261006.02
+var FORM_VERSION = 'ver.20261008.02'; // 役員情報：ふりがなの * は「氏名を入力した役員（＝その役員がいるとき）」だけ表示。必須判定は氏名入力済みの役員のみ。 ／ ver.20261008.01: 役員のふりがなを必須に ／ ver.20261006.02
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -3412,10 +3412,17 @@ function officerRow(n) {
     '<div style="font-size:11px;font-weight:700;color:#6366f1;margin-bottom:6px;">役員' + nums[n] + '</div>' +
     '<div class="grid2">' +
       '<div class="field"><label>役職</label><input type="text" id="f-officer' + n + 'Title" placeholder="例: 代表取締役"></div>' +
-      '<div class="field"><label>氏名</label><input type="text" id="f-officer' + n + 'Name" placeholder="例: 山田 太郎"></div>' +
+      '<div class="field"><label>氏名</label><input type="text" id="f-officer' + n + 'Name" placeholder="例: 山田 太郎" oninput="_officerKanaReq(' + n + ')"></div>' +
     '</div>' +
-    '<div class="field"><label>ふりがな<span class="req">*</span></label><input type="text" id="f-officer' + n + 'Kana" placeholder="例: やまだ たろう"></div>' +
+    '<div class="field"><label>ふりがな<span class="req" id="f-officer' + n + 'KanaReq" style="display:none;">*</span></label><input type="text" id="f-officer' + n + 'Kana" placeholder="例: やまだ たろう"></div>' +
   '</div>';
+}
+// ver.20261008.02: 役員は「氏名を入力したとき（＝その役員がいるとき）だけ」ふりがなの * を表示
+function _officerKanaReq(n){
+  var nm = document.getElementById('f-officer'+n+'Name');
+  var rq = document.getElementById('f-officer'+n+'KanaReq');
+  if (!rq) return;
+  rq.style.display = (nm && (nm.value||'').trim()) ? '' : 'none';
 }
 
 function finRow(label, prefix) {
