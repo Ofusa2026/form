@@ -192,7 +192,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20261008.02'; // 役員情報：ふりがなの * は「氏名を入力した役員（＝その役員がいるとき）」だけ表示。必須判定は氏名入力済みの役員のみ。 ／ ver.20261008.01: 役員のふりがなを必須に ／ ver.20261006.02
+var FORM_VERSION = 'ver.20261008.03'; // 企業ヒアリングフォームから「作成責任者」欄（氏名・役職・英語）を削除（技人国・46号・9号・特定技能すべて）。セクション名は「代表者」に変更。 ／ ver.20261008.02: 役員ふりがなの * は氏名入力時のみ ／ ver.20261008.01: 役員のふりがなを必須に
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -2327,7 +2327,7 @@ function buildCompanyForm() {
     field('f-jobDescription','受け入れる外国人の職務内容','textarea',false,'例: 食品製造ラインにおいて加工品の仕上げ・品質判別等に従事') +
   '</div>' +
 
-  '<div class="card"><div class="section-title">代表者・作成責任者</div>' +
+  '<div class="card"><div class="section-title">代表者</div>' +
     '<div class="grid2">' +
       field('f-coRepName','代表者氏名','text',false,'例: 山田 太郎') +
       field('f-coRepTitle','代表者役職','text',false,'例: 代表取締役') +
@@ -2336,11 +2336,6 @@ function buildCompanyForm() {
       field('f-coRepNameEn','代表者氏名（英語）','text',false,'例: YAMADA TARO') +
       field('f-coRepTitleEn','代表者役職（英語）','text',false,'例: President') +
     '</div>' +
-    '<div class="grid2">' +
-      field('f-coAuthorName','作成責任者氏名','text',false,'例: 佐藤 花子') +
-      field('f-coAuthorTitle','作成責任者役職','text',false,'例: 人事部長') +
-    '</div>' +
-    field('f-coAuthorNameEn','作成責任者氏名（英語）','text',false,'例: SATO HANAKO') +
   '</div>' +
 
   '<div class="card"><div class="section-title">雇用管理相談窓口</div>' +
@@ -3012,7 +3007,7 @@ function buildCompanyGijinkokuForm() {
     '</div>' +
   '</div>' +
 
-  '<div class="card"><div class="section-title">代表者・作成責任者</div>' +
+  '<div class="card"><div class="section-title">代表者</div>' +
     '<div class="grid2">' +
       field('f-coRepName','代表者氏名','text',true,'例: 山田 太郎') +
       field('f-coRepTitle','代表者役職','text',true,'例: 代表取締役') +
@@ -3031,10 +3026,6 @@ function buildCompanyGijinkokuForm() {
     '<div id="gjRepForeignWrap" style="display:none;">' +
       field('f-gjRepResidenceCard','代表者 在留カード番号','text',true,'例: AB12345678CD') +
       field('f-gjRepNameEnForeign','代表者 氏名（英語表記）','text',true,'例: NGUYEN VAN A') +
-    '</div>' +
-    '<div class="grid2">' +
-      field('f-coAuthorName','作成責任者氏名','text',true,'例: 佐藤 花子') +
-      field('f-coAuthorTitle','作成責任者役職','text',true,'例: 人事部長') +
     '</div>' +
   '</div>' +
 
@@ -3214,14 +3205,10 @@ function buildCompanyDesignated9Form() {
     field('f-coTel','電話番号','text',false,'例: 03-1234-5678') +
   '</div>' +
 
-  '<div class="card"><div class="section-title">代表者・作成責任者</div>' +
+  '<div class="card"><div class="section-title">代表者</div>' +
     '<div class="grid2">' +
       field('f-coRepName','代表者氏名','text',false,'例: 山田 太郎') +
       field('f-coRepTitle','代表者役職','text',false,'例: 代表取締役') +
-    '</div>' +
-    '<div class="grid2">' +
-      field('f-coAuthorName','作成責任者氏名','text',false,'例: 佐藤 花子') +
-      field('f-coAuthorTitle','作成責任者役職','text',false,'例: 人事部長') +
     '</div>' +
   '</div>' +
 
