@@ -193,7 +193,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20261009.02-test'; // 受入経験は案シスから自動判定（役員情報・比較対象日本人の出し分け）、標準の内容（社会保険等・離職者0）を一番下にまとめ、相談窓口に「代表者と同じにする」、自動計算の説明文を修正 ／ ver.20261009.01-test // 特定技能の企業フォームを基本すべて必須に（条件付き項目は「有」のときだけ）。住所を1欄に、分野・区分を削除・職務内容を比較対象日本人へ移動、役員情報は受入れ経験なしのときだけ、控除3点を削除、居住費・食費・水道光熱費は控除の有無で分岐、社会保険等は標準選択＋その他記入、休日を先頭・所定労働日数/時間を自動計算、契約更新の判断基準（Saysay準拠）。比較対象日本人は「いる」ときだけ入力、受け入れる外国人の職務内容は任意。役員①は役職・氏名・ふりがな必須。追完の項目しぼり込みリンクは従来どおり。非表示の * を「あと○項目」に数えていた不具合を修正 ／ ver.20261008.04: // 「作成責任者」欄の削除は特定技能の企業フォームのみに限定（技人国・46号・9号は元に戻す） ／ ver.20261008.03: 作成責任者欄を削除 ／ ver.20261008.02: 役員ふりがなの * は氏名入力時のみ ／ ver.20261008.01: 役員のふりがなを必須に
+var FORM_VERSION = 'ver.20261009.03-test'; // 「① 企業情報」「② 雇用条件」のタブに分割 ／ ver.20261009.02-test: // 受入経験は案シスから自動判定（役員情報・比較対象日本人の出し分け）、標準の内容（社会保険等・離職者0）を一番下にまとめ、相談窓口に「代表者と同じにする」、自動計算の説明文を修正 ／ ver.20261009.01-test // 特定技能の企業フォームを基本すべて必須に（条件付き項目は「有」のときだけ）。住所を1欄に、分野・区分を削除・職務内容を比較対象日本人へ移動、役員情報は受入れ経験なしのときだけ、控除3点を削除、居住費・食費・水道光熱費は控除の有無で分岐、社会保険等は標準選択＋その他記入、休日を先頭・所定労働日数/時間を自動計算、契約更新の判断基準（Saysay準拠）。比較対象日本人は「いる」ときだけ入力、受け入れる外国人の職務内容は任意。役員①は役職・氏名・ふりがな必須。追完の項目しぼり込みリンクは従来どおり。非表示の * を「あと○項目」に数えていた不具合を修正 ／ ver.20261008.04: // 「作成責任者」欄の削除は特定技能の企業フォームのみに限定（技人国・46号・9号は元に戻す） ／ ver.20261008.03: 作成責任者欄を削除 ／ ver.20261008.02: 役員ふりがなの * は氏名入力時のみ ／ ver.20261008.01: 役員のふりがなを必須に
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -2315,6 +2315,89 @@ function copyRepToConsult() {
 function _tkSetDefaults() {
   ['f-resignJp','f-resignForeign','f-dismissJp','f-dismissForeign','f-missing1y'].forEach(function(id){ var e = document.getElementById(id); if (e && e.value === '') e.value = '0'; });
 }
+// ===== ver.20261009.03: 特定技能の企業フォームを「① 企業情報」「② 雇用条件」のタブに分ける =====
+var TK_TAB1 = ['企業基本情報','所在地','代表者','役員情報'];
+var TK_TAB2 = ['雇用条件','就業場所（事業所）','労働時間・休日','契約期間','雇用管理相談窓口','住居（支援計画書用）','比較対象日本人','標準の内容'];
+var _tkTabCur = 0, _tkTabsOn = false;
+function _tkCardTitle(c){ var t = c.querySelector('.section-title'); return t ? t.textContent.trim() : ''; }
+function _tkBuildTabs() {
+  if (fieldsFilter && fieldsFilter.length) return;            // 追完の項目しぼり込みリンクはタブにしない
+  var body = document.getElementById('formBody'); if (!body) return;
+  var cards = [].filter.call(body.children, function(c){ return c.classList && c.classList.contains('card'); });
+  if (!cards.length) return;
+  var panes = [document.createElement('div'), document.createElement('div'), document.createElement('div')];
+  panes.forEach(function(pn, i){ pn.className = 'tk-pane'; pn.setAttribute('data-tab', i); });
+  var used = [];
+  var pick = function(names, pane){
+    names.forEach(function(nm){
+      cards.forEach(function(c){
+        if (used.indexOf(c) >= 0) return;
+        var t = _tkCardTitle(c);
+        if (t === nm || (nm === '標準の内容' && t.indexOf('標準の内容') === 0)) { pane.appendChild(c); used.push(c); }
+      });
+    });
+  };
+  var anchor = document.createElement('div'); body.insertBefore(anchor, cards[0]);
+  pick(TK_TAB1, panes[0]); pick(TK_TAB2, panes[1]);
+  cards.forEach(function(c){ if (used.indexOf(c) < 0) panes[2].appendChild(c); });
+  var labels = ['① 企業情報', '② 雇用条件', (type === 'company_tokutei2') ? '③ 2号誓約書' : '③ その他'];
+  var bar = document.createElement('div');
+  bar.id = 'tkTabBar';
+  bar.style.cssText = 'display:flex;gap:8px;margin:0 0 14px;';
+  var n = panes[2].children.length ? 3 : 2;
+  for (var i = 0; i < n; i++) {
+    var b = document.createElement('button'); b.type = 'button'; b.className = 'tk-tab'; b.setAttribute('data-tab', i);
+    b.style.cssText = 'flex:1;padding:12px 6px;border-radius:12px;border:2px solid #c7d2fe;background:#fff;color:#4338ca;font-weight:800;font-size:14px;cursor:pointer;font-family:inherit;line-height:1.35;';
+    b.innerHTML = labels[i] + '<div class="tk-tab-cnt" style="font-size:11px;font-weight:700;margin-top:2px;"></div>';
+    (function(ix){ b.onclick = function(){ _tkShowTab(ix, true); }; })(i);
+    bar.appendChild(b);
+  }
+  body.insertBefore(bar, anchor);
+  for (var k = 0; k < n; k++) body.insertBefore(panes[k], anchor);
+  anchor.remove();
+  // 各タブの最後に「次へ」ボタン
+  for (var j = 0; j < n - 1; j++) {
+    var nx = document.createElement('button'); nx.type = 'button';
+    nx.style.cssText = 'width:100%;padding:14px;margin:4px 0 16px;border-radius:12px;border:none;background:#4338ca;color:#fff;font-weight:800;font-size:15px;cursor:pointer;font-family:inherit;';
+    nx.textContent = labels[j + 1] + ' へ進む →';
+    (function(ix){ nx.onclick = function(){ _tkShowTab(ix, true); }; })(j + 1);
+    panes[j].appendChild(nx);
+  }
+  _tkTabsOn = true;
+  _tkShowTab(0, false);
+}
+function _tkShowTab(ix, scroll) {
+  _tkTabCur = ix;
+  document.querySelectorAll('.tk-pane').forEach(function(pn){ pn.style.display = (+pn.getAttribute('data-tab') === ix) ? '' : 'none'; });
+  document.querySelectorAll('.tk-tab').forEach(function(b){
+    var on = (+b.getAttribute('data-tab') === ix);
+    b.style.background = on ? '#4338ca' : '#fff'; b.style.color = on ? '#fff' : '#4338ca'; b.style.borderColor = on ? '#4338ca' : '#c7d2fe';
+  });
+  if (scroll) { try { document.getElementById('tkTabBar').scrollIntoView({ behavior:'smooth', block:'start' }); } catch(e) {} }
+  try { _updateReqRemain(); } catch(e) {}
+}
+// 全タブを一時的に表示した状態で処理する（入力チェック・未入力数は全タブ分を見る）
+function _tkWithAllTabs(fn) {
+  if (!_tkTabsOn) return fn();
+  var panes = document.querySelectorAll('.tk-pane');
+  panes.forEach(function(pn){ pn.style.display = ''; });
+  var r, act = null;
+  try { r = fn(); act = document.activeElement; }
+  finally { panes.forEach(function(pn){ pn.style.display = (+pn.getAttribute('data-tab') === _tkTabCur) ? '' : 'none'; }); }
+  return { r: r, act: act };
+}
+function _tkPaneOf(el) { var pn = el && el.closest ? el.closest('.tk-pane') : null; return pn ? +pn.getAttribute('data-tab') : -1; }
+// タブごとの未入力数をボタンに表示
+function _tkUpdateTabCounts(list) {
+  if (!_tkTabsOn) return;
+  var cnt = {};
+  (list || []).forEach(function(el){ var t = _tkPaneOf(el); cnt[t] = (cnt[t] || 0) + 1; });
+  document.querySelectorAll('.tk-tab').forEach(function(b){
+    var t = +b.getAttribute('data-tab'), c = b.querySelector('.tk-tab-cnt'); if (!c) return;
+    c.textContent = cnt[t] ? ('未入力 ' + cnt[t] + '項目') : '✓ 入力済み';
+  });
+}
+
 // 契約更新の判断基準（案シス・Saysayと同じ5項目。保存は「、」区切り＋その他）
 var TK_RENEW_OPTS = ['契約期間満了時の業務量','労働者の勤務成績、態度','従事している業務の進捗状況','労働者の業務を遂行する能力','会社の経営状況'];
 // 標準を選択済みのセレクト＋「その他」用の自由記入欄（同じ枠の中＝どの項目のその他かが分かる）
@@ -4644,6 +4727,19 @@ function _coNumCheck(){
   return null;
 }
 function validate() {
+  if (typeof _tkTabsOn !== 'undefined' && _tkTabsOn) {
+    var _w = _tkWithAllTabs(_validateInner);
+    if (_w.r) {
+      var _t = _tkPaneOf(_w.act);
+      if (_t < 0) { var _f = (_reqEmptyFields() || [])[0]; _t = _tkPaneOf(_f); _w.act = _f; }
+      if (_t >= 0 && _t !== _tkTabCur) _tkShowTab(_t, false);
+      try { if (_w.act && _w.act.focus) { _w.act.scrollIntoView({behavior:'smooth', block:'center'}); _w.act.focus(); } } catch(e) {}
+    }
+    return _w.r;
+  }
+  return _validateInner();
+}
+function _validateInner() {
   // ver.20260822: 特定技能2号 企業フォームの誓約書チェック（分野別の必要人数）
   if (type === 'company_tokutei2' || type === 'tokutei2_pledge') {
     var _t2field = val('f-t2Field');
@@ -5065,8 +5161,12 @@ function _reqT(key, n){
   else if(L && m.ja && L!=='fr') out+='<div style="font-size:11px;font-weight:400;margin-top:2px;opacity:.8;">'+String(m.ja).replace('{n}', n)+'</div>';
   return out;
 }
-// 表示中の「*」付き項目のうち、まだ入っていないもの
+// 表示中の「*」付き項目のうち、まだ入っていないもの（タブがあるときは全タブ分）
 function _reqEmptyFields(){
+  if (typeof _tkTabsOn !== 'undefined' && _tkTabsOn) { var w = _tkWithAllTabs(_reqEmptyFieldsRaw); _tkUpdateTabCounts(w.r); return w.r; }
+  return _reqEmptyFieldsRaw();
+}
+function _reqEmptyFieldsRaw(){
   var root=document.getElementById('formBody'); if(!root) return [];
   var out=[];
   root.querySelectorAll('.field label').forEach(function(lb){
@@ -5093,6 +5193,7 @@ function _updateReqRemain(){
 }
 function _reqJumpFirst(){
   var f=_reqEmptyFields()[0]; if(!f) return;
+  try { if (typeof _tkTabsOn !== 'undefined' && _tkTabsOn) { var _t=_tkPaneOf(f); if (_t >= 0 && _t !== _tkTabCur) _tkShowTab(_t, false); } } catch(e) {}
   try{ f.scrollIntoView({behavior:'smooth', block:'center'}); setTimeout(function(){ try{ f.focus(); }catch(e){} }, 400); }catch(e){}
 }
 document.addEventListener('input', function(){ _formDirty=true; _formSentClean=false; _updateReqRemain(); });
@@ -5214,7 +5315,7 @@ function confirmName(isMatch){
     document.getElementById('nameConfirmName').innerHTML = _escName;
   }
   document.getElementById('formBody').innerHTML = buildForm(type);
-  try { if (document.getElementById('officersWrap')) { _tkSetDefaults(); _tkLoadAcceptExp(); } } catch(e) {}   // ver.20261009.02
+  try { if (document.getElementById('officersWrap')) { _tkSetDefaults(); _tkLoadAcceptExp(); _tkBuildTabs(); } } catch(e) { console.error('tk init error:', e); }   // ver.20261009.02 / .03 タブ
   if (fieldsFilter && fieldsFilter.length && type === 'company') {
     applyFieldsFilter(fieldsFilter);
   }
