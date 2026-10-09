@@ -192,7 +192,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20261008.04'; // 「作成責任者」欄の削除は特定技能の企業フォームのみに限定（技人国・46号・9号は元に戻す） ／ ver.20261008.03: 作成責任者欄を削除 ／ ver.20261008.02: 役員ふりがなの * は氏名入力時のみ ／ ver.20261008.01: 役員のふりがなを必須に
+var FORM_VERSION = 'ver.20261009.02'; // 支援計画書をアップロードするとAIがその場で読み取り、空いている欄だけに入力（紫色）。残りは登録支援機関が入力して送信 ／ ver.20261009.01: 登録支援機関フォームに「過去の支援計画書」のアップロード欄 ／ ver.20261008.04: 「作成責任者」欄の削除は特定技能の企業フォームのみに限定（技人国・46号・9号は元に戻す） ／ ver.20261008.03: 作成責任者欄を削除 ／ ver.20261008.02: 役員ふりがなの * は氏名入力時のみ ／ ver.20261008.01: 役員のふりがなを必須に
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -1452,11 +1452,163 @@ function _soGoStep(n){
   if(next) next.style.visibility=(n<steps.length-1)?'visible':'hidden';
   try{ window.scrollTo({top:0,behavior:'smooth'}); }catch(e){ try{window.scrollTo(0,0);}catch(_){} }
 }
+// ===== ver.20261009.01: 過去の支援計画書（参考様式第1-17号）のアップロード =====
+//   アップロード先：Supabase Storage irai-docs/so_<登録支援機関ID>/plan/<時刻>_<ファイル名>
+//   ver.20261009.02: アップロード直後に so-plan-read（Edge Function）で読み取り、フォームの空欄に入れる
+window._soPlanFiles = window._soPlanFiles || [];
+function _soPlanUploadHtml(){
+  return '<div class="card" style="border:2px dashed #7c3aed;background:linear-gradient(135deg,#f5f3ff,#faf5ff);">'
+    + '<div class="section-title" style="color:#6d28d9;">📎 過去の支援計画書（あれば）</div>'
+    + '<div style="font-size:13px;color:#4b5563;line-height:1.7;margin-bottom:10px;">以前に入管へ提出した<b>「1号特定技能外国人支援計画書（参考様式第1-17号）」</b>のPDF・写真があれば、アップロードしてください。<br>アップロードすると<b>AIがすぐに読み取り、空いている欄に自動で入力</b>します（<span style="background:#ede9fe;border:1px solid #7c3aed;border-radius:4px;padding:0 4px;">紫色の欄</span>）。<br>紫色の欄は内容をご確認のうえ、<b>入っていない欄だけご入力</b>いただき、最後に送信してください。<br><span style="font-size:12px;color:#6b7280;">※ 1ファイル30MBまで（写真は自動で縮小します）。読み取りに30秒〜1分ほどかかります。</span></div>'
+    + '<input type="file" id="f-so_planFile" accept=".pdf,image/*" multiple style="display:none" onchange="_soPlanUpload(this.files);this.value=\'\';">'
+    + '<button type="button" onclick="document.getElementById(\'f-so_planFile\').click()" style="width:100%;padding:13px;background:#7c3aed;color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:800;cursor:pointer;min-height:48px;">📄 支援計画書を選ぶ（PDF・写真）</button>'
+    + '<ul id="so-plan-list" style="list-style:none;padding:0;margin:10px 0 0;font-size:13px;"></ul>'
+    + '<div id="so-plan-ai" style="display:none;margin-top:10px;padding:10px 12px;border-radius:10px;font-size:13px;line-height:1.7;"></div>'
+    + '</div>';
+}
+function _soPlanRenderList(){
+  var ul=document.getElementById('so-plan-list'); if(!ul) return;
+  ul.innerHTML=(window._soPlanFiles||[]).map(function(f){ return '<li style="padding:6px 8px;background:#fff;border:1px solid #ddd6fe;border-radius:8px;margin-bottom:6px;">📎 '+String(f.name||'').replace(/[&<>]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c];})+'　<span style="color:#16a34a;font-weight:700;">✓ アップロード済み</span></li>'; }).join('');
+}
+function _soPlanUpload(files){
+  if(!files||!files.length) return;
+  var ul=document.getElementById('so-plan-list');
+  if(!caseId){ alert('サンプル表示のため、アップロードはできません。'); return; }
+  var safeOrg='so_'+String(caseId).replace(/[^\w\-]+/g,'_');
+  Array.prototype.forEach.call(files, function(f){
+    var li=document.createElement('li'); li.style.cssText='padding:6px 8px;background:#fff;border:1px solid #e5e7eb;border-radius:8px;margin-bottom:6px;';
+    li.textContent='📎 '+f.name+'　アップロード中…'; if(ul) ul.appendChild(li);
+    if(f.size>30*1024*1024){ li.textContent='📎 '+f.name+'　⚠️ ファイルが大きすぎます（30MBまで）'; li.style.color='#dc2626'; return; }
+    _soPlanShrink(f).then(function(body){
+    var safe=f.name.replace(/[^\w.\-]+/g,'_'); if(body!==f) safe=safe.replace(/\.[^.]*$/,'')+'.jpg';
+    var path=safeOrg+'/plan/'+Date.now()+'_'+safe;
+    var encPath=path.split('/').map(encodeURIComponent).join('/');
+    return fetch(SUPABASE_URL+'/storage/v1/object/irai-docs/'+encPath,{method:'POST',headers:{'apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY,'Content-Type':body.type||'application/octet-stream'},body:body})
+      .then(function(res){
+        if(!res.ok){ li.textContent='📎 '+f.name+'　⚠️ アップロードできませんでした（'+res.status+'）'; li.style.color='#dc2626'; return; }
+        window._soPlanFiles.push({name:f.name, path:path, size:body.size, at:new Date().toISOString()});
+        if(li.parentNode) li.parentNode.removeChild(li);
+        _soPlanRenderList();
+        _soPlanAiRead(path, f.name);   // ver.20261009.02: アップロードしたらすぐAIで読み取って空欄に入れる
+      });
+    })
+      .catch(function(){ li.textContent='📎 '+f.name+'　⚠️ 通信エラー'; li.style.color='#dc2626'; });
+  });
+}
+// ===== ver.20261009.02: アップロードした支援計画書をAIで読み取り、空いている欄だけに入れる（紫色で表示） =====
+function _soPlanShrink(f){
+  // 写真は長辺2000pxのJPEGに縮小（PDFはそのまま）
+  return new Promise(function(ok){
+    if(!/^image\//.test(f.type||'') || /gif/.test(f.type) || f.size<1.5*1024*1024){ ok(f); return; }
+    try{
+      var url=URL.createObjectURL(f), im=new Image();
+      im.onload=function(){ try{ var r=Math.min(1,2000/Math.max(im.width,im.height)), c=document.createElement('canvas'); c.width=Math.round(im.width*r); c.height=Math.round(im.height*r); c.getContext('2d').drawImage(im,0,0,c.width,c.height); URL.revokeObjectURL(url); c.toBlob(function(b){ ok(b||f); },'image/jpeg',0.85); }catch(e){ ok(f); } };
+      im.onerror=function(){ URL.revokeObjectURL(url); ok(f); };
+      im.src=url;
+    }catch(e){ ok(f); }
+  });
+}
+function _soPlanAiMsg(html,kind){
+  var b=document.getElementById('so-plan-ai'); if(!b) return;
+  var c={run:['#eff6ff','#1d4ed8','#bfdbfe'],ok:['#f5f3ff','#5b21b6','#c4b5fd'],ng:['#fef2f2','#b91c1c','#fecaca']}[kind||'run'];
+  b.style.display='block'; b.style.background=c[0]; b.style.color=c[1]; b.style.border='1px solid '+c[2]; b.innerHTML=html;
+}
+window._soPlanAiBusy=0;
+function _soPlanAiRead(path,name){
+  window._soPlanAiBusy++;
+  _soPlanAiMsg('⏳ <b>AIが「'+String(name).replace(/[&<>]/g,'')+'」を読み取り中です…</b>（30秒〜1分ほど）<br>このまま下の欄を入力していても大丈夫です。');
+  fetch(SUPABASE_URL+'/functions/v1/so-plan-read',{method:'POST',headers:{'apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY,'Content-Type':'application/json'},body:JSON.stringify({org_id:caseId,path:path})})
+    .then(function(r){ return r.json().catch(function(){ return {ok:false,error:'HTTP '+r.status}; }); })
+    .then(function(j){
+      window._soPlanAiBusy--;
+      if(!j||!j.ok){ _soPlanAiMsg('⚠️ 自動読み取りができませんでした。ファイルはアップロード済みなので、お手数ですが各欄をご入力ください。<br><span style="font-size:11px;opacity:.8;">（'+String((j&&j.error)||'').replace(/[&<>]/g,'')+'）</span>','ng'); return; }
+      var d=j.data||{};
+      if(d.found===false){ _soPlanAiMsg('ℹ️ この支援計画書には登録支援機関（Ⅲ）の欄の記入がありませんでした。お手数ですが各欄をご入力ください。','ng'); return; }
+      var n=_soPlanAiFill(d);
+      if(n) _soPlanAiMsg('✨ <b>AIが '+n+' か所に入力しました。</b><br>紫色の欄の内容をご確認のうえ、<b>空いている欄だけご入力</b>ください（①〜③の各ページ）。<br><span style="font-size:12px;">※ すでに入力されていた欄は上書きしていません。</span>','ok');
+      else _soPlanAiMsg('ℹ️ 読み取りましたが、新しく入れられる空欄はありませんでした。','ok');
+    })
+    .catch(function(){ window._soPlanAiBusy--; _soPlanAiMsg('⚠️ 通信エラーで自動読み取りができませんでした。各欄をご入力ください。','ng'); });
+}
+function _soAiMark(el){
+  if(!el) return;
+  var t=(el.type==='checkbox'||el.type==='radio')?(el.closest('label')||el.parentNode):el;
+  t.classList.add('so-ai');
+  if(el.type==='checkbox'||el.type==='radio'){ t.style.outline='2px solid #7c3aed'; t.style.borderRadius='6px'; t.style.background='#ede9fe'; }
+  else { el.style.background='#f5f3ff'; el.style.borderColor='#7c3aed'; el.title='AIが支援計画書から入力しました（ご確認ください）';
+    el.addEventListener('input',function(){ el.style.background=''; el.style.borderColor=''; },{once:true}); }
+}
+function _soPlanAiFill(d){
+  var n=0, g=function(id){return document.getElementById(id);};
+  var nz=function(x){ return x!=null && String(x).trim()!==''; };
+  var put=function(id,val){ var el=g(id); if(!el||!nz(val)||el.disabled) return false; if(String(el.value||'').trim()!=='') return false;
+    if(el.tagName==='SELECT'){ var ok=Array.prototype.some.call(el.options,function(o){return o.value===String(val);}); if(!ok) return false; }
+    el.value=String(val).trim(); _soAiMark(el); n++; return true; };
+  var digits=function(x){ return String(x==null?'':x).replace(/[^\d]/g,''); };
+  // 基本情報
+  put('f-so_name',d.name); put('f-so_nameKana',d.nameKana); put('f-so_nameEn',d.nameEn);
+  put('f-so_regNo',d.regNo); put('f-so_regDate',String(d.regDate||'').replace(/[^\d]/g,''));
+  put('f-so_zip',d.zip); put('f-so_pref',d.pref); put('f-so_city',d.city); put('f-so_addressDetail',d.addressDetail); put('f-so_addressEn',d.addressEn); put('f-so_tel',d.tel);
+  put('f-so_repName',d.repName); put('f-so_repNameKana',d.repNameKana); put('f-so_repNameEn',d.repNameEn);
+  put('f-so_languages',d.languages); put('f-so_supportLanguages',d.languages);
+  // 支援体制
+  put('f-so_supportManagerName',d.supportManagerName); put('f-so_supportManagerKana',d.supportManagerKana); put('f-so_supportManagerTitle',d.supportManagerTitle); put('f-so_supportManagerTitleEn',d.supportManagerTitleEn);
+  put('f-so_supporterCount',digits(d.supporterCount)); put('f-so_supportStaffCount',digits(d.supportStaffCount));
+  if(d.supportProperness==='有'||d.supportProperness==='無'){
+    var any=document.querySelector('input[name="f-so_properness"]:checked');
+    var r=document.querySelector('input[name="f-so_properness"][value="'+d.supportProperness+'"]');
+    if(!any&&r){ r.checked=true; _soAiMark(r); n++; }
+  }
+  // 対応時間（空いている曜日だけ）
+  var sh=d.supportHours||{};
+  _SO_DAYS.forEach(function(dd){ var k=dd[0], hv=sh[k]||{}; var f=g('f-so_hours_'+k+'_from'), t=g('f-so_hours_'+k+'_to'), no=g('f-so_hours_'+k+'_none');
+    if(!f||!t) return; if((no&&no.checked)||f.value||t.value) return;
+    if(hv.none&&no){ no.checked=true; _soHoursNoneToggle(k); _soAiMark(no); n++; return; }
+    if(nz(hv.from)&&nz(hv.to)){ f.value=hv.from; t.value=hv.to; _soAiMark(f); _soAiMark(t); n++; } });
+  // 相談方法・緊急時対応（まだ何も選んでいないときだけ）
+  [['consult',d.consultMethods],['emg',d.emergencyContact]].forEach(function(pm){ var pfx=pm[0], mv=pm[1]||{};
+    var cb=['f2f','tel','mail'].map(function(k){return g('f-so_'+pfx+'_'+k);});
+    if(cb.some(function(e){return e&&e.checked;}) || (g('f-so_'+pfx+'_other')&&g('f-so_'+pfx+'_other').value)) return;
+    var hit=false;
+    ['f2f','tel','mail'].forEach(function(k,i){ if(mv[k]&&cb[i]){ cb[i].checked=true; _soAiMark(cb[i]); hit=true; } });
+    _soMethToggle(pfx);
+    if(mv.tel) put('f-so_'+pfx+'_telNo',mv.telNo); if(mv.mail) put('f-so_'+pfx+'_mailAddr',mv.mailAddr);
+    if(nz(mv.other)) put('f-so_'+pfx+'_other',mv.other);
+    if(hit) n++; });
+  // 支援担当者（名簿が空のときだけ）
+  var st=(d.staff||[]).filter(function(x){return x&&nz(x.name);});
+  var sc=g('so-staff-container');
+  if(st.length&&sc&&!Array.prototype.some.call(sc.querySelectorAll('input'),function(e){return nz(e.value);})){
+    sc.innerHTML=''; _soStaffCount=0;
+    st.forEach(function(x,i){ sc.insertAdjacentHTML('beforeend',_soFormStaffRow(i)); _soStaffCount=i;
+      [['name',x.name],['title',x.title],['nameEn',x.nameEn],['titleEn',x.titleEn],['tel',x.tel]].forEach(function(kv){ var e=g('f-so_staff'+i+'_'+kv[0]); if(e&&nz(kv[1])){ e.value=kv[1]; _soAiMark(e); } }); });
+    n++;
+  }
+  // 通訳者（名簿が空のときだけ。言語のチェックはご本人に）
+  var it=(d.interpreters||[]).filter(function(x){return x&&nz(x.name);});
+  var ic=g('so-interp-container');
+  if(it.length&&ic&&!Array.prototype.some.call(ic.querySelectorAll('input[type=text]'),function(e){return nz(e.value);})){
+    ic.innerHTML=''; _soInterpCount=0;
+    it.forEach(function(x,i){ ic.insertAdjacentHTML('beforeend',_soFormInterpRow(i)); _soInterpCount=i;
+      var e1=g('f-so_interp'+i+'_name'); if(e1){ e1.value=x.name; _soAiMark(e1); }
+      var e2=g('f-so_interp'+i+'_kana'); if(e2&&nz(x.kana)){ e2.value=x.kana; _soAiMark(e2); }
+      var eo=g('f-so_interp'+i+'_langOther'); if(eo&&nz(x.language)){ eo.value=x.language; _soAiMark(eo); } });
+    n++;
+  }
+  // 支援を行う事務所（住所と違うときだけ・まだ空のとき）
+  var of=d.office, oc=g('so-office-container');
+  if(of&&typeof of==='object'&&nz(of.addressDetail||of.city)&&oc&&!Array.prototype.some.call(oc.querySelectorAll('input'),function(e){return nz(e.value);})){
+    oc.innerHTML=''; _soOfficeCount=0; oc.insertAdjacentHTML('beforeend',_soFormOfficeRow(0));
+    [['zip',of.zip],['pref',of.pref],['city',of.city],['addr',of.addressDetail],['addrEn',of.addressEn],['tel',of.tel]].forEach(function(kv){ put('f-so_office0_'+kv[0],kv[1]); });
+  }
+  return n;
+}
 function buildSupportOrgForm() {
   window._soStep=0;
   var h = _soStepBarHtml(0);
   // ステップ①基本情報
   h += '<div class="so-step" data-sostep="0">';
+  h += _soPlanUploadHtml();   // ver.20261009.01: 過去の支援計画書のアップロード（こちらでAIが読み取って入力欄に入れる）
   h += '<div class="card"><div class="section-title">基本情報</div>';
   h += field('f-so_name','登録支援機関名','text',true,'例：○○協同組合','');
   h += field('f-so_nameKana','ふりがな','text',false,'例：まるまるきょうどうくみあい','');
@@ -1813,12 +1965,14 @@ function _soFormCollect(){
     implHours:{ guidance:v('f-so_implH_guidance'), orientation:v('f-so_implH_orientation') },
     implSchedules:{ guidance:v('f-so_sched_guidance'), escort:v('f-so_sched_escort'), housing:v('f-so_sched_housing'), orientation:v('f-so_sched_orientation'), procedures:v('f-so_sched_procedures'), japanese:v('f-so_sched_japanese'), consultation:v('f-so_sched_consultation'), exchange:v('f-so_sched_exchange'), jobchange:v('f-so_sched_jobchange') },
     housingPolicy:{ a:(function(){var r=document.querySelector('input[name="f-so_hp_a"]:checked');return r?r.value:'';})(), b:(function(){var r=document.querySelector('input[name="f-so_hp_b"]:checked');return r?r.value:'';})(), c:(function(){var r=document.querySelector('input[name="f-so_hp_c"]:checked');return r?r.value:'';})(), note:v('f-so_hpNote') },
+    planFiles:(window._soPlanFiles||[]).slice(),   // ver.20261009.01: アップロードした支援計画書
     symbiosisCheck:{ hp:(function(id){var e=document.getElementById(id);return !!(e&&e.checked);})('f-so_symb_hp'), other:v('f-so_symb_other') }
   };
 }
 function _soFormValidate(){ if(!val('f-so_name')) return '登録支援機関名は必須です。'; return null; }
 function _soFormPrefill(resp){
   resp = resp || {};
+  if(Array.isArray(resp.planFiles) && resp.planFiles.length){ window._soPlanFiles=resp.planFiles.slice(); setTimeout(_soPlanRenderList,0); }
   var map={ name:'f-so_name', nameKana:'f-so_nameKana', nameEn:'f-so_nameEn', corpNo:'f-so_corpNo', empInsNo:'f-so_empInsNo', regNo:'f-so_regNo', regDate:'f-so_regDate', zip:'f-so_zip', pref:'f-so_pref', city:'f-so_city', addressDetail:'f-so_addressDetail', addressEn:'f-so_addressEn', tel:'f-so_tel', repName:'f-so_repName', repNameKana:'f-so_repNameKana', repNameEn:'f-so_repNameEn', languages:'f-so_languages', supportManagerName:'f-so_supportManagerName', supportManagerKana:'f-so_supportManagerKana', supportManagerTitle:'f-so_supportManagerTitle', supportManagerTitleEn:'f-so_supportManagerTitleEn', supporterCount:'f-so_supporterCount', supportStaffCount:'f-so_supportStaffCount', jjName:'f-so_jjName', jjCorpNo:'f-so_jjCorpNo', jjEmpInsNo:'f-so_jjEmpInsNo', jjZip:'f-so_jjZip', jjPref:'f-so_jjPref', jjCity:'f-so_jjCity', jjAddressDetail:'f-so_jjAddressDetail', jjTel:'f-so_jjTel', jjPermitNo:'f-so_jjPermitNo', jjPermitDate:'f-so_jjPermitDate' };
   Object.keys(map).forEach(function(k){ var el=document.getElementById(map[k]); if(el && resp[k]!=null && resp[k]!=='') el.value=resp[k]; });
   if(resp.supportHours && typeof resp.supportHours==='object'){ _SO_DAYS.forEach(function(d){ var hv=resp.supportHours[d[0]]||{}; var f=document.getElementById('f-so_hours_'+d[0]+'_from'),t=document.getElementById('f-so_hours_'+d[0]+'_to'),n=document.getElementById('f-so_hours_'+d[0]+'_none'); if(f&&hv.from)f.value=hv.from; if(t&&hv.to)t.value=hv.to; if(n){n.checked=!!hv.none; if(typeof _soHoursNoneToggle==='function')_soHoursNoneToggle(d[0]);} }); }
