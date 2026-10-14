@@ -192,7 +192,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20261014.07'; // ①＋②の確認用リンク（part=12：会社情報を入れて通常のフォームを開く）
+var FORM_VERSION = 'ver.20261015.01'; // 住居（支援計画書用）は居住費控除「有」のときだけ表示／③タブ名を「2号に関するヒアリング」に／2号の項目で止まったら③へ切り替え ／ ver.20261014.07: // ①＋②の確認用リンク（part=12：会社情報を入れて通常のフォームを開く）
 // var FORM_VERSION = 'ver.20261014.06'; // 就業場所を「＋」で2か所目以降も入力（office2Name〜）
 // var FORM_VERSION = 'ver.20261014.05'; // 昇給の下に「建設分野の場合の記載」の案内と入力ボタン
 // var FORM_VERSION = 'ver.20261014.04'; // 「① 企業情報」だけの確認用リンク（part=1）。雇用条件・保険は出さず送らない
@@ -2522,7 +2522,7 @@ function _tkBuildTabs() {
   var anchor = document.createElement('div'); body.insertBefore(anchor, cards[0]);
   pick(TK_TAB1, panes[0]); pick(TK_TAB2, panes[1]);
   cards.forEach(function(c){ if (used.indexOf(c) < 0) panes[2].appendChild(c); });
-  var labels = ['① 企業情報', '② 雇用条件', (type === 'company_tokutei2') ? '③ 2号誓約書' : '③ その他'];
+  var labels = ['① 企業情報', '② 雇用条件', (type === 'company_tokutei2') ? '③ 2号に関するヒアリング' : '③ その他'];
   var bar = document.createElement('div');
   bar.id = 'tkTabBar';
   bar.style.cssText = 'display:flex;gap:8px;margin:0 0 14px;';
@@ -2633,6 +2633,7 @@ function _tkCalcWork() {
 function _tkApplyToggles() {
   var sh = function(id, on){ var e = document.getElementById(id); if (e) e.style.display = on ? '' : 'none'; };
   sh('housingWrap', val('f-housingProvided') === '有');
+  sh('tkHousingCard', val('f-housingProvided') === '有');
   sh('foodWrap', val('f-foodProvided') === '有');
   sh('utilityWrap', val('f-utilityProvided') === '有');
   var _expAri = (_tkAcceptExp === 'あり');
@@ -3022,7 +3023,7 @@ function buildCompanyForm() {
     '<input type="hidden" id="f-contractRenewalCond">' +
   '</div>' +
 
-  '<div class="card"><div class="section-title">住居（支援計画書用）</div>' +
+  '<div class="card" id="tkHousingCard"><div class="section-title">住居（支援計画書用）</div>' +   // ver.20261015.01: 居住費控除「有」のときだけ表示
     '<div style="font-size:11px;color:#9ca3af;margin-bottom:10px;">支援計画書に記載する住居情報</div>' +
     field('f-housingOwnership','住居形態（自己所有/借上）','select',true,'',null,['','自己所有','借上']) +
     field('f-cohabitants','同居人数','number',true,'例: 3') +
@@ -5046,6 +5047,11 @@ function validate() {
     var _w = _tkWithAllTabs(_validateInner);
     if (_w.r) {
       var _t = _tkPaneOf(_w.act);
+      // ver.20261015.01: 2号ヒアリング（誓約書）の項目で止まったときは③へ
+      if (_t < 0 && typeof _w.r === 'string' && /特定産業分野|２号|2号|指導を受ける|重複|名以上を選定/.test(_w.r)) {
+        var _t2 = document.getElementById('f-t2Field') || document.getElementById('t2TargetContainer');
+        if (_t2) { _t = _tkPaneOf(_t2); if (!val('f-t2Field')) _w.act = document.getElementById('f-t2Field'); }
+      }
       if (_t < 0) { var _f = (_reqEmptyFields() || [])[0]; _t = _tkPaneOf(_f); _w.act = _f; }
       if (_t >= 0 && _t !== _tkTabCur) _tkShowTab(_t, false);
       try { if (_w.act && _w.act.focus) { _w.act.scrollIntoView({behavior:'smooth', block:'center'}); _w.act.focus(); } } catch(e) {}
