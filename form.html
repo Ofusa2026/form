@@ -192,7 +192,8 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20261014.01'; // 企業フォーム：① 待遇の相違について説明を求める窓口を追加（代表者と同じ・①②と同じボタン）
+var FORM_VERSION = 'ver.20261014.02'; // ①の窓口を②と同じ並び（担当者名・英語）に。②のボタンは「①と同じ」だけ
+// ver.20261014.01: 企業フォーム：① 待遇の相違について説明を求める窓口を追加（代表者と同じ・①②と同じボタン）
 // ver.20261009.02: // 支援計画書をアップロードするとAIがその場で読み取り、空いている欄だけに入力（紫色）。残りは登録支援機関が入力して送信 ／ ver.20261009.01: 登録支援機関フォームに「過去の支援計画書」のアップロード欄 ／ ver.20261008.04: 「作成責任者」欄の削除は特定技能の企業フォームのみに限定（技人国・46号・9号は元に戻す） ／ ver.20261008.03: 作成責任者欄を削除 ／ ver.20261008.02: 役員ふりがなの * は氏名入力時のみ ／ ver.20261008.01: 役員のふりがなを必須に
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
 var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
@@ -2314,15 +2315,15 @@ function copyContactFrom(to, from) {
   if (from === 'rep') {
     var nm = g('f-coRepName'), tt = g('f-coRepTitle');
     if (!nm) { alert('先に「代表者」の氏名を入力してください'); return; }
-    src = { dept:'', person:(tt ? tt + '　' : '') + nm, name:nm, nameEn:g('f-coRepNameEn'), tel:g('f-coTel') };
+    src = { dept:'', name:nm, nameEn:g('f-coRepNameEn'), tel:g('f-coTel') };
   } else if (from === 'main') {
-    src = { dept:g('f-consultDept'), person:g('f-consultName'), name:g('f-consultName'), nameEn:g('f-consultNameEn'), tel:g('f-consultTel') };
+    src = { dept:g('f-consultDept'), name:g('f-consultName'), nameEn:g('f-consultNameEn'), tel:g('f-consultTel') };
   } else {
-    src = { dept:g('f-diffContactDept'), person:g('f-diffContactPerson'), name:g('f-diffContactPerson'), nameEn:'', tel:g('f-diffContactTel') };
+    src = { dept:g('f-diffContactDept'), name:g('f-diffContactPerson'), nameEn:g('f-diffContactPersonEn'), tel:g('f-diffContactTel') };
   }
-  if (!src.dept && !src.person && !src.tel) { alert('写すもとの窓口が空です'); return; }
+  if (!src.dept && !src.name && !src.tel) { alert('写すもとの窓口が空です'); return; }
   var dst = (to === 'diff')
-    ? [['f-diffContactDept', src.dept], ['f-diffContactPerson', src.person], ['f-diffContactTel', src.tel]]
+    ? [['f-diffContactDept', src.dept], ['f-diffContactPerson', src.name], ['f-diffContactPersonEn', src.nameEn], ['f-diffContactTel', src.tel]]
     : [['f-consultDept', src.dept], ['f-consultName', src.name], ['f-consultNameEn', src.nameEn], ['f-consultTel', src.tel]];
   var filled = dst.some(function(d){ return d[1] && g(d[0]); });
   if (filled && !confirm('入力済みの内容を上書きします。よろしいですか？')) return;
@@ -2529,14 +2530,16 @@ function buildCompanyForm() {
       '<button type="button" onclick="copyContactFrom(\'diff\',\'main\')\" style="padding:8px 12px;background:#eff6ff;color:#1d4ed8;border:1.5px solid #93c5fd;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;">⬇ ②と同じ</button>' +
     '</div>' +
     field('f-diffContactDept','部署名','text',false,'例: 人事部') +
-    field('f-diffContactPerson','担当者職氏名','text',false,'例: 人事課長　田中 一郎') +
+    '<div class="grid2">' +
+      field('f-diffContactPerson','担当者名','text',false,'例: 田中 一郎') +
+      field('f-diffContactPersonEn','担当者名（英語）','text',false,'例: TANAKA ICHIRO') +
+    '</div>' +
     field('f-diffContactTel','電話番号','text',false,'例: 03-1234-5678') +
   '</div>' +
 
   '<div class="card"><div class="section-title">② 雇用管理の改善等に関する事項に係る相談窓口</div>' +
     '<div style="font-size:11px;color:#9ca3af;margin-bottom:10px;">申請人の雇用条件の相談等に対応する窓口</div>' +
     '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;">' +
-      '<button type="button" onclick="copyContactFrom(\'main\',\'rep\')\" style="padding:8px 12px;background:#f0fdf4;color:#15803d;border:1.5px solid #86efac;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;">👤 代表者と同じ</button>' +
       '<button type="button" onclick="copyContactFrom(\'main\',\'diff\')\" style="padding:8px 12px;background:#f0fdfa;color:#0f766e;border:1.5px solid #5eead4;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;">⬆ ①と同じ</button>' +
     '</div>' +
     field('f-consultDept','部署名','text',false,'例: 人事部') +
@@ -4058,7 +4061,7 @@ function collectData() {
       authorName: val('f-coAuthorName'), authorTitle: val('f-coAuthorTitle'),
       authorNameEn: val('f-coAuthorNameEn'),
       consultDept: val('f-consultDept'), consultName: val('f-consultName'), consultNameEn: val('f-consultNameEn'), consultTel: val('f-consultTel'),
-      diffContactDept: val('f-diffContactDept'), diffContactPerson: val('f-diffContactPerson'), diffContactTel: val('f-diffContactTel'),   // ver.20261014.01
+      diffContactDept: val('f-diffContactDept'), diffContactPerson: val('f-diffContactPerson'), diffContactPersonEn: val('f-diffContactPersonEn'), diffContactTel: val('f-diffContactTel'),   // ver.20261014.01
       housingOwnership: val('f-housingOwnership'), cohabitants: val('f-cohabitants'), actualCostDesc: val('f-actualCostDesc'),
       salaryType: val('f-salaryType'), salaryMonthly: val('f-salaryMonthly'),
       allowance1Name: val('f-allowance1Name'), allowance1Amount: val('f-allowance1Amount'), allowance1Cond: val('f-allowance1Cond'),
@@ -5322,7 +5325,7 @@ function prefillForm(resp) {
     repNameEn: 'f-coRepNameEn', repTitleEn: 'f-coRepTitleEn',
     authorName: 'f-coAuthorName', authorTitle: 'f-coAuthorTitle',
     consultDept: 'f-consultDept', consultName: 'f-consultName', consultNameEn: 'f-consultNameEn', consultTel: 'f-consultTel',
-    diffContactDept: 'f-diffContactDept', diffContactPerson: 'f-diffContactPerson', diffContactTel: 'f-diffContactTel',   // ver.20261014.01
+    diffContactDept: 'f-diffContactDept', diffContactPerson: 'f-diffContactPerson', diffContactPersonEn: 'f-diffContactPersonEn', diffContactTel: 'f-diffContactTel',   // ver.20261014.01
     housingOwnership: 'f-housingOwnership', cohabitants: 'f-cohabitants', actualCostDesc: 'f-actualCostDesc',
     salaryMonthly: 'f-salaryMonthly',
     fixedOTName: 'f-fixedOTName', fixedOTAmount: 'f-fixedOTAmount', fixedOTHours: 'f-fixedOTHours',
