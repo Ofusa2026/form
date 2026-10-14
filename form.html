@@ -192,7 +192,8 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20261014.06'; // 就業場所を「＋」で2か所目以降も入力（office2Name〜）
+var FORM_VERSION = 'ver.20261014.07'; // ①＋②の確認用リンク（part=12：会社情報を入れて通常のフォームを開く）
+// var FORM_VERSION = 'ver.20261014.06'; // 就業場所を「＋」で2か所目以降も入力（office2Name〜）
 // var FORM_VERSION = 'ver.20261014.05'; // 昇給の下に「建設分野の場合の記載」の案内と入力ボタン
 // var FORM_VERSION = 'ver.20261014.04'; // 「① 企業情報」だけの確認用リンク（part=1）。雇用条件・保険は出さず送らない
 // var FORM_VERSION = 'ver.20261014.03'; // テスト版（ver.20261009.01〜04-test）の特定技能 企業フォーム改修を本番に反映（すべて必須・タブ分割・受入経験の自動判定・標準の内容 ほか）。住所は3欄のまま、「その他」は内容を別項目で送る、判断基準の「、」入り選択肢に対応、定期健康診断は実施月だけを雇用条件のプルダウンで選ぶ、契約開始日・終了日は聞かない
@@ -239,6 +240,8 @@ var srcParam = params.get('src') || '';  // ver.20260531.02: 流入元（aidem �
 var fieldsFilter = params.get('fields') ? params.get('fields').split(',').map(function(s){return s.trim();}) : null;
 // ver.20261014.04: part=1 →「① 企業情報」タブだけの確認用リンク（特定技能の企業フォーム）
 var formPart = (params.get('part') === '1') ? 1 : 0;
+// ver.20261014.07: part=12 →「① 企業情報」＋「② 雇用条件」の確認用リンク（通常のフォームに、案シスの会社情報を入れて開く）
+var formPartAll = (params.get('part') === '12') ? 1 : 0;
 // ver.20260812: 介護分野判定（URLパラメータ ?field=介護 で指定）
 var applicantField = params.get('field') || '';
 // ver.20260910: 推薦票の大房対応（suisen=self）のときだけ、ベトナム技能実習生の追加情報を表示（大房が推薦票を用意するため申請人に本国情報を聞く。旧仕様は企業対応で出しており逆だった）
@@ -5735,6 +5738,24 @@ function confirmName(isMatch){
           try { _tkPartInfo(); _updateReqRemain(); } catch(e){}
         })
         .catch(function(e){ console.error('company prefill fetch error (ignored):', e); });
+    } else if (formPartAll && (type === 'company' || type === 'company_tokutei2')) {
+      // ver.20261014.07: ①＋②の確認用リンク（part=12）：会社マスタを入れてから、通常どおり保存済みの回答を重ねる
+      callRpc('form_prefill_company', { p_case_id: caseId, p_form_type: type })
+        .then(function(r){ return r.ok ? r.json() : null; })
+        .then(function(m){
+          if (m && m.response && typeof m.response === 'object') {
+            var _mr = {}; Object.keys(m.response).forEach(function(k){ if (k !== 'formPart') _mr[k] = m.response[k]; });
+            try { prefillForm(_mr); } catch(e){ console.error('company prefill error (ignored):', e); }
+            var el = document.getElementById('infoBox');
+            if (el) {
+              var nm = String(caseName || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+              el.style.background = '#eef2ff'; el.style.borderColor = '#a5b4fc'; el.style.color = '#3730a3';
+              el.innerHTML = (nm ? '<span class="case-name">' + nm + '</span>' : '') + '🏢 <b>登録済みの会社情報を入力しています</b>。「① 企業情報」は違うところだけ直し、「② 雇用条件」をご入力のうえ送信してください。';
+            }
+          }
+        })
+        .catch(function(e){ console.error('company prefill fetch error (ignored):', e); })
+        .then(_runSavedLoad);
     } else {
       _runSavedLoad();
     }
