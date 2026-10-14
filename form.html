@@ -192,7 +192,8 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20261014.03'; // テスト版（ver.20261009.01〜04-test）の特定技能 企業フォーム改修を本番に反映（すべて必須・タブ分割・受入経験の自動判定・標準の内容 ほか）。住所は3欄のまま、「その他」は内容を別項目で送る、判断基準の「、」入り選択肢に対応、定期健康診断は実施月だけを雇用条件のプルダウンで選ぶ、契約開始日・終了日は聞かない
+var FORM_VERSION = 'ver.20261014.04'; // 「① 企業情報」だけの確認用リンク（part=1）。雇用条件・保険は出さず送らない
+// var FORM_VERSION = 'ver.20261014.03'; // テスト版（ver.20261009.01〜04-test）の特定技能 企業フォーム改修を本番に反映（すべて必須・タブ分割・受入経験の自動判定・標準の内容 ほか）。住所は3欄のまま、「その他」は内容を別項目で送る、判断基準の「、」入り選択肢に対応、定期健康診断は実施月だけを雇用条件のプルダウンで選ぶ、契約開始日・終了日は聞かない
 // var FORM_VERSION = 'ver.20261014.02'; // ①の窓口を②と同じ並び（担当者名・英語）に。②のボタンは「①と同じ」だけ
 // ver.20261014.01: 企業フォーム：① 待遇の相違について説明を求める窓口を追加（代表者と同じ・①②と同じボタン）
 // ver.20261009.02: // 支援計画書をアップロードするとAIがその場で読み取り、空いている欄だけに入力（紫色）。残りは登録支援機関が入力して送信 ／ ver.20261009.01: 登録支援機関フォームに「過去の支援計画書」のアップロード欄 ／ ver.20261008.04: 「作成責任者」欄の削除は特定技能の企業フォームのみに限定（技人国・46号・9号は元に戻す） ／ ver.20261008.03: 作成責任者欄を削除 ／ ver.20261008.02: 役員ふりがなの * は氏名入力時のみ ／ ver.20261008.01: 役員のふりがなを必須に
@@ -234,6 +235,8 @@ var responseId = params.get('response_id') || '';  // 編集モード: 既存回
 var editMode = !!responseId;
 var srcParam = params.get('src') || '';  // ver.20260531.02: 流入元（aidem 等）。本人不一致時の連絡先案内の出し分けに使用
 var fieldsFilter = params.get('fields') ? params.get('fields').split(',').map(function(s){return s.trim();}) : null;
+// ver.20261014.04: part=1 →「① 企業情報」タブだけの確認用リンク（特定技能の企業フォーム）
+var formPart = (params.get('part') === '1') ? 1 : 0;
 // ver.20260812: 介護分野判定（URLパラメータ ?field=介護 で指定）
 var applicantField = params.get('field') || '';
 // ver.20260910: 推薦票の大房対応（suisen=self）のときだけ、ベトナム技能実習生の追加情報を表示（大房が推薦票を用意するため申請人に本国情報を聞く。旧仕様は企業対応で出しており逆だった）
@@ -2539,6 +2542,25 @@ function _tkBuildTabs() {
   }
   _tkTabsOn = true;
   _tkShowTab(0, false);
+  if (formPart) _tkApplyPart();
+}
+// ver.20261014.04: 確認用リンク（part=1）—「① 企業情報」だけを出す。雇用条件（②以降）と保険は出さない・送らない
+function _tkApplyPart() {
+  var bar = document.getElementById('tkTabBar'); if (bar) bar.style.display = 'none';
+  document.querySelectorAll('.tk-pane').forEach(function(pn){
+    var t = +pn.getAttribute('data-tab');
+    if (t !== 0) { pn.style.display = 'none'; return; }
+    var last = pn.lastElementChild; if (last && last.tagName === 'BUTTON') last.remove();   // 「② 雇用条件 へ進む」ボタン
+  });
+  var ins = document.getElementById('tkStdInsWrap'); if (ins) ins.style.display = 'none';
+  _tkPartInfo();
+}
+function _tkPartInfo() {
+  if (!formPart) return;
+  var el = document.getElementById('infoBox'); if (!el) return;
+  var nm = String(caseName || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  el.style.background = '#eef2ff'; el.style.borderColor = '#a5b4fc'; el.style.color = '#3730a3';
+  el.innerHTML = (nm ? '<span class="case-name">' + nm + '</span>' : '') + '🏢 <b>企業情報のご確認</b>：登録済みの内容を入力しています。<b>違うところだけ</b>直して、送信してください。';
 }
 function _tkShowTab(ix, scroll) {
   _tkTabCur = ix;
@@ -2554,7 +2576,7 @@ function _tkShowTab(ix, scroll) {
 function _tkWithAllTabs(fn) {
   if (!_tkTabsOn) return fn();
   var panes = document.querySelectorAll('.tk-pane');
-  panes.forEach(function(pn){ pn.style.display = ''; });
+  panes.forEach(function(pn){ if (!formPart || +pn.getAttribute('data-tab') === 0) pn.style.display = ''; });
   var r, act = null;
   try { r = fn(); act = document.activeElement; }
   finally { panes.forEach(function(pn){ pn.style.display = (+pn.getAttribute('data-tab') === _tkTabCur) ? '' : 'none'; }); }
@@ -2629,6 +2651,25 @@ function _tkRenewCondValue() {
   document.querySelectorAll('.tk-rnc:checked').forEach(function(el){ if (el.value) arr.push(el.value); });
   var o = val('f-contractRenewalCondOther'); if (o) arr.push(o);
   return arr.join('、');
+}
+// 確認用リンク（part=1）：① 企業情報タブにない項目（雇用条件・保険など）は送らない（案シスの雇用条件を上書き・追加しない）
+function _tkPartTrim(d) {
+  var pane = document.querySelector('.tk-pane[data-tab="0"]'); if (!pane) return;
+  var keep = {};
+  pane.querySelectorAll('input[id^="f-"],select[id^="f-"],textarea[id^="f-"]').forEach(function(el){
+    if (el.closest('#tkStdInsWrap')) return;
+    keep[el.id.slice(2)] = 1;
+  });
+  var alias = { coName:'name', coNameKana:'nameKana', coNameEn:'nameEn', coCorpNo:'corpNo', coEmpInsNo:'empInsNo', coLaborInsNo:'laborInsNo',
+    coEmployees:'employees', coForeignEmployees:'foreignEmployees', coTrainees:'trainees', coCapital:'capital', coAnnualSales:'annualSales',
+    coZip:'zip', coPref:'pref', coCity:'city', coAddress:'address', coAddressEn:'addressEn', coTel:'tel',
+    coRepName:'repName', coRepTitle:'repTitle', coRepNameEn:'repNameEn', coRepTitleEn:'repTitleEn' };
+  Object.keys(alias).forEach(function(k){ if (keep[k]) keep[alias[k]] = 1; });
+  Object.keys(d).forEach(function(k){
+    if (keep[k] || /^officer\d/.test(k)) return;
+    delete d[k];
+  });
+  d.formPart = '企業情報';
 }
 // 定期健康診断の実施月（選んだ月の番号。1回目→2回目の順、同じ月は1つに）
 function _tkHcMonths() {
@@ -2951,6 +2992,7 @@ function buildCompanyForm() {
   // ver.20261009.02: 標準の内容（選択済み・0を入力済み）は一番下にまとめ、違う場合だけ変更してもらう
   '<div class="card" id="tkStdCard"><div class="section-title">標準の内容（違う場合だけ変更してください）</div>' +
     '<div style="font-size:11.5px;color:#1d4ed8;background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:8px 10px;margin-bottom:10px;line-height:1.6;">以下の項目は、一般的な内容をあらかじめ入力しています。<b>実際と異なる項目だけ</b>変更してください。<br>「その他」を選ぶと、その項目のすぐ下に記入欄が表示されます。</div>' +
+    '<div id="tkStdInsWrap">' +
     '<div class="sub-label">【社会保険・雇用保険】</div>' +
     '<div class="grid2">' +
       _tkStdSel('insKenpo','健康保険','加入',['加入','未加入','その他']) +
@@ -2959,6 +3001,7 @@ function buildCompanyForm() {
     '<div class="grid2">' +
       _tkStdSel('insEmp','雇用保険','加入',['加入','未加入','その他']) +
       _tkStdSel('insLabor','労災保険','加入',['加入','未加入','その他']) +
+    '</div>' +
     '</div>' +
     '<div class="sub-label" style="margin-top:14px;">【離職者・行方不明者（直近1年以内）】</div>' +
     '<div style="font-size:11px;color:#6b7280;margin-bottom:8px;">いない場合は「0」のままで構いません。</div>' +
@@ -4354,6 +4397,7 @@ function collectData() {
       });
       d.contractRenewalCond = (d.contractRenewal === '更新する場合があり得る') ? _tkRenewCondValue() : '';
       d.contractRenewalCondOther = val('f-contractRenewalCondOther');
+      if (formPart) _tkPartTrim(d);
     }
         // ver.20260822: 特定技能2号の誓約書データ（企業フォーム）
     if (t === 'company_tokutei2') {
@@ -4876,8 +4920,10 @@ function _tkCompanyValidate() {
       return '「' + name + '」は必須です。';
     }
   }
-  if (!val('f-payCutoffMonth') || !val('f-payCutoffDay')) return '「締め日」は必須です。';
-  if (!val('f-payDayMonth') || !val('f-payDayDay')) return '「支払日」は必須です。';
+  if (!formPart) {   // 確認用リンク（part=1）は雇用条件を聞かない
+    if (!val('f-payCutoffMonth') || !val('f-payCutoffDay')) return '「締め日」は必須です。';
+    if (!val('f-payDayMonth') || !val('f-payDayDay')) return '「支払日」は必須です。';
+  }
   var _vis = function(id){ var e = document.getElementById(id); return !!(e && e.offsetParent !== null); };
   var _need = [
     [val('f-salaryRaise') === '有',     'f-salaryRaiseCond',  '昇給 条件・時期（昇給「有」の場合）'],
@@ -5547,6 +5593,9 @@ function confirmName(isMatch){
         var isSubmitted = !!row.submitted_at;
         // ver.20260605.01: 取込後・送信後も同じ行を表示し、再送信は同じ行をPATCHする（送信しても内容が消えない）
         _draftResponseId = row.id;
+        // ver.20261014.04: 確認用リンク（part=1）では、送信済み・取込済みの回答や雇用条件まで入った下書きは上書きしない
+        //   （内容は表示に使うだけで、保存・送信は新しい回答として別に作る）
+        if (formPart && (isImported || isSubmitted || !(row.response && (row.response.formPart || !(row.response.salaryType || row.response.officeName || row.response.startTime))))) _draftResponseId = '';
         var infoEl = document.getElementById('infoBox');
         var btnEl = document.getElementById('btn-submit');
         var draftBtn = document.getElementById('btn-draft');
@@ -5577,6 +5626,7 @@ function confirmName(isMatch){
             console.error('prefillForm error (ignored to keep form usable):', prefillErr);
           }
           try { _tkAfterPrefill(resp); } catch (tkErr) { console.error('tk prefill error (ignored):', tkErr); }   // ver.20261009.01
+          try { _tkPartInfo(); } catch (_pe) {}   // ver.20261014.04: 確認用リンクの案内に戻す
           // ver.20261005.01: 2号誓約書は「前回の修正」か「新しい申請として入力」を選べる（前回の回答は残す）
           try { if (type === 'tokutei2_pledge' && (isImported || isSubmitted)) _t2OfferNew(resp, row); } catch(_t2e){ console.error('t2 new offer error (ignored):', _t2e); }
         }
@@ -5602,6 +5652,20 @@ function confirmName(isMatch){
         })
         .catch(function(e){ console.error('master prefill fetch error (ignored):', e); })
         .then(_runSavedLoad);
+    } else if (formPart && (type === 'company' || type === 'company_tokutei2')) {
+      // ver.20261014.04: 確認用リンク（part=1）は案シスの会社マスタの内容を入れて開く（確認用リンクで保存した回答があれば、その内容）
+      callRpc('form_prefill_company', { p_case_id: caseId, p_form_type: type })
+        .then(function(r){ return r.ok ? r.json() : null; })
+        .then(function(m){
+          if (m && m.response && typeof m.response === 'object') {
+            try { prefillForm(m.response); } catch(e){ console.error('company prefill error (ignored):', e); }
+            try { _tkAfterPrefill(m.response); } catch(e){}
+          }
+          _draftResponseId = (m && m.id) ? String(m.id) : '';
+          try { _tkApplyToggles(); } catch(e){}
+          try { _tkPartInfo(); _updateReqRemain(); } catch(e){}
+        })
+        .catch(function(e){ console.error('company prefill fetch error (ignored):', e); });
     } else {
       _runSavedLoad();
     }
@@ -5610,6 +5674,14 @@ function confirmName(isMatch){
 
 function prefillForm(resp) {
   if (type === 'support_org') { _soFormPrefill(resp); return; }
+  // ver.20261014.04: 企業フォームの町名番地（address）は f-coAddress に入れる／役員が4人以上なら欄を足してから入れる
+  try {
+    if (resp.address && !resp.address_co && !document.getElementById('f-address') && document.getElementById('f-coAddress')) resp.address_co = resp.address;
+    if (document.getElementById('officers-container') && typeof addOfficer === 'function') {
+      var _om = 0; Object.keys(resp).forEach(function(k){ var m = k.match(/^officer(\d+)(Name|Kana|Title)$/); if (m && resp[k]) _om = Math.max(_om, +m[1]); });
+      for (var _oi = 0; _oi < 10 && _officerCount < Math.min(_om, 10); _oi++) addOfficer();
+    }
+  } catch (_pfe) { console.error('prefill pre-step error (ignored):', _pfe); }
   var keyToId = {
     applicantNameEn: 'f-name', birthdate: 'f-birth',
     nationality: 'f-nationality', passport: 'f-passport', passportExpiry: 'f-passExpiry',
