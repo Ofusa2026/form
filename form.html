@@ -192,7 +192,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20261015.01'; // 住居（支援計画書用）は居住費控除「有」のときだけ表示／③タブ名を「2号に関するヒアリング」に／2号の項目で止まったら③へ切り替え ／ ver.20261014.07: // ①＋②の確認用リンク（part=12：会社情報を入れて通常のフォームを開く）
+var FORM_VERSION = 'ver.20261015.02'; // 「居住費 適正額の説明」を削除（「住居（支援計画書用）」の「実費相当の説明」と重複のため） ／ ver.20261015.01: // 住居（支援計画書用）は居住費控除「有」のときだけ表示／③タブ名を「2号に関するヒアリング」に／2号の項目で止まったら③へ切り替え ／ ver.20261014.07: // ①＋②の確認用リンク（part=12：会社情報を入れて通常のフォームを開く）
 // var FORM_VERSION = 'ver.20261014.06'; // 就業場所を「＋」で2か所目以降も入力（office2Name〜）
 // var FORM_VERSION = 'ver.20261014.05'; // 昇給の下に「建設分野の場合の記載」の案内と入力ボタン
 // var FORM_VERSION = 'ver.20261014.04'; // 「① 企業情報」だけの確認用リンク（part=1）。雇用条件・保険は出さず送らない
@@ -2417,7 +2417,7 @@ var FIELDS_TO_FORM_IDS = {
   fixedHoliday:    ['f-fixedHolidayMon','f-fixedHolidayTue','f-fixedHolidayWed','f-fixedHolidayThu','f-fixedHolidayFri','f-fixedHolidaySat','f-fixedHolidaySun','f-fixedHolidayHol'],
   deductTax:       ['f-deductTax','f-deductSocial','f-deductEmployment'],
   deductSocial:    ['f-deductTax','f-deductSocial','f-deductEmployment'],
-  deductHousing:   ['f-deductHousing','f-housingProvided','f-housingDetail'],
+  deductHousing:   ['f-deductHousing','f-housingProvided','f-actualCostDesc'],   // ver.20261015.02: 説明は住居（支援計画書用）の「実費相当の説明」に一本化
   jpCompJobDesc:   ['f-jpCompJobDesc','f-jpCompAge','f-jpCompGender','f-jpCompExp','f-jpCompSalary','f-jpCompReason','f-salaryRuleFlg'],
   jpCompSalary:    ['f-jpCompSalary','f-jpCompJobDesc','f-jpCompAge','f-jpCompExp','f-salaryRuleFlg'],
 };
@@ -2897,7 +2897,6 @@ function buildCompanyForm() {
     field('f-housingProvided','居住費控除の有無','select',true,'',null,['','有','無']) +
     '<div id="housingWrap" style="display:none;">' +
       field('f-deductHousing','居住費控除 月額（円）','number',true,'例: 13000') +
-      field('f-housingDetail','居住費 適正額の説明','textarea',true,'例: 月額13万円で借上の物件。居住人数10名のため1万3千円は適正。') +
     '</div>' +
 
     '<div class="sub-label">【食費】</div>' +
