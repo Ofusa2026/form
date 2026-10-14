@@ -192,7 +192,8 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20261014.02'; // ①の窓口を②と同じ並び（担当者名・英語）に。②のボタンは「①と同じ」だけ
+var FORM_VERSION = 'ver.20261014.03'; // テスト版（ver.20261009.01〜04-test）の特定技能 企業フォーム改修を本番に反映（すべて必須・タブ分割・受入経験の自動判定・標準の内容 ほか）。住所は3欄のまま、「その他」は内容を別項目で送る、判断基準の「、」入り選択肢に対応、定期健康診断は実施月だけを雇用条件のプルダウンで選ぶ、契約開始日・終了日は聞かない
+// var FORM_VERSION = 'ver.20261014.02'; // ①の窓口を②と同じ並び（担当者名・英語）に。②のボタンは「①と同じ」だけ
 // ver.20261014.01: 企業フォーム：① 待遇の相違について説明を求める窓口を追加（代表者と同じ・①②と同じボタン）
 // ver.20261009.02: // 支援計画書をアップロードするとAIがその場で読み取り、空いている欄だけに入力（紫色）。残りは登録支援機関が入力して送信 ／ ver.20261009.01: 登録支援機関フォームに「過去の支援計画書」のアップロード欄 ／ ver.20261008.04: 「作成責任者」欄の削除は特定技能の企業フォームのみに限定（技人国・46号・9号は元に戻す） ／ ver.20261008.03: 作成責任者欄を削除 ／ ver.20261008.02: 役員ふりがなの * は氏名入力時のみ ／ ver.20261008.01: 役員のふりがなを必須に
 console.log('📋 ヒアリングフォーム', FORM_VERSION);
@@ -2315,7 +2316,7 @@ function copyContactFrom(to, from) {
   if (from === 'rep') {
     var nm = g('f-coRepName'), tt = g('f-coRepTitle');
     if (!nm) { alert('先に「代表者」の氏名を入力してください'); return; }
-    src = { dept:'', name:nm, nameEn:g('f-coRepNameEn'), tel:g('f-coTel') };
+    src = { dept:tt, name:nm, nameEn:g('f-coRepNameEn'), tel:g('f-coTel') };   // 部署名には代表者の役職（テスト版の「代表者と同じ」と同じ）
   } else if (from === 'main') {
     src = { dept:g('f-consultDept'), name:g('f-consultName'), nameEn:g('f-consultNameEn'), tel:g('f-consultTel') };
   } else {
@@ -2334,6 +2335,7 @@ function copyContactFrom(to, from) {
     setTimeout(function(){ el.style.background = ''; }, 1500);
     try { el.dispatchEvent(new Event('input', {bubbles:true})); } catch(e){}
   });
+  try { _updateReqRemain(); } catch(e) {}
 }
 function copyHQToOffice() {
   var pref = (document.getElementById('f-coPref')||{}).value || '';
@@ -2436,6 +2438,8 @@ function applyFieldsFilter(fields) {
     }
   });
 
+  // ver.20261009.01: 項目しぼり込みリンクでは必須チェックをしないため、* 表示も外す
+  try { document.querySelectorAll('#formBody .field label span.req').forEach(function(sp){ sp.style.display = 'none'; }); } catch(e) {}
   var infoBox = document.getElementById('infoBox');
   if (infoBox) {
     infoBox.innerHTML = '📋 <strong>雇用条件ヒアリング</strong>：以下の未入力項目についてご回答ください。<br><span style="font-size:12px;color:#6b7280;">' +
@@ -2460,30 +2464,236 @@ function applyFieldsFilter(fields) {
   }
 }
 
+// ===== ver.20261009.01: 特定技能の企業フォーム用の部品 =====
+// 特定技能外国人の受入経験（案シスの案件／会社データから取得。URLの exp=あり|なし でも指定可＝テスト用）
+var _tkAcceptExp = (function(){ var e = new URLSearchParams(location.search).get('exp') || ''; return (e === 'あり' || e === 'なし') ? e : ''; })();
+function _tkLoadAcceptExp() {
+  if (_tkAcceptExp || !caseId || !document.getElementById('tkOfficersCard')) { _tkApplyToggles(); return; }
+  callRpc('form_company_accept_exp', { p_case_id: caseId })
+    .then(function(r){ return r.ok ? r.json() : ''; })
+    .then(function(v){ _tkAcceptExp = (v === 'あり' || v === 'なし') ? v : ''; _tkApplyToggles(); })
+    .catch(function(){ _tkApplyToggles(); });
+}
+// 雇用管理相談窓口 ← 代表者
+function copyRepToConsult() {
+  var g = function(id){ return (document.getElementById(id) || {}).value || ''; };
+  var put = function(id, v){ var e = document.getElementById(id); if (e && v) { e.value = v; e.style.background = '#f0fdf4'; setTimeout(function(){ e.style.background = ''; }, 1500); } };
+  if (!g('f-coRepName')) { alert('先に代表者の氏名を入力してください'); return; }
+  put('f-consultDept', g('f-coRepTitle'));
+  put('f-consultName', g('f-coRepName'));
+  put('f-consultNameEn', g('f-coRepNameEn'));
+  put('f-consultTel', g('f-coTel'));
+  try { _updateReqRemain(); } catch(e) {}
+}
+// 離職者・行方不明者は 0 を初期値に
+function _tkSetDefaults() {
+  ['f-resignJp','f-resignForeign','f-dismissJp','f-dismissForeign','f-missing1y'].forEach(function(id){ var e = document.getElementById(id); if (e && e.value === '') e.value = '0'; });
+}
+// ===== ver.20261009.03: 特定技能の企業フォームを「① 企業情報」「② 雇用条件」のタブに分ける =====
+var TK_TAB1 = ['企業基本情報','所在地','代表者','役員情報','標準の内容'];   // ver.20261009.04: 標準の内容は企業情報の一番下
+var TK_TAB2 = ['雇用条件','就業場所（事業所）','労働時間・休日','契約期間','雇用管理相談窓口','① 待遇の相違について説明を求める窓口','② 雇用管理の改善等に関する事項に係る相談窓口','住居（支援計画書用）','比較対象日本人'];
+var _tkTabCur = 0, _tkTabsOn = false;
+function _tkCardTitle(c){ var t = c.querySelector('.section-title'); return t ? t.textContent.trim() : ''; }
+function _tkBuildTabs() {
+  if (fieldsFilter && fieldsFilter.length) return;            // 追完の項目しぼり込みリンクはタブにしない
+  var body = document.getElementById('formBody'); if (!body) return;
+  var cards = [].filter.call(body.children, function(c){ return c.classList && c.classList.contains('card'); });
+  if (!cards.length) return;
+  var panes = [document.createElement('div'), document.createElement('div'), document.createElement('div')];
+  panes.forEach(function(pn, i){ pn.className = 'tk-pane'; pn.setAttribute('data-tab', i); });
+  var used = [];
+  var pick = function(names, pane){
+    names.forEach(function(nm){
+      cards.forEach(function(c){
+        if (used.indexOf(c) >= 0) return;
+        var t = _tkCardTitle(c);
+        if (t === nm || (nm === '標準の内容' && t.indexOf('標準の内容') === 0)) { pane.appendChild(c); used.push(c); }
+      });
+    });
+  };
+  var anchor = document.createElement('div'); body.insertBefore(anchor, cards[0]);
+  pick(TK_TAB1, panes[0]); pick(TK_TAB2, panes[1]);
+  cards.forEach(function(c){ if (used.indexOf(c) < 0) panes[2].appendChild(c); });
+  var labels = ['① 企業情報', '② 雇用条件', (type === 'company_tokutei2') ? '③ 2号誓約書' : '③ その他'];
+  var bar = document.createElement('div');
+  bar.id = 'tkTabBar';
+  bar.style.cssText = 'display:flex;gap:8px;margin:0 0 14px;';
+  var n = panes[2].children.length ? 3 : 2;
+  for (var i = 0; i < n; i++) {
+    var b = document.createElement('button'); b.type = 'button'; b.className = 'tk-tab'; b.setAttribute('data-tab', i);
+    b.style.cssText = 'flex:1;padding:12px 6px;border-radius:12px;border:2px solid #c7d2fe;background:#fff;color:#4338ca;font-weight:800;font-size:14px;cursor:pointer;font-family:inherit;line-height:1.35;';
+    b.innerHTML = labels[i] + '<div class="tk-tab-cnt" style="font-size:11px;font-weight:700;margin-top:2px;"></div>';
+    (function(ix){ b.onclick = function(){ _tkShowTab(ix, true); }; })(i);
+    bar.appendChild(b);
+  }
+  body.insertBefore(bar, anchor);
+  for (var k = 0; k < n; k++) body.insertBefore(panes[k], anchor);
+  anchor.remove();
+  // 各タブの最後に「次へ」ボタン
+  for (var j = 0; j < n - 1; j++) {
+    var nx = document.createElement('button'); nx.type = 'button';
+    nx.style.cssText = 'width:100%;padding:14px;margin:4px 0 16px;border-radius:12px;border:none;background:#4338ca;color:#fff;font-weight:800;font-size:15px;cursor:pointer;font-family:inherit;';
+    nx.textContent = labels[j + 1] + ' へ進む →';
+    (function(ix){ nx.onclick = function(){ _tkShowTab(ix, true); }; })(j + 1);
+    panes[j].appendChild(nx);
+  }
+  _tkTabsOn = true;
+  _tkShowTab(0, false);
+}
+function _tkShowTab(ix, scroll) {
+  _tkTabCur = ix;
+  document.querySelectorAll('.tk-pane').forEach(function(pn){ pn.style.display = (+pn.getAttribute('data-tab') === ix) ? '' : 'none'; });
+  document.querySelectorAll('.tk-tab').forEach(function(b){
+    var on = (+b.getAttribute('data-tab') === ix);
+    b.style.background = on ? '#4338ca' : '#fff'; b.style.color = on ? '#fff' : '#4338ca'; b.style.borderColor = on ? '#4338ca' : '#c7d2fe';
+  });
+  if (scroll) { try { document.getElementById('tkTabBar').scrollIntoView({ behavior:'smooth', block:'start' }); } catch(e) {} }
+  try { _updateReqRemain(); } catch(e) {}
+}
+// 全タブを一時的に表示した状態で処理する（入力チェック・未入力数は全タブ分を見る）
+function _tkWithAllTabs(fn) {
+  if (!_tkTabsOn) return fn();
+  var panes = document.querySelectorAll('.tk-pane');
+  panes.forEach(function(pn){ pn.style.display = ''; });
+  var r, act = null;
+  try { r = fn(); act = document.activeElement; }
+  finally { panes.forEach(function(pn){ pn.style.display = (+pn.getAttribute('data-tab') === _tkTabCur) ? '' : 'none'; }); }
+  return { r: r, act: act };
+}
+function _tkPaneOf(el) { var pn = el && el.closest ? el.closest('.tk-pane') : null; return pn ? +pn.getAttribute('data-tab') : -1; }
+// タブごとの未入力数をボタンに表示
+function _tkUpdateTabCounts(list) {
+  if (!_tkTabsOn) return;
+  var cnt = {};
+  (list || []).forEach(function(el){ var t = _tkPaneOf(el); cnt[t] = (cnt[t] || 0) + 1; });
+  document.querySelectorAll('.tk-tab').forEach(function(b){
+    var t = +b.getAttribute('data-tab'), c = b.querySelector('.tk-tab-cnt'); if (!c) return;
+    c.textContent = cnt[t] ? ('未入力 ' + cnt[t] + '項目') : '✓ 入力済み';
+  });
+}
+
+// 契約更新の判断基準（案シス・Saysayと同じ5項目。保存は「、」区切り＋その他）
+var TK_RENEW_OPTS = ['契約期間満了時の業務量','労働者の勤務成績、態度','従事している業務の進捗状況','労働者の業務を遂行する能力','会社の経営状況'];
+// 標準を選択済みのセレクト＋「その他」用の自由記入欄（同じ枠の中＝どの項目のその他かが分かる）
+function _tkStdSel(k, label, def, opts) {
+  var h = '<div class="field"><label>' + label + '<span class="req">*</span></label><select id="f-' + k + '">';
+  opts.forEach(function(o){ h += '<option value="' + o + '"' + (o === def ? ' selected' : '') + '>' + o + '</option>'; });
+  h += '</select>';
+  h += '<div id="' + k + 'OtherWrap" style="display:none;margin-top:6px;"><div style="font-size:11px;color:#6b7280;margin-bottom:3px;">↳ ' + label + 'の「その他」の内容</div>' +
+       '<input type="text" id="f-' + k + 'Other" placeholder="' + label + 'について具体的にご記入ください"></div>';
+  h += '</div>';
+  return h;
+}
+// 自動計算の欄（入力不可）
+function _tkCalcField(id, label) {
+  return '<div class="field"><label>' + label + '</label><input type="number" id="' + id + '" readonly tabindex="-1" placeholder="自動計算" style="background:#f3f4f6;color:#374151;"></div>';
+}
+// 年間休日数・1日所定労働時間 → 年/月/週の所定労働日数・時間
+function _tkCalcWork() {
+  var yEl = document.getElementById('f-yearlyDays');
+  if (!yEl || !yEl.readOnly) return;
+  var r1 = function(x){ return Math.round(x * 10) / 10; };
+  var set = function(id, v){ var e = document.getElementById(id); if (e) e.value = String(v); };
+  var ah = parseFloat(val('f-annualHolidays')), dh = parseFloat(val('f-dailyHours'));
+  if (isNaN(ah) || ah < 0 || ah >= 365) return;
+  var yd = 365 - ah;
+  set('f-yearlyDays', yd); set('f-monthlyDays', r1(yd / 12)); set('f-weeklyDays', r1(yd / 52.14));
+  if (isNaN(dh) || dh <= 0) return;
+  var yh = yd * dh;
+  set('f-yearlyH', r1(yh)); set('f-monthlyH', r1(yh / 12)); set('f-weeklyH', r1(yh / 52.14));
+}
+// 「有」「なし」などの選択に応じて下の項目を出し入れ
+function _tkApplyToggles() {
+  var sh = function(id, on){ var e = document.getElementById(id); if (e) e.style.display = on ? '' : 'none'; };
+  sh('housingWrap', val('f-housingProvided') === '有');
+  sh('foodWrap', val('f-foodProvided') === '有');
+  sh('utilityWrap', val('f-utilityProvided') === '有');
+  var _expAri = (_tkAcceptExp === 'あり');
+  sh('tkOfficersCard', !_expAri);
+  sh('tkJpCompCard', !_expAri);
+  sh('renewCondWrap', val('f-contractRenewal') === '更新する場合があり得る');
+  ['insKenpo','insPension','insEmp','insLabor'].forEach(function(k){ sh(k + 'OtherWrap', val('f-' + k) === 'その他'); });
+  // 「有」「あり」を選んだときだけ、条件・内容の欄に * を出す（＝必須）
+  [['f-salaryRaiseCond','f-salaryRaise','有'],['f-bonusCond','f-bonus','有'],['f-retirementDetail','f-retirement','有'],
+   ['f-shiftDetail','f-shiftFlg','あり'],['f-flexDetail','f-flexFlg','適用あり']].forEach(function(c){
+    var el = document.getElementById(c[0]); if (!el) return;
+    var fd = el.closest('.field'); var rq = fd ? fd.querySelector('label span.req') : null;
+    if (rq) rq.style.display = (val(c[1]) === c[2]) ? '' : 'none';
+  });
+  _tkCalcWork();
+}
+document.addEventListener('change', function(){ try { if (document.getElementById('officersWrap')) _tkApplyToggles(); } catch(_){} });
+document.addEventListener('input', function(e){ try { if (e.target && (e.target.id === 'f-annualHolidays' || e.target.id === 'f-dailyHours')) _tkCalcWork(); } catch(_){} });
+function _tkRenewCondValue() {
+  var arr = [];
+  document.querySelectorAll('.tk-rnc:checked').forEach(function(el){ if (el.value) arr.push(el.value); });
+  var o = val('f-contractRenewalCondOther'); if (o) arr.push(o);
+  return arr.join('、');
+}
+// 定期健康診断の実施月（選んだ月の番号。1回目→2回目の順、同じ月は1つに）
+function _tkHcMonths() {
+  var a = [];
+  ['f-healthCheckM1','f-healthCheckM2nd'].forEach(function(id){ var m = val(id).replace(/[^0-9]/g, ''); if (m && a.indexOf(m) < 0) a.push(m); });
+  return a;
+}
+// 途中保存・送信済みの回答を開いたときの復元（その他・判断基準・旧選択肢）
+function _tkAfterPrefill(resp) {
+  if (!document.getElementById('f-contractRenewalCondOther')) return;   // 特定技能の企業フォームのときだけ
+  String(resp.healthCheckM || '').split(/[,、，・\s]+/).map(function(m){
+    m = String(m).replace(/[０-９]/g, function(c){ return String.fromCharCode(c.charCodeAt(0) - 0xFEE0); }).replace(/[^0-9]/g, '');
+    return m ? String(parseInt(m, 10)) : '';
+  }).filter(Boolean).slice(0, 2).forEach(function(m, i){
+    var sel = document.getElementById(i === 0 ? 'f-healthCheckM1' : 'f-healthCheckM2nd'); if (sel && !sel.value) sel.value = m + '月';
+  });
+  ['insKenpo','insPension','insEmp','insLabor'].forEach(function(k){
+    var v = String(resp[k] || '');
+    if (v.indexOf('その他') === 0) {
+      var sel = document.getElementById('f-' + k); if (sel) sel.value = 'その他';
+      var ot = document.getElementById('f-' + k + 'Other'); if (ot && !ot.value) ot.value = resp[k + 'Other'] || v.replace(/^その他[：:]?/, '');
+    }
+  });
+  var cr = document.getElementById('f-contractRenewal');
+  if (cr) {
+    var old = { '更新しない':'契約の更新はしない', '自動更新':'自動的に更新する' }[resp.contractRenewal];
+    if (old) cr.value = old;
+  }
+  var rc = String(resp.contractRenewalCond || '');
+  if (rc) {
+    var others = [];
+    // 「労働者の勤務成績、態度」のように「、」を含む選択肢があるので、選択肢を先に取り出してから残りを分ける
+    TK_RENEW_OPTS.slice().sort(function(a, b){ return b.length - a.length; }).forEach(function(x){
+      if (rc.indexOf(x) >= 0) { rc = rc.split(x).join('、'); document.querySelectorAll('.tk-rnc').forEach(function(el){ if (el.value === x) el.checked = true; }); }
+    });
+    rc.split(/[、,]/).map(function(x){ return x.trim(); }).filter(Boolean).forEach(function(x){ others.push(x); });
+    var o = document.getElementById('f-contractRenewalCondOther'); if (o && others.length) o.value = others.join('、');
+  }
+  _tkApplyToggles();
+}
+
 function buildCompanyForm() {
   return (
   '<div class="card"><div class="section-title">企業基本情報</div>' +
     '<div class="field"><label>会社名<span class="req">*</span></label><input type="text" id="f-coName" placeholder="例: 株式会社〇〇食品" oninput="coNameKanaHelper(this.value)"></div>' +
-    '<div class="field"><label>会社名（ひらがな）</label><input type="text" id="f-coNameKana" placeholder="例: かぶしきかいしゃ〇〇しょくひん"><div id="co-kana-suggestion" style="font-size:11px;color:#6b7280;margin-top:3px;"></div></div>' +
-    field('f-coNameEn','会社名（英語）','text',false,'例: OO Foods Co., Ltd.') +
+    '<div class="field"><label>会社名（ひらがな）<span class="req">*</span></label><input type="text" id="f-coNameKana" placeholder="例: かぶしきかいしゃ〇〇しょくひん"><div id="co-kana-suggestion" style="font-size:11px;color:#6b7280;margin-top:3px;"></div></div>' +
+    field('f-coNameEn','会社名（英語）','text',true,'例: OO Foods Co., Ltd.') +
     '<div class="grid2">' +
       field('f-coCorpNo','法人番号（13桁）','text',false,'例: 1234567890123') +
-      field('f-coEmpInsNo','雇用保険適用事業所番号（11桁）','text',false,'例: 1234-567890-1') +
+      field('f-coEmpInsNo','雇用保険適用事業所番号（11桁）','text',true,'例: 1234-567890-1') +
     '</div>' +
-    field('f-coLaborInsNo','労働保険番号（14桁）','text',false,'例: 12-3-45-678901-000') +
+    field('f-coLaborInsNo','労働保険番号（14桁）','text',true,'例: 12-3-45-678901-000') +
     '<div class="grid2">' +
-      field('f-coEmployees','常勤職員数','number',false,'例: 25') +
-      field('f-coForeignEmployees','うち外国人職員数','number',false,'例: 3') +
+      field('f-coEmployees','常勤職員数','number',true,'例: 25') +
+      field('f-coForeignEmployees','うち外国人職員数','number',true,'例: 3') +
     '</div>' +
     '<div class="grid2">' +
-      field('f-coTrainees','技能実習生数','number',false,'例: 2') +
-      field('f-coCapital','資本金（円）','number',false,'例: 10000000') +
+      field('f-coTrainees','技能実習生数','number',true,'例: 2') +
+      field('f-coCapital','資本金（円）','number',true,'例: 10000000') +
     '</div>' +
-    field('f-coAnnualSales','年間売上金額（円）','number',false,'例: 500000000') +
+    field('f-coAnnualSales','年間売上金額（円）','number',true,'例: 500000000') +
   '</div>' +
 
   '<div class="card"><div class="section-title">所在地</div>' +
-    '<div class="field"><label>郵便番号</label>' +
+    '<div class="field"><label>郵便番号<span class="req">*</span></label>' +
       '<div style="display:flex;gap:8px;align-items:center;">' +
         '<input type="text" id="f-coZip" placeholder="例: 160-0022" style="flex:1;" oninput="coZipAutoFill(this.value)" inputmode="numeric">' +
         '<button type="button" onclick="coZipAutoFill(document.getElementById(\'f-coZip\').value, true)" style="white-space:nowrap;padding:10px 14px;background:#3b82f6;color:white;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;">🔍 住所を自動入力</button>' +
@@ -2491,34 +2701,32 @@ function buildCompanyForm() {
       '<div id="co-zip-msg" style="font-size:11px;margin-top:4px;"></div>' +
     '</div>' +
     '<div class="grid2">' +
-      field('f-coPref','都道府県','text',false,'例: 東京都') +
-      field('f-coCity','市区町村','text',false,'例: 新宿区') +
+      field('f-coPref','都道府県','text',true,'例: 東京都') +
+      field('f-coCity','市区町村','text',true,'例: 新宿区') +
     '</div>' +
-    field('f-coAddress','町名番地','text',false,'例: 新宿2丁目1番1号 〇〇ビル3F') +
-    field('f-coAddressEn','住所（英語）','text',false,'例: 3F OO Bldg., 2-1-1 Shinjuku, Shinjuku-ku, Tokyo') +
-    field('f-coTel','電話番号','text',false,'例: 03-1234-5678') +
+    field('f-coAddress','町名番地','text',true,'例: 新宿2丁目1番1号 〇〇ビル3F') +
+    field('f-coAddressEn','住所（英語）','text',true,'例: 3F OO Bldg., 2-1-1 Shinjuku, Shinjuku-ku, Tokyo') +
+    field('f-coTel','電話番号','text',true,'例: 03-1234-5678') +
   '</div>' +
 
   '<div class="card"><div class="section-title">就業場所（事業所）</div>' +
     '<div style="margin-bottom:10px;">' +
       '<button type="button" onclick="copyHQToOffice()" style="padding:8px 16px;background:#f0fdf4;color:#15803d;border:1.5px solid #86efac;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;">🏢 本社と同じ住所を転記</button>' +
     '</div>' +
-    field('f-officeName','事業所名','text',false,'例: 株式会社〇〇 板橋工場') +
-    field('f-officeNameEn','事業所名（英語）','text',false,'例: OO Co., Ltd. Itabashi Factory') +
-    field('f-officeAddress','事業所住所','text',false,'例: 東京都板橋区板橋1丁目2番3号') +
-    field('f-officeTel','事業所電話番号','text',false,'例: 03-9876-5432') +
-    field('f-jobCategory','業務内容（特定技能分野・区分）','text',false,'例: 飲食料品製造業 / 飲食料品製造') +
-    field('f-jobDescription','受け入れる外国人の職務内容','textarea',false,'例: 食品製造ラインにおいて加工品の仕上げ・品質判別等に従事') +
+    field('f-officeName','事業所名','text',true,'例: 株式会社〇〇 板橋工場') +
+    field('f-officeNameEn','事業所名（英語）','text',true,'例: OO Co., Ltd. Itabashi Factory') +
+    field('f-officeAddress','事業所住所','text',true,'例: 東京都板橋区板橋1丁目2番3号') +
+    field('f-officeTel','事業所電話番号','text',true,'例: 03-9876-5432') +
   '</div>' +
 
   '<div class="card"><div class="section-title">代表者</div>' +
     '<div class="grid2">' +
-      field('f-coRepName','代表者氏名','text',false,'例: 山田 太郎') +
-      field('f-coRepTitle','代表者役職','text',false,'例: 代表取締役') +
+      field('f-coRepName','代表者氏名','text',true,'例: 山田 太郎') +
+      field('f-coRepTitle','代表者役職','text',true,'例: 代表取締役') +
     '</div>' +
     '<div class="grid2">' +
-      field('f-coRepNameEn','代表者氏名（英語）','text',false,'例: YAMADA TARO') +
-      field('f-coRepTitleEn','代表者役職（英語）','text',false,'例: President') +
+      field('f-coRepNameEn','代表者氏名（英語）','text',true,'例: YAMADA TARO') +
+      field('f-coRepTitleEn','代表者役職（英語）','text',true,'例: President') +
     '</div>' +
   '</div>' +
 
@@ -2529,12 +2737,12 @@ function buildCompanyForm() {
       '<button type="button" onclick="copyContactFrom(\'diff\',\'rep\')\" style="padding:8px 12px;background:#f0fdf4;color:#15803d;border:1.5px solid #86efac;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;">👤 代表者と同じ</button>' +
       '<button type="button" onclick="copyContactFrom(\'diff\',\'main\')\" style="padding:8px 12px;background:#eff6ff;color:#1d4ed8;border:1.5px solid #93c5fd;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;">⬇ ②と同じ</button>' +
     '</div>' +
-    field('f-diffContactDept','部署名','text',false,'例: 人事部') +
+    field('f-diffContactDept','部署名','text',true,'例: 人事部') +
     '<div class="grid2">' +
-      field('f-diffContactPerson','担当者名','text',false,'例: 田中 一郎') +
-      field('f-diffContactPersonEn','担当者名（英語）','text',false,'例: TANAKA ICHIRO') +
+      field('f-diffContactPerson','担当者名','text',true,'例: 田中 一郎') +
+      field('f-diffContactPersonEn','担当者名（英語）','text',true,'例: TANAKA ICHIRO') +
     '</div>' +
-    field('f-diffContactTel','電話番号','text',false,'例: 03-1234-5678') +
+    field('f-diffContactTel','電話番号','text',true,'例: 03-1234-5678') +
   '</div>' +
 
   '<div class="card"><div class="section-title">② 雇用管理の改善等に関する事項に係る相談窓口</div>' +
@@ -2542,27 +2750,30 @@ function buildCompanyForm() {
     '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;">' +
       '<button type="button" onclick="copyContactFrom(\'main\',\'diff\')\" style="padding:8px 12px;background:#f0fdfa;color:#0f766e;border:1.5px solid #5eead4;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;">⬆ ①と同じ</button>' +
     '</div>' +
-    field('f-consultDept','部署名','text',false,'例: 人事部') +
+    field('f-consultDept','部署名','text',true,'例: 人事部') +
     '<div class="grid2">' +
-      field('f-consultName','担当者名','text',false,'例: 田中 一郎') +
-      field('f-consultNameEn','担当者名（英語）','text',false,'例: TANAKA ICHIRO') +
+      field('f-consultName','担当者名','text',true,'例: 田中 一郎') +
+      field('f-consultNameEn','担当者名（英語）','text',true,'例: TANAKA ICHIRO') +
     '</div>' +
-    field('f-consultTel','電話番号','text',false,'例: 03-1234-5678') +
+    field('f-consultTel','電話番号','text',true,'例: 03-1234-5678') +
   '</div>' +
 
-  '<div class="card"><div class="section-title">役員情報</div>' +
+  // ver.20261009.02: 役員情報・比較対象日本人は、案シスの受入経験が「なし（または未登録）」のときだけ表示（フォームでは聞かない）
+  '<div class="card" id="tkOfficersCard"><div class="section-title">役員情報</div>' +
+    '<div id="officersWrap">' +
     '<div style="font-size:11px;color:#9ca3af;margin-bottom:10px;">代表者を含む全役員を記入してください</div>' +
     '<div id="officers-container">' +
       officerRow(1) + officerRow(2) + officerRow(3) +
     '</div>' +
     '<button type="button" onclick="addOfficer()" style="font-size:11px;padding:5px 14px;background:white;border:1.5px dashed #c7d2fe;border-radius:6px;color:#6366f1;cursor:pointer;font-weight:700;">＋ 役員を追加</button>' +
+    '</div>' +
   '</div>' +
 
   '<div class="card"><div class="section-title">雇用条件</div>' +
     '<div class="sub-label">【給与】</div>' +
     '<div class="grid2">' +
-      field('f-salaryType','給与形態','select',false,'',null,['','月給','時給','日給']) +
-      field('f-salaryMonthly','基本給（円）','number',false,'例: 200000') +
+      field('f-salaryType','給与形態','select',true,'',null,['','月給','時給','日給']) +
+      field('f-salaryMonthly','基本給（円）','number',true,'例: 200000') +
     '</div>' +
 
     '<div class="sub-label">【手当】</div>' +
@@ -2576,163 +2787,146 @@ function buildCompanyForm() {
       field('f-fixedOTHours','何時間分','number',false,'例: 20') +
     '</div>' +
 
-    '<div class="sub-label">【控除】</div>' +
-    '<div class="grid2">' +
-      field('f-deductTax','税金 概算額（円）','number',false,'例: 15000') +
-      field('f-deductSocial','社会保険料 概算額（円）','number',false,'例: 30000') +
-    '</div>' +
-    field('f-deductEmployment','雇用保険料 概算額（円）','number',false,'例: 1000') +
-
     '<div class="sub-label">【居住費】</div>' +
-    field('f-housingProvided','居住費徴収の有無','select',false,'',null,['','有','無']) +
-    field('f-deductHousing','居住費控除 月額（円）','number',false,'なければ 0') +
-    field('f-housingDetail','居住費 適正額の説明','textarea',false,'例: 月額13万円で借上の物件。居住人数10名のため1万3千円は適正。') +
+    field('f-housingProvided','居住費控除の有無','select',true,'',null,['','有','無']) +
+    '<div id="housingWrap" style="display:none;">' +
+      field('f-deductHousing','居住費控除 月額（円）','number',true,'例: 13000') +
+      field('f-housingDetail','居住費 適正額の説明','textarea',true,'例: 月額13万円で借上の物件。居住人数10名のため1万3千円は適正。') +
+    '</div>' +
 
     '<div class="sub-label">【食費】</div>' +
-    field('f-foodProvided','食費徴収の有無','select',false,'',null,['','有','無']) +
-    field('f-deductFood','食費控除 月額（円）','number',false,'なければ 0') +
-    field('f-foodDetail','食費 適正額の説明・食事内容','textarea',false,'例: 社員食堂で昼食1食500円。月20日×500円=10,000円は適正。') +
+    field('f-foodProvided','食費控除の有無','select',true,'',null,['','有','無']) +
+    '<div id="foodWrap" style="display:none;">' +
+      field('f-deductFood','食費控除 月額（円）','number',true,'例: 10000') +
+      field('f-foodDetail','食費 適正額の説明・食事内容','textarea',true,'例: 社員食堂で昼食1食500円。月20日×500円=10,000円は適正。') +
+    '</div>' +
 
-    '<div class="sub-label">【水道光熱費・その他控除】</div>' +
+    '<div class="sub-label">【水道光熱費】</div>' +
+    field('f-utilityProvided','水道光熱費控除の有無','select',true,'',null,['','有','無']) +
+    '<div id="utilityWrap" style="display:none;">' +
+      field('f-deductUtility','水道光熱費控除 月額（円）','number',true,'例: 5000') +
+    '</div>' +
+    '<div class="sub-label">【その他の控除】（ある場合のみ）</div>' +
     '<div class="grid2">' +
-      field('f-deductUtility','水道光熱費 月額（円）','number',false,'なければ 0') +
       field('f-deductOther1Name','その他控除① 名目','text',false,'例: 〇〇費') +
+      field('f-deductOther1Amount','その他控除① 金額（円）','number',false,'例: 3000') +
     '</div>' +
-    field('f-deductOther1Amount','その他控除① 金額（円）','number',false,'なければ 0') +
-
-    '<div class="sub-label">【社会保険・雇用保険】</div>' +
-    '<div class="grid2">' +
-      field('f-insKenpo','健康保険 加入','select',false,'',null,['','加入','未加入']) +
-      field('f-insPension','厚生年金 加入','select',false,'',null,['','加入','未加入']) +
-    '</div>' +
-    '<div class="grid2">' +
-      field('f-insEmp','雇用保険 加入','select',false,'',null,['','加入','未加入']) +
-      field('f-insLabor','労災保険 加入','select',false,'',null,['','加入','未加入']) +
-    '</div>' +
-    field('f-healthCheck','定期健康診断','select',false,'',null,['','年1回（毎年実施）','年2回（半年ごと）','その他']) +
 
     '<div class="sub-label">【昇給・賞与・退職金】</div>' +
     '<div class="grid2">' +
-      field('f-salaryRaise','昇給','select',false,'',null,['','有','無']) +
-      field('f-salaryRaiseCond','昇給 条件・時期','text',false,'例: 毎年4月（査定による）') +
+      field('f-salaryRaise','昇給','select',true,'',null,['','有','無']) +
+      field('f-salaryRaiseCond','昇給 条件・時期','text',true,'例: 毎年4月（査定による）') +
     '</div>' +
     '<div class="grid2">' +
-      field('f-bonus','賞与','select',false,'',null,['','有','無']) +
-      field('f-bonusCond','賞与 条件・時期','text',false,'例: 年2回（6月・12月）') +
+      field('f-bonus','賞与','select',true,'',null,['','有','無']) +
+      field('f-bonusCond','賞与 条件・時期','text',true,'例: 年2回（6月・12月）') +
     '</div>' +
     '<div class="grid2">' +
-      field('f-retirement','退職金','select',false,'',null,['','有','無']) +
-      field('f-retirementDetail','退職金 制度内容','text',false,'例: 勤続3年以上') +
+      field('f-retirement','退職金','select',true,'',null,['','有','無']) +
+      field('f-retirementDetail','退職金 制度内容','text',true,'例: 勤続3年以上') +
     '</div>' +
 
     '<div class="sub-label">【支払方法・締め日】</div>' +
-    field('f-payMethod','支払方法','select',false,'',null,['','口座振込','現金','その他']) +
+    field('f-payMethod','支払方法','select',true,'',null,['','口座振込','現金','その他']) +
     buildPayDateFields() +
+
+    // ver.20261014.03: 定期健康診断は「実施する月」だけプルダウンで選んでもらう（2回目を選んだら年2回）
+    '<div class="sub-label">【定期健康診断】</div>' +
+    '<div class="grid2">' +
+      field('f-healthCheckM1','定期健康診断の実施月','select',true,'',null,['','1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月']) +
+      field('f-healthCheckM2nd','2回目の実施月（年2回の場合）','select',false,'',null,['','1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月']) +
+    '</div>' +
+
   '</div>' +
 
   '<div class="card"><div class="section-title">労働時間・休日</div>' +
-    '<div class="sub-label">【所定労働時間】</div>' +
-    '<div class="grid2">' +
-      field('f-startTime','始業時刻','time',false,'') +
-      field('f-endTime','終業時刻','time',false,'') +
-    '</div>' +
-    '<div class="grid2">' +
-      field('f-breakTime','休憩時間（分）','number',false,'例: 60') +
-      field('f-dailyHours','1日所定労働時間（時間）','number',false,'例: 8') +
-    '</div>' +
-    '<div class="grid2">' +
-      field('f-weeklyDays','週所定労働日数','number',false,'例: 5') +
-      field('f-weeklyH','週所定労働時間','number',false,'例: 40') +
-    '</div>' +
-    '<div class="grid2">' +
-      field('f-monthlyDays','月所定労働日数','number',false,'例: 21') +
-      field('f-monthlyH','月所定労働時間','number',false,'例: 170') +
-    '</div>' +
-    '<div class="grid2">' +
-      field('f-yearlyDays','年所定労働日数','number',false,'例: 261') +
-      field('f-yearlyH','年所定労働時間','number',false,'例: 2080') +
-    '</div>' +
-    field('f-overtimeFlg','所定労働時間外労働の有無','select',false,'',null,['','有','無']) +
-
-    '<div class="sub-label">【交代制（シフト制）】</div>' +
-    field('f-shiftFlg','交代制（シフト制）の採用','select',false,'',null,['','あり','なし']) +
-    field('f-shiftDetail','シフトパターン詳細','textarea',false,'例: 早番 7:00-16:00 / 遅番 13:00-22:00（週ごとに交代）') +
-
-    field('f-flexFlg','変形時間労働制の適用','select',false,'',null,['','適用あり','適用なし']) +
-    '<div id="flexTypeWrap" style="display:none;">' +
-      field('f-flexType','変形労働時間制の種類','select',false,'',null,['','1年単位','1ヶ月単位']) +
-    '</div>' +
-    field('f-flexDetail','変形労働時間制の詳細','text',false,'例: 1年単位の変形労働時間制（単位：月、最大週平均40時間）') +
-
     '<div class="sub-label">【休日】</div>' +
-    field('f-holidayType','休日の種類','select',false,'',null,['','定例日','非定例日','定例日＋非定例日']) +
+    field('f-holidayType','休日の種類','select',true,'',null,['','定例日','非定例日','定例日＋非定例日']) +
     '<div id="holiday-fixed-area" style="display:none;">' +
     '<div class="grid2">' +
-      field('f-fixedHolidayMon','月曜日','select',false,'',null,['','休み','出勤']) +
-      field('f-fixedHolidayTue','火曜日','select',false,'',null,['','休み','出勤']) +
+      field('f-fixedHolidayMon','月曜日','select',true,'',null,['','休み','出勤']) +
+      field('f-fixedHolidayTue','火曜日','select',true,'',null,['','休み','出勤']) +
     '</div>' +
     '<div class="grid2">' +
-      field('f-fixedHolidayWed','水曜日','select',false,'',null,['','休み','出勤']) +
-      field('f-fixedHolidayThu','木曜日','select',false,'',null,['','休み','出勤']) +
+      field('f-fixedHolidayWed','水曜日','select',true,'',null,['','休み','出勤']) +
+      field('f-fixedHolidayThu','木曜日','select',true,'',null,['','休み','出勤']) +
     '</div>' +
     '<div class="grid2">' +
-      field('f-fixedHolidayFri','金曜日','select',false,'',null,['','休み','出勤']) +
-      field('f-fixedHolidaySat','土曜日','select',false,'',null,['','休み','出勤']) +
+      field('f-fixedHolidayFri','金曜日','select',true,'',null,['','休み','出勤']) +
+      field('f-fixedHolidaySat','土曜日','select',true,'',null,['','休み','出勤']) +
     '</div>' +
     '<div class="grid2">' +
-      field('f-fixedHolidaySun','日曜日','select',false,'',null,['','休み','出勤']) +
-      field('f-fixedHolidayHol','祝日','select',false,'',null,['','休み','出勤']) +
+      field('f-fixedHolidaySun','日曜日','select',true,'',null,['','休み','出勤']) +
+      field('f-fixedHolidayHol','祝日','select',true,'',null,['','休み','出勤']) +
     '</div>' +
     '</div>' +
     '<div id="holiday-nonreg-area" style="display:none;">' +
     '<div class="grid2">' +
-      field('f-nonRegWeeklyDays','週あたりの休日日数','number',false,'例: 2') +
-      field('f-nonRegMonthlyDays','月あたりの休日日数','number',false,'例: 8') +
+      field('f-nonRegWeeklyDays','週あたりの休日日数','number',true,'例: 2') +
+      field('f-nonRegMonthlyDays','月あたりの休日日数','number',true,'例: 8') +
     '</div>' +
     '</div>' +
     field('f-otherHoliday','その他休日（非定例日等）','text',false,'例: GW・夏季・年末年始') +
-    field('f-annualHolidays','年間休日数','number',false,'例: 120') +
+    field('f-annualHolidays','年間休日数','number',true,'例: 120') +
+    '<div class="sub-label">【所定労働時間】</div>' +
+    '<div class="grid2">' +
+      field('f-startTime','始業時刻','time',true,'') +
+      field('f-endTime','終業時刻','time',true,'') +
+    '</div>' +
+    '<div class="grid2">' +
+      field('f-breakTime','休憩時間（分）','number',true,'例: 60') +
+      field('f-dailyHours','1日所定労働時間（時間）','number',true,'例: 8') +
+    '</div>' +
+    '<div class="sub-label">【所定労働日数・時間】（自動計算）</div>' +
+    '<div style="font-size:11px;color:#6b7280;margin-bottom:8px;line-height:1.6;">年間休日数と1日の所定労働時間をもとに、入管指定の算出方法により自動で算出しています（年間＝365日－年間休日数、月＝年間÷12、週＝年間÷52.14）。</div>' +
+    '<div class="grid2">' + _tkCalcField('f-yearlyDays','年所定労働日数') + _tkCalcField('f-yearlyH','年所定労働時間') + '</div>' +
+    '<div class="grid2">' + _tkCalcField('f-monthlyDays','月所定労働日数') + _tkCalcField('f-monthlyH','月所定労働時間') + '</div>' +
+    '<div class="grid2">' + _tkCalcField('f-weeklyDays','週所定労働日数') + _tkCalcField('f-weeklyH','週所定労働時間') + '</div>' +
+    field('f-overtimeFlg','所定労働時間外労働の有無','select',true,'',null,['','有','無']) +
+
+    '<div class="sub-label">【交代制（シフト制）】</div>' +
+    field('f-shiftFlg','交代制（シフト制）の採用','select',true,'',null,['','あり','なし']) +
+    field('f-shiftDetail','シフトパターン詳細','textarea',true,'例: 早番 7:00-16:00 / 遅番 13:00-22:00（週ごとに交代）') +
+
+    field('f-flexFlg','変形時間労働制の適用','select',true,'',null,['','適用あり','適用なし']) +
+    '<div id="flexTypeWrap" style="display:none;">' +
+      field('f-flexType','変形労働時間制の種類','select',true,'',null,['','1年単位','1ヶ月単位']) +
+    '</div>' +
+    field('f-flexDetail','変形労働時間制の詳細','text',true,'例: 1年単位の変形労働時間制（単位：月、最大週平均40時間）') +
   '</div>' +
 
   '<div class="card"><div class="section-title">契約期間</div>' +
-    '<div class="grid2">' +
-      field('f-contractStart','契約開始日','date',false,'') +
-      field('f-contractEnd','契約終了日','date',false,'') +
+    // ver.20261014.03: 契約開始日・終了日はフォームでは聞かない（案シス側で入力）
+    field('f-contractRenewal','契約更新の有無','select',true,'',null,['','自動的に更新する','更新する場合があり得る','契約の更新はしない']) +
+    // ver.20261009.01: 「更新する場合があり得る」のときは判断基準を選ぶ（Saysay／案シスと同じ5項目＋その他）
+    '<div id="renewCondWrap" style="display:none;">' +
+      '<div class="field"><label>更新の判断基準（あてはまるものをすべて）<span class="req">*</span></label>' +
+        '<div style="display:flex;flex-direction:column;gap:6px;">' +
+        TK_RENEW_OPTS.map(function(o){ return '<label style="display:flex;align-items:center;gap:8px;font-weight:400;font-size:14px;cursor:pointer;"><input type="checkbox" class="tk-rnc" value="' + o + '" style="width:18px;height:18px;"> ' + o + '</label>'; }).join('') +
+        '</div>' +
+        '<input type="text" id="f-contractRenewalCondOther" placeholder="その他（自由記入）" style="margin-top:8px;">' +
+      '</div>' +
     '</div>' +
-    field('f-contractRenewal','契約更新の有無','select',false,'',null,['','更新する場合があり得る','更新しない','自動更新']) +
-  '</div>' +
-
-  '<div class="card"><div class="section-title">離職者・行方不明者情報</div>' +
-    '<div class="sub-label">【自己都合離職者（直近1年以内）】</div>' +
-    '<div class="grid2">' +
-      field('f-resignJp','日本人 人数','number',false,'例: 1') +
-      field('f-resignForeign','外国人 人数','number',false,'例: 0') +
-    '</div>' +
-    '<div class="sub-label">【会社都合離職者（直近1年以内）】</div>' +
-    '<div class="grid2">' +
-      field('f-dismissJp','日本人 人数','number',false,'例: 0') +
-      field('f-dismissForeign','外国人 人数','number',false,'例: 0') +
-    '</div>' +
-    '<div class="sub-label">【行方不明者数（特定技能）前1年間】</div>' +
-    field('f-missing1y','行方不明者数','number',false,'0') +
+    '<input type="hidden" id="f-contractRenewalCond">' +
   '</div>' +
 
   '<div class="card"><div class="section-title">住居（支援計画書用）</div>' +
     '<div style="font-size:11px;color:#9ca3af;margin-bottom:10px;">支援計画書に記載する住居情報</div>' +
-    field('f-housingOwnership','住居形態（自己所有/借上）','select',false,'',null,['','自己所有','借上']) +
-    field('f-cohabitants','同居人数','number',false,'例: 3') +
-    field('f-actualCostDesc','実費相当の説明','textarea',false,'例: 月額13万円で借上の物件。居住人数10名のため1人当たり1万3千円は適正。') +
+    field('f-housingOwnership','住居形態（自己所有/借上）','select',true,'',null,['','自己所有','借上']) +
+    field('f-cohabitants','同居人数','number',true,'例: 3') +
+    field('f-actualCostDesc','実費相当の説明','textarea',true,'例: 月額13万円で借上の物件。居住人数10名のため1人当たり1万3千円は適正。') +
   '</div>' +
 
-  '<div class="card"><div class="section-title">比較対象日本人</div>' +
+  '<div class="card" id="tkJpCompCard"><div class="section-title">比較対象日本人</div>' +
     '<div style="font-size:11px;color:#9ca3af;margin-bottom:10px;">外国人と同等業務に従事する日本人の情報</div>' +
+    '<div id="jpCompWrap">' +
     '<div class="grid2">' +
-      field('f-jpCompAge','年齢','number',false,'例: 35') +
-      field('f-jpCompGender','性別','select',false,'',null,['','男','女']) +
+      field('f-jpCompAge','年齢','number',true,'例: 35') +
+      field('f-jpCompGender','性別','select',true,'',null,['','男','女']) +
     '</div>' +
-    field('f-jpCompExp','経験年数','text',false,'例: 5年') +
-    field('f-jpCompJobDesc','職務内容','text',false,'例: 食品製造ライン作業（盛付・包装）') +
-    field('f-jpCompSalary','月額報酬（円）','number',false,'例: 210000') +
+    field('f-jpCompExp','経験年数','text',true,'例: 5年') +
+    field('f-jpCompJobDesc','職務内容','text',true,'例: 食品製造ライン作業（盛付・包装）') +
+    field('f-jpCompSalary','月額報酬（円）','number',true,'例: 210000') +
     '<div class="grid2">' +
       field('f-jpCompAllow1Name','手当①名称','text',false,'例: 通勤手当') +
       field('f-jpCompAllow1Amt','手当①金額（円）','number',false,'例: 10000') +
@@ -2745,11 +2939,38 @@ function buildCompanyForm() {
       field('f-jpCompAllow3Name','手当③名称','text',false,'') +
       field('f-jpCompAllow3Amt','手当③金額（円）','number',false,'') +
     '</div>' +
-    field('f-salaryRuleFlg','賃金規定の有無','select',false,'',null,['','有','無']) +
+    '</div>' +
+    field('f-salaryRuleFlg','賃金規定の有無','select',true,'',null,['','有','無']) +
 
-    field('f-jpCompReason','同等以上の理由','textarea',false,'例: 同一ラインで同等業務に従事しており、経験年数・職務内容が同等であるため') +
+    field('f-jobDescription','受け入れる外国人の職務内容','textarea',false,'例: 食品製造ラインにおいて加工品の仕上げ・品質判別等に従事') +
+    field('f-jpCompReason','同等以上の理由','textarea',true,'例: 同一ラインで同等業務に従事しており、経験年数・職務内容が同等であるため') +
 
     '</div>' +
+  '</div>' +
+
+  // ver.20261009.02: 標準の内容（選択済み・0を入力済み）は一番下にまとめ、違う場合だけ変更してもらう
+  '<div class="card" id="tkStdCard"><div class="section-title">標準の内容（違う場合だけ変更してください）</div>' +
+    '<div style="font-size:11.5px;color:#1d4ed8;background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:8px 10px;margin-bottom:10px;line-height:1.6;">以下の項目は、一般的な内容をあらかじめ入力しています。<b>実際と異なる項目だけ</b>変更してください。<br>「その他」を選ぶと、その項目のすぐ下に記入欄が表示されます。</div>' +
+    '<div class="sub-label">【社会保険・雇用保険】</div>' +
+    '<div class="grid2">' +
+      _tkStdSel('insKenpo','健康保険','加入',['加入','未加入','その他']) +
+      _tkStdSel('insPension','厚生年金','加入',['加入','未加入','その他']) +
+    '</div>' +
+    '<div class="grid2">' +
+      _tkStdSel('insEmp','雇用保険','加入',['加入','未加入','その他']) +
+      _tkStdSel('insLabor','労災保険','加入',['加入','未加入','その他']) +
+    '</div>' +
+    '<div class="sub-label" style="margin-top:14px;">【離職者・行方不明者（直近1年以内）】</div>' +
+    '<div style="font-size:11px;color:#6b7280;margin-bottom:8px;">いない場合は「0」のままで構いません。</div>' +
+    '<div class="grid2">' +
+      field('f-resignJp','自己都合離職者 日本人（人）','number',true,'0') +
+      field('f-resignForeign','自己都合離職者 外国人（人）','number',true,'0') +
+    '</div>' +
+    '<div class="grid2">' +
+      field('f-dismissJp','会社都合離職者 日本人（人）','number',true,'0') +
+      field('f-dismissForeign','会社都合離職者 外国人（人）','number',true,'0') +
+    '</div>' +
+    field('f-missing1y','行方不明者数（特定技能・前1年間）（人）','number',true,'0') +
   '</div>'
   );
 }
@@ -3568,7 +3789,7 @@ function buildPayDateFields() {
   };
   var row = function(label, monthId, dayId) {
     return '<div class="field">' +
-      '<label>' + label + '</label>' +
+      '<label>' + label + '<span class="req">*</span></label>' +   // ver.20261009.01: 締め日・支払日は必須（特定技能・技人国とも元から必須チェックあり）
       '<div style="display:flex;align-items:center;gap:6px;">' +
         sel(monthId, '<option value="毎月">毎月</option><option value="翌月">翌月</option>') +
         '<span style="color:#6b7280;font-size:13px;white-space:nowrap;">⇨</span>' +
@@ -3605,20 +3826,22 @@ function prefillPayDate(resp) {
 
 function officerRow(n) {
   var nums = ['','①','②','③','④','⑤','⑥','⑦','⑧','⑨','⑩'];
+  // ver.20261009.01: 役員①（代表者）は役職・氏名・ふりがなすべて必須。②以降は氏名を入れたときだけふりがな必須
+  var _r1 = (n === 1) ? '<span class="req">*</span>' : '';
   return '<div class="officer-row" data-idx="' + n + '">' +
     '<div style="font-size:11px;font-weight:700;color:#6366f1;margin-bottom:6px;">役員' + nums[n] + '</div>' +
     '<div class="grid2">' +
-      '<div class="field"><label>役職</label><input type="text" id="f-officer' + n + 'Title" placeholder="例: 代表取締役"></div>' +
-      '<div class="field"><label>氏名</label><input type="text" id="f-officer' + n + 'Name" placeholder="例: 山田 太郎" oninput="_officerKanaReq(' + n + ')"></div>' +
+      '<div class="field"><label>役職' + _r1 + '</label><input type="text" id="f-officer' + n + 'Title" placeholder="例: 代表取締役"></div>' +
+      '<div class="field"><label>氏名' + _r1 + '</label><input type="text" id="f-officer' + n + 'Name" placeholder="例: 山田 太郎" oninput="_officerKanaReq(' + n + ')"></div>' +
     '</div>' +
-    '<div class="field"><label>ふりがな<span class="req" id="f-officer' + n + 'KanaReq" style="display:none;">*</span></label><input type="text" id="f-officer' + n + 'Kana" placeholder="例: やまだ たろう"></div>' +
+    '<div class="field"><label>ふりがな<span class="req" id="f-officer' + n + 'KanaReq"' + (n === 1 ? '' : ' style="display:none;"') + '>*</span></label><input type="text" id="f-officer' + n + 'Kana" placeholder="例: やまだ たろう"></div>' +
   '</div>';
 }
 // ver.20261008.02: 役員は「氏名を入力したとき（＝その役員がいるとき）だけ」ふりがなの * を表示
 function _officerKanaReq(n){
   var nm = document.getElementById('f-officer'+n+'Name');
   var rq = document.getElementById('f-officer'+n+'KanaReq');
-  if (!rq) return;
+  if (!rq || n === 1) return;   // 役員①は常に必須
   rq.style.display = (nm && (nm.value||'').trim()) ? '' : 'none';
 }
 
@@ -4113,6 +4336,25 @@ function collectData() {
       jaimIndustryCode: val('f-jaimIndustryCode'), jaimAgreement: (document.getElementById('f-jaimAgreement') && document.getElementById('f-jaimAgreement').checked) ? '確認済み' : '', jaimProductName: val('f-jaimProductName'), jaimProductPurpose: val('f-jaimProductPurpose'), jaimFinalProductName: val('f-jaimFinalProductName'), jaimFinalProductDesc: val('f-jaimFinalProductDesc'), jaimEquipmentPurpose: val('f-jaimEquipmentPurpose'), jaimEquipmentEffect: val('f-jaimEquipmentEffect'), jaimBranchOfficeFlag: val('f-jaimBranchOfficeFlag'), jaimBranchOfficeName: val('f-jaimBranchOfficeName'), jaimBranchOfficeZip: val('f-jaimBranchOfficeZip'), jaimBranchOfficeAddress: val('f-jaimBranchOfficeAddress'), jaimBranchOfficeContact: val('f-jaimBranchOfficeContact'), jaimBranchOfficeTel: val('f-jaimBranchOfficeTel'), jaimCompanySize: val('f-jaimCompanySize'), jaimMemberOrg: val('f-jaimMemberOrg'), jaimAnnualFee: _jaimFeeValue()
     };
     Object.assign(d, officers);
+    // ver.20261009.01: 特定技能の企業フォームの組み替えに合わせて送信データを整える
+    if (document.getElementById('f-contractRenewalCondOther')) {
+      d.acceptExp = _tkAcceptExp;   // 案シスの受入経験（あり／なし／空＝未登録）
+      d.utilityProvided = val('f-utilityProvided');
+      if (d.housingProvided === '無') { d.deductHousing = '0'; d.housingDetail = ''; }
+      if (d.foodProvided === '無') { d.deductFood = '0'; d.foodDetail = ''; }
+      if (d.utilityProvided === '無') { d.deductUtility = '0'; }
+      // 定期健康診断：実施月（例 4,10）を送り、年1回／年2回は月の数で決める
+      var _hcm = _tkHcMonths();
+      d.healthCheckM = _hcm.join(',');
+      d.healthCheck = _hcm.length === 1 ? '年1回（毎年実施）' : _hcm.length === 2 ? '年2回（半年ごと）' : '';
+      d.healthCheckOther = '';
+      ['insKenpo','insPension','insEmp','insLabor'].forEach(function(k){
+        // 「その他」はそのまま送り、内容は別の項目（insKenpoOther など）で送る（案シスの選択肢に合わせる）
+        d[k + 'Other'] = (d[k] === 'その他') ? val('f-' + k + 'Other') : '';
+      });
+      d.contractRenewalCond = (d.contractRenewal === '更新する場合があり得る') ? _tkRenewCondValue() : '';
+      d.contractRenewalCondOther = val('f-contractRenewalCondOther');
+    }
         // ver.20260822: 特定技能2号の誓約書データ（企業フォーム）
     if (t === 'company_tokutei2') {
       d.t2Field = val('f-t2Field');
@@ -4575,7 +4817,7 @@ function _gjCompanyValidate() {
   var labels = root.querySelectorAll('.field label');
   for (var i = 0; i < labels.length; i++) {
     var lb = labels[i];
-    if (!lb.querySelector('span.req')) continue;
+    var _rq = lb.querySelector('span.req'); if (!_rq || _rq.style.display === 'none') continue;
     var fld = lb.parentNode;
     if (!fld || fld.offsetParent === null) continue; // 非表示ブロック
     var inp = fld.querySelector('input,select,textarea');
@@ -4615,6 +4857,50 @@ function _gjCompanyValidate() {
   return null;
 }
 
+// ver.20261009.01: 特定技能の企業フォーム（company / company_tokutei2）は基本すべて必須。
+//   表示中の「*」付き項目が空なら送信不可。「有」「あり」を選んだときだけ必要になる項目は条件付きで必須。
+//   追完用の項目しぼり込みリンク（fields=）ではこのチェックをしない（従来どおり）。
+function _tkCompanyValidate() {
+  var root = document.getElementById('formBody') || document;
+  var labels = root.querySelectorAll('.field label');
+  for (var i = 0; i < labels.length; i++) {
+    var lb = labels[i];
+    var _rq = lb.querySelector('span.req'); if (!_rq || _rq.style.display === 'none') continue;
+    var fld = lb.parentNode;
+    if (!fld || fld.offsetParent === null) continue;
+    var inp = fld.querySelector('input,select,textarea');
+    if (!inp || inp.offsetParent === null) continue;
+    if (!(inp.value || '').trim()) {
+      var name = lb.textContent.replace(/\*/g, '').trim();
+      try { inp.focus(); } catch(e) {}
+      return '「' + name + '」は必須です。';
+    }
+  }
+  if (!val('f-payCutoffMonth') || !val('f-payCutoffDay')) return '「締め日」は必須です。';
+  if (!val('f-payDayMonth') || !val('f-payDayDay')) return '「支払日」は必須です。';
+  var _vis = function(id){ var e = document.getElementById(id); return !!(e && e.offsetParent !== null); };
+  var _need = [
+    [val('f-salaryRaise') === '有',     'f-salaryRaiseCond',  '昇給 条件・時期（昇給「有」の場合）'],
+    [val('f-bonus') === '有',           'f-bonusCond',        '賞与 条件・時期（賞与「有」の場合）'],
+    [val('f-retirement') === '有',      'f-retirementDetail', '退職金 制度内容（退職金「有」の場合）'],
+    [val('f-shiftFlg') === 'あり',      'f-shiftDetail',      'シフトパターン詳細（交代制「あり」の場合）'],
+    [val('f-flexFlg') === '適用あり',   'f-flexDetail',       '変形労働時間制の詳細（変形労働「適用あり」の場合）']
+  ];
+  var _insL = { insKenpo:'健康保険', insPension:'厚生年金', insEmp:'雇用保険', insLabor:'労災保険' };
+  Object.keys(_insL).forEach(function(k){ _need.push([val('f-' + k) === 'その他', 'f-' + k + 'Other', _insL[k] + 'の「その他」の内容']); });
+  for (var j = 0; j < _need.length; j++) {
+    var c = _need[j];
+    if (c[0] && _vis(c[1]) && !val(c[1])) {
+      try { document.getElementById(c[1]).focus(); } catch(e) {}
+      return '「' + c[2] + '」は必須です。';
+    }
+  }
+  if (val('f-contractRenewal') === '更新する場合があり得る' && _vis('renewCondWrap') && !_tkRenewCondValue()) {
+    return '「更新の判断基準」を1つ以上選んでください（契約更新が「更新する場合があり得る」の場合）。';
+  }
+  return null;
+}
+
 // ver.20261006.02: 番号の桁数チェック（法人番号13桁・雇用保険適用事業所番号11桁・労働保険番号14桁）。空欄はここでは見ない
 var _CO_NUM_RULES = [
   {id:'f-coCorpNo',     label:'法人番号',             len:13},
@@ -4638,6 +4924,19 @@ function _coNumCheck(){
   return null;
 }
 function validate() {
+  if (typeof _tkTabsOn !== 'undefined' && _tkTabsOn) {
+    var _w = _tkWithAllTabs(_validateInner);
+    if (_w.r) {
+      var _t = _tkPaneOf(_w.act);
+      if (_t < 0) { var _f = (_reqEmptyFields() || [])[0]; _t = _tkPaneOf(_f); _w.act = _f; }
+      if (_t >= 0 && _t !== _tkTabCur) _tkShowTab(_t, false);
+      try { if (_w.act && _w.act.focus) { _w.act.scrollIntoView({behavior:'smooth', block:'center'}); _w.act.focus(); } } catch(e) {}
+    }
+    return _w.r;
+  }
+  return _validateInner();
+}
+function _validateInner() {
   // ver.20260822: 特定技能2号 企業フォームの誓約書チェック（分野別の必要人数）
   if (type === 'company_tokutei2' || type === 'tokutei2_pledge') {
     var _t2field = val('f-t2Field');
@@ -4683,6 +4982,10 @@ function validate() {
   }
     if (type === 'company_gijinkoku' || type === 'company_designated46') {
     return _gjCompanyValidate();
+  }
+    // ver.20261009.01: 特定技能の企業フォームは基本すべて必須（追完の項目しぼり込みリンクは除く）
+  if ((type === 'company' || type === 'company_tokutei2') && !(fieldsFilter && fieldsFilter.length)) {
+    var _tkErr = _tkCompanyValidate(); if (_tkErr) return _tkErr;
   }
     if (type === 'company' || type === 'company_tokutei2' || type === 'company_gijinkoku' || type === 'company_designated46' || type === 'company_designated9') {
     if (!val('f-coName')) return '会社名は必須です。';
@@ -5055,12 +5358,16 @@ function _reqT(key, n){
   else if(L && m.ja && L!=='fr') out+='<div style="font-size:11px;font-weight:400;margin-top:2px;opacity:.8;">'+String(m.ja).replace('{n}', n)+'</div>';
   return out;
 }
-// 表示中の「*」付き項目のうち、まだ入っていないもの
+// 表示中の「*」付き項目のうち、まだ入っていないもの（タブがあるときは全タブ分）
 function _reqEmptyFields(){
+  if (typeof _tkTabsOn !== 'undefined' && _tkTabsOn) { var w = _tkWithAllTabs(_reqEmptyFieldsRaw); _tkUpdateTabCounts(w.r); return w.r; }
+  return _reqEmptyFieldsRaw();
+}
+function _reqEmptyFieldsRaw(){
   var root=document.getElementById('formBody'); if(!root) return [];
   var out=[];
   root.querySelectorAll('.field label').forEach(function(lb){
-    if(!lb.querySelector('span.req')) return;
+    var _rq=lb.querySelector('span.req'); if(!_rq || _rq.style.display==='none') return;   // ver.20261009.01: 非表示の * は数えない
     var fld=lb.parentNode; if(!fld || fld.offsetParent===null) return;
     var inps=fld.querySelectorAll('input,select,textarea'); if(!inps.length) return;
     var vis=[].filter.call(inps, function(i){ return i.offsetParent!==null && i.type!=='hidden'; }); if(!vis.length) return;
@@ -5083,6 +5390,7 @@ function _updateReqRemain(){
 }
 function _reqJumpFirst(){
   var f=_reqEmptyFields()[0]; if(!f) return;
+  try { if (typeof _tkTabsOn !== 'undefined' && _tkTabsOn) { var _t=_tkPaneOf(f); if (_t >= 0 && _t !== _tkTabCur) _tkShowTab(_t, false); } } catch(e) {}
   try{ f.scrollIntoView({behavior:'smooth', block:'center'}); setTimeout(function(){ try{ f.focus(); }catch(e){} }, 400); }catch(e){}
 }
 document.addEventListener('input', function(){ _formDirty=true; _formSentClean=false; _updateReqRemain(); });
@@ -5204,6 +5512,7 @@ function confirmName(isMatch){
     document.getElementById('nameConfirmName').innerHTML = _escName;
   }
   document.getElementById('formBody').innerHTML = buildForm(type);
+  try { if (document.getElementById('officersWrap')) { _tkSetDefaults(); _tkLoadAcceptExp(); _tkBuildTabs(); } } catch(e) { console.error('tk init error:', e); }   // ver.20261009.02 / .03 タブ
   if (fieldsFilter && fieldsFilter.length && type === 'company') {
     applyFieldsFilter(fieldsFilter);
   }
@@ -5267,6 +5576,7 @@ function confirmName(isMatch){
           } catch (prefillErr) {
             console.error('prefillForm error (ignored to keep form usable):', prefillErr);
           }
+          try { _tkAfterPrefill(resp); } catch (tkErr) { console.error('tk prefill error (ignored):', tkErr); }   // ver.20261009.01
           // ver.20261005.01: 2号誓約書は「前回の修正」か「新しい申請として入力」を選べる（前回の回答は残す）
           try { if (type === 'tokutei2_pledge' && (isImported || isSubmitted)) _t2OfferNew(resp, row); } catch(_t2e){ console.error('t2 new offer error (ignored):', _t2e); }
         }
