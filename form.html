@@ -192,7 +192,9 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20261014.04'; // 「① 企業情報」だけの確認用リンク（part=1）。雇用条件・保険は出さず送らない
+var FORM_VERSION = 'ver.20261014.06'; // 就業場所を「＋」で2か所目以降も入力（office2Name〜）
+// var FORM_VERSION = 'ver.20261014.05'; // 昇給の下に「建設分野の場合の記載」の案内と入力ボタン
+// var FORM_VERSION = 'ver.20261014.04'; // 「① 企業情報」だけの確認用リンク（part=1）。雇用条件・保険は出さず送らない
 // var FORM_VERSION = 'ver.20261014.03'; // テスト版（ver.20261009.01〜04-test）の特定技能 企業フォーム改修を本番に反映（すべて必須・タブ分割・受入経験の自動判定・標準の内容 ほか）。住所は3欄のまま、「その他」は内容を別項目で送る、判断基準の「、」入り選択肢に対応、定期健康診断は実施月だけを雇用条件のプルダウンで選ぶ、契約開始日・終了日は聞かない
 // var FORM_VERSION = 'ver.20261014.02'; // ①の窓口を②と同じ並び（担当者名・英語）に。②のボタンは「①と同じ」だけ
 // ver.20261014.01: 企業フォーム：① 待遇の相違について説明を求める窓口を追加（代表者と同じ・①②と同じボタン）
@@ -2652,6 +2654,56 @@ function _tkRenewCondValue() {
   var o = val('f-contractRenewalCondOther'); if (o) arr.push(o);
   return arr.join('、');
 }
+// 就業場所の2か所目以降（f-office2Name … 最大10か所）
+function addOfficeRow(v) {
+  var wrap = document.getElementById('officeExtraRows'); if (!wrap) return;
+  var used = {}; wrap.querySelectorAll('.office-extra').forEach(function(r){ used[r.getAttribute('data-n')] = 1; });
+  var n = 2; while (used[n] && n <= 10) n++;
+  if (n > 10) { alert('就業場所は10か所まで入力できます'); return; }
+  var d = document.createElement('div');
+  d.className = 'office-extra'; d.setAttribute('data-n', n);
+  d.style.cssText = 'background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:10px 12px;margin:6px 0 10px;';
+  d.innerHTML = '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;"><span class="office-extra-title" style="font-size:12px;font-weight:800;color:#15803d;"></span>' +
+      '<button type="button" onclick="removeOfficeRow(this)" style="font-size:11px;padding:3px 10px;background:white;border:1px solid #fca5a5;color:#dc2626;border-radius:6px;cursor:pointer;">削除</button></div>' +
+    field('f-office' + n + 'Name','事業所名','text',true,'例: 株式会社〇〇 千葉工場') +
+    field('f-office' + n + 'NameEn','事業所名（英語）','text',true,'例: OO Co., Ltd. Chiba Factory') +
+    field('f-office' + n + 'Address','事業所住所','text',true,'例: 千葉県千葉市中央区1丁目2番3号') +
+    field('f-office' + n + 'Tel','事業所電話番号','text',true,'例: 043-123-4567');
+  wrap.appendChild(d);
+  if (v) ['Name','NameEn','Address','Tel'].forEach(function(k){ var e = document.getElementById('f-office' + n + k); if (e && v[k]) e.value = v[k]; });
+  _officeRenumber();
+  try { _updateReqRemain(); } catch(e) {}
+}
+function removeOfficeRow(btn) {
+  var r = btn.closest('.office-extra'); if (!r) return;
+  var has = [].some.call(r.querySelectorAll('input'), function(i){ return String(i.value || '').trim(); });
+  if (has && !confirm('この就業場所を削除しますか？')) return;
+  r.remove(); _officeRenumber();
+  try { _updateReqRemain(); } catch(e) {}
+}
+function _officeRenumber() {
+  document.querySelectorAll('#officeExtraRows .office-extra').forEach(function(r, i){ var t = r.querySelector('.office-extra-title'); if (t) t.textContent = '就業場所 ' + (i + 2); });
+}
+// 送信用：画面の並び順で office2〜 に詰めて入れる
+function _collectOfficeRows(d) {
+  var k = 2;
+  document.querySelectorAll('#officeExtraRows .office-extra').forEach(function(r){
+    var n = r.getAttribute('data-n'), g = function(x){ return val('f-office' + n + x); };
+    if (!g('Name') && !g('Address') && !g('NameEn') && !g('Tel')) return;
+    d['office' + k + 'Name'] = g('Name'); d['office' + k + 'NameEn'] = g('NameEn');
+    d['office' + k + 'Address'] = g('Address'); d['office' + k + 'Tel'] = g('Tel');
+    k++;
+  });
+}
+// 建設分野の昇給の記載を入れる（○月はお客様が入力）
+function _tkFillKensetsuRaise() {
+  var r = document.getElementById('f-salaryRaise'), c = document.getElementById('f-salaryRaiseCond');
+  if (r) { r.value = '有'; try { r.dispatchEvent(new Event('change', {bubbles:true})); } catch(e) {} }
+  if (c) {
+    c.value = '年1回○月に1,000円以上昇給。経験年数に基づき必ず実施し、技能習熟度および勤務態度を考慮する。';
+    try { c.dispatchEvent(new Event('input', {bubbles:true})); c.focus(); c.setSelectionRange(3, 4); } catch(e) {}
+  }
+}
 // 確認用リンク（part=1）：① 企業情報タブにない項目（雇用条件・保険など）は送らない（案シスの雇用条件を上書き・追加しない）
 function _tkPartTrim(d) {
   var pane = document.querySelector('.tk-pane[data-tab="0"]'); if (!pane) return;
@@ -2680,6 +2732,12 @@ function _tkHcMonths() {
 // 途中保存・送信済みの回答を開いたときの復元（その他・判断基準・旧選択肢）
 function _tkAfterPrefill(resp) {
   if (!document.getElementById('f-contractRenewalCondOther')) return;   // 特定技能の企業フォームのときだけ
+  if (document.getElementById('officeExtraRows') && !document.querySelector('#officeExtraRows .office-extra')) {   // 就業場所 2か所目以降
+    for (var _on = 2; _on <= 10; _on++) {
+      if (!resp['office' + _on + 'Name'] && !resp['office' + _on + 'Address']) continue;
+      addOfficeRow({ Name: resp['office' + _on + 'Name'], NameEn: resp['office' + _on + 'NameEn'], Address: resp['office' + _on + 'Address'], Tel: resp['office' + _on + 'Tel'] });
+    }
+  }
   String(resp.healthCheckM || '').split(/[,、，・\s]+/).map(function(m){
     m = String(m).replace(/[０-９]/g, function(c){ return String.fromCharCode(c.charCodeAt(0) - 0xFEE0); }).replace(/[^0-9]/g, '');
     return m ? String(parseInt(m, 10)) : '';
@@ -2758,6 +2816,9 @@ function buildCompanyForm() {
     field('f-officeNameEn','事業所名（英語）','text',true,'例: OO Co., Ltd. Itabashi Factory') +
     field('f-officeAddress','事業所住所','text',true,'例: 東京都板橋区板橋1丁目2番3号') +
     field('f-officeTel','事業所電話番号','text',true,'例: 03-9876-5432') +
+    // ver.20261014.06: 就業場所が2か所以上ある場合は「＋」で追加
+    '<div id="officeExtraRows"></div>' +
+    '<button type="button" id="addOfficeBtn" onclick="addOfficeRow()" style="font-size:12px;padding:6px 14px;background:white;border:1.5px dashed #86efac;border-radius:8px;color:#15803d;cursor:pointer;font-weight:700;">＋ 就業場所を追加（2か所目以降）</button>' +
   '</div>' +
 
   '<div class="card"><div class="section-title">代表者</div>' +
@@ -2857,6 +2918,13 @@ function buildCompanyForm() {
     '<div class="grid2">' +
       field('f-salaryRaise','昇給','select',true,'',null,['','有','無']) +
       field('f-salaryRaiseCond','昇給 条件・時期','text',true,'例: 毎年4月（査定による）') +
+    '</div>' +
+    // ver.20261014.05: 建設分野の場合の昇給の書き方（必要な記載）を案内
+    '<div style="font-size:11.5px;color:#9a3412;background:#fff7ed;border:1px solid #fed7aa;border-radius:8px;padding:8px 10px;margin:-4px 0 12px;line-height:1.7;">' +
+      '🏗️ <b>建設分野の場合、こちらの記載が必要となります</b><br>' +
+      '昇給：<b>有</b><br>' +
+      '昇給 条件・時期：<b>年1回○月に1,000円以上昇給。経験年数に基づき必ず実施し、技能習熟度および勤務態度を考慮する。</b>' +
+      '<div style="margin-top:6px;"><button type="button" onclick="_tkFillKensetsuRaise()" style="padding:5px 12px;background:white;color:#c2410c;border:1.5px solid #fdba74;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;">この内容を入れる（○月は入力してください）</button></div>' +
     '</div>' +
     '<div class="grid2">' +
       field('f-bonus','賞与','select',true,'',null,['','有','無']) +
@@ -4397,6 +4465,7 @@ function collectData() {
       });
       d.contractRenewalCond = (d.contractRenewal === '更新する場合があり得る') ? _tkRenewCondValue() : '';
       d.contractRenewalCondOther = val('f-contractRenewalCondOther');
+      _collectOfficeRows(d);   // ver.20261014.06: 就業場所 2か所目以降
       if (formPart) _tkPartTrim(d);
     }
         // ver.20260822: 特定技能2号の誓約書データ（企業フォーム）
