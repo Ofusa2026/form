@@ -192,7 +192,8 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20261015.02'; // 「居住費 適正額の説明」を削除（「住居（支援計画書用）」の「実費相当の説明」と重複のため） ／ ver.20261015.01: // 住居（支援計画書用）は居住費控除「有」のときだけ表示／③タブ名を「2号に関するヒアリング」に／2号の項目で止まったら③へ切り替え ／ ver.20261014.07: // ①＋②の確認用リンク（part=12：会社情報を入れて通常のフォームを開く）
+var FORM_VERSION = 'ver.20261015.03'; // 特定技能2号の確認用リンク：③だけ（part=3）・①②③すべて（part=123）を追加／①＋②（part=12）は③を出さない／①だけ（part=1）で隠れた③の入力チェックに止まっていたのを修正
+// var FORM_VERSION = 'ver.20261015.02'; // 「居住費 適正額の説明」を削除（「住居（支援計画書用）」の「実費相当の説明」と重複のため） ／ ver.20261015.01: // 住居（支援計画書用）は居住費控除「有」のときだけ表示／③タブ名を「2号に関するヒアリング」に／2号の項目で止まったら③へ切り替え ／ ver.20261014.07: // ①＋②の確認用リンク（part=12：会社情報を入れて通常のフォームを開く）
 // var FORM_VERSION = 'ver.20261014.06'; // 就業場所を「＋」で2か所目以降も入力（office2Name〜）
 // var FORM_VERSION = 'ver.20261014.05'; // 昇給の下に「建設分野の場合の記載」の案内と入力ボタン
 // var FORM_VERSION = 'ver.20261014.04'; // 「① 企業情報」だけの確認用リンク（part=1）。雇用条件・保険は出さず送らない
@@ -241,7 +242,15 @@ var fieldsFilter = params.get('fields') ? params.get('fields').split(',').map(fu
 // ver.20261014.04: part=1 →「① 企業情報」タブだけの確認用リンク（特定技能の企業フォーム）
 var formPart = (params.get('part') === '1') ? 1 : 0;
 // ver.20261014.07: part=12 →「① 企業情報」＋「② 雇用条件」の確認用リンク（通常のフォームに、案シスの会社情報を入れて開く）
-var formPartAll = (params.get('part') === '12') ? 1 : 0;
+var formPartAll = (params.get('part') === '12' || params.get('part') === '123') ? 1 : 0;   // ver.20261015.03: part=123 は①②③すべて
+// ver.20261015.03: 特定技能2号の企業フォーム
+//   part=3   →「③ 2号に関するヒアリング」だけ（会社情報・雇用条件は出さず送らない。③だけの回答として別に保存）
+//   part=12  →「① 企業情報」＋「② 雇用条件」（③は出さない。前の回答の③はそのまま残して送る）
+var formPart3 = (params.get('part') === '3' && type === 'company_tokutei2') ? 1 : 0;
+var formNo3 = (params.get('part') === '12' && type === 'company_tokutei2') ? 1 : 0;
+var FORM_PART3_NAME = '2号に関するヒアリング';
+// 確認用リンクで出すタブ（0:① 1:② 2:③）
+function _tkTabOk(i) { if (formPart) return i === 0; if (formPart3) return i === 2; if (formNo3) return i !== 2; return true; }
 // ver.20260812: 介護分野判定（URLパラメータ ?field=介護 で指定）
 var applicantField = params.get('field') || '';
 // ver.20260910: 推薦票の大房対応（suisen=self）のときだけ、ベトナム技能実習生の追加情報を表示（大房が推薦票を用意するため申請人に本国情報を聞く。旧仕様は企業対応で出しており逆だった）
@@ -2548,6 +2557,21 @@ function _tkBuildTabs() {
   _tkTabsOn = true;
   _tkShowTab(0, false);
   if (formPart) _tkApplyPart();
+  else if (formPart3 || formNo3) _tkApplyPartTabs();   // ver.20261015.03
+}
+// ver.20261015.03: ③だけ（part=3）／①＋②で③を出さない（part=12・2号）
+function _tkApplyPartTabs() {
+  if (formPart3) {
+    var bar = document.getElementById('tkTabBar'); if (bar) bar.style.display = 'none';
+    _tkShowTab(2, false);
+    _tkPartInfo();
+    return;
+  }
+  // formNo3：③のタブと「③ へ進む」ボタンを消す
+  var b3 = document.querySelector('.tk-tab[data-tab="2"]'); if (b3) b3.remove();
+  var p2 = document.querySelector('.tk-pane[data-tab="1"]');
+  var last = p2 ? p2.lastElementChild : null; if (last && last.tagName === 'BUTTON') last.remove();
+  var p3 = document.querySelector('.tk-pane[data-tab="2"]'); if (p3) p3.style.display = 'none';
 }
 // ver.20261014.04: 確認用リンク（part=1）—「① 企業情報」だけを出す。雇用条件（②以降）と保険は出さない・送らない
 function _tkApplyPart() {
@@ -2561,10 +2585,14 @@ function _tkApplyPart() {
   _tkPartInfo();
 }
 function _tkPartInfo() {
-  if (!formPart) return;
+  if (!formPart && !formPart3) return;
   var el = document.getElementById('infoBox'); if (!el) return;
   var nm = String(caseName || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
   el.style.background = '#eef2ff'; el.style.borderColor = '#a5b4fc'; el.style.color = '#3730a3';
+  if (formPart3) {   // ver.20261015.03
+    el.innerHTML = (nm ? '<span class="case-name">' + nm + '</span>' : '') + '📝 <b>２号に関するヒアリング</b>：２号特定技能外国人の業務内容をご入力のうえ、送信してください。前にご回答いただいた内容がある場合は、入力した状態で開いています。<b>違うところだけ</b>直してください。';
+    return;
+  }
   el.innerHTML = (nm ? '<span class="case-name">' + nm + '</span>' : '') + '🏢 <b>企業情報のご確認</b>：登録済みの内容を入力しています。<b>違うところだけ</b>直して、送信してください。';
 }
 function _tkShowTab(ix, scroll) {
@@ -2581,7 +2609,7 @@ function _tkShowTab(ix, scroll) {
 function _tkWithAllTabs(fn) {
   if (!_tkTabsOn) return fn();
   var panes = document.querySelectorAll('.tk-pane');
-  panes.forEach(function(pn){ if (!formPart || +pn.getAttribute('data-tab') === 0) pn.style.display = ''; });
+  panes.forEach(function(pn){ if (_tkTabOk(+pn.getAttribute('data-tab'))) pn.style.display = ''; });   // ver.20261015.03
   var r, act = null;
   try { r = fn(); act = document.activeElement; }
   finally { panes.forEach(function(pn){ pn.style.display = (+pn.getAttribute('data-tab') === _tkTabCur) ? '' : 'none'; }); }
@@ -2726,6 +2754,14 @@ function _tkPartTrim(d) {
     delete d[k];
   });
   d.formPart = '企業情報';
+}
+// ver.20261015.03: ③だけの確認用リンク（part=3）：③のタブの項目と2号の項目（t2〜）だけ送る（会社情報・雇用条件を上書きしない）
+function _tkPart3Trim(d) {
+  var pane = document.querySelector('.tk-pane[data-tab="2"]');
+  var keep = {};
+  if (pane) pane.querySelectorAll('input[id^="f-"],select[id^="f-"],textarea[id^="f-"]').forEach(function(el){ keep[el.id.slice(2)] = 1; });
+  Object.keys(d).forEach(function(k){ if (keep[k] || /^t2/.test(k)) return; delete d[k]; });
+  d.formPart = FORM_PART3_NAME;
 }
 // 定期健康診断の実施月（選んだ月の番号。1回目→2回目の順、同じ月は1つに）
 function _tkHcMonths() {
@@ -4495,6 +4531,8 @@ function collectData() {
       });
       d.t2Targets = _t2targets;
     }
+    if (formPart) _tkPartTrim(d);    // ver.20261015.03: ①だけは2号の項目も送らない
+    if (formPart3) _tkPart3Trim(d);  // ver.20261015.03: ③だけは③の項目だけ送る
     return d;
   }
 
@@ -4992,7 +5030,7 @@ function _tkCompanyValidate() {
       return '「' + name + '」は必須です。';
     }
   }
-  if (!formPart) {   // 確認用リンク（part=1）は雇用条件を聞かない
+  if (!formPart && !formPart3) {   // 確認用リンク（part=1／③だけ part=3）は雇用条件を聞かない
     if (!val('f-payCutoffMonth') || !val('f-payCutoffDay')) return '「締め日」は必須です。';
     if (!val('f-payDayMonth') || !val('f-payDayDay')) return '「支払日」は必須です。';
   }
@@ -5061,7 +5099,8 @@ function validate() {
 }
 function _validateInner() {
   // ver.20260822: 特定技能2号 企業フォームの誓約書チェック（分野別の必要人数）
-  if (type === 'company_tokutei2' || type === 'tokutei2_pledge') {
+  // ver.20261015.03: ③を出さない確認用リンク（①だけ part=1／①＋② part=12）では2号の入力チェックをしない
+  if ((type === 'company_tokutei2' && !formPart && !formNo3) || type === 'tokutei2_pledge') {
     var _t2field = val('f-t2Field');
     if (!_t2field) {
       return '特定産業分野を選んでください。';
@@ -5109,6 +5148,7 @@ function _validateInner() {
     // ver.20261009.01: 特定技能の企業フォームは基本すべて必須（追完の項目しぼり込みリンクは除く）
   if ((type === 'company' || type === 'company_tokutei2') && !(fieldsFilter && fieldsFilter.length)) {
     var _tkErr = _tkCompanyValidate(); if (_tkErr) return _tkErr;
+    if (formPart3) return null;   // ver.20261015.03: ③だけ（会社名・役員のふりがなは聞いていない）
   }
     if (type === 'company' || type === 'company_tokutei2' || type === 'company_gijinkoku' || type === 'company_designated46' || type === 'company_designated9') {
     if (!val('f-coName')) return '会社名は必須です。';
@@ -5436,7 +5476,8 @@ async function saveDraft(auto) {
             + '&type=' + encodeURIComponent(type)
             + (caseName ? '&name=' + encodeURIComponent(caseName) : '')
             + '&response_id=' + encodeURIComponent(_draftResponseId)
-            + (currentLang ? '&lang=' + encodeURIComponent(currentLang) : '');
+            + (currentLang ? '&lang=' + encodeURIComponent(currentLang) : '')
+            + ((formPart || formPart3 || formPartAll) ? '&part=' + encodeURIComponent(params.get('part')) : '');   // ver.20261015.03: 確認用リンクは開き直しても同じ項目だけ
           history.replaceState(null, '', newUrl);
         }
       } catch(_) {}
@@ -5673,10 +5714,13 @@ function confirmName(isMatch){
         // ver.20261014.04: 確認用リンク（part=1）では、送信済み・取込済みの回答や雇用条件まで入った下書きは上書きしない
         //   （内容は表示に使うだけで、保存・送信は新しい回答として別に作る）
         if (formPart && (isImported || isSubmitted || !(row.response && (row.response.formPart || !(row.response.salaryType || row.response.officeName || row.response.startTime))))) _draftResponseId = '';
+        if (formPart3) _draftResponseId = '';   // ver.20261015.03: ③だけ：前の回答は表示に使うだけ（保存・送信は③だけの回答として別に作る）
         var infoEl = document.getElementById('infoBox');
         var btnEl = document.getElementById('btn-submit');
         var draftBtn = document.getElementById('btn-draft');
-        if (isImported || isSubmitted) {
+        if (formPart3) {
+          // ver.20261015.03: ③だけの確認用リンクは「送信済み」の表示・ボタンにしない（案内は _tkPartInfo）
+        } else if (isImported || isSubmitted) {
           if (infoEl) {
             infoEl.style.background = '#dcfce7';
             infoEl.style.borderColor = '#86efac';
@@ -5738,11 +5782,27 @@ function confirmName(isMatch){
             try { prefillForm(m.response); } catch(e){ console.error('company prefill error (ignored):', e); }
             try { _tkAfterPrefill(m.response); } catch(e){}
           }
-          _draftResponseId = (m && m.id) ? String(m.id) : '';
+          _draftResponseId = (m && m.id && !(m.response && m.response.formPart === FORM_PART3_NAME)) ? String(m.id) : '';   // ver.20261015.03: ③だけの回答には上書きしない
           try { _tkApplyToggles(); } catch(e){}
           try { _tkPartInfo(); _updateReqRemain(); } catch(e){}
         })
         .catch(function(e){ console.error('company prefill fetch error (ignored):', e); });
+    } else if (formPart3) {
+      // ver.20261015.03: ③だけ（part=3）：③だけで保存した回答（未取込）があればそれを、なければ前の回答の③を入れて開く
+      callRpc('form_prefill_company', { p_case_id: caseId, p_form_type: type })
+        .then(function(r){ return r.ok ? r.json() : null; })
+        .then(function(m){
+          if (m && m.id && m.response && typeof m.response === 'object' && m.response.formPart === FORM_PART3_NAME) {
+            try { prefillForm(m.response); } catch(e){ console.error('part3 prefill error (ignored):', e); }
+            try { _tkAfterPrefill(m.response); } catch(e){}
+            _draftResponseId = String(m.id);
+            try { _tkApplyToggles(); } catch(e){}
+            try { _tkPartInfo(); _updateReqRemain(); } catch(e){}
+            return;
+          }
+          _runSavedLoad();
+        })
+        .catch(function(e){ console.error('part3 prefill fetch error (ignored):', e); _runSavedLoad(); });
     } else if (formPartAll && (type === 'company' || type === 'company_tokutei2')) {
       // ver.20261014.07: ①＋②の確認用リンク（part=12）：会社マスタを入れてから、通常どおり保存済みの回答を重ねる
       callRpc('form_prefill_company', { p_case_id: caseId, p_form_type: type })
@@ -5755,7 +5815,7 @@ function confirmName(isMatch){
             if (el) {
               var nm = String(caseName || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
               el.style.background = '#eef2ff'; el.style.borderColor = '#a5b4fc'; el.style.color = '#3730a3';
-              el.innerHTML = (nm ? '<span class="case-name">' + nm + '</span>' : '') + '🏢 <b>登録済みの会社情報を入力しています</b>。「① 企業情報」は違うところだけ直し、「② 雇用条件」をご入力のうえ送信してください。';
+              el.innerHTML = (nm ? '<span class="case-name">' + nm + '</span>' : '') + '🏢 <b>登録済みの会社情報を入力しています</b>。「① 企業情報」は違うところだけ直し、「② 雇用条件」' + ((type === 'company_tokutei2' && !formNo3) ? '「③ 2号に関するヒアリング」' : '') + 'をご入力のうえ送信してください。';
             }
           }
         })
