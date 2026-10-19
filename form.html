@@ -192,7 +192,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20261019.01'; // 特定技能1号の企業フォームに【自社支援】支援体制・【自社支援】担当者・その他タブを追加（案件の登録支援機関なし＝自社支援のときだけ表示。登録支援機関フォームと同じ部品・同じ送信キー selfSupport ＋ 選任の根拠：①1-11-2号／②1-11-3号・1-20号・1-22号） ／ ver.20261015.04: // 定期健康診断の下に「自己都合退職は何日前までに申し出るか（日）」を追加（必須・初期値30日） ／ ver.20261015.03: // 特定技能2号の確認用リンク：③だけ（part=3）・①②③すべて（part=123）を追加／①＋②（part=12）は③を出さない／①だけ（part=1）で隠れた③の入力チェックに止まっていたのを修正
+var FORM_VERSION = 'ver.20261019.02'; // 在日親族に「生年月日」「国籍」を追加（送信 familyMembers[].birth / nationality）・途中保存した在日親族を開き直したときに戻すように ／ ver.20261019.01: 特定技能1号の企業フォームに【自社支援】支援体制・【自社支援】担当者・その他タブを追加（案件の登録支援機関なし＝自社支援のときだけ表示。登録支援機関フォームと同じ部品・同じ送信キー selfSupport ＋ 選任の根拠：①1-11-2号／②1-11-3号・1-20号・1-22号） ／ ver.20261015.04: // 定期健康診断の下に「自己都合退職は何日前までに申し出るか（日）」を追加（必須・初期値30日） ／ ver.20261015.03: // 特定技能2号の確認用リンク：③だけ（part=3）・①②③すべて（part=123）を追加／①＋②（part=12）は③を出さない／①だけ（part=1）で隠れた③の入力チェックに止まっていたのを修正
 // var FORM_VERSION = 'ver.20261015.02'; // 「居住費 適正額の説明」を削除（「住居（支援計画書用）」の「実費相当の説明」と重複のため） ／ ver.20261015.01: // 住居（支援計画書用）は居住費控除「有」のときだけ表示／③タブ名を「2号に関するヒアリング」に／2号の項目で止まったら③へ切り替え ／ ver.20261014.07: // ①＋②の確認用リンク（part=12：会社情報を入れて通常のフォームを開く）
 // var FORM_VERSION = 'ver.20261014.06'; // 就業場所を「＋」で2か所目以降も入力（office2Name〜）
 // var FORM_VERSION = 'ver.20261014.05'; // 昇給の下に「建設分野の場合の記載」の案内と入力ボタン
@@ -303,7 +303,7 @@ var TRANS = {
     hasFamily:'Do you have family in Japan?',
     familyName:'Full Name', familyRelation:'Relationship / Relation', familyResidenceCard:'Family Member\'s Residence Card No.',
     familyWorkplace:'Family Member\'s Workplace', familyLiveTogether:'Do you live together?',
-    familyAddress:'Family Member\'s Address',
+    familyAddress:'Family Member\'s Address', familyBirth:'Family Member\'s Date of Birth', familyNationality:'Family Member\'s Nationality',
     tenshutsuDate:'Date of submitting change of address notification',tenshutsuTitle:'/ Change of Address',tenshutsuNote:'※ Only if you have a planned move'
   },
   vi: {
@@ -340,7 +340,7 @@ var TRANS = {
     hasFamily:'Bạn có người thân ở Nhật không?',
     familyName:'Họ và tên', familyRelation:'Quan hệ', familyResidenceCard:'Số thẻ cư trú của người thân',
     familyWorkplace:'Nơi làm việc của người thân', familyLiveTogether:'Bạn có sống chung không?',
-    familyAddress:'Địa chỉ của người thân',
+    familyAddress:'Địa chỉ của người thân', familyBirth:'Ngày sinh của người thân', familyNationality:'Quốc tịch của người thân',
     tenshutsuDate:'Ngày nộp thông báo thay đổi địa chỉ',tenshutsuTitle:'/ Thay đổi địa chỉ',tenshutsuNote:'※ Chỉ khi có kế hoạch chuyển nhà'
   },
   id: {
@@ -376,7 +376,7 @@ var TRANS = {
     hasFamily:'Apakah Anda memiliki keluarga di Jepang?',
     familyName:'Nama Lengkap', familyRelation:'Hubungan', familyResidenceCard:'No. Kartu Izin Tinggal anggota keluarga',
     familyWorkplace:'Tempat kerja anggota keluarga', familyLiveTogether:'Apakah tinggal bersama?',
-    familyAddress:'Alamat anggota keluarga',
+    familyAddress:'Alamat anggota keluarga', familyBirth:'Tanggal lahir anggota keluarga', familyNationality:'Kewarganegaraan anggota keluarga',
     tenshutsuDate:'Tanggal pelaporan pindah alamat',tenshutsuTitle:'/ Pindah Alamat',tenshutsuNote:'※ Hanya jika ada rencana pindah'
   },
   my: {
@@ -411,7 +411,7 @@ var TRANS = {
     hasFamily:'ဂျပန်တွင် မိသားစုရှိပါသလား？',
     familyName:'အမည်အပြည့်အစုံ', familyRelation:'ဆက်ဆံရေး', familyResidenceCard:'မိသားစုဝင် နေထိုင်ခွင့်ကတ်နံပါတ်',
     familyWorkplace:'မိသားစုဝင် အလုပ်ခွင်', familyLiveTogether:'အတူနေထိုင်ပါသလား？',
-    familyAddress:'မိသားစုဝင် လိပ်စာ',
+    familyAddress:'မိသားစုဝင် လိပ်စာ', familyBirth:'မိသားစုဝင် မွေးသက္ကရာဇ်', familyNationality:'မိသားစုဝင် နိုင်ငံသား',
     tenshutsuDate:'နေရပ်ပြောင်းရွှေ့ကြောင်း အကြောင်းကြားစာ တင်သွင်းမည့်ရက်',tenshutsuTitle:'/ နေရာပြောင်းရွှေ့မှု',tenshutsuNote:'※ ပြောင်းရွှေ့ရန် စီစဉ်ထားပါက သာ'
   },
   km: {
@@ -446,7 +446,7 @@ var TRANS = {
     hasFamily:'តើអ្នកមានក្រុមគ្រួសារនៅជប៉ុនទេ？',
     familyName:'ឈ្មោះពេញ', familyRelation:'ទំនាក់ទំនង', familyResidenceCard:'លេខកាតស្នាក់នៅរបស់សមាជិកគ្រួសារ',
     familyWorkplace:'កន្លែងធ្វើការរបស់សមាជិកគ្រួសារ', familyLiveTogether:'តើរស់នៅជាមួយគ្នាទេ？',
-    familyAddress:'អាសយដ្ឋានរបស់សមាជិកគ្រួសារ',
+    familyAddress:'អាសយដ្ឋានរបស់សមាជិកគ្រួសារ', familyBirth:'ថ្ងៃខែឆ្នាំកំណើតរបស់សមាជិកគ្រួសារ', familyNationality:'សញ្ជាតិរបស់សមាជិកគ្រួសារ',
     tenshutsuDate:'ថ្ងៃដាក់លិខិតជូនដំណឹងផ្លាស់ប្តូរអាសយដ្ឋាន',tenshutsuTitle:'/ ផ្លាស់ប្តូរអាសយដ្ឋាន',tenshutsuNote:'※ តែក្នុងករណីមានផែនការ引越しប៉ុណ្ណោះ'
   },
   ne: {
@@ -481,7 +481,7 @@ var TRANS = {
     hasFamily:'के तपाईंका परिवारजन जापानमा छन्？',
     familyName:'पूरा नाम', familyRelation:'नाता', familyResidenceCard:'परिवारको बसोबास कार्ड नम्बर',
     familyWorkplace:'परिवारको कार्यस्थल', familyLiveTogether:'के सँगै बस्नुहुन्छ？',
-    familyAddress:'परिवारको ठेगाना',
+    familyAddress:'परिवारको ठेगाना', familyBirth:'परिवारको जन्म मिति', familyNationality:'परिवारको राष्ट्रियता',
     tenshutsuDate:'ठेगाना परिवर्तन सूचना दिने मिति',tenshutsuTitle:'/ ठेगाना परिवर्तन',tenshutsuNote:'※ सर्ने योजना भएमा मात्र'
   },
   zh: {
@@ -516,7 +516,7 @@ var TRANS = {
     hasFamily:'在日本是否有家属？',
     familyName:'姓名', familyRelation:'关系', familyResidenceCard:'家属居留卡号码',
     familyWorkplace:'家属工作单位', familyLiveTogether:'是否同住？',
-    familyAddress:'家属地址',
+    familyAddress:'家属地址', familyBirth:'家属出生日期', familyNationality:'家属国籍',
     tenshutsuDate:'迁出申报日期',tenshutsuTitle:'/ 迁出申报',tenshutsuNote:'※ 仅在有搬家计划时填写'
   }
 };
@@ -4634,6 +4634,8 @@ function toggleFamilyAddress(idx, val) {
   if (el) el.style.display = (val === 'no') ? 'block' : 'none';
 }
 
+var FAMILY_NAT_LIST = ['','ベトナム','インドネシア','ミャンマー','カンボジア','ネパール','フィリピン','中国','タイ','モンゴル','日本','その他'];   // ver.20261019.02
+function toggleFamilyNatOther(idx, v) { var e = document.getElementById('f-family' + idx + 'NationalityOther'); if (e) e.style.display = (v === 'その他') ? 'block' : 'none'; }
 function familyMemberRow(idx) {
   var h = '<div class="officer-row" id="familyRow' + idx + '" data-fidx="' + idx + '" style="margin-bottom:12px;">';
   h += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">';
@@ -4643,6 +4645,13 @@ function familyMemberRow(idx) {
   h += '<div class="grid2">';
   h += '<div class="field"><label>氏名（しめい） / Full Name<div class="trans" data-key="familyName"></div></label><input type="text" id="f-family' + idx + 'Name" placeholder="例: NGUYEN VAN A"></div>';
   h += '<div class="field"><label>続柄（つづきがら） / Relation<div class="trans" data-key="familyRelation"></div></label><input type="text" id="f-family' + idx + 'Relation" placeholder="例: 配偶者 / Spouse"></div>';
+  h += '</div>';
+  // ver.20261019.02: 在日親族の生年月日・国籍（在留申請書の「在日親族」欄）
+  h += '<div class="grid2">';
+  h += '<div class="field"><label>家族の生年月日（かぞくのせいねんがっぴ）<div class="trans" data-key="familyBirth"></div></label><input type="date" id="f-family' + idx + 'Birth"></div>';
+  h += '<div class="field"><label>家族の国籍（かぞくのこくせき）<div class="trans" data-key="familyNationality"></div></label><select id="f-family' + idx + 'Nationality" onchange="toggleFamilyNatOther(' + idx + ', this.value)">';
+  FAMILY_NAT_LIST.forEach(function(o){ h += '<option value="' + o + '">' + (o === '' ? '---' : o) + '</option>'; });
+  h += '</select><input type="text" id="f-family' + idx + 'NationalityOther" placeholder="国籍を入力 / Enter nationality" style="display:none;margin-top:8px;"></div>';
   h += '</div>';
   h += '<div class="grid2">';
   h += '<div class="field"><label>家族の在留カード番号（かぞくのざいりゅうカードばんごう）<div class="trans" data-key="familyResidenceCard"></div></label><input type="text" id="f-family' + idx + 'ResidenceCard" placeholder="例: AB12345678CD"></div>';
@@ -4667,6 +4676,11 @@ function addFamilyMember() {
   var div = document.createElement('div');
   div.innerHTML = familyMemberRow(_familyCount);
   document.getElementById('familyMembersContainer').appendChild(div.firstChild);
+  _familyTrans();   // ver.20261019.02: 追加した行にも訳を付ける
+}
+function _familyTrans() {
+  var dict = (typeof TRANS !== 'undefined' && TRANS[currentLang]) || {};
+  document.querySelectorAll('#familyMembersContainer .trans[data-key]').forEach(function(el){ var t = dict[el.getAttribute('data-key')] || ''; el.textContent = t; el.classList.toggle('show', !!t); });
 }
 function removeFamilyMember(idx) {
   var el = document.getElementById('familyRow' + idx);
@@ -5198,6 +5212,8 @@ function collectData() {
       var member = {
         name:          val('f-family' + i + 'Name'),
         relation:      val('f-family' + i + 'Relation'),
+        birth:         val('f-family' + i + 'Birth'),   // ver.20261019.02: 生年月日（YYYY-MM-DD）
+        nationality:   (val('f-family' + i + 'Nationality') === 'その他') ? (val('f-family' + i + 'NationalityOther') || 'その他') : val('f-family' + i + 'Nationality'),   // ver.20261019.02: 国籍
         residenceCard: val('f-family' + i + 'ResidenceCard'),
         workplace:     val('f-family' + i + 'Workplace'),
         liveTogether:  val('f-family' + i + 'LiveTogether'),
@@ -6221,8 +6237,32 @@ function confirmName(isMatch){
   }
 })();
 
+// ver.20261019.02: 在日親族（hasFamily・familyMembers）を保存済みの回答から戻す
+function _familyRestore(resp) {
+  var hf = document.getElementById('f-hasFamily'); if (!hf || !resp) return;
+  if (resp.hasFamily) { hf.value = resp.hasFamily; if (typeof toggleFamilyBlock === 'function') toggleFamilyBlock(resp.hasFamily); }
+  var arr = Array.isArray(resp.familyMembers) ? resp.familyMembers : [];
+  if (!arr.length) return;
+  var cont = document.getElementById('familyMembersContainer'); if (!cont) return;
+  cont.innerHTML = ''; _familyCount = 0;
+  arr.forEach(function(m){
+    m = m || {}; _familyCount++;
+    var i = _familyCount, tmp = document.createElement('div'); tmp.innerHTML = familyMemberRow(i); cont.appendChild(tmp.firstChild);
+    var set = function(k, v){ var e = document.getElementById('f-family' + i + k); if (e && v != null && v !== '') e.value = v; };
+    set('Name', m.name); set('Relation', m.relation); set('Birth', m.birth); set('ResidenceCard', m.residenceCard);
+    set('Workplace', m.workplace); set('LiveTogether', m.liveTogether); set('Address', m.address);
+    if (m.nationality) {
+      if (FAMILY_NAT_LIST.indexOf(m.nationality) >= 0) set('Nationality', m.nationality);
+      else { set('Nationality', 'その他'); set('NationalityOther', m.nationality); }
+      toggleFamilyNatOther(i, document.getElementById('f-family' + i + 'Nationality').value);
+    }
+    toggleFamilyAddress(i, m.liveTogether || '');
+  });
+  _familyTrans();
+}
 function prefillForm(resp) {
   if (type === 'support_org') { _soFormPrefill(resp); return; }
+  try { _familyRestore(resp); } catch (_fre) { console.error('family prefill error (ignored):', _fre); }
   // ver.20261014.04: 企業フォームの町名番地（address）は f-coAddress に入れる／役員が4人以上なら欄を足してから入れる
   try {
     if (resp.address && !resp.address_co && !document.getElementById('f-address') && document.getElementById('f-coAddress')) resp.address_co = resp.address;
