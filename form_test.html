@@ -193,7 +193,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20261019.03-test'; // 在日親族に「生年月日」「国籍」を追加・在日親族を開き直したときに戻すように ／ ver.20261019.02-test: 選任の根拠を全文が見える選択肢に ／ ver.20261019.01-test: // 特定技能1号の企業フォームに【自社支援】支援体制・【自社支援】担当者・その他タブを追加（登録支援機関フォームと同じ部品＋選任の根拠） ／ 本番 ver.20261015.04 ベース: // 定期健康診断の下に「自己都合退職は何日前までに申し出るか（日）」を追加（必須・初期値30日） ／ ver.20261015.03: // 特定技能2号の確認用リンク：③だけ（part=3）・①②③すべて（part=123）を追加／①＋②（part=12）は③を出さない／①だけ（part=1）で隠れた③の入力チェックに止まっていたのを修正
+var FORM_VERSION = 'ver.20261020.01-test'; // 在日親族：入れ始めた行は全項目必須 ／ ver.20261019.03-test: 在日親族に「生年月日」「国籍」を追加・在日親族を開き直したときに戻すように ／ ver.20261019.02-test: 選任の根拠を全文が見える選択肢に ／ ver.20261019.01-test: // 特定技能1号の企業フォームに【自社支援】支援体制・【自社支援】担当者・その他タブを追加（登録支援機関フォームと同じ部品＋選任の根拠） ／ 本番 ver.20261015.04 ベース: // 定期健康診断の下に「自己都合退職は何日前までに申し出るか（日）」を追加（必須・初期値30日） ／ ver.20261015.03: // 特定技能2号の確認用リンク：③だけ（part=3）・①②③すべて（part=123）を追加／①＋②（part=12）は③を出さない／①だけ（part=1）で隠れた③の入力チェックに止まっていたのを修正
 // var FORM_VERSION = 'ver.20261015.02'; // 「居住費 適正額の説明」を削除（「住居（支援計画書用）」の「実費相当の説明」と重複のため） ／ ver.20261015.01: // 住居（支援計画書用）は居住費控除「有」のときだけ表示／③タブ名を「2号に関するヒアリング」に／2号の項目で止まったら③へ切り替え ／ ver.20261014.07: // ①＋②の確認用リンク（part=12：会社情報を入れて通常のフォームを開く）
 // var FORM_VERSION = 'ver.20261014.06'; // 就業場所を「＋」で2か所目以降も入力（office2Name〜）
 // var FORM_VERSION = 'ver.20261014.05'; // 昇給の下に「建設分野の場合の記載」の案内と入力ボタン
@@ -4644,33 +4644,71 @@ function familyMemberRow(idx) {
   if (idx > 1) h += '<button type="button" onclick="removeFamilyMember(' + idx + ')" style="font-size:11px;padding:2px 8px;background:white;border:1px solid #fca5a5;border-radius:4px;color:#dc2626;cursor:pointer;">削除</button>';
   h += '</div>';
   h += '<div class="grid2">';
-  h += '<div class="field"><label>氏名（しめい） / Full Name<div class="trans" data-key="familyName"></div></label><input type="text" id="f-family' + idx + 'Name" placeholder="例: NGUYEN VAN A"></div>';
-  h += '<div class="field"><label>続柄（つづきがら） / Relation<div class="trans" data-key="familyRelation"></div></label><input type="text" id="f-family' + idx + 'Relation" placeholder="例: 配偶者 / Spouse"></div>';
+  h += '<div class="field"><label>氏名（しめい） / Full Name<span class="req fam-req" style="display:none;">*</span><div class="trans" data-key="familyName"></div></label><input type="text" id="f-family' + idx + 'Name" placeholder="例: NGUYEN VAN A"></div>';
+  h += '<div class="field"><label>続柄（つづきがら） / Relation<span class="req fam-req" style="display:none;">*</span><div class="trans" data-key="familyRelation"></div></label><input type="text" id="f-family' + idx + 'Relation" placeholder="例: 配偶者 / Spouse"></div>';
   h += '</div>';
   // ver.20261019.02: 在日親族の生年月日・国籍（在留申請書の「在日親族」欄）
   h += '<div class="grid2">';
-  h += '<div class="field"><label>家族の生年月日（かぞくのせいねんがっぴ）<div class="trans" data-key="familyBirth"></div></label><input type="date" id="f-family' + idx + 'Birth"></div>';
-  h += '<div class="field"><label>家族の国籍（かぞくのこくせき）<div class="trans" data-key="familyNationality"></div></label><select id="f-family' + idx + 'Nationality" onchange="toggleFamilyNatOther(' + idx + ', this.value)">';
+  h += '<div class="field"><label>家族の生年月日（かぞくのせいねんがっぴ）<span class="req fam-req" style="display:none;">*</span><div class="trans" data-key="familyBirth"></div></label><input type="date" id="f-family' + idx + 'Birth"></div>';
+  h += '<div class="field"><label>家族の国籍（かぞくのこくせき）<span class="req fam-req" style="display:none;">*</span><div class="trans" data-key="familyNationality"></div></label><select id="f-family' + idx + 'Nationality" onchange="toggleFamilyNatOther(' + idx + ', this.value)">';
   FAMILY_NAT_LIST.forEach(function(o){ h += '<option value="' + o + '">' + (o === '' ? '---' : o) + '</option>'; });
   h += '</select><input type="text" id="f-family' + idx + 'NationalityOther" placeholder="国籍を入力 / Enter nationality" style="display:none;margin-top:8px;"></div>';
   h += '</div>';
   h += '<div class="grid2">';
-  h += '<div class="field"><label>家族の在留カード番号（かぞくのざいりゅうカードばんごう）<div class="trans" data-key="familyResidenceCard"></div></label><input type="text" id="f-family' + idx + 'ResidenceCard" placeholder="例: AB12345678CD"></div>';
+  h += '<div class="field"><label>家族の在留カード番号（かぞくのざいりゅうカードばんごう）<span class="req fam-req fam-req-card" style="display:none;">*</span><div class="trans" data-key="familyResidenceCard"></div></label><input type="text" id="f-family' + idx + 'ResidenceCard" placeholder="例: AB12345678CD"></div>';
   h += '</div>';
-  h += '<div class="field"><label>家族が働いている会社（かぞくがはたらいているかいしゃ）<div class="trans" data-key="familyWorkplace"></div></label><input type="text" id="f-family' + idx + 'Workplace" placeholder="例: 株式会社〇〇"></div>';
-  h += '<div class="field"><label>一緒に住んでいますか？（いっしょにすんでいますか）<div class="trans" data-key="familyLiveTogether"></div></label>';
+  h += '<div class="field"><label>家族が働いている会社（かぞくがはたらいているかいしゃ）<span class="req fam-req" style="display:none;">*</span><div class="trans" data-key="familyWorkplace"></div></label><input type="text" id="f-family' + idx + 'Workplace" placeholder="例: 株式会社〇〇 ／ 働いていない: なし"></div>';
+  h += '<div class="field"><label>一緒に住んでいますか？（いっしょにすんでいますか）<span class="req fam-req" style="display:none;">*</span><div class="trans" data-key="familyLiveTogether"></div></label>';
   h += '<select id="f-family' + idx + 'LiveTogether" onchange="toggleFamilyAddress(' + idx + ', this.value)">';
   h += '<option value="">---</option>';
   h += '<option value="yes">はい / Yes</option>';
   h += '<option value="no">いいえ / No</option>';
   h += '</select></div>';
   h += '<div id="familyAddressWrap' + idx + '" style="display:none;">';
-  h += '<div class="field"><label>家族の住所（かぞくのじゅうしょ）<div class="trans" data-key="familyAddress"></div></label><input type="text" id="f-family' + idx + 'Address" placeholder="例: 東京都新宿区〇〇1-1-1"></div>';
+  h += '<div class="field"><label>家族の住所（かぞくのじゅうしょ）<span class="req fam-req" style="display:none;">*</span><div class="trans" data-key="familyAddress"></div></label><input type="text" id="f-family' + idx + 'Address" placeholder="例: 東京都新宿区〇〇1-1-1"></div>';
   h += '</div>';
   h += '</div>';
   return h;
 }
 
+// ver.20261020.01: 在日親族は、1つでも入れた行（「はい」なら1人目も）は全項目必須
+var FAMILY_KEYS = ['Name','Relation','Birth','Nationality','ResidenceCard','Workplace','LiveTogether','Address'];
+function _famRowActive(row, first) {
+  var i = row.getAttribute('data-fidx');
+  var any = FAMILY_KEYS.some(function(k){ return !!val('f-family' + i + k); });
+  return any || (first && val('f-hasFamily') === 'yes');
+}
+function _famReqUpdate() {
+  var rows = document.querySelectorAll('#familyMembersContainer [data-fidx]');
+  rows.forEach(function(row, n){
+    var on = _famRowActive(row, n === 0), i = row.getAttribute('data-fidx');
+    var jp = val('f-family' + i + 'Nationality') === '日本';
+    row.querySelectorAll('.fam-req').forEach(function(sp){ sp.style.display = (on && !(jp && sp.classList.contains('fam-req-card'))) ? '' : 'none'; });
+  });
+  try { _updateReqRemain(); } catch(e) {}
+}
+function _famValidate() {
+  if (!document.getElementById('f-hasFamily') || val('f-hasFamily') !== 'yes') return null;
+  var rows = document.querySelectorAll('#familyMembersContainer [data-fidx]');
+  var bad = function(id, msg){ var e = document.getElementById(id); if (e) { e.style.borderColor = '#dc2626'; e.style.background = '#fef2f2'; e.addEventListener('input', function(){ e.style.borderColor = ''; e.style.background = ''; }, { once: true }); e.addEventListener('change', function(){ e.style.borderColor = ''; e.style.background = ''; }, { once: true }); try { e.scrollIntoView({ behavior:'smooth', block:'center' }); } catch(_) {} } return msg; };
+  for (var n = 0; n < rows.length; n++) {
+    var row = rows[n], i = row.getAttribute('data-fidx');
+    if (!_famRowActive(row, n === 0)) continue;
+    var f = function(k){ return 'f-family' + i + k; };
+    if (!val(f('Name')))         return bad(f('Name'), '日本の家族の氏名を入力してください。');
+    if (!val(f('Relation')))     return bad(f('Relation'), '日本の家族の続柄を入力してください。');
+    if (!val(f('Birth')))        return bad(f('Birth'), '日本の家族の生年月日を入力してください。');
+    if (!val(f('Nationality')))  return bad(f('Nationality'), '日本の家族の国籍を選択してください。');
+    if (val(f('Nationality')) === 'その他' && !val(f('NationalityOther'))) return bad(f('NationalityOther'), '日本の家族の国籍（その他）を入力してください。');
+    if (val(f('Nationality')) !== '日本' && !val(f('ResidenceCard'))) return bad(f('ResidenceCard'), '日本の家族の在留カード番号を入力してください。');
+    if (!val(f('Workplace')))    return bad(f('Workplace'), '日本の家族が働いている会社を入力してください（働いていない場合は「なし」）。');
+    if (!val(f('LiveTogether'))) return bad(f('LiveTogether'), '日本の家族と一緒に住んでいるかを選択してください。');
+    if (val(f('LiveTogether')) === 'no' && !val(f('Address'))) return bad(f('Address'), '日本の家族の住所を入力してください。');
+  }
+  return null;
+}
+document.addEventListener('input', function(e){ try { if (e.target && e.target.closest && e.target.closest('#familyMembersContainer')) _famReqUpdate(); } catch(_){} });
+document.addEventListener('change', function(e){ try { if (e.target && e.target.closest && (e.target.closest('#familyMembersContainer') || e.target.id === 'f-hasFamily')) _famReqUpdate(); } catch(_){} });
 var _familyCount = 1;
 function addFamilyMember() {
   _familyCount++;
@@ -4678,6 +4716,7 @@ function addFamilyMember() {
   div.innerHTML = familyMemberRow(_familyCount);
   document.getElementById('familyMembersContainer').appendChild(div.firstChild);
   _familyTrans();   // ver.20261019.02: 追加した行にも訳を付ける
+  _famReqUpdate();
 }
 function _familyTrans() {
   var dict = (typeof TRANS !== 'undefined' && TRANS[currentLang]) || {};
@@ -4686,6 +4725,7 @@ function _familyTrans() {
 function removeFamilyMember(idx) {
   var el = document.getElementById('familyRow' + idx);
   if (el) el.remove();
+  _famReqUpdate();
 }
 
 function toggleSkillProof(num, val) {
@@ -5230,6 +5270,16 @@ function collectData() {
 
 // ver.20260803.17: 全エラーのふりがな/翻訳（日本語文言をキーに引く。未登録は素の日本語表示）
 var ERR_MSG_I18N = {
+  // ver.20261020.01: 在日親族（1人分を入れ始めたら全部必須）
+  '日本の家族の氏名を入力してください。':{fr:'にほんの かぞくの しめいを にゅうりょくして ください。',en:'Please enter your family member\'s full name.',vi:'Vui lòng nhập họ tên người thân ở Nhật.',id:'Masukkan nama lengkap anggota keluarga di Jepang.',my:'ဂျပန်ရှိ မိသားစုဝင်၏ အမည်ကို ဖြည့်ပါ။',km:'សូមបញ្ចូលឈ្មោះសមាជិកគ្រួសារនៅជប៉ុន។',ne:'जापानमा रहेको परिवारको नाम लेख्नुहोस्।',zh:'请输入在日家属的姓名。'},
+  '日本の家族の続柄を入力してください。':{fr:'にほんの かぞくの つづきがらを にゅうりょくして ください。',en:'Please enter the relationship of your family member.',vi:'Vui lòng nhập quan hệ với người thân ở Nhật.',id:'Masukkan hubungan dengan anggota keluarga di Jepang.',my:'ဂျပန်ရှိ မိသားစုဝင်နှင့် ဆက်ဆံရေးကို ဖြည့်ပါ။',km:'សូមបញ្ចូលទំនាក់ទំនងជាមួយសមាជិកគ្រួសារនៅជប៉ុន។',ne:'जापानमा रहेको परिवारसँगको नाता लेख्नुहोस्।',zh:'请输入与在日家属的关系。'},
+  '日本の家族の生年月日を入力してください。':{fr:'にほんの かぞくの せいねんがっぴを にゅうりょくして ください。',en:'Please enter your family member\'s date of birth.',vi:'Vui lòng nhập ngày sinh của người thân ở Nhật.',id:'Masukkan tanggal lahir anggota keluarga di Jepang.',my:'ဂျပန်ရှိ မိသားစုဝင်၏ မွေးသက္ကရာဇ်ကို ဖြည့်ပါ။',km:'សូមបញ្ចូលថ្ងៃខែឆ្នាំកំណើតរបស់សមាជិកគ្រួសារនៅជប៉ុន។',ne:'जापानमा रहेको परिवारको जन्म मिति लेख्नुहोस्।',zh:'请输入在日家属的出生日期。'},
+  '日本の家族の国籍を選択してください。':{fr:'にほんの かぞくの こくせきを えらんで ください。',en:'Please select your family member\'s nationality.',vi:'Vui lòng chọn quốc tịch của người thân ở Nhật.',id:'Pilih kewarganegaraan anggota keluarga di Jepang.',my:'ဂျပန်ရှိ မိသားစုဝင်၏ နိုင်ငံသားကို ရွေးပါ။',km:'សូមជ្រើសរើសសញ្ជាតិរបស់សមាជិកគ្រួសារនៅជប៉ុន។',ne:'जापानमा रहेको परिवारको राष्ट्रियता छान्नुहोस्।',zh:'请选择在日家属的国籍。'},
+  '日本の家族の国籍（その他）を入力してください。':{fr:'にほんの かぞくの こくせき（そのた）を にゅうりょくして ください。',en:'Please enter your family member\'s nationality (Other).',vi:'Vui lòng nhập quốc tịch (khác) của người thân ở Nhật.',id:'Masukkan kewarganegaraan (lainnya) anggota keluarga di Jepang.',my:'ဂျပန်ရှိ မိသားစုဝင်၏ နိုင်ငံသား (အခြား) ကို ဖြည့်ပါ။',km:'សូមបញ្ចូលសញ្ជាតិ (ផ្សេងទៀត) របស់សមាជិកគ្រួសារនៅជប៉ុន។',ne:'जापानमा रहेको परिवारको राष्ट्रियता (अन्य) लेख्नुहोस्।',zh:'请输入在日家属的国籍（其他）。'},
+  '日本の家族の在留カード番号を入力してください。':{fr:'にほんの かぞくの ざいりゅうかーどばんごうを にゅうりょくして ください。',en:'Please enter your family member\'s Residence Card number.',vi:'Vui lòng nhập số Thẻ cư trú của người thân ở Nhật.',id:'Masukkan nomor Kartu Izin Tinggal anggota keluarga di Jepang.',my:'ဂျပန်ရှိ မိသားစုဝင်၏ နေထိုင်ခွင့်ကတ်နံပါတ်ကို ဖြည့်ပါ။',km:'សូមបញ្ចូលលេខកាតស្នាក់នៅរបស់សមាជិកគ្រួសារនៅជប៉ុន។',ne:'जापानमा रहेको परिवारको बसोबास कार्ड नम्बर लेख्नुहोस्।',zh:'请输入在日家属的在留卡号码。'},
+  '日本の家族が働いている会社を入力してください（働いていない場合は「なし」）。':{fr:'にほんの かぞくが はたらいている かいしゃを にゅうりょくして ください（はたらいて いない ばあいは「なし」）。',en:'Please enter your family member\'s workplace (write "なし" if not working).',vi:'Vui lòng nhập nơi làm việc của người thân (nếu không đi làm, ghi "なし").',id:'Masukkan tempat kerja anggota keluarga (tulis "なし" jika tidak bekerja).',my:'မိသားစုဝင်၏ အလုပ်ခွင်ကို ဖြည့်ပါ (အလုပ်မလုပ်ပါက "なし" ဟု ရေးပါ)။',km:'សូមបញ្ចូលកន្លែងធ្វើការរបស់សមាជិកគ្រួសារ (បើមិនធ្វើការ សរសេរ "なし")។',ne:'परिवारको काम गर्ने ठाउँ लेख्नुहोस् (काम नगर्ने भए "なし" लेख्नुहोस्)।',zh:'请输入在日家属的工作单位（无工作请填写“なし”）。'},
+  '日本の家族と一緒に住んでいるかを選択してください。':{fr:'にほんの かぞくと いっしょに すんでいるかを えらんで ください。',en:'Please select whether you live with your family member.',vi:'Vui lòng chọn bạn có sống chung với người thân không.',id:'Pilih apakah Anda tinggal bersama anggota keluarga.',my:'မိသားစုဝင်နှင့် အတူနေခြင်း ရှိ/မရှိ ရွေးပါ။',km:'សូមជ្រើសរើសថាតើអ្នករស់នៅជាមួយសមាជិកគ្រួសារឬទេ។',ne:'परिवारसँग सँगै बस्नुहुन्छ कि छैन छान्नुहोस्।',zh:'请选择是否与在日家属同住。'},
+  '日本の家族の住所を入力してください。':{fr:'にほんの かぞくの じゅうしょを にゅうりょくして ください。',en:'Please enter your family member\'s address.',vi:'Vui lòng nhập địa chỉ của người thân ở Nhật.',id:'Masukkan alamat anggota keluarga di Jepang.',my:'ဂျပန်ရှိ မိသားစုဝင်၏ လိပ်စာကို ဖြည့်ပါ။',km:'សូមបញ្ចូលអាសយដ្ឋានរបស់សមាជិកគ្រួសារនៅជប៉ុន។',ne:'जापानमा रहेको परिवारको ठेगाना लेख्नुहोस्।',zh:'请输入在日家属的地址。'},
   '氏名（パスポート表記）は必須です。':{fr:'しめい（ぱすぽーとひょうき）は ひっすです。',en:'Full name (as in passport) is required.',vi:'Họ tên (như trên hộ chiếu) là bắt buộc.',id:'Nama lengkap (sesuai paspor) wajib diisi.',my:'အမည် (ပတ်စ်ပို့အတိုင်း) ဖြည့်ရန်လိုအပ်သည်။',km:'ឈ្មោះ (តាមលិខិតឆ្លងដែន) ត្រូវបំពេញ។',ne:'नाम (राहदानी अनुसार) अनिवार्य छ।',zh:'姓名（护照拼写）为必填项。'},
   '生年月日は必須です。':{fr:'せいねんがっぴは ひっすです。',en:'Date of birth is required.',vi:'Ngày sinh là bắt buộc.',id:'Tanggal lahir wajib diisi.',my:'မွေးသက္ကရာဇ် ဖြည့်ရန်လိုအပ်သည်။',km:'ថ្ងៃខែឆ្នាំកំណើត ត្រូវបំពេញ។',ne:'जन्म मिति अनिवार्य छ।',zh:'出生年月日为必填项。'},
   '国籍は必須です。':{fr:'こくせきは ひっすです。',en:'Nationality is required.',vi:'Quốc tịch là bắt buộc.',id:'Kewarganegaraan wajib diisi.',my:'နိုင်ငံသား ဖြည့်ရန်လိုအပ်သည်။',km:'សញ្ជាតិ ត្រូវបំពេញ។',ne:'राष्ट्रियता अनिवार्य छ।',zh:'国籍为必填项。'},
@@ -5683,6 +5733,7 @@ function _validateInner() {
     }
   }
 
+  var _famErr = _famValidate(); if (_famErr) return _famErr;   // ver.20261020.01: 在日親族
   return null;
 }
 
@@ -6260,6 +6311,7 @@ function _familyRestore(resp) {
     toggleFamilyAddress(i, m.liveTogether || '');
   });
   _familyTrans();
+  _famReqUpdate();
 }
 function prefillForm(resp) {
   if (type === 'support_org') { _soFormPrefill(resp); return; }
