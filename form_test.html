@@ -193,7 +193,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20261019.01-test'; // 特定技能1号の企業フォームに【自社支援】支援体制・【自社支援】担当者・その他タブを追加（登録支援機関フォームと同じ部品＋選任の根拠） ／ 本番 ver.20261015.04 ベース: // 定期健康診断の下に「自己都合退職は何日前までに申し出るか（日）」を追加（必須・初期値30日） ／ ver.20261015.03: // 特定技能2号の確認用リンク：③だけ（part=3）・①②③すべて（part=123）を追加／①＋②（part=12）は③を出さない／①だけ（part=1）で隠れた③の入力チェックに止まっていたのを修正
+var FORM_VERSION = 'ver.20261019.02-test'; // 選任の根拠を全文が見える選択肢に ／ ver.20261019.01-test: // 特定技能1号の企業フォームに【自社支援】支援体制・【自社支援】担当者・その他タブを追加（登録支援機関フォームと同じ部品＋選任の根拠） ／ 本番 ver.20261015.04 ベース: // 定期健康診断の下に「自己都合退職は何日前までに申し出るか（日）」を追加（必須・初期値30日） ／ ver.20261015.03: // 特定技能2号の確認用リンク：③だけ（part=3）・①②③すべて（part=123）を追加／①＋②（part=12）は③を出さない／①だけ（part=1）で隠れた③の入力チェックに止まっていたのを修正
 // var FORM_VERSION = 'ver.20261015.02'; // 「居住費 適正額の説明」を削除（「住居（支援計画書用）」の「実費相当の説明」と重複のため） ／ ver.20261015.01: // 住居（支援計画書用）は居住費控除「有」のときだけ表示／③タブ名を「2号に関するヒアリング」に／2号の項目で止まったら③へ切り替え ／ ver.20261014.07: // ①＋②の確認用リンク（part=12：会社情報を入れて通常のフォームを開く）
 // var FORM_VERSION = 'ver.20261014.06'; // 就業場所を「＋」で2か所目以降も入力（office2Name〜）
 // var FORM_VERSION = 'ver.20261014.05'; // 昇給の下に「建設分野の場合の記載」の案内と入力ボタン
@@ -2652,6 +2652,19 @@ function _ssSoCards() {
   var cards = function(step, cls){ var st = q('.so-step[data-sostep="' + step + '"]'); return st ? [].filter.call(st.children, function(c){ return c.classList.contains('card'); }).map(function(c){ c.classList.add(cls, 'ss-on-card'); return c; }) : []; };
   return { a: cards(1, 'tk-ss-card'), b: cards(2, 'tk-ss2-card') };
 }
+// 選任の根拠：文が長いので、プルダウンではなく全文が見える選択肢にする
+function _ssBasisOpt(v, text) {
+  return '<label class="ss-basis-opt" style="display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border:1.5px solid #c7d2fe;border-radius:10px;background:#fff;cursor:pointer;font-weight:400;font-size:14px;line-height:1.7;white-space:normal;">' +
+    '<input type="radio" name="f-ssBasisR" value="' + v + '" onchange="_ssSetBasis(this.value)" style="width:20px;height:20px;flex:none;padding:0;margin:3px 0 0;min-height:0;border-radius:50%;-webkit-appearance:radio;appearance:auto;">' +
+    '<span>' + text + '</span></label>';
+}
+function _ssSetBasis(v) {
+  var h = document.getElementById('f-ssBasis'); if (h) h.value = v || '';
+  document.querySelectorAll('input[name="f-ssBasisR"]').forEach(function(r){
+    r.checked = (r.value === v);
+    var lb = r.closest('label'); if (lb) { lb.style.borderColor = r.checked ? '#4338ca' : '#c7d2fe'; lb.style.background = r.checked ? '#eef2ff' : '#fff'; }
+  });
+}
 function _ssCardsHtml() {
   if (type !== 'company') return '';
   return '' +
@@ -2661,8 +2674,8 @@ function _ssCardsHtml() {
   '</div>' +
   '<div id="ssSlotA"></div><div id="ssSlotB"></div>' +
   '<div class="card tk-ss2-card" id="tkSSCard2"><div class="section-title">支援責任者・支援担当者の選任の根拠</div>' +
-    '<div class="field"><label>あてはまるものを選んでください<span class="req">*</span></label><select id="f-ssBasis">' +
-      '<option value="">---</option><option value="1">' + SS_BASIS1 + '</option><option value="2">' + SS_BASIS2 + '</option></select></div>' +
+    '<div class="field"><label>あてはまるものを選んでください<span class="req">*</span></label><input type="hidden" id="f-ssBasis" value="">' +
+      '<div style="display:flex;flex-direction:column;gap:8px;">' + _ssBasisOpt('1', SS_BASIS1) + _ssBasisOpt('2', SS_BASIS2) + '</div></div>' +
     field('f-ssCorrective','過去5年間に、労働基準監督署から是正勧告を受けたことがありますか','select',true,'',null,['','是正勧告なし','是正勧告あり']) +
     // ① 受入れ実績
     '<div id="ssBasis1Wrap" style="display:none;">' +
@@ -2748,7 +2761,7 @@ function _ssRestore(o) {
     var d = document.getElementById('f-so_staff' + i + '_dept'); if (d && x.dept) d.value = x.dept; });
   var md = document.getElementById('f-ssMgrDept'); if (md && o.supportManagerDept) md.value = o.supportManagerDept;
   if (o.neutrality) { var nr = document.querySelector('input[name="f-ssNeutral"][value="' + o.neutrality + '"]'); if (nr) nr.checked = true; }
-  var b = document.getElementById('f-ssBasis'); if (b && o.basis) b.value = o.basis;
+  if (o.basis) _ssSetBasis(o.basis);
   var c = document.getElementById('f-ssCorrective'); if (c && o.corrective) c.value = o.corrective;
   if (o.accept) {
     var a = o.accept; [['1y','y1'],['2y','y2'],['Law','law']].forEach(function(p){ var e = document.getElementById('f-ssAccept' + p[0]); if (e && a[p[1]] != null) e.value = a[p[1]]; });
@@ -2764,6 +2777,8 @@ function _ssValidate() {
   var foc = function(id){ try { var e = document.getElementById(id); if (e) e.focus(); } catch(_) {} };
   var focR = function(name){ try { document.querySelector('input[name="' + name + '"]').focus(); } catch(_) {} };
   var chk = function(id){ var e = document.getElementById(id); return !!(e && e.checked); };
+  var _c2 = document.getElementById('tkSSCard2');
+  if (_c2 && _c2.style.display !== 'none' && !val('f-ssBasis')) { try { document.querySelector('input[name="f-ssBasisR"]').focus(); } catch(_) {} return '「支援責任者・支援担当者の選任の根拠」を選んでください。'; }
   if (!document.querySelector('input[name="f-ssNeutral"]:checked')) { focR('f-ssNeutral'); return '「支援の中立性を確保していることの有無」を選んでください。'; }
   for (var i = 0; i < _SO_DAYS.length; i++) {
     var d = _SO_DAYS[i][0], fr = val('f-so_hours_' + d + '_from'), to = val('f-so_hours_' + d + '_to');
