@@ -192,7 +192,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20261020.01'; // 在日親族：1つでも入れた行（「はい」のときは1人目も）は全項目必須（日本国籍は在留カード不要・同居なら住所不要・働いていなければ「なし」） ／ ver.20261019.02: 在日親族に「生年月日」「国籍」を追加（送信 familyMembers[].birth / nationality）・途中保存した在日親族を開き直したときに戻すように ／ ver.20261019.01: 特定技能1号の企業フォームに【自社支援】支援体制・【自社支援】担当者・その他タブを追加（案件の登録支援機関なし＝自社支援のときだけ表示。登録支援機関フォームと同じ部品・同じ送信キー selfSupport ＋ 選任の根拠：①1-11-2号／②1-11-3号・1-20号・1-22号） ／ ver.20261015.04: // 定期健康診断の下に「自己都合退職は何日前までに申し出るか（日）」を追加（必須・初期値30日） ／ ver.20261015.03: // 特定技能2号の確認用リンク：③だけ（part=3）・①②③すべて（part=123）を追加／①＋②（part=12）は③を出さない／①だけ（part=1）で隠れた③の入力チェックに止まっていたのを修正
+var FORM_VERSION = 'ver.20261020.02'; // 自社支援：受入経験ありでも選任の根拠を聞く／確認用リンク（①企業情報）に【自社支援】タブを付ける ／ ver.20261020.01: 在日親族：1つでも入れた行（「はい」のときは1人目も）は全項目必須（日本国籍は在留カード不要・同居なら住所不要・働いていなければ「なし」） ／ ver.20261019.02: 在日親族に「生年月日」「国籍」を追加（送信 familyMembers[].birth / nationality）・途中保存した在日親族を開き直したときに戻すように ／ ver.20261019.01: 特定技能1号の企業フォームに【自社支援】支援体制・【自社支援】担当者・その他タブを追加（案件の登録支援機関なし＝自社支援のときだけ表示。登録支援機関フォームと同じ部品・同じ送信キー selfSupport ＋ 選任の根拠：①1-11-2号／②1-11-3号・1-20号・1-22号） ／ ver.20261015.04: // 定期健康診断の下に「自己都合退職は何日前までに申し出るか（日）」を追加（必須・初期値30日） ／ ver.20261015.03: // 特定技能2号の確認用リンク：③だけ（part=3）・①②③すべて（part=123）を追加／①＋②（part=12）は③を出さない／①だけ（part=1）で隠れた③の入力チェックに止まっていたのを修正
 // var FORM_VERSION = 'ver.20261015.02'; // 「居住費 適正額の説明」を削除（「住居（支援計画書用）」の「実費相当の説明」と重複のため） ／ ver.20261015.01: // 住居（支援計画書用）は居住費控除「有」のときだけ表示／③タブ名を「2号に関するヒアリング」に／2号の項目で止まったら③へ切り替え ／ ver.20261014.07: // ①＋②の確認用リンク（part=12：会社情報を入れて通常のフォームを開く）
 // var FORM_VERSION = 'ver.20261014.06'; // 就業場所を「＋」で2か所目以降も入力（office2Name〜）
 // var FORM_VERSION = 'ver.20261014.05'; // 昇給の下に「建設分野の場合の記載」の案内と入力ボタン
@@ -2932,12 +2932,24 @@ function _tkApplyPartTabs() {
 }
 // ver.20261014.04: 確認用リンク（part=1）—「① 企業情報」だけを出す。雇用条件（②以降）と保険は出さない・送らない
 function _tkApplyPart() {
-  var bar = document.getElementById('tkTabBar'); if (bar) bar.style.display = 'none';
+  // ver.20261020.02: 自社支援のときは ①＋【自社支援】2タブを出す（②③は出さない）。委託なら①だけ（タブ表示は _tkApplyToggles）
+  var _hasSS = !!document.querySelector('.tk-pane[data-tab="3"]');
+  document.querySelectorAll('.tk-tab').forEach(function(b){ var t = +b.getAttribute('data-tab'); if (t === 1 || t === 2) b.remove(); });
   document.querySelectorAll('.tk-pane').forEach(function(pn){
     var t = +pn.getAttribute('data-tab');
-    if (t !== 0) { pn.style.display = 'none'; return; }
+    if (t === 1 || t === 2) { pn.setAttribute('data-part-off','1'); pn.style.display = 'none'; return; }
+    if (t !== 0) return;
+    pn.style.display = '';
     var last = pn.lastElementChild; if (last && last.tagName === 'BUTTON') last.remove();   // 「② 雇用条件 へ進む」ボタン
+    if (_hasSS) {
+      var nx = document.createElement('button'); nx.type = 'button'; nx.className = 'tk-next-3';
+      nx.style.cssText = 'width:100%;padding:14px;margin:4px 0 16px;border-radius:12px;border:none;background:#4338ca;color:#fff;font-weight:800;font-size:15px;cursor:pointer;font-family:inherit;';
+      nx.textContent = '【自社支援】支援体制 へ進む →';
+      nx.onclick = function(){ _tkShowTab(3, true); };
+      pn.appendChild(nx);
+    }
   });
+  _tkShowTab(0, false);
   var ins = document.getElementById('tkStdInsWrap'); if (ins) ins.style.display = 'none';
   _tkPartInfo();
 }
@@ -2950,11 +2962,11 @@ function _tkPartInfo() {
     el.innerHTML = (nm ? '<span class="case-name">' + nm + '</span>' : '') + '📝 <b>２号に関するヒアリング</b>：２号特定技能外国人の業務内容をご入力のうえ、送信してください。前にご回答いただいた内容がある場合は、入力した状態で開いています。<b>違うところだけ</b>直してください。';
     return;
   }
-  el.innerHTML = (nm ? '<span class="case-name">' + nm + '</span>' : '') + '🏢 <b>企業情報のご確認</b>：登録済みの内容を入力しています。<b>違うところだけ</b>直して、送信してください。';
+  el.innerHTML = (nm ? '<span class="case-name">' + nm + '</span>' : '') + '🏢 <b>企業情報のご確認</b>：登録済みの内容を入力しています。<b>違うところだけ</b>直して、送信してください。' + (_ssOn() ? '<br>🤝 自社支援のため、<b>【自社支援】のタブ</b>もご入力ください。' : '');   // ver.20261020.02
 }
 function _tkShowTab(ix, scroll) {
   _tkTabCur = ix;
-  document.querySelectorAll('.tk-pane').forEach(function(pn){ pn.style.display = (+pn.getAttribute('data-tab') === ix) ? '' : 'none'; });
+  document.querySelectorAll('.tk-pane').forEach(function(pn){ pn.style.display = (+pn.getAttribute('data-tab') === ix && !pn.hasAttribute('data-part-off')) ? '' : 'none'; });
   document.querySelectorAll('.tk-tab').forEach(function(b){
     var on = (+b.getAttribute('data-tab') === ix);
     b.style.background = on ? '#4338ca' : '#fff'; b.style.color = on ? '#fff' : '#4338ca'; b.style.borderColor = on ? '#4338ca' : '#c7d2fe';
@@ -3029,7 +3041,7 @@ function _tkApplyToggles() {
     var _ssO = _ssOn();
     sh('tkSSCard0', !_tkSupportMode);
     document.querySelectorAll('.ss-on-card').forEach(function(c){ c.style.display = _ssO ? '' : 'none'; });
-    sh('tkSSCard2', _ssO && !_expAri);   // 選任の根拠と書類は、受入経験「あり」なら不要
+    sh('tkSSCard2', _ssO);   // ver.20261020.02: 自社支援の選任の根拠と書類は、受入経験「あり」でも毎回聞く
     sh('ssBasis1Wrap', val('f-ssBasis') === '1');
     sh('ssBasis2Wrap', val('f-ssBasis') === '2');
     sh('ssAcceptListWrap', !((document.getElementById('f-ssAcceptExempt') || {}).checked));
@@ -3040,6 +3052,7 @@ function _tkApplyToggles() {
     document.querySelectorAll('.tk-next-3').forEach(function(b){ b.style.display = (_tkSupportMode === 'org') ? 'none' : ''; });
     document.querySelectorAll('.tk-next-4').forEach(function(b){ b.style.display = _ssO ? '' : 'none'; });
     if ((_tkSupportMode === 'org' && _tkTabCur === 3) || (!_ssO && _tkTabCur === 4)) _tkShowTab(_tkSupportMode === 'org' ? 0 : 3, false);
+    if (formPart) { var _bar = document.getElementById('tkTabBar'); if (_bar) _bar.style.display = (_tkSupportMode === 'org') ? 'none' : ''; try { _tkPartInfo(); } catch(_e) {} }   // ver.20261020.02
   }
   sh('renewCondWrap', val('f-contractRenewal') === '更新する場合があり得る');
   ['insKenpo','insPension','insEmp','insLabor'].forEach(function(k){ sh(k + 'OtherWrap', val('f-' + k) === 'その他'); });
@@ -3124,7 +3137,7 @@ function _tkPartTrim(d) {
     coRepName:'repName', coRepTitle:'repTitle', coRepNameEn:'repNameEn', coRepTitleEn:'repTitleEn' };
   Object.keys(alias).forEach(function(k){ if (keep[k]) keep[alias[k]] = 1; });
   Object.keys(d).forEach(function(k){
-    if (keep[k] || /^officer\d/.test(k)) return;
+    if (keep[k] || /^officer\d/.test(k) || k === 'ssMode' || k === 'selfSupport') return;   // ver.20261020.02: 自社支援は①とセットで送る
     delete d[k];
   });
   d.formPart = '企業情報';
@@ -4947,7 +4960,7 @@ function collectData() {
       d.contractRenewalCondOther = val('f-contractRenewalCondOther');
       _collectOfficeRows(d);   // ver.20261014.06: 就業場所 2か所目以降
       // ver.20261019.01: ④ 自社支援
-      if (document.getElementById('tkSSCard0') && !formPart) {
+      if (document.getElementById('tkSSCard0')) {   // ver.20261020.02: 確認用リンク（part=1）でも自社支援は送る
         d.ssMode = _ssOn() ? 'self' : ((_tkSupportMode === 'org' || val('f-ssMode') === '登録支援機関に委託する') ? 'org' : '');
         if (d.ssMode === 'self') d.selfSupport = _ssCollect();
       }
