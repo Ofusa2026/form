@@ -193,7 +193,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20261020.02-test'; // 自社支援：受入経験ありでも選任の根拠を聞く／確認用リンク（①企業情報）に【自社支援】タブを付ける ／ ver.20261020.01-test: 在日親族：入れ始めた行は全項目必須 ／ ver.20261019.03-test: 在日親族に「生年月日」「国籍」を追加・在日親族を開き直したときに戻すように ／ ver.20261019.02-test: 選任の根拠を全文が見える選択肢に ／ ver.20261019.01-test: // 特定技能1号の企業フォームに【自社支援】支援体制・【自社支援】担当者・その他タブを追加（登録支援機関フォームと同じ部品＋選任の根拠） ／ 本番 ver.20261015.04 ベース: // 定期健康診断の下に「自己都合退職は何日前までに申し出るか（日）」を追加（必須・初期値30日） ／ ver.20261015.03: // 特定技能2号の確認用リンク：③だけ（part=3）・①②③すべて（part=123）を追加／①＋②（part=12）は③を出さない／①だけ（part=1）で隠れた③の入力チェックに止まっていたのを修正
+var FORM_VERSION = 'ver.20261023.01-test'; // 2号（所属機関）：第1-32号 新様式の留意事項３〜５に対応・カーテン工事を追加 ／ ver.20261020.04-test: 技能実習2号「内装仕上げ施工」の作業に「カーテン工事」を追加 ／ ver.20261020.02-test: 自社支援：受入経験ありでも選任の根拠を聞く／確認用リンク（①企業情報）に【自社支援】タブを付ける ／ ver.20261020.01-test: 在日親族：入れ始めた行は全項目必須 ／ ver.20261019.03-test: 在日親族に「生年月日」「国籍」を追加・在日親族を開き直したときに戻すように ／ ver.20261019.02-test: 選任の根拠を全文が見える選択肢に ／ ver.20261019.01-test: // 特定技能1号の企業フォームに【自社支援】支援体制・【自社支援】担当者・その他タブを追加（登録支援機関フォームと同じ部品＋選任の根拠） ／ 本番 ver.20261015.04 ベース: // 定期健康診断の下に「自己都合退職は何日前までに申し出るか（日）」を追加（必須・初期値30日） ／ ver.20261015.03: // 特定技能2号の確認用リンク：③だけ（part=3）・①②③すべて（part=123）を追加／①＋②（part=12）は③を出さない／①だけ（part=1）で隠れた③の入力チェックに止まっていたのを修正
 // var FORM_VERSION = 'ver.20261015.02'; // 「居住費 適正額の説明」を削除（「住居（支援計画書用）」の「実費相当の説明」と重複のため） ／ ver.20261015.01: // 住居（支援計画書用）は居住費控除「有」のときだけ表示／③タブ名を「2号に関するヒアリング」に／2号の項目で止まったら③へ切り替え ／ ver.20261014.07: // ①＋②の確認用リンク（part=12：会社情報を入れて通常のフォームを開く）
 // var FORM_VERSION = 'ver.20261014.06'; // 就業場所を「＋」で2か所目以降も入力（office2Name〜）
 // var FORM_VERSION = 'ver.20261014.05'; // 昇給の下に「建設分野の場合の記載」の案内と入力ボタン
@@ -979,7 +979,7 @@ function applyGijutsuProofLang(l) {
 }
 // ver.20260603.01: 技能実習2号 職種・作業マスター（index.html と完全一致）
 var GINOJISSHU_TYPE_LIST=['耕種農業','畜産農業','林業','漁船漁業','養殖業','さく井','建築板金','冷凍空気調和機器施工','建具製作','建築大工','型枠施工','鉄筋施工','とび','石材施エ','タイル張り','かわらぶき','左官','配管','熱絶縁施工','内装仕上げ施工','サッシ施工','防水施工','コンクリート圧送施工','ウェルポイント施工','表装','建設機械施工','築炉','缶詰巻締','食鳥処理加工業','加熱性水産加工　食品製造業','非加熱性水産加工　食品製造業','水産練り製品製造','牛豚食肉処理加工業','ハム・ソーセージ・ベーコン製造','パン製造','そう菜製造業','農産物漬物製造業','医療・福祉施設給食製造','紡績運転','織布運転','染色','ニット製品製造','たて編ニット生地製造','婦人子供服製造','紳士服製造','下着類製造','寝具製作','カーペット製造','帆布製品製造','布はく縫製','座席シート縫製','鋳造','鍛造','ダイカスト','機械加工','金属プレス加工','鉄工','工場板金','めっき','アルミニウム陽極酸化処理','仕上げ','機械検査','機械保全','電子機器組立て','電気機器組立て','プリント配線板製造','アルミニウム圧延・押出製品製造','金属熱処理業','家具製作','印刷','製本','プラスチック成形','強化プラスチック成形','塗装','溶接','工業包装','紙器・段ボール箱製造','陶磁器工業製品製造','自動車整備','ビルクリーニング','介護','クリーニング','リネンサプライ','コンクリート製品製造','宿泊','ＲＰＦ製造職種','鉄道施設保守整備','ゴム製品製造','鉄道車両整備','木材加工','空港グランドハンドリング','ボイラーメンテナンス'];
-var GINOJISSHU_WORK_MAP={'耕種農業':['施設園芸','畑作・野菜','果樹'],'畜産農業':['養豚','養鶏','酪農','養牛'],'林業':['育林','素材生産'],'漁船漁業':['かつお一本釣り漁業','延縄漁業','いか釣り漁業','まき網漁業','ひき網漁業','刺し網漁業','定置網漁業','かに・えびかご漁業','棒受け網漁業'],'養殖業':['ほたてがい・まがき養殖'],'さく井':['パーカッション式さく井工事','ロータリー式さく井工事'],'建築板金':['ダクト板金','内外装板金'],'冷凍空気調和機器施工':['冷凍空気調和機器施工'],'建具製作':['木製建具手加工','木製建具機械加工'],'建築大工':['大工工事'],'型枠施工':['型枠工事'],'鉄筋施工':['鉄筋組立て'],'とび':['とび'],'石材施エ':['石材施工','石張り'],'タイル張り':['タイル張り'],'かわらぶき':['かわらぶき'],'左官':['左官'],'配管':['建築配管','プラント配管'],'熱絶縁施工':['保温保冷工事'],'内装仕上げ施工':['プラスチック系床仕上げ工事','カーペット系床仕上げ工事','銘木フローリング工事','硬質床仕上げ工事','石張り工事','タイル張り工事','畳工事','ボード仕上げ工事','壁紙張り工事','鋼製下地工事'],'サッシ施工':['ビル用サッシ施工'],'防水施工':['シーリング防水工事'],'コンクリート圧送施工':['コンクリート圧送工事'],'ウェルポイント施工':['ウェルポイント工事'],'表装':['壁装'],'建設機械施工':['押土・整地','積込み','掘削','締固め'],'築炉':['築炉'],'缶詰巻締':['缶詰巻締'],'食鳥処理加工業':['食鳥処理加工業'],'加熱性水産加工　食品製造業':['節類製造','加熱乾製品製造','調味加工品製造','くん製品製造','容器詰製品製造','かまぼこ製品製造'],'非加熱性水産加工　食品製造業':['塩蔵品製造','乾製品製造','発酵食品製造','調理加工品製造','生食用加工品製造'],'水産練り製品製造':['かまぼこ製品製造'],'牛豚食肉処理加工業':['牛豚部分肉製造'],'ハム・ソーセージ・ベーコン製造':['ハム・ソーセージ・ベーコン製造'],'パン製造':['パン製造'],'そう菜製造業':['そう菜加工'],'農産物漬物製造業':['農産物漬物製造'],'医療・福祉施設給食製造':['医療・福祉施設給食製造'],'紡績運転':['前紡工程','精紡工程','巻糸工程','合撚糸工程'],'織布運転':['準備工程','製織工程','仕上工程'],'染色':['糸染色','織物・ニット染色','染色仕上'],'ニット製品製造':['靴下製造','丸編みニット製造'],'たて編ニット生地製造':['たて編ニット生地製造'],'婦人子供服製造':['婦人子供既製服縫製'],'紳士服製造':['紳士既製服製造'],'下着類製造':['下着類製造'],'寝具製作':['寝具製作'],'カーペット製造':['織じゅうたん製造','タフテッドカーペット製造','ニードルパンチカーペット製造'],'帆布製品製造':['帆布製品製造'],'布はく縫製':['ワイシャツ製造'],'座席シート縫製':['自動車シート縫製'],'鋳造':['鋳鉄鋳物鋳造','非鉄金属鋳物鋳造'],'鍛造':['ハンマ型鍛造','プレス型鍛造'],'ダイカスト':['ホットチャンバダイカスト','コールドチャンバダイカスト'],'機械加工':['普通旋盤','フライス盤','数値制御旋盤','マシニングセンタ'],'金属プレス加工':['金属プレス'],'鉄工':['構造物鉄工','製缶'],'工場板金':['機械板金'],'めっき':['電気めっき','溶融亜鉛めっき'],'アルミニウム陽極酸化処理':['陽極酸化処理'],'仕上げ':['治工具仕上げ','金型仕上げ','機械組立て仕上げ'],'機械検査':['機械検査'],'機械保全':['機械系保全','電気系保全'],'電子機器組立て':['電子機器組立て'],'電気機器組立て':['回転電機組立て','変圧器組立て','配電盤・制御盤組立て','開閉制御器具組立て','回転電機巻線製造'],'プリント配線板製造':['プリント配線板設計','プリント配線板製造'],'アルミニウム圧延・押出製品製造':['アルミニウム圧延製品製造','アルミニウム押出製品製造'],'金属熱処理業':['熱処理'],'家具製作':['家具手加工','家具機械加工'],'印刷':['オフセット印刷','グラビア印刷'],'製本':['製本'],'プラスチック成形':['圧縮成形','射出成形','インフレーション成形','ブロー成形'],'強化プラスチック成形':['手積み積層成形'],'塗装':['建築塗装','金属塗装','鋼橋塗装','噴霧塗装'],'溶接':['手溶接','半自動溶接'],'工業包装':['工業包装'],'紙器・段ボール箱製造':['印刷箱打抜き','印刷箱製箱','貼箱製造','段ボール箱製造'],'陶磁器工業製品製造':['機械ろくろ成形','圧力鋳込み成形','パッド印刷'],'自動車整備':['自動車整備'],'ビルクリーニング':['ビルクリーニング'],'介護':['介護'],'クリーニング':['クリーニング'],'リネンサプライ':['リネンサプライ仕上げ'],'コンクリート製品製造':['コンクリート製品製造'],'宿泊':['接客・衛生管理'],'ＲＰＦ製造職種':['ＲＰＦ製造'],'鉄道施設保守整備':['軌道保守整備','電気設備保守整備'],'ゴム製品製造':['成形加工','仕上・検査'],'鉄道車両整備':['鉄道車両整備'],'木材加工':['製材','木材チップ製造'],'空港グランドハンドリング':['航空機地上支援','航空貨物取扱'],'ボイラーメンテナンス':['ボイラーメンテナンス']};
+var GINOJISSHU_WORK_MAP={'耕種農業':['施設園芸','畑作・野菜','果樹'],'畜産農業':['養豚','養鶏','酪農','養牛'],'林業':['育林','素材生産'],'漁船漁業':['かつお一本釣り漁業','延縄漁業','いか釣り漁業','まき網漁業','ひき網漁業','刺し網漁業','定置網漁業','かに・えびかご漁業','棒受け網漁業'],'養殖業':['ほたてがい・まがき養殖'],'さく井':['パーカッション式さく井工事','ロータリー式さく井工事'],'建築板金':['ダクト板金','内外装板金'],'冷凍空気調和機器施工':['冷凍空気調和機器施工'],'建具製作':['木製建具手加工','木製建具機械加工'],'建築大工':['大工工事'],'型枠施工':['型枠工事'],'鉄筋施工':['鉄筋組立て'],'とび':['とび'],'石材施エ':['石材施工','石張り'],'タイル張り':['タイル張り'],'かわらぶき':['かわらぶき'],'左官':['左官'],'配管':['建築配管','プラント配管'],'熱絶縁施工':['保温保冷工事'],'内装仕上げ施工':['プラスチック系床仕上げ工事','カーペット系床仕上げ工事','銘木フローリング工事','硬質床仕上げ工事','石張り工事','タイル張り工事','畳工事','ボード仕上げ工事','壁紙張り工事','鋼製下地工事','カーテン工事'],'サッシ施工':['ビル用サッシ施工'],'防水施工':['シーリング防水工事'],'コンクリート圧送施工':['コンクリート圧送工事'],'ウェルポイント施工':['ウェルポイント工事'],'表装':['壁装'],'建設機械施工':['押土・整地','積込み','掘削','締固め'],'築炉':['築炉'],'缶詰巻締':['缶詰巻締'],'食鳥処理加工業':['食鳥処理加工業'],'加熱性水産加工　食品製造業':['節類製造','加熱乾製品製造','調味加工品製造','くん製品製造','容器詰製品製造','かまぼこ製品製造'],'非加熱性水産加工　食品製造業':['塩蔵品製造','乾製品製造','発酵食品製造','調理加工品製造','生食用加工品製造'],'水産練り製品製造':['かまぼこ製品製造'],'牛豚食肉処理加工業':['牛豚部分肉製造'],'ハム・ソーセージ・ベーコン製造':['ハム・ソーセージ・ベーコン製造'],'パン製造':['パン製造'],'そう菜製造業':['そう菜加工'],'農産物漬物製造業':['農産物漬物製造'],'医療・福祉施設給食製造':['医療・福祉施設給食製造'],'紡績運転':['前紡工程','精紡工程','巻糸工程','合撚糸工程'],'織布運転':['準備工程','製織工程','仕上工程'],'染色':['糸染色','織物・ニット染色','染色仕上'],'ニット製品製造':['靴下製造','丸編みニット製造'],'たて編ニット生地製造':['たて編ニット生地製造'],'婦人子供服製造':['婦人子供既製服縫製'],'紳士服製造':['紳士既製服製造'],'下着類製造':['下着類製造'],'寝具製作':['寝具製作'],'カーペット製造':['織じゅうたん製造','タフテッドカーペット製造','ニードルパンチカーペット製造'],'帆布製品製造':['帆布製品製造'],'布はく縫製':['ワイシャツ製造'],'座席シート縫製':['自動車シート縫製'],'鋳造':['鋳鉄鋳物鋳造','非鉄金属鋳物鋳造'],'鍛造':['ハンマ型鍛造','プレス型鍛造'],'ダイカスト':['ホットチャンバダイカスト','コールドチャンバダイカスト'],'機械加工':['普通旋盤','フライス盤','数値制御旋盤','マシニングセンタ'],'金属プレス加工':['金属プレス'],'鉄工':['構造物鉄工','製缶'],'工場板金':['機械板金'],'めっき':['電気めっき','溶融亜鉛めっき'],'アルミニウム陽極酸化処理':['陽極酸化処理'],'仕上げ':['治工具仕上げ','金型仕上げ','機械組立て仕上げ'],'機械検査':['機械検査'],'機械保全':['機械系保全','電気系保全'],'電子機器組立て':['電子機器組立て'],'電気機器組立て':['回転電機組立て','変圧器組立て','配電盤・制御盤組立て','開閉制御器具組立て','回転電機巻線製造'],'プリント配線板製造':['プリント配線板設計','プリント配線板製造'],'アルミニウム圧延・押出製品製造':['アルミニウム圧延製品製造','アルミニウム押出製品製造'],'金属熱処理業':['熱処理'],'家具製作':['家具手加工','家具機械加工'],'印刷':['オフセット印刷','グラビア印刷'],'製本':['製本'],'プラスチック成形':['圧縮成形','射出成形','インフレーション成形','ブロー成形'],'強化プラスチック成形':['手積み積層成形'],'塗装':['建築塗装','金属塗装','鋼橋塗装','噴霧塗装'],'溶接':['手溶接','半自動溶接'],'工業包装':['工業包装'],'紙器・段ボール箱製造':['印刷箱打抜き','印刷箱製箱','貼箱製造','段ボール箱製造'],'陶磁器工業製品製造':['機械ろくろ成形','圧力鋳込み成形','パッド印刷'],'自動車整備':['自動車整備'],'ビルクリーニング':['ビルクリーニング'],'介護':['介護'],'クリーニング':['クリーニング'],'リネンサプライ':['リネンサプライ仕上げ'],'コンクリート製品製造':['コンクリート製品製造'],'宿泊':['接客・衛生管理'],'ＲＰＦ製造職種':['ＲＰＦ製造'],'鉄道施設保守整備':['軌道保守整備','電気設備保守整備'],'ゴム製品製造':['成形加工','仕上・検査'],'鉄道車両整備':['鉄道車両整備'],'木材加工':['製材','木材チップ製造'],'空港グランドハンドリング':['航空機地上支援','航空貨物取扱'],'ボイラーメンテナンス':['ボイラーメンテナンス']};
 // 職種選択時に作業の選択肢を切り替える
 function _updateGijutsuWorkSelect(selectedType){
   var sel = document.getElementById('f-gijutsuWork');
@@ -3584,12 +3584,29 @@ function blockT2Pledge() {
   // ver.20260825.04: 2号ごとに（氏名＋その2号の指導対象者min名）をネスト生成するコンテナ
   h += '<div id="t2TargetNote" style="font-size:12px;color:#6b7280;background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;padding:10px 12px;margin-bottom:10px;line-height:1.8;">分野と採用人数を選ぶと、必要な指導対象者の人数が表示されます。</div>';
   h += '<div id="t2TargetContainer"></div>';
+  // ver.20261023.01: 第1-32号 新様式の留意事項３〜５に対応（③事業所・部署が違う理由／④他の２号にも指導を受ける理由／⑤人数を一時的に充足していない）
+  h += '<div id="t2RulesBox" style="margin-top:12px;">';
+  h += '<div class="field"><label>指導を受ける対象者は、全員、２号特定技能外国人と<b>同じ事業所に出勤し、同じ部署に所属</b>していますか？<span style="color:#dc2626;">*</span></label>'
+    + '<select id="f-t2SameOffice" onchange="_t2RulesToggle()"><option value="">--- 選んでください ---</option><option value="はい">はい</option><option value="いいえ">いいえ（事業所や部署が違う人がいる）</option></select></div>';
+  h += '<div class="field" id="t2Reason3Wrap" style="display:none;"><label>事業所や部署が違う理由（分野の特性など）<span style="color:#dc2626;">*</span></label>'
+    + '<div style="font-size:11px;color:#6b7280;margin-bottom:4px;">分野の特性で同じ事業所・部署でない場合は、事情を踏まえて個別に判断されます。理由を具体的にご記入ください。</div>'
+    + '<textarea id="f-t2Reason3" rows="2" placeholder="例：建設現場ごとに配置が変わるため、同じ現場に出勤する者を対象としている"></textarea></div>';
+  h += '<div class="field" id="t2DupReasonWrap" style="display:none;background:#fff7ed;border:1.5px solid #fdba74;border-radius:10px;padding:10px 12px;"><label>他の２号特定技能外国人にも指導を受けている人を含める理由<span style="color:#dc2626;">*</span></label>'
+    + '<div style="font-size:11px;color:#9a3412;margin-bottom:4px;line-height:1.6;">原則は、他の２号に指導を受けている人は対象外です。<b>専門性の異なる２号が同じ人を指導する場合</b>や、<b>分野特有の事情がある場合</b>など、合理的な理由があるときだけ対象者に含められます。</div>'
+    + '<textarea id="f-t2DupReason" rows="2" placeholder="例：溶接と塗装で専門が異なる２号が、それぞれの作業を指導するため"></textarea></div>';
+  h += '<div id="t2ShortWrap" style="display:none;background:#fef2f2;border:1.5px solid #fca5a5;border-radius:10px;padding:10px 12px;margin-bottom:12px;">'
+    + '<div id="t2ShortMsg" style="font-size:13px;font-weight:800;color:#991b1b;margin-bottom:6px;"></div>'
+    + '<div style="font-size:12px;color:#7f1d1d;margin-bottom:8px;line-height:1.6;">採用手続き中などで、必要な人数を<b>一時的に</b>満たしていない場合は、下の内容を確認してチェックを入れ、理由をご記入ください。</div>'
+    + '<label style="display:flex;align-items:flex-start;gap:8px;cursor:pointer;font-size:12.5px;color:#7f1d1d;line-height:1.6;"><input type="checkbox" id="f-t2Short5" style="width:20px;height:20px;flex-shrink:0;margin-top:1px;">'
+    + '<span>今般の申請に当たって、特定産業分野ごとに必要とされる指導対象者数を充足していませんが、この状況は、理由欄記載のとおり一時的なものであり、<b>次回の在留期間更新許可申請の際に指導対象者数を充足していない場合は、次回の在留期間更新許可申請が不許可となり得る</b>ことを理解しています。</span></label>'
+    + '<div class="field" style="margin-top:8px;"><label>一時的に足りていない理由<span style="color:#dc2626;">*</span></label><textarea id="f-t2Reason5" rows="2" placeholder="例：1名が採用手続き中（12月入社予定）のため"></textarea></div></div>';
+  h += '</div>';
 
   // 必須確認チェックボックス
   h += '<div id="t2ConfirmWrap" style="margin-top:16px;padding:12px 14px;background:#fef2f2;border:1.5px solid #fca5a5;border-radius:10px;">';
   h += '<label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-size:13px;color:#991b1b;font-weight:700;line-height:1.6;">';
   h += '<input type="checkbox" id="f-t2Confirm" style="width:20px;height:20px;flex-shrink:0;margin-top:1px;">';
-  h += '<span id="t2ConfirmText">指導を受ける対象者を選定し、いずれも<b>他の２号特定技能外国人に指導を受けていない（重複していない）</b>ことを確認しました。<span class="req">*</span></span>';
+  h += '<span id="t2ConfirmText">指導を受ける対象者を選定し、記入内容に誤りがないことを確認しました。<span class="req">*</span></span>';
   h += '</label>';
   h += '</div>';
 
@@ -3700,24 +3717,25 @@ function recalcT2Targets(){
     } else {
       note.innerHTML = '❗ <b>指導を受ける対象者を「'+need+'名以上」選定する必要があります。</b><br>'
         + '（２号 '+total+'名 × '+perPerson+'名／人 ＝ '+need+'名）<br>'
-        + '・対象者は<b>他の２号特定技能外国人に指導を受けていない</b>方に限ります（重複不可）。<br>'
-        + '・同一の事業所に出勤し、原則同一部署でフルタイム勤務の方に限ります。<br>'
-        + '<span style="color:#991b1b;">※ '+need+'名以上を別途選定し、重複がないことを必ずご確認ください。要件を満たさないと許可されません。</span>';
+        + '・原則として、２号と<b>同じ事業所に出勤し、同じ部署に所属する方</b>です（分野の特性で違う場合は、下で理由をご記入ください）。<br>'
+        + '・<b>他の２号特定技能外国人に指導を受けている方</b>は原則対象外です（専門性の異なる２号が指導する場合など、合理的な理由があれば対象にできます）。<br>'
+        + '<span style="color:#991b1b;">※ 採用手続き中などで一時的に'+need+'名に足りない場合は、下の欄でチェックと理由をご入力ください（次回の更新までに満たしていないと不許可となり得ます）。</span>';
       note.style.color = '#b45309';
     }
   }
   if (confirmText){
     if (key !== '' && perPerson === 0){
-      confirmText.innerHTML = '（該当者を入力した場合）いずれも<b>他の２号特定技能外国人に指導を受けていない（重複していない）</b>ことを確認しました。';
+      confirmText.innerHTML = '（該当者を入力した場合）指導を受ける対象者の記入内容に誤りがないことを確認しました。';
     } else if (need > 0){
-      confirmText.innerHTML = '指導を受ける対象者を<b>'+need+'名以上</b>選定し、いずれも<b>他の２号特定技能外国人に指導を受けていない（重複していない）</b>ことを確認しました。<span class="req">*</span>';
+      confirmText.innerHTML = '指導を受ける対象者（必要数 <b>'+need+'名以上</b>）を選定し、記入内容に誤りがないことを確認しました（他の２号にも指導を受けている人を含む場合・人数が一時的に足りない場合は、その理由を記入しました）。<span class="req">*</span>';
     } else {
-      confirmText.innerHTML = '指導を受ける対象者を選定し、いずれも<b>他の２号特定技能外国人に指導を受けていない（重複していない）</b>ことを確認しました。<span class="req">*</span>';
+      confirmText.innerHTML = '指導を受ける対象者を選定し、記入内容に誤りがないことを確認しました。<span class="req">*</span>';
     }
   }
   if (confirmWrap){
     confirmWrap.style.opacity = (perPerson === 0) ? '0.7' : '1';
   }
+  try{ _t2RulesToggle(); }catch(e){}
 }
 // ===== ver.20261005.01: 指導対象者の重複チェック（現在の２号・今回の２号をまたいで、同じ人が2回出てこないか） =====
 function _t2NormName(v){ var x=String(v||''); try{ x=x.normalize('NFKC'); }catch(e){} return x.replace(/[\s\u3000・．.,，、]/g,'').toUpperCase(); }
@@ -3748,19 +3766,45 @@ function _t2DupCheck(){
       row.style.borderColor='#ef4444'; row.style.background='#fef2f2';
       var d=document.createElement('div'); d.className='t2-dup-msg';
       d.style.cssText='margin-top:6px;font-size:12px;font-weight:800;color:#b91c1c;line-height:1.6;';
-      d.textContent='⚠️ 「'+others.join('」「')+'」の指導対象者と重複しています。別の対象者を選定する必要があります。';
+      d.textContent='⚠️ 「'+others.join('」「')+'」の指導対象者と重複しています。合理的な理由がある場合だけ対象者に含められます（下の欄に理由をご記入ください）。';
       row.appendChild(d);
     });
     var nm=(rs[0].querySelector('[data-fld="name"]')||{}).value||'';
     msgs.push('「'+String(nm).trim()+'」さん（'+rs.map(_t2RowLabel).join('・')+'）');
   });
   if(!msgs.length) return '';
-  return '⚠️ 指導を受ける対象者が重複しています：'+msgs.join('、')+'。１人の対象者を複数の２号特定技能外国人が指導することはできないため、別の対象者を選定する必要があります。';
+  return '⚠️ 指導を受ける対象者が重複しています：'+msgs.join('、')+'。他の２号特定技能外国人にも指導を受けている人は、専門性の異なる２号が指導する場合など合理的な理由があるときだけ対象者に含められます。';
 }
 // 入力のたびに重複を確認（少し待ってから）
 document.addEventListener('input', function(e){
   var t=e.target; if(!t || !t.closest || !t.closest('#t2TargetContainer')) return;
   clearTimeout(window._t2DupTimer); window._t2DupTimer=setTimeout(function(){ try{ _t2DupCheck(); }catch(_){ } }, 300);
+});
+// ===== ver.20261023.01: 第1-32号 新様式の留意事項３〜５（理由欄・人数不足のチェック）の表示切り替え =====
+function _t2FilledCount(){
+  var n=0; document.querySelectorAll('#t2TargetContainer .t2-target-row').forEach(function(row){ var el=row.querySelector('[data-fld="name"]'); if(el && String(el.value||'').trim()) n++; }); return n;
+}
+function _t2NeedCount(){
+  var key=(document.getElementById('f-t2Field')||{}).value||''; if(!key) return 0;
+  var per=_t2MinForField(key);
+  var tot=parseInt((document.getElementById('f-t2CountNow')||{}).value||'0',10)+parseInt((document.getElementById('f-t2CountThis')||{}).value||'0',10);
+  return per*tot;
+}
+function _t2RulesToggle(){
+  var so=(document.getElementById('f-t2SameOffice')||{}).value||'';
+  var w3=document.getElementById('t2Reason3Wrap'); if(w3) w3.style.display=(so==='いいえ')?'':'none';
+  var dw=document.getElementById('t2DupReasonWrap'); if(dw){ var dm=''; try{ dm=_t2DupCheck(); }catch(e){} dw.style.display=dm?'':'none'; }
+  var need=_t2NeedCount(), filled=_t2FilledCount();
+  var sw=document.getElementById('t2ShortWrap'), sm=document.getElementById('t2ShortMsg');
+  if(sw){
+    var short=(need>0 && filled<need);
+    sw.style.display=short?'':'none';
+    if(sm) sm.textContent=short?('⚠️ 指導を受ける対象者が、必要な人数（'+need+'名）に足りていません（入力 '+filled+'名）。'):'';
+  }
+}
+document.addEventListener('input', function(e){
+  var t=e.target; if(!t || !t.closest || !t.closest('#t2TargetContainer')) return;
+  clearTimeout(window._t2RuleTimer); window._t2RuleTimer=setTimeout(function(){ try{ _t2RulesToggle(); }catch(_){ } }, 350);
 });
 // ===== ver.20261005.01: 2回目以降の申請（前回の回答は残し、新しい申請として入力する） =====
 function _t2OfferNew(resp, row){
@@ -3808,8 +3852,10 @@ function _t2StartNew(){
     var base='f-t2tgt_now'+np+'_'+ptr[k];
     ['name','card','dept','position','job'].forEach(function(sfx){ var el=document.getElementById(base+'_'+sfx); if(el && t[sfx]!=null) el.value=t[sfx]; });
   });
-  ['f-t2Dept','f-t2Position','f-t2JobDetail','f-t2JobDiff'].forEach(function(id){ setV(id,''); });
+  ['f-t2Dept','f-t2Position','f-t2JobDetail','f-t2JobDiff','f-t2SameOffice','f-t2Reason3','f-t2DupReason','f-t2Reason5'].forEach(function(id){ setV(id,''); });
   var cb=document.getElementById('f-t2Confirm'); if(cb) cb.checked=false;
+  var cb5=document.getElementById('f-t2Short5'); if(cb5) cb5.checked=false;
+  try{ _t2RulesToggle(); }catch(e){}
   // ver.20261005.02: 仕事内容が前回と同じなら、ボタン1つでコピーできるようにする
   var cw=document.getElementById('t2CopyJobWrap');
   if(cw && (resp.t2Dept||resp.t2Position||resp.t2JobDetail||resp.t2JobDiff)){
@@ -4855,6 +4901,13 @@ function collectData() {
     d.t2JobDetail = val('f-t2JobDetail');
     d.t2JobDiff = val('f-t2JobDiff');
     d.t2Confirm = (document.getElementById('f-t2Confirm') && document.getElementById('f-t2Confirm').checked) ? 'confirmed' : '';
+    // ver.20261023.01: 第1-32号 新様式の留意事項３〜５
+    d.t2SameOffice = val('f-t2SameOffice');
+    d.t2Reason3 = (d.t2SameOffice === 'いいえ') ? val('f-t2Reason3') : '';
+    d.t2DupReason = (document.getElementById('t2DupReasonWrap') && document.getElementById('t2DupReasonWrap').style.display !== 'none') ? val('f-t2DupReason') : '';
+    var _t2sw = document.getElementById('t2ShortWrap'), _t2shOn = !!(_t2sw && _t2sw.style.display !== 'none');
+    d.t2Short5 = (_t2shOn && document.getElementById('f-t2Short5') && document.getElementById('f-t2Short5').checked) ? 'checked' : '';
+    d.t2Reason5 = _t2shOn ? val('f-t2Reason5') : '';
     var _t2t = [];
     document.querySelectorAll('#t2TargetContainer .t2-target-row').forEach(function(row){
       var g=function(sfx){ var el=row.querySelector('[data-fld="'+sfx+'"]'); return el?(el.value||'').trim():''; };
@@ -4983,6 +5036,13 @@ function collectData() {
       d.t2JobDetail = val('f-t2JobDetail');
       d.t2JobDiff = val('f-t2JobDiff');
       d.t2Confirm = (document.getElementById('f-t2Confirm') && document.getElementById('f-t2Confirm').checked) ? 'confirmed' : '';
+      // ver.20261023.01: 第1-32号 新様式の留意事項３〜５
+      d.t2SameOffice = val('f-t2SameOffice');
+      d.t2Reason3 = (d.t2SameOffice === 'いいえ') ? val('f-t2Reason3') : '';
+      d.t2DupReason = (document.getElementById('t2DupReasonWrap') && document.getElementById('t2DupReasonWrap').style.display !== 'none') ? val('f-t2DupReason') : '';
+      var _t2sw = document.getElementById('t2ShortWrap'), _t2shOn = !!(_t2sw && _t2sw.style.display !== 'none');
+      d.t2Short5 = (_t2shOn && document.getElementById('f-t2Short5') && document.getElementById('f-t2Short5').checked) ? 'checked' : '';
+      d.t2Reason5 = _t2shOn ? val('f-t2Reason5') : '';
       var _t2targets = [];
       document.querySelectorAll('#t2TargetContainer .t2-target-row').forEach(function(row){
         var g=function(sfx){ var el=row.querySelector('[data-fld="'+sfx+'"]'); return el?(el.value||'').trim():''; };
@@ -5595,17 +5655,29 @@ function _validateInner() {
       var nm = el ? (el.value||'').trim() : '';
       if (nm !== '') _filled++;
     });
+    try{ _t2RulesToggle(); }catch(e){}
+    // ver.20261023.01: 第1-32号 新様式 留意事項５ … 人数が足りないときは「一時的に充足していない」のチェック＋理由があれば送信できる
     if (_need > 0 && _filled < _need) {
-      return '指導を受ける対象者を' + _need + '名以上ご入力ください（２号' + _total + '名×' + _t2per + '名／人）。氏名が必要です。他の2号特定技能外国人と重複しない方を選定してください。';
+      var _sh5 = document.getElementById('f-t2Short5');
+      if (!_sh5 || !_sh5.checked) {
+        return '指導を受ける対象者が' + _need + '名に足りていません（入力 ' + _filled + '名・２号' + _total + '名×' + _t2per + '名／人）。採用手続き中などで一時的に足りない場合は、「必要な人数を一時的に充足していない」のチェックを入れて理由をご入力ください。';
+      }
+      if (!val('f-t2Reason5')) return '指導を受ける対象者が一時的に足りていない理由をご入力ください。';
     }
-    // ver.20261005.01: 指導対象者の重複（同じ人を2人以上の2号が指導）は送信できない
+    // ver.20261023.01: 留意事項４ … 他の２号にも指導を受けている人は、合理的な理由があれば対象者に含められる（理由が必須）
     var _dupMsg = (typeof _t2DupCheck === 'function') ? _t2DupCheck() : '';
-    if (_dupMsg) return _dupMsg;
+    if (_dupMsg && !val('f-t2DupReason')) return _dupMsg + '（含める場合は、その理由をご入力ください。理由がなければ別の対象者を選定してください）';
+    // ver.20261023.01: 留意事項３ … 同じ事業所・部署か（違う人がいれば理由が必須）
+    if (_filled > 0) {
+      var _so = val('f-t2SameOffice');
+      if (!_so) return '指導を受ける対象者が「全員、同じ事業所・同じ部署か」を選んでください。';
+      if (_so === 'いいえ' && !val('f-t2Reason3')) return '指導を受ける対象者の事業所や部署が違う理由をご入力ください。';
+    }
     // 対象者不要の分野(per=0)ではチェック必須にしない
     if (_need > 0) {
       var _cb = document.getElementById('f-t2Confirm');
       if (!_cb || !_cb.checked) {
-        return '「' + _need + '名以上を選定し、重複がないことを確認しました」のチェックを入れてください。';
+        return '一番下の「指導を受ける対象者を選定し、記入内容に誤りがないことを確認しました」にチェックを入れてください。';
       }
     }
     // ver.20260831: 誓約書単独フォーム(tokutei2_pledge)は氏名/会社名フィールドを持たない。
@@ -6572,6 +6644,10 @@ function prefillForm(resp) {
       _t2set('f-t2JobDiff', resp.t2JobDiff);
       var _t2cf = document.getElementById('f-t2Confirm');
       if (_t2cf && resp.t2Confirm === 'confirmed') _t2cf.checked = true;
+      // ver.20261023.01: 留意事項３〜５
+      _t2set('f-t2SameOffice', resp.t2SameOffice); _t2set('f-t2Reason3', resp.t2Reason3); _t2set('f-t2DupReason', resp.t2DupReason); _t2set('f-t2Reason5', resp.t2Reason5);
+      var _t2s5 = document.getElementById('f-t2Short5'); if (_t2s5) _t2s5.checked = (resp.t2Short5 === 'checked');
+      try{ _t2RulesToggle(); }catch(e){}
     }
   } catch(e) { console.error('t2 pledge prefill error (ignored):', e); }
 }
