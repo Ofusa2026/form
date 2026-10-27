@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex,nofollow">
+<title>お支払い完了報告 / Payment report</title>
+<style>
+  :root{
+    --navy:#0f2040; --line:#e5e7eb; --muted:#64748b; --bg:#f1f5f9;
+    --accent:#1d4ed8; --ok:#16a34a; --err:#dc2626; --warn:#b45309;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--bg); color:#0f172a;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Hiragino Kaku Gothic ProN","Noto Sans JP",sans-serif;
+    line-height:1.6; -webkit-text-size-adjust:100%;
+  }
+  ruby rt{ font-size:.6em; color:var(--muted); font-weight:400; }
+  .wrap{ max-width:560px; margin:0 auto; padding:0 0 60px; }
+  header{ background:var(--navy); color:#fff; padding:20px 20px 18px; text-align:center; }
+  header .org{ font-size:12px; opacity:.75; letter-spacing:.5px; }
+  header h1{ font-size:19px; margin:6px 0 2px; font-weight:700; }
+  header .en{ font-size:12px; opacity:.8; }
+  .body{ padding:18px 18px 0; }
+  .case-box{ background:#fff; border:1px solid var(--line); border-radius:12px; padding:13px 15px; font-size:14px; margin-bottom:14px; }
+  .case-box .cn{ font-weight:700; color:var(--navy); font-size:15px; }
+  .case-box table{ width:100%; border-collapse:collapse; margin-top:8px; font-size:13.5px; }
+  .case-box td{ padding:3px 0; vertical-align:top; }
+  .case-box td.k{ color:var(--muted); width:42%; }
+  .case-box td.v{ font-weight:700; }
+  .card{ background:#fff; border:1px solid var(--line); border-radius:14px; padding:18px 16px 6px; }
+  .field{ margin-bottom:18px; }
+  .lbl{ display:block; font-size:14px; font-weight:600; margin-bottom:7px; }
+  .lbl .req{ color:var(--err); margin-left:4px; }
+  .en{ font-weight:400; color:var(--muted); font-size:12px; }
+  .ck{ display:flex; gap:10px; align-items:flex-start; padding:12px; border:1.5px solid var(--line); border-radius:10px; margin-bottom:10px; font-size:14px; cursor:pointer; }
+  .ck input{ width:22px; height:22px; margin:2px 0 0; flex-shrink:0; accent-color:var(--navy); }
+  .ck.on{ border-color:var(--navy); background:#f8fafc; }
+  input[type=date]{ width:100%; padding:12px 14px; border:1.5px solid var(--line); border-radius:10px; font-size:16px; min-height:50px; background:#fff; -webkit-appearance:none; }
+  .radios{ display:flex; gap:10px; }
+  .radios label{ flex:1; display:flex; gap:8px; align-items:center; justify-content:center; padding:12px; border:1.5px solid var(--line); border-radius:10px; font-size:15px; cursor:pointer; }
+  .radios input{ width:20px; height:20px; accent-color:var(--navy); }
+  .radios label.on{ border-color:var(--navy); background:#f8fafc; font-weight:700; }
+  .warnbox{ background:#fffbeb; border:1px solid #fde68a; color:var(--warn); border-radius:12px; padding:12px 14px; font-size:13px; margin-bottom:14px; }
+  .submit-wrap{ padding:18px; }
+  button.submit{ width:100%; padding:16px; border:none; border-radius:12px; background:var(--navy); color:#fff; font-size:17px; font-weight:700; cursor:pointer; }
+  button.submit:disabled{ opacity:.6; cursor:default; }
+  .errmsg{ display:none; background:#fef2f2; color:var(--err); border:1px solid #fecaca; border-radius:10px; padding:12px 14px; font-size:14px; margin:0 18px 8px; }
+  .msg{ text-align:center; padding:48px 24px; }
+  .msg .ic{ font-size:54px; }
+  .msg h2{ color:var(--navy); margin:10px 0 6px; }
+  .msg p{ color:#334155; font-size:14px; }
+  .ov{ display:none; position:fixed; inset:0; background:rgba(15,23,42,.55); z-index:50; align-items:center; justify-content:center; padding:16px; }
+  .ov.show{ display:flex; }
+  .dlg{ background:#fff; border-radius:16px; max-width:400px; width:100%; padding:20px 18px 16px; max-height:90vh; overflow:auto; }
+  .dlg h3{ margin:0 0 8px; color:var(--err); font-size:17px; }
+  .dlg p{ font-size:14px; color:#334155; margin:0 0 10px; }
+  .dlg .sum{ background:#f8fafc; border:1px solid var(--line); border-radius:10px; padding:10px 12px; font-size:14px; margin-bottom:12px; }
+  .dlg .btns{ display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:6px; }
+  .dlg button{ padding:13px; border-radius:10px; font-size:15px; font-weight:700; cursor:pointer; font-family:inherit; }
+  .dlg .back{ background:#fff; border:1.5px solid #cbd5e1; color:var(--navy); }
+  .dlg .go{ background:var(--navy); border:none; color:#fff; }
+  .dlg .go:disabled{ opacity:.5; }
+  .ver{ text-align:center; font-size:10px; color:#94a3b8; margin-top:24px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="org">大房行政書士法人</div>
+    <h1>お<ruby>支払<rt>しはら</rt></ruby>い<ruby>完了<rt>かんりょう</rt></ruby>の<ruby>報告<rt>ほうこく</rt></ruby></h1>
+    <div class="en">Payment completion report</div>
+  </header>
+
+  <div id="loading" class="msg"><p>読み込み中… / Loading…</p></div>
+
+  <div id="main" style="display:none;">
+    <div class="body">
+      <div class="case-box" id="caseBox"></div>
+      <div class="warnbox">
+        <b>決済完了のメール（@veritrans.jp）が届いてから</b>報告してください。<br>
+        事実と違う報告をすると、在留カードの交付手続きに支障が出ます。<br>
+        <span class="en">Please report only after you receive the payment completion email (@veritrans.jp).</span>
+      </div>
+      <div class="card">
+        <div class="field">
+          <span class="lbl">お支払いの確認<span class="req">*</span></span>
+          <label class="ck" id="ck1w"><input type="checkbox" id="ck1" onchange="tog(this)"><span>お<ruby>支払<rt>しはら</rt></ruby>いが<ruby>完了<rt>かんりょう</rt></ruby>しました<br><span class="en">I have completed the payment.</span></span></label>
+          <label class="ck" id="ck2w"><input type="checkbox" id="ck2" onchange="tog(this)"><span><ruby>決済<rt>けっさい</rt></ruby><ruby>完了<rt>かんりょう</rt></ruby>のメール（@veritrans.jp）が<ruby>届<rt>とど</rt></ruby>いています<br><span class="en">I received the payment completion email.</span></span></label>
+        </div>
+        <div class="field">
+          <span class="lbl">お<ruby>支払<rt>しはら</rt></ruby>いした<ruby>日<rt>ひ</rt></ruby><span class="req">*</span> <span class="en">Payment date</span></span>
+          <input type="date" id="f-date">
+        </div>
+        <div class="field">
+          <span class="lbl">お<ruby>支払<rt>しはら</rt></ruby>いした<ruby>人<rt>ひと</rt></ruby><span class="req">*</span> <span class="en">Who paid</span></span>
+          <div class="radios">
+            <label id="py1w"><input type="radio" name="payer" value="本人" onchange="togR()"> <ruby>本人<rt>ほんにん</rt></ruby> <span class="en">Myself</span></label>
+            <label id="py2w"><input type="radio" name="payer" value="会社" onchange="togR()"> <ruby>会社<rt>かいしゃ</rt></ruby> <span class="en">Company</span></label>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="errmsg" class="errmsg"></div>
+    <div class="submit-wrap">
+      <button type="button" class="submit" id="btn-submit" onclick="openConfirm()"><ruby>報告<rt>ほうこく</rt></ruby>する / Report</button>
+    </div>
+  </div>
+
+  <div id="done" class="msg" style="display:none;"></div>
+  <div class="ver" id="ver"></div>
+</div>
+
+<div class="ov" id="ov">
+  <div class="dlg" role="dialog" aria-modal="true">
+    <h3>⚠️ 本当にお支払いは完了していますか？</h3>
+    <p>事実と違う報告をすると、在留カードの交付手続きに支障が出ます。決済完了のメールが届いていることを、もう一度確かめてください。</p>
+    <p class="en">If you report incorrectly, your residence card may not be issued. Please check the payment completion email again.</p>
+    <div class="sum" id="sum"></div>
+    <label class="ck" id="ck3w"><input type="checkbox" id="ck3" onchange="tog(this);$('btn-go').disabled=!this.checked;"><span>決済完了のメールを確認しました<br><span class="en">I checked the email.</span></span></label>
+    <div class="btns">
+      <button type="button" class="back" onclick="closeConfirm()">戻る / Back</button>
+      <button type="button" class="go" id="btn-go" disabled onclick="submitReport()">はい、報告する</button>
+    </div>
+  </div>
+</div>
+
+<script>
+var PAY_VERSION = 'ver.20261027.01';
+var SUPABASE_URL = 'https://ehwlgbwpycglmopiqyty.supabase.co';
+var SUPABASE_KEY = 'sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
+
+var token = new URLSearchParams(location.search).get('r') || '';
+var info = null;
+
+function $(id){ return document.getElementById(id); }
+function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function yen(n){ return (n==null||n==='') ? '—' : Number(n).toLocaleString('ja-JP') + '円'; }
+function jpDate(ymd){ if(!ymd) return '—'; var p=String(ymd).slice(0,10).split('-'); return p.length===3 ? (Number(p[0])+'年'+Number(p[1])+'月'+Number(p[2])+'日') : ymd; }
+function todayYmd(){ var d=new Date(Date.now()+9*3600*1000); return d.toISOString().slice(0,10); }
+function tog(el){ var w=el.closest('.ck'); if(w) w.classList.toggle('on', el.checked); }
+function togR(){ ['py1w','py2w'].forEach(function(id){ var w=$(id); w.classList.toggle('on', w.querySelector('input').checked); }); }
+function payer(){ var r=document.querySelector('input[name="payer"]:checked'); return r ? r.value : ''; }
+
+function callRpc(fn, body){
+  return fetch(SUPABASE_URL + '/rest/v1/rpc/' + fn, {
+    method:'POST',
+    headers:{ 'Content-Type':'application/json', 'apikey':SUPABASE_KEY, 'Authorization':'Bearer '+SUPABASE_KEY },
+    body: JSON.stringify(body || {})
+  }).then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); });
+}
+
+function showMsg(icon, title, html){
+  $('loading').style.display='none'; $('main').style.display='none';
+  var d=$('done'); d.innerHTML='<div class="ic">'+icon+'</div><h2>'+title+'</h2><p>'+html+'</p>'; d.style.display='block';
+  window.scrollTo(0,0);
+}
+function showReported(at, py, pd){
+  showMsg('✅', '報告を受け付けました / Received',
+    'お支払いの完了報告ありがとうございました。<br>これから在留カードの交付の手続きに進みます。<br>'
+    +'決済完了のメールは、在留カードをお受け取りになるまで消さずに保管してください。<br>'
+    +(pd ? ('<span style="color:#64748b;font-size:12px;">お支払い日 '+esc(jpDate(pd))+(py?('・'+esc(py)):'')+'</span><br>') : '')
+    +'<span style="color:#64748b;font-size:12px;">Thank you. We will proceed with your residence card.</span>');
+}
+function showErr(msg){ var el=$('errmsg'); el.textContent=msg; el.style.display='block'; el.scrollIntoView({ behavior:'smooth', block:'center' }); }
+
+function validate(){
+  if(!$('ck1').checked || !$('ck2').checked) return 'お支払いの確認の2つにチェックを入れてください。 / Please check both boxes.';
+  var d=$('f-date').value;
+  if(!d) return 'お支払いした日を入れてください。 / Please enter the payment date.';
+  if(d > todayYmd()) return 'お支払いした日に、未来の日は入れられません。 / The date cannot be in the future.';
+  if(info && info.mail_date && d < info.mail_date) return 'お支払いした日が、決済リンクが届いた日（'+jpDate(info.mail_date)+'）より前になっています。 / Please check the date.';
+  if(!payer()) return 'お支払いした人（本人／会社）を選んでください。 / Please choose who paid.';
+  return '';
+}
+function openConfirm(){
+  $('errmsg').style.display='none';
+  var e=validate(); if(e){ showErr(e); return; }
+  $('sum').innerHTML='お支払い日 <b>'+esc(jpDate($('f-date').value))+'</b><br>お支払いした人 <b>'+esc(payer())+'</b><br>金額 <b>'+esc(yen(info && info.amount))+'</b>';
+  $('ck3').checked=false; tog($('ck3')); $('btn-go').disabled=true;
+  $('ov').classList.add('show');
+}
+function closeConfirm(){ $('ov').classList.remove('show'); }
+
+function submitReport(){
+  if(!$('ck3').checked) return;
+  var b=$('btn-go'); b.disabled=true; b.textContent='送信中…';
+  callRpc('fee_report_submit', { p_token: token, p_paid_date: $('f-date').value, p_payer: payer(), p_confirmed: true })
+    .then(function(r){
+      closeConfirm(); b.textContent='はい、報告する';
+      if(r && r.ok){ showReported(r.reported_at, payer(), $('f-date').value); return; }
+      var m=(r&&r.msg)||'';
+      if(m==='bad_date') showErr('お支払いした日を確かめてください（未来の日・決済リンクが届く前の日は入れられません）。');
+      else if(m==='not_found') showMsg('⚠️', 'このリンクは使えません', 'リンクが正しくないか、古いリンクです。担当者にお問い合わせください。');
+      else showErr('送信できませんでした。もう一度お試しください。('+esc(m)+')');
+    })
+    .catch(function(e){ closeConfirm(); b.disabled=false; b.textContent='はい、報告する'; showErr('送信に失敗しました。通信環境をご確認のうえ、もう一度お試しください。('+e.message+')'); });
+}
+
+(function init(){
+  $('ver').textContent = PAY_VERSION;
+  if(!token){ showMsg('⚠️', 'このリンクは使えません', 'リンクが正しくありません。担当者から届いたリンクを開いてください。'); return; }
+  callRpc('fee_report_load', { p_token: token })
+    .then(function(d){
+      if(!d){ showMsg('⚠️', 'このリンクは使えません', 'リンクが正しくないか、古いリンクです。担当者にお問い合わせください。'); return; }
+      info = d;
+      if(d.reported_at){ showReported(d.reported_at, d.payer, d.paid_date); return; }
+      $('caseBox').innerHTML = '<span class="cn">'+esc(d.name||'')+'</span> 様'
+        +'<table><tr><td class="k">許可の内容</td><td class="v">'+esc(d.approval||'—')+'</td></tr>'
+        +'<tr><td class="k">お支払い金額</td><td class="v">'+esc(yen(d.amount))+'</td></tr>'
+        +'<tr><td class="k">お支払い期限</td><td class="v">'+esc(jpDate(d.deadline))+'</td></tr></table>';
+      var f=$('f-date'); f.max=todayYmd(); if(d.mail_date) f.min=String(d.mail_date).slice(0,10); f.value=todayYmd();
+      $('loading').style.display='none'; $('main').style.display='';
+    })
+    .catch(function(e){ showMsg('⚠️', '読み込めませんでした', '通信環境をご確認のうえ、ページを再読み込みしてください。('+esc(e.message)+')'); });
+})();
+</script>
+</body>
+</html>
