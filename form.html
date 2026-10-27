@@ -192,7 +192,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20261023.01'; // 2号（所属機関）：第1-32号 新様式の留意事項３〜５に対応（事業所・部署が違う理由／他の２号にも指導を受ける人を理由付きで可／人数が一時的に足りない場合はチェック＋理由で送信可。送信 t2SameOffice・t2Reason3・t2DupReason・t2Short5・t2Reason5）・技能実習2号「内装仕上げ施工」の作業に「カーテン工事」を追加 ／ ver.20261020.04: 技能実習2号「内装仕上げ施工」の作業に「カーテン工事」を追加 ／ ver.20261020.03: support=skip（自社支援を別で管理）：企業情報だけ聞き、【自社支援】タブは出さない ／ ver.20261020.02: 自社支援：受入経験ありでも選任の根拠を聞く／確認用リンク（①企業情報）に【自社支援】タブを付ける ／ ver.20261020.01: 在日親族：1つでも入れた行（「はい」のときは1人目も）は全項目必須（日本国籍は在留カード不要・同居なら住所不要・働いていなければ「なし」） ／ ver.20261019.02: 在日親族に「生年月日」「国籍」を追加（送信 familyMembers[].birth / nationality）・途中保存した在日親族を開き直したときに戻すように ／ ver.20261019.01: 特定技能1号の企業フォームに【自社支援】支援体制・【自社支援】担当者・その他タブを追加（案件の登録支援機関なし＝自社支援のときだけ表示。登録支援機関フォームと同じ部品・同じ送信キー selfSupport ＋ 選任の根拠：①1-11-2号／②1-11-3号・1-20号・1-22号） ／ ver.20261015.04: // 定期健康診断の下に「自己都合退職は何日前までに申し出るか（日）」を追加（必須・初期値30日） ／ ver.20261015.03: // 特定技能2号の確認用リンク：③だけ（part=3）・①②③すべて（part=123）を追加／①＋②（part=12）は③を出さない／①だけ（part=1）で隠れた③の入力チェックに止まっていたのを修正
+var FORM_VERSION = 'ver.20261027.02'; // 氏名（英字以外）・生年月日（15歳未満）を送信前に知らせる／サーバーで弾かれたら理由を表示（旧 ver.20261023.01: // 2号（所属機関）：第1-32号 新様式の留意事項３〜５に対応（事業所・部署が違う理由／他の２号にも指導を受ける人を理由付きで可／人数が一時的に足りない場合はチェック＋理由で送信可。送信 t2SameOffice・t2Reason3・t2DupReason・t2Short5・t2Reason5）・技能実習2号「内装仕上げ施工」の作業に「カーテン工事」を追加 ／ ver.20261020.04: 技能実習2号「内装仕上げ施工」の作業に「カーテン工事」を追加 ／ ver.20261020.03: support=skip（自社支援を別で管理）：企業情報だけ聞き、【自社支援】タブは出さない ／ ver.20261020.02: 自社支援：受入経験ありでも選任の根拠を聞く／確認用リンク（①企業情報）に【自社支援】タブを付ける ／ ver.20261020.01: 在日親族：1つでも入れた行（「はい」のときは1人目も）は全項目必須（日本国籍は在留カード不要・同居なら住所不要・働いていなければ「なし」） ／ ver.20261019.02: 在日親族に「生年月日」「国籍」を追加（送信 familyMembers[].birth / nationality）・途中保存した在日親族を開き直したときに戻すように ／ ver.20261019.01: 特定技能1号の企業フォームに【自社支援】支援体制・【自社支援】担当者・その他タブを追加（案件の登録支援機関なし＝自社支援のときだけ表示。登録支援機関フォームと同じ部品・同じ送信キー selfSupport ＋ 選任の根拠：①1-11-2号／②1-11-3号・1-20号・1-22号） ／ ver.20261015.04: // 定期健康診断の下に「自己都合退職は何日前までに申し出るか（日）」を追加（必須・初期値30日） ／ ver.20261015.03: // 特定技能2号の確認用リンク：③だけ（part=3）・①②③すべて（part=123）を追加／①＋②（part=12）は③を出さない／①だけ（part=1）で隠れた③の入力チェックに止まっていたのを修正
 // var FORM_VERSION = 'ver.20261015.02'; // 「居住費 適正額の説明」を削除（「住居（支援計画書用）」の「実費相当の説明」と重複のため） ／ ver.20261015.01: // 住居（支援計画書用）は居住費控除「有」のときだけ表示／③タブ名を「2号に関するヒアリング」に／2号の項目で止まったら③へ切り替え ／ ver.20261014.07: // ①＋②の確認用リンク（part=12：会社情報を入れて通常のフォームを開く）
 // var FORM_VERSION = 'ver.20261014.06'; // 就業場所を「＋」で2か所目以降も入力（office2Name〜）
 // var FORM_VERSION = 'ver.20261014.05'; // 昇給の下に「建設分野の場合の記載」の案内と入力ボタン
@@ -5736,7 +5736,11 @@ function _validateInner() {
     return null;
   }
   if (!val('f-name')) return '氏名（パスポート表記）は必須です。';
+  // ver.20261027.02: サーバーで弾かれる内容は送信前にここで分かるように（理由が出ずに「サーバー側で不備」になっていたため）
+  if (/[\u3040-\u30FF\u3400-\u9FFF\uFF66-\uFF9F]/.test(val('f-name'))) return '氏名はパスポートどおりローマ字（英字）で入力してください。記入者（ご担当者）様のお名前ではなく、申請人本人のお名前を入力してください。';
   if (!val('f-birth')) return '生年月日は必須です。';
+  var _bd = val('f-birth'), _lim = new Date(); _lim.setFullYear(_lim.getFullYear()-15);
+  if (/^\d{4}-\d{2}-\d{2}$/.test(_bd) && _bd > _lim.toISOString().slice(0,10)) return '生年月日が正しくありません（' + _bd + '）。申請人本人の生年月日を入力してください。';
   if (!val('f-nationality')) return '国籍は必須です。';
   if (!val('f-email')) return 'メールアドレスは必須です。';
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val('f-email'))) {
@@ -5916,8 +5920,11 @@ async function submitForm() {
       var errorBody = '';
       try { errorBody = await res.text(); } catch(_) {}
       if (errorBody.indexOf('FORM_VALIDATION_ERROR') >= 0) {
-        // サーバー側で拒否された = フォームの中身が破損 → 再読み込みを促す
-        throw new Error('SERVER_VALIDATION_FAILED');
+        // ver.20261027.02: サーバーの理由（氏名が英字でない・生年月日の誤りなど）を取り出して画面に出す
+        var _why = '';
+        try { var _eb = JSON.parse(errorBody); _why = String((_eb && (_eb.message || _eb.msg)) || ''); } catch(_) { _why = errorBody; }
+        _why = _why.replace(/^.*FORM_VALIDATION_ERROR:\s*/, '').replace(/\s*case_id=.*$/, '').replace(/[（(]入力値:[^）)]*[）)]/, '').trim();
+        var _se = new Error('SERVER_VALIDATION_FAILED'); _se.why = _why; throw _se;
       }
       throw new Error('HTTP ' + res.status);
     }
@@ -5953,7 +5960,11 @@ async function submitForm() {
   } catch(e) {
     btn.disabled = false; btn.textContent = '送信する';
     var el = document.getElementById('errorMsg');
-    if (e.message === 'SERVER_VALIDATION_FAILED') {
+    if (e.message === 'SERVER_VALIDATION_FAILED' && e.why && !/不足|未入力/.test(e.why)) {
+      // ver.20261027.02: 理由が分かるもの（氏名・生年月日など）はそのまま出す。再読み込みは不要
+      var _ew = document.createElement('div'); _ew.textContent = e.why;
+      el.innerHTML = '⚠️ 送信できませんでした。次の点を直して、もう一度「送信する」を押してください。<br><strong>' + _ew.innerHTML + '</strong>';
+    } else if (e.message === 'SERVER_VALIDATION_FAILED') {
       el.innerHTML = '⚠️ サーバー側で入力内容に不備が検出されました。<br>'
         + '<strong>ページを再読み込み(Ctrl+Shift+R / Cmd+Shift+R / iPhoneは閉じて開き直す)してから、もう一度入力してください。</strong><br>'
         + 'それでも解決しない場合は担当者までご連絡ください。';
