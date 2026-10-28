@@ -192,7 +192,8 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20261028.03'; // 現在の在留期間：選んだあとに「アプリで読み取って確認しましたか？」（はい／いいえ・必須、いいえでは送信できない）＋「まちがっていると申請までに時間がかかることがあります」の注意を追加
+var FORM_VERSION = 'ver.20261028.04'; // 確認の質問を「在留カードの表面または、アプリで在留カードを読み取って、在留期間を確認しましたか？」に変更
+// var FORM_VERSION = 'ver.20261028.03'; // 現在の在留期間：選んだあとに「アプリで読み取って確認しましたか？」（はい／いいえ・必須、いいえでは送信できない）＋「まちがっていると申請までに時間がかかることがあります」の注意を追加
 // var FORM_VERSION = 'ver.20261028.02'; // 変更・更新：案シスの「許可された在留期間」が空のときだけ「現在の在留期間」を必須で聞く（在留カードの表面または確認用アプリ＝出入国在留管理庁の案内PDF付き・認定は聞かない）
 // var FORM_VERSION = 'ver.20261028.01'; // 企業フォーム：「①と②は同じ窓口ですか？」（はい＝入力は1か所・②にも同じ内容を送る／いいえ＝今までどおり①②）。②にも「代表者と同じ」 ／ ver.20261027.02: 氏名（英字以外）・生年月日（15歳未満）を送信前に知らせる／サーバーで弾かれたら理由を表示（旧 ver.20261023.01: // 2号（所属機関）：第1-32号 新様式の留意事項３〜５に対応（事業所・部署が違う理由／他の２号にも指導を受ける人を理由付きで可／人数が一時的に足りない場合はチェック＋理由で送信可。送信 t2SameOffice・t2Reason3・t2DupReason・t2Short5・t2Reason5）・技能実習2号「内装仕上げ施工」の作業に「カーテン工事」を追加 ／ ver.20261020.04: 技能実習2号「内装仕上げ施工」の作業に「カーテン工事」を追加 ／ ver.20261020.03: support=skip（自社支援を別で管理）：企業情報だけ聞き、【自社支援】タブは出さない ／ ver.20261020.02: 自社支援：受入経験ありでも選任の根拠を聞く／確認用リンク（①企業情報）に【自社支援】タブを付ける ／ ver.20261020.01: 在日親族：1つでも入れた行（「はい」のときは1人目も）は全項目必須（日本国籍は在留カード不要・同居なら住所不要・働いていなければ「なし」） ／ ver.20261019.02: 在日親族に「生年月日」「国籍」を追加（送信 familyMembers[].birth / nationality）・途中保存した在日親族を開き直したときに戻すように ／ ver.20261019.01: 特定技能1号の企業フォームに【自社支援】支援体制・【自社支援】担当者・その他タブを追加（案件の登録支援機関なし＝自社支援のときだけ表示。登録支援機関フォームと同じ部品・同じ送信キー selfSupport ＋ 選任の根拠：①1-11-2号／②1-11-3号・1-20号・1-22号） ／ ver.20261015.04: // 定期健康診断の下に「自己都合退職は何日前までに申し出るか（日）」を追加（必須・初期値30日） ／ ver.20261015.03: // 特定技能2号の確認用リンク：③だけ（part=3）・①②③すべて（part=123）を追加／①＋②（part=12）は③を出さない／①だけ（part=1）で隠れた③の入力チェックに止まっていたのを修正
 // var FORM_VERSION = 'ver.20261015.02'; // 「居住費 適正額の説明」を削除（「住居（支援計画書用）」の「実費相当の説明」と重複のため） ／ ver.20261015.01: // 住居（支援計画書用）は居住費控除「有」のときだけ表示／③タブ名を「2号に関するヒアリング」に／2号の項目で止まったら③へ切り替え ／ ver.20261014.07: // ①＋②の確認用リンク（part=12：会社情報を入れて通常のフォームを開く）
@@ -277,7 +278,7 @@ var TRANS = {
     passport:'Passport Number', passExpiry:'Passport Expiry Date',
     married:'Are you married?', email:'Email Address',
     firstEntry:'When did you first come to Japan with Specified Skilled Worker visa? (Year / Month / Day)',
-    curStayAppQ:'Did you read your Residence Card with the app and check your period of stay?', curStayAppNo:'You cannot submit yet. Please read your Residence Card with the app (see the guide below), check your period of stay, then select 「はい」 (Yes).', curStayWarn:'⚠️ If the period of stay is wrong, it may take longer before we can submit your application. Please check your Residence Card carefully.',
+    curStayAppQ:'Did you check your period of stay on the front of your Residence Card, or by reading the card with the app?', curStayAppNo:'You cannot submit yet. Please check your period of stay on the front of your Residence Card or with the app (see the guide below), then select 「はい」 (Yes).', curStayWarn:'⚠️ If the period of stay is wrong, it may take longer before we can submit your application. Please check your Residence Card carefully.',
     curStayPeriod:'Current period of stay (as shown on your Residence Card)', curStayPeriodHelp:'You can check your period of stay on the front of your Residence Card, or with the app below.',
     entryCount:'How many times have you visited Japan?',
     coeCount:'How many times have you applied for a COE?',
@@ -316,7 +317,7 @@ var TRANS = {
     passport:'Số hộ chiếu', passExpiry:'Ngày hết hạn hộ chiếu',
     married:'Bạn đã kết hôn chưa?', email:'Địa chỉ email',
     firstEntry:'Lần đầu tiên bạn đến Nhật Bản với tư cách Kỹ năng đặc định là khi nào? (Năm / Tháng / Ngày)',
-    curStayAppQ:'Bạn đã đọc Thẻ lưu trú bằng ứng dụng và kiểm tra thời hạn lưu trú chưa?', curStayAppNo:'Chưa thể gửi. Vui lòng đọc Thẻ lưu trú bằng ứng dụng (xem hướng dẫn bên dưới), kiểm tra thời hạn lưu trú rồi chọn 「はい」 (Có).', curStayWarn:'⚠️ Nếu thời hạn lưu trú bị sai, việc nộp hồ sơ có thể mất nhiều thời gian hơn. Vui lòng kiểm tra kỹ Thẻ lưu trú.',
+    curStayAppQ:'Bạn đã kiểm tra thời hạn lưu trú ở mặt trước Thẻ lưu trú, hoặc bằng cách đọc thẻ bằng ứng dụng chưa?', curStayAppNo:'Chưa thể gửi. Vui lòng kiểm tra thời hạn lưu trú ở mặt trước Thẻ lưu trú hoặc bằng ứng dụng (xem hướng dẫn bên dưới), rồi chọn 「はい」 (Có).', curStayWarn:'⚠️ Nếu thời hạn lưu trú bị sai, việc nộp hồ sơ có thể mất nhiều thời gian hơn. Vui lòng kiểm tra kỹ Thẻ lưu trú.',
     curStayPeriod:'Thời hạn lưu trú hiện tại (ghi trên Thẻ lưu trú)', curStayPeriodHelp:'Bạn có thể kiểm tra thời hạn lưu trú ở mặt trước Thẻ lưu trú, hoặc bằng ứng dụng bên dưới.',
     entryCount:'Bạn đã đến Nhật Bản bao nhiêu lần?',
     coeCount:'Bạn đã xin COE bao nhiêu lần?',
@@ -355,7 +356,7 @@ var TRANS = {
     passport:'Nomor Paspor', passExpiry:'Masa Berlaku Paspor',
     married:'Apakah Anda sudah menikah?', email:'Alamat Email',
     firstEntry:'Kapan pertama kali Anda datang ke Jepang dengan visa Specified Skilled Worker? (Tahun / Bulan / Hari)',
-    curStayAppQ:'Apakah Anda sudah membaca Kartu Izin Tinggal dengan aplikasi dan memeriksa masa tinggal?', curStayAppNo:'Belum bisa dikirim. Silakan baca Kartu Izin Tinggal dengan aplikasi (lihat panduan di bawah), periksa masa tinggal, lalu pilih 「はい」 (Ya).', curStayWarn:'⚠️ Jika masa tinggal salah, pengajuan permohonan bisa memakan waktu lebih lama. Mohon periksa Kartu Izin Tinggal dengan teliti.',
+    curStayAppQ:'Apakah Anda sudah memeriksa masa tinggal di bagian depan Kartu Izin Tinggal, atau dengan membaca kartu melalui aplikasi?', curStayAppNo:'Belum bisa dikirim. Silakan periksa masa tinggal di bagian depan Kartu Izin Tinggal atau dengan aplikasi (lihat panduan di bawah), lalu pilih 「はい」 (Ya).', curStayWarn:'⚠️ Jika masa tinggal salah, pengajuan permohonan bisa memakan waktu lebih lama. Mohon periksa Kartu Izin Tinggal dengan teliti.',
     curStayPeriod:'Masa tinggal saat ini (tertera di Kartu Izin Tinggal)', curStayPeriodHelp:'Anda dapat memeriksa masa tinggal di bagian depan Kartu Izin Tinggal, atau melalui aplikasi di bawah.',
     entryCount:'Berapa kali Anda mengunjungi Jepang?',
     coeCount:'Berapa kali Anda mengajukan COE?',
@@ -393,7 +394,7 @@ var TRANS = {
     passport:'ပတ်စ်ပို့ နံပါတ်', passExpiry:'သက်တမ်းကုန်ဆုံးရက်',
     married:'အိမ်ထောင်ရှိပါသလား？', email:'အီးမေးလ်',
     firstEntry:'ဂျပန်နိုင်ငံသို့ ပထမဆုံးဝင်ရောက်ခဲ့သည့်ရက် (နှစ် / လ / ရက်)',
-    curStayAppQ:'အက်ပ်ဖြင့် နေထိုင်ခွင့်ကတ်ကို ဖတ်ပြီး နေထိုင်ခွင့်ကာလကို စစ်ဆေးပြီးပြီလား?', curStayAppNo:'ယခု ပေးပို့၍ မရသေးပါ။ အောက်ပါ လမ်းညွှန်အတိုင်း အက်ပ်ဖြင့် နေထိုင်ခွင့်ကတ်ကို ဖတ်ပြီး နေထိုင်ခွင့်ကာလကို စစ်ဆေးကာ 「はい」 (ဟုတ်ကဲ့) ကို ရွေးပါ။', curStayWarn:'⚠️ နေထိုင်ခွင့်ကာလ မှားယွင်းပါက လျှောက်ထားရန် အချိန်ပိုကြာနိုင်ပါသည်။ နေထိုင်ခွင့်ကတ်ကို သေချာစစ်ဆေးပါ။',
+    curStayAppQ:'နေထိုင်ခွင့်ကတ်၏ ရှေ့ဘက်တွင် သို့မဟုတ် အက်ပ်ဖြင့် ကတ်ကိုဖတ်၍ နေထိုင်ခွင့်ကာလကို စစ်ဆေးပြီးပြီလား?', curStayAppNo:'ယခု ပေးပို့၍ မရသေးပါ။ နေထိုင်ခွင့်ကတ်၏ ရှေ့ဘက်တွင် သို့မဟုတ် အက်ပ်ဖြင့် (အောက်ပါ လမ်းညွှန်) နေထိုင်ခွင့်ကာလကို စစ်ဆေးပြီး 「はい」 (ဟုတ်ကဲ့) ကို ရွေးပါ။', curStayWarn:'⚠️ နေထိုင်ခွင့်ကာလ မှားယွင်းပါက လျှောက်ထားရန် အချိန်ပိုကြာနိုင်ပါသည်။ နေထိုင်ခွင့်ကတ်ကို သေချာစစ်ဆေးပါ။',
     curStayPeriod:'လက်ရှိ နေထိုင်ခွင့်ကာလ (နေထိုင်ခွင့်ကတ်ပေါ်တွင်ပါရှိ)', curStayPeriodHelp:'နေထိုင်ခွင့်ကာလကို နေထိုင်ခွင့်ကတ်၏ ရှေ့ဘက်တွင် သို့မဟုတ် အောက်ပါ အက်ပ်ဖြင့် စစ်ဆေးနိုင်ပါသည်။',
     entryCount:'ဂျပန်နိုင်ငံသို့ မည်မျှကြိမ်ရောက်ဖူးသနည်း？',
     coeCount:'COE ကို မည်မျှကြိမ်လျှောက်ဖူးသနည်း？',
@@ -430,7 +431,7 @@ var TRANS = {
     passport:'លេខលិខិតឆ្លងដែន', passExpiry:'ថ្ងៃផុតសុពលភាព',
     married:'តើអ្នកបានរៀបការហើយឬ？', email:'អ៊ីមែល',
     firstEntry:'តើអ្នកមកប្រទេសជប៉ុនជាលើកដំបូងនៅពេលណា? (ឆ្នាំ / ខែ / ថ្ងៃ)',
-    curStayAppQ:'តើអ្នកបានអានប័ណ្ណស្នាក់នៅដោយកម្មវិធី ហើយពិនិត្យរយៈពេលស្នាក់នៅហើយឬនៅ?', curStayAppNo:'មិនទាន់អាចផ្ញើបានទេ។ សូមអានប័ណ្ណស្នាក់នៅដោយកម្មវិធី (មើលការណែនាំខាងក្រោម) ពិនិត្យរយៈពេលស្នាក់នៅ រួចជ្រើសរើស 「はい」 (បាទ/ចាស)។', curStayWarn:'⚠️ ប្រសិនបើរយៈពេលស្នាក់នៅខុស ការដាក់ពាក្យអាចចំណាយពេលយូរជាងមុន។ សូមពិនិត្យប័ណ្ណស្នាក់នៅឱ្យបានល្អ។',
+    curStayAppQ:'តើអ្នកបានពិនិត្យរយៈពេលស្នាក់នៅ នៅផ្នែកខាងមុខនៃប័ណ្ណស្នាក់នៅ ឬដោយអានប័ណ្ណតាមកម្មវិធីហើយឬនៅ?', curStayAppNo:'មិនទាន់អាចផ្ញើបានទេ។ សូមពិនិត្យរយៈពេលស្នាក់នៅ នៅផ្នែកខាងមុខនៃប័ណ្ណស្នាក់នៅ ឬតាមកម្មវិធី (មើលការណែនាំខាងក្រោម) រួចជ្រើសរើស 「はい」 (បាទ/ចាស)។', curStayWarn:'⚠️ ប្រសិនបើរយៈពេលស្នាក់នៅខុស ការដាក់ពាក្យអាចចំណាយពេលយូរជាងមុន។ សូមពិនិត្យប័ណ្ណស្នាក់នៅឱ្យបានល្អ។',
     curStayPeriod:'រយៈពេលស្នាក់នៅបច្ចុប្បន្ន (ដូចមានក្នុងប័ណ្ណស្នាក់នៅ)', curStayPeriodHelp:'អ្នកអាចពិនិត្យរយៈពេលស្នាក់នៅ នៅផ្នែកខាងមុខនៃប័ណ្ណស្នាក់នៅ ឬតាមកម្មវិធីខាងក្រោម។',
     entryCount:'តើអ្នកបានមកប្រទេសជប៉ុនប៉ុន្មានដង？',
     coeCount:'តើអ្នកបានដាក់ពាក្យ COE ប៉ុន្មានដង？',
@@ -467,7 +468,7 @@ var TRANS = {
     passport:'राहदानी नम्बर', passExpiry:'राहदानी म्याद सकिने मिति',
     married:'के तपाईं विवाहित हुनुहुन्छ？', email:'इमेल ठेगाना',
     firstEntry:'तपाईं पहिलो पटक जापान कहिले आउनुभयो? (साल / महिना / दिन)',
-    curStayAppQ:'के तपाईंले एपबाट रेसिडेन्स कार्ड पढेर बसोबास अवधि जाँच गर्नुभयो?', curStayAppNo:'अहिले पठाउन सकिँदैन। कृपया एपबाट रेसिडेन्स कार्ड पढ्नुहोस् (तलको गाइड हेर्नुहोस्), बसोबास अवधि जाँच गरेर 「はい」 (हो) छान्नुहोस्।', curStayWarn:'⚠️ बसोबास अवधि गलत भएमा आवेदन पेश गर्न धेरै समय लाग्न सक्छ। कृपया रेसिडेन्स कार्ड राम्ररी जाँच गर्नुहोस्।',
+    curStayAppQ:'के तपाईंले रेसिडेन्स कार्डको अगाडिपट्टि, वा एपबाट कार्ड पढेर बसोबास अवधि जाँच गर्नुभयो?', curStayAppNo:'अहिले पठाउन सकिँदैन। कृपया रेसिडेन्स कार्डको अगाडिपट्टि वा एपबाट (तलको गाइड हेर्नुहोस्) बसोबास अवधि जाँच गरेर 「はい」 (हो) छान्नुहोस्।', curStayWarn:'⚠️ बसोबास अवधि गलत भएमा आवेदन पेश गर्न धेरै समय लाग्न सक्छ। कृपया रेसिडेन्स कार्ड राम्ररी जाँच गर्नुहोस्।',
     curStayPeriod:'हालको बसोबास अवधि (रेसिडेन्स कार्डमा लेखिएको)', curStayPeriodHelp:'तपाईं बसोबास अवधि रेसिडेन्स कार्डको अगाडिपट्टि, वा तलको एपबाट हेर्न सक्नुहुन्छ।',
     entryCount:'तपाईं जापान कति पटक आउनुभएको छ？',
     coeCount:'COE को लागि कति पटक आवेदन दिनुभयो？',
@@ -504,7 +505,7 @@ var TRANS = {
     passport:'护照号码', passExpiry:'护照有效期',
     married:'您结婚了吗？', email:'电子邮件地址',
     firstEntry:'您第一次以特定技能身份来日本是什么时候？（年/月/日）',
-    curStayAppQ:'您是否已用应用程序读取在留卡并确认了在留期间？', curStayAppNo:'目前无法提交。请参照下方说明，用应用程序读取在留卡并确认在留期间后，选择「はい」（是）。', curStayWarn:'⚠️ 如果在留期间有误，提交申请可能需要更长时间。请仔细确认在留卡的内容。',
+    curStayAppQ:'您是否已通过在留卡正面，或用应用程序读取在留卡，确认了在留期间？', curStayAppNo:'目前无法提交。请通过在留卡正面或应用程序（参照下方说明）确认在留期间后，选择「はい」（是）。', curStayWarn:'⚠️ 如果在留期间有误，提交申请可能需要更长时间。请仔细确认在留卡的内容。',
     curStayPeriod:'现在的在留期间（在留卡上记载的期间）', curStayPeriodHelp:'在留期间可以在在留卡的正面，或通过下方的应用程序确认。',
     entryCount:'您来过日本几次？',
     coeCount:'您申请过COE几次？',
@@ -771,13 +772,13 @@ function blockCurStayPeriod() {
   h += '</select></div>';
   h += '<div class="field" id="curStayOtherWrap" style="display:none;"><label>在留期間（その他）<span class="req">*</span></label><input type="text" id="f-curStayPeriodOther" placeholder="例: 7年"></div>';
   // ver.20261028.04: 在留期間を選んだあとに「アプリで読み取って確認しましたか？」（はい／いいえ・必須）
-  h += '<div class="field" id="curStayAppWrap" style="display:none;"><label>アプリで在留カードを読み取って、在留期間を確認しましたか？（アプリで ざいりゅうカードを よみとって、ざいりゅうきかんを かくにん しましたか）<span class="req">*</span></label>';
+  h += '<div class="field" id="curStayAppWrap" style="display:none;"><label>在留カードの表面または、アプリで在留カードを読み取って、在留期間を確認しましたか？（ざいりゅうカードの おもて または アプリで、ざいりゅうきかんを かくにん しましたか）<span class="req">*</span></label>';
   h += '<div class="trans" data-key="curStayAppQ"></div>';
   h += '<input type="hidden" id="f-curStayAppChecked" value="">';
   h += '<div style="display:flex;gap:10px;">';
   ['はい','いいえ'].forEach(function(v){ h += '<button type="button" class="csp-app-btn" data-v="' + v + '" onclick="_cspSetApp(\'' + v + '\')" style="flex:1;padding:13px 10px;border:1.5px solid #d1d5db;border-radius:10px;background:#fff;font-size:16px;font-weight:700;color:#374151;cursor:pointer;">' + v + '</button>'; });
   h += '</div>';
-  h += '<div id="curStayAppNo" style="display:none;margin-top:8px;font-size:13px;color:#92400e;background:#fffbeb;border:1px solid #fcd34d;border-radius:8px;padding:10px 12px;line-height:1.7;">このままでは送信できません。お手数ですが、下のアプリの案内を見て在留カードを読み取り、在留期間をご確認のうえ「はい」を選んでください（したの アプリで かくにん してから「はい」を えらんで ください）。<div class="trans" data-key="curStayAppNo"></div></div>';
+  h += '<div id="curStayAppNo" style="display:none;margin-top:8px;font-size:13px;color:#92400e;background:#fffbeb;border:1px solid #fcd34d;border-radius:8px;padding:10px 12px;line-height:1.7;">このままでは送信できません。お手数ですが、在留カードの表面、または下のアプリの案内を見て在留カードを読み取り、在留期間をご確認のうえ「はい」を選んでください（ざいりゅうカードの おもて または アプリで かくにん してから「はい」を えらんで ください）。<div class="trans" data-key="curStayAppNo"></div></div>';
   h += '</div>';
   h += '<div style="font-size:13px;color:#b91c1c;font-weight:700;line-height:1.7;margin-bottom:10px;">⚠️ 在留期間がまちがっていると、申請までに時間がかかることがあります。在留カードの内容をよくご確認ください（まちがっていると、しんせいまでに じかんが かかることが あります）。<div class="trans" data-key="curStayWarn"></div></div>';
   h += '<div style="font-size:12px;color:#374151;line-height:1.7;background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;padding:10px 12px;">在留期間は、在留カードの表面、またはこちらのアプリからご確認いただけます（ざいりゅうカードの おもて、または こちらの アプリで かくにん できます）。<br>'
@@ -5864,8 +5865,8 @@ function _validateInner() {
   if (_cspNeed && _cspIsTarget()) {
     if (!val('f-curStayPeriod')) return '現在の在留期間を選択してください。';
     if (val('f-curStayPeriod') === 'その他' && !val('f-curStayPeriodOther')) return '現在の在留期間（その他）を入力してください。';
-    if (!val('f-curStayAppChecked')) return 'アプリで在留期間を確認したかどうか（はい／いいえ）を選んでください。';
-    if (val('f-curStayAppChecked') === 'いいえ') return 'アプリで在留カードを読み取り、在留期間をご確認のうえ「はい」を選んでください。';
+    if (!val('f-curStayAppChecked')) return '在留カードの表面またはアプリで在留期間を確認したかどうか（はい／いいえ）を選んでください。';
+    if (val('f-curStayAppChecked') === 'いいえ') return '在留カードの表面またはアプリで在留期間をご確認のうえ「はい」を選んでください。';
   }
   if ((type==='tokutei_nintei' || type==='gijinkoku_nintei') && !val('f-entryCount')) return '来日回数を入力してください。';
   if ((type==='tokutei_nintei' || type==='gijinkoku_nintei') && !val('f-coeCount')) return 'COE申請回数を入力してください。';
