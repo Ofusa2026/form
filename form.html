@@ -192,7 +192,8 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20261028.01'; // 企業フォーム：「①と②は同じ窓口ですか？」（はい＝入力は1か所・②にも同じ内容を送る／いいえ＝今までどおり①②）。②にも「代表者と同じ」 ／ ver.20261027.02: 氏名（英字以外）・生年月日（15歳未満）を送信前に知らせる／サーバーで弾かれたら理由を表示（旧 ver.20261023.01: // 2号（所属機関）：第1-32号 新様式の留意事項３〜５に対応（事業所・部署が違う理由／他の２号にも指導を受ける人を理由付きで可／人数が一時的に足りない場合はチェック＋理由で送信可。送信 t2SameOffice・t2Reason3・t2DupReason・t2Short5・t2Reason5）・技能実習2号「内装仕上げ施工」の作業に「カーテン工事」を追加 ／ ver.20261020.04: 技能実習2号「内装仕上げ施工」の作業に「カーテン工事」を追加 ／ ver.20261020.03: support=skip（自社支援を別で管理）：企業情報だけ聞き、【自社支援】タブは出さない ／ ver.20261020.02: 自社支援：受入経験ありでも選任の根拠を聞く／確認用リンク（①企業情報）に【自社支援】タブを付ける ／ ver.20261020.01: 在日親族：1つでも入れた行（「はい」のときは1人目も）は全項目必須（日本国籍は在留カード不要・同居なら住所不要・働いていなければ「なし」） ／ ver.20261019.02: 在日親族に「生年月日」「国籍」を追加（送信 familyMembers[].birth / nationality）・途中保存した在日親族を開き直したときに戻すように ／ ver.20261019.01: 特定技能1号の企業フォームに【自社支援】支援体制・【自社支援】担当者・その他タブを追加（案件の登録支援機関なし＝自社支援のときだけ表示。登録支援機関フォームと同じ部品・同じ送信キー selfSupport ＋ 選任の根拠：①1-11-2号／②1-11-3号・1-20号・1-22号） ／ ver.20261015.04: // 定期健康診断の下に「自己都合退職は何日前までに申し出るか（日）」を追加（必須・初期値30日） ／ ver.20261015.03: // 特定技能2号の確認用リンク：③だけ（part=3）・①②③すべて（part=123）を追加／①＋②（part=12）は③を出さない／①だけ（part=1）で隠れた③の入力チェックに止まっていたのを修正
+var FORM_VERSION = 'ver.20261028.02'; // 変更・更新：案シスの「許可された在留期間」が空のときだけ「現在の在留期間」を必須で聞く（在留カードの表面または確認用アプリ＝出入国在留管理庁の案内PDF付き・認定は聞かない）
+// var FORM_VERSION = 'ver.20261028.01'; // 企業フォーム：「①と②は同じ窓口ですか？」（はい＝入力は1か所・②にも同じ内容を送る／いいえ＝今までどおり①②）。②にも「代表者と同じ」 ／ ver.20261027.02: 氏名（英字以外）・生年月日（15歳未満）を送信前に知らせる／サーバーで弾かれたら理由を表示（旧 ver.20261023.01: // 2号（所属機関）：第1-32号 新様式の留意事項３〜５に対応（事業所・部署が違う理由／他の２号にも指導を受ける人を理由付きで可／人数が一時的に足りない場合はチェック＋理由で送信可。送信 t2SameOffice・t2Reason3・t2DupReason・t2Short5・t2Reason5）・技能実習2号「内装仕上げ施工」の作業に「カーテン工事」を追加 ／ ver.20261020.04: 技能実習2号「内装仕上げ施工」の作業に「カーテン工事」を追加 ／ ver.20261020.03: support=skip（自社支援を別で管理）：企業情報だけ聞き、【自社支援】タブは出さない ／ ver.20261020.02: 自社支援：受入経験ありでも選任の根拠を聞く／確認用リンク（①企業情報）に【自社支援】タブを付ける ／ ver.20261020.01: 在日親族：1つでも入れた行（「はい」のときは1人目も）は全項目必須（日本国籍は在留カード不要・同居なら住所不要・働いていなければ「なし」） ／ ver.20261019.02: 在日親族に「生年月日」「国籍」を追加（送信 familyMembers[].birth / nationality）・途中保存した在日親族を開き直したときに戻すように ／ ver.20261019.01: 特定技能1号の企業フォームに【自社支援】支援体制・【自社支援】担当者・その他タブを追加（案件の登録支援機関なし＝自社支援のときだけ表示。登録支援機関フォームと同じ部品・同じ送信キー selfSupport ＋ 選任の根拠：①1-11-2号／②1-11-3号・1-20号・1-22号） ／ ver.20261015.04: // 定期健康診断の下に「自己都合退職は何日前までに申し出るか（日）」を追加（必須・初期値30日） ／ ver.20261015.03: // 特定技能2号の確認用リンク：③だけ（part=3）・①②③すべて（part=123）を追加／①＋②（part=12）は③を出さない／①だけ（part=1）で隠れた③の入力チェックに止まっていたのを修正
 // var FORM_VERSION = 'ver.20261015.02'; // 「居住費 適正額の説明」を削除（「住居（支援計画書用）」の「実費相当の説明」と重複のため） ／ ver.20261015.01: // 住居（支援計画書用）は居住費控除「有」のときだけ表示／③タブ名を「2号に関するヒアリング」に／2号の項目で止まったら③へ切り替え ／ ver.20261014.07: // ①＋②の確認用リンク（part=12：会社情報を入れて通常のフォームを開く）
 // var FORM_VERSION = 'ver.20261014.06'; // 就業場所を「＋」で2か所目以降も入力（office2Name〜）
 // var FORM_VERSION = 'ver.20261014.05'; // 昇給の下に「建設分野の場合の記載」の案内と入力ボタン
@@ -275,6 +276,7 @@ var TRANS = {
     passport:'Passport Number', passExpiry:'Passport Expiry Date',
     married:'Are you married?', email:'Email Address',
     firstEntry:'When did you first come to Japan with Specified Skilled Worker visa? (Year / Month / Day)',
+    curStayPeriod:'Current period of stay (as shown on your Residence Card)', curStayPeriodHelp:'You can check your period of stay on the front of your Residence Card, or with the app below.',
     entryCount:'How many times have you visited Japan?',
     coeCount:'How many times have you applied for a COE?',
     coeDenied:'How many times was it denied?',
@@ -312,6 +314,7 @@ var TRANS = {
     passport:'Số hộ chiếu', passExpiry:'Ngày hết hạn hộ chiếu',
     married:'Bạn đã kết hôn chưa?', email:'Địa chỉ email',
     firstEntry:'Lần đầu tiên bạn đến Nhật Bản với tư cách Kỹ năng đặc định là khi nào? (Năm / Tháng / Ngày)',
+    curStayPeriod:'Thời hạn lưu trú hiện tại (ghi trên Thẻ lưu trú)', curStayPeriodHelp:'Bạn có thể kiểm tra thời hạn lưu trú ở mặt trước Thẻ lưu trú, hoặc bằng ứng dụng bên dưới.',
     entryCount:'Bạn đã đến Nhật Bản bao nhiêu lần?',
     coeCount:'Bạn đã xin COE bao nhiêu lần?',
     coeDenied:'Bị từ chối bao nhiêu lần?',
@@ -349,6 +352,7 @@ var TRANS = {
     passport:'Nomor Paspor', passExpiry:'Masa Berlaku Paspor',
     married:'Apakah Anda sudah menikah?', email:'Alamat Email',
     firstEntry:'Kapan pertama kali Anda datang ke Jepang dengan visa Specified Skilled Worker? (Tahun / Bulan / Hari)',
+    curStayPeriod:'Masa tinggal saat ini (tertera di Kartu Izin Tinggal)', curStayPeriodHelp:'Anda dapat memeriksa masa tinggal di bagian depan Kartu Izin Tinggal, atau melalui aplikasi di bawah.',
     entryCount:'Berapa kali Anda mengunjungi Jepang?',
     coeCount:'Berapa kali Anda mengajukan COE?',
     coeDenied:'Berapa kali ditolak?',
@@ -385,6 +389,7 @@ var TRANS = {
     passport:'ပတ်စ်ပို့ နံပါတ်', passExpiry:'သက်တမ်းကုန်ဆုံးရက်',
     married:'အိမ်ထောင်ရှိပါသလား？', email:'အီးမေးလ်',
     firstEntry:'ဂျပန်နိုင်ငံသို့ ပထမဆုံးဝင်ရောက်ခဲ့သည့်ရက် (နှစ် / လ / ရက်)',
+    curStayPeriod:'လက်ရှိ နေထိုင်ခွင့်ကာလ (နေထိုင်ခွင့်ကတ်ပေါ်တွင်ပါရှိ)', curStayPeriodHelp:'နေထိုင်ခွင့်ကာလကို နေထိုင်ခွင့်ကတ်၏ ရှေ့ဘက်တွင် သို့မဟုတ် အောက်ပါ အက်ပ်ဖြင့် စစ်ဆေးနိုင်ပါသည်။',
     entryCount:'ဂျပန်နိုင်ငံသို့ မည်မျှကြိမ်ရောက်ဖူးသနည်း？',
     coeCount:'COE ကို မည်မျှကြိမ်လျှောက်ဖူးသနည်း？',
     coeDenied:'မည်မျှကြိမ်ငြင်းပယ်ခြင်းခံရသနည်း？',
@@ -420,6 +425,7 @@ var TRANS = {
     passport:'លេខលិខិតឆ្លងដែន', passExpiry:'ថ្ងៃផុតសុពលភាព',
     married:'តើអ្នកបានរៀបការហើយឬ？', email:'អ៊ីមែល',
     firstEntry:'តើអ្នកមកប្រទេសជប៉ុនជាលើកដំបូងនៅពេលណា? (ឆ្នាំ / ខែ / ថ្ងៃ)',
+    curStayPeriod:'រយៈពេលស្នាក់នៅបច្ចុប្បន្ន (ដូចមានក្នុងប័ណ្ណស្នាក់នៅ)', curStayPeriodHelp:'អ្នកអាចពិនិត្យរយៈពេលស្នាក់នៅ នៅផ្នែកខាងមុខនៃប័ណ្ណស្នាក់នៅ ឬតាមកម្មវិធីខាងក្រោម។',
     entryCount:'តើអ្នកបានមកប្រទេសជប៉ុនប៉ុន្មានដង？',
     coeCount:'តើអ្នកបានដាក់ពាក្យ COE ប៉ុន្មានដង？',
     coeDenied:'ត្រូវបានបដិសេធប៉ុន្មានដង？',
@@ -455,6 +461,7 @@ var TRANS = {
     passport:'राहदानी नम्बर', passExpiry:'राहदानी म्याद सकिने मिति',
     married:'के तपाईं विवाहित हुनुहुन्छ？', email:'इमेल ठेगाना',
     firstEntry:'तपाईं पहिलो पटक जापान कहिले आउनुभयो? (साल / महिना / दिन)',
+    curStayPeriod:'हालको बसोबास अवधि (रेसिडेन्स कार्डमा लेखिएको)', curStayPeriodHelp:'तपाईं बसोबास अवधि रेसिडेन्स कार्डको अगाडिपट्टि, वा तलको एपबाट हेर्न सक्नुहुन्छ।',
     entryCount:'तपाईं जापान कति पटक आउनुभएको छ？',
     coeCount:'COE को लागि कति पटक आवेदन दिनुभयो？',
     coeDenied:'कति पटक अस्वीकार भयो？',
@@ -490,6 +497,7 @@ var TRANS = {
     passport:'护照号码', passExpiry:'护照有效期',
     married:'您结婚了吗？', email:'电子邮件地址',
     firstEntry:'您第一次以特定技能身份来日本是什么时候？（年/月/日）',
+    curStayPeriod:'现在的在留期间（在留卡上记载的期间）', curStayPeriodHelp:'在留期间可以在在留卡的正面，或通过下方的应用程序确认。',
     entryCount:'您来过日本几次？',
     coeCount:'您申请过COE几次？',
     coeDenied:'被拒绝几次？',
@@ -742,6 +750,31 @@ function buildCautionHTML(lang) {
 
 // 共通ブロック：結婚（※家族情報ブロックに統合済み・後方互換のため残す）
 function blockMarried() { return ''; }
+// ver.20261028.02: 変更・更新で案シスの「許可された在留期間」が空のときだけ表示する「現在の在留期間」（必須）
+var _CSP_OPTS = (function(){ var a=['']; for(var m=1;m<=60;m++){ var y=Math.floor(m/12), mo=m%12, l=''; if(y>0) l+=y+'年'; if(mo>0) l+=mo+'月'; a.push(l);} a.push('その他'); return a; })();
+var _cspNeed = false;
+function _cspIsTarget(){ return /^(tokutei|gijinkoku|tokutei2_person)_(koushin|henkou)$/.test(type||''); }
+function blockCurStayPeriod() {
+  var h = '<div class="card" id="curStayCard" style="display:none;"><div class="section-title">現在の在留期間（げんざいの ざいりゅうきかん）</div>';
+  h += '<div class="field"><label>今もっている在留カードの在留期間（いま もっている ざいりゅうカードの ざいりゅうきかん）<span class="req">*</span></label>';
+  h += '<div class="trans" data-key="curStayPeriod"></div>';
+  h += '<select id="f-curStayPeriod" onchange="var o=document.getElementById(\'curStayOtherWrap\'); if(o) o.style.display=(this.value===\'その他\')?\'block\':\'none\';">';
+  _CSP_OPTS.forEach(function(o){ h += '<option value="' + o + '">' + (o === '' ? '---' : o) + '</option>'; });
+  h += '</select></div>';
+  h += '<div class="field" id="curStayOtherWrap" style="display:none;"><label>在留期間（その他）<span class="req">*</span></label><input type="text" id="f-curStayPeriodOther" placeholder="例: 7年"></div>';
+  h += '<div style="font-size:12px;color:#374151;line-height:1.7;background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;padding:10px 12px;">在留期間は、在留カードの表面、またはこちらのアプリからご確認いただけます（ざいりゅうカードの おもて、または こちらの アプリで かくにん できます）。<br>'
+    + '<div class="trans" data-key="curStayPeriodHelp"></div>'
+    + '<a href="https://www.moj.go.jp/isa/content/001406558.pdf" target="_blank" rel="noopener" style="color:#2563eb;font-weight:700;">📱 確認用アプリの案内（出入国在留管理庁・PDF）</a></div>';
+  h += '</div>';
+  return h;
+}
+function _cspLoad() {
+  if (!_cspIsTarget() || !caseId || !document.getElementById('curStayCard')) return;
+  callRpc('form_person_stay_period_empty', { p_case_id: caseId })
+    .then(function(r){ return r.ok ? r.json() : false; })
+    .then(function(v){ _cspNeed = (v === true); var c = document.getElementById('curStayCard'); if (c) c.style.display = _cspNeed ? 'block' : 'none'; })
+    .catch(function(){});
+}
 
 // 学歴ブロック
 function blockEducation() {
@@ -1284,13 +1317,13 @@ function buildForm(t) {
       return blockBasic() + blockMarried() + blockTokuteiNintei() + blockSkillProof() + blockJapaneseProof() + blockContact(false, false);
     case 'tokutei_koushin':
     case 'tokutei_henkou':
-      return blockBasic() + blockMarried() + blockTokuteiKoushin() + blockSkillProof() + blockJapaneseProof() + blockContact(false, true);
+      return blockBasic() + blockMarried() + blockCurStayPeriod() + blockTokuteiKoushin() + blockSkillProof() + blockJapaneseProof() + blockContact(false, true);
     case 'gijinkoku_nintei':
       // ver.20260911.01: 技人国・認定にも特定技能・認定と同じ来日・在留歴（来日回数/COE申請回数/不許可回数/最終来日・帰国日）を表示
       return blockBasic() + blockMarried() + blockEducation() + blockGijinkokuExtra() + blockTokuteiNintei() + blockContact(false, false);
     case 'gijinkoku_koushin':
     case 'gijinkoku_henkou':
-      return blockBasic() + blockMarried() + blockEducation() + blockGijinkokuExtra() + blockContact(false, true);
+      return blockBasic() + blockMarried() + blockCurStayPeriod() + blockEducation() + blockGijinkokuExtra() + blockContact(false, true);
     case 'kazoku_nintei':
     case 'kazoku_henkou':
     case 'kazoku_koushin':
@@ -1305,7 +1338,7 @@ function buildForm(t) {
       return blockBasic() + blockMarried() + blockTokuteiNintei() + blockSkillProof() + blockJapaneseProof() + blockGinoIten() + blockContact(false, false);
     case 'tokutei2_person_koushin':
     case 'tokutei2_person_henkou':
-      return blockBasic() + blockMarried() + blockTokuteiKoushin() + blockSkillProof() + blockJapaneseProof() + blockGinoIten() + blockContact(false, true);
+      return blockBasic() + blockMarried() + blockCurStayPeriod() + blockTokuteiKoushin() + blockSkillProof() + blockJapaneseProof() + blockGinoIten() + blockContact(false, true);
     case 'company_gijinkoku':
       return buildCompanyGijinkokuForm();
     case 'company_designated46':
@@ -5317,6 +5350,11 @@ function collectData() {
       if (y || m || dd) d.firstEntry = y + '年' + m + '月' + dd + '日';
     }
   }
+  // ver.20261028.02: 現在の在留期間 → 案シスの「許可された在留期間」(stayPeriod / stayPeriodOther) にそのまま入る
+  if (_cspNeed && _cspIsTarget()) {
+    d.stayPeriod = val('f-curStayPeriod');
+    if (d.stayPeriod === 'その他') d.stayPeriodOther = val('f-curStayPeriodOther');
+  }
   if (t === 'gijinkoku_nintei' || t === 'gijinkoku_koushin' || t === 'gijinkoku_henkou') {
     d.eduCountry = val('f-eduCountry'); d.education = val('f-education');
     d.schoolName = val('f-schoolName'); d.completionDate = val('f-completionDate');
@@ -5794,6 +5832,11 @@ function _validateInner() {
     return {key:'addrPref', field:'f-address', fixes:_computeAddressFixes(_addr)};
   }
   if (!val('f-married')) return '結婚しているかどうかを選択してください。';
+  // ver.20261028.02: 現在の在留期間（表示されているときだけ必須）
+  if (_cspNeed && _cspIsTarget()) {
+    if (!val('f-curStayPeriod')) return '現在の在留期間を選択してください。';
+    if (val('f-curStayPeriod') === 'その他' && !val('f-curStayPeriodOther')) return '現在の在留期間（その他）を入力してください。';
+  }
   if ((type==='tokutei_nintei' || type==='gijinkoku_nintei') && !val('f-entryCount')) return '来日回数を入力してください。';
   if ((type==='tokutei_nintei' || type==='gijinkoku_nintei') && !val('f-coeCount')) return 'COE申請回数を入力してください。';
 
@@ -6275,6 +6318,7 @@ function confirmName(isMatch){
   if (fieldsFilter && fieldsFilter.length && type === 'company') {
     applyFieldsFilter(fieldsFilter);
   }
+  try { _cspLoad(); } catch(_ce) {}   // ver.20261028.02
   var verEl = document.getElementById('ver-display');
   if (verEl) verEl.textContent = FORM_VERSION;
   setLang(currentLang);
@@ -6470,6 +6514,7 @@ function prefillForm(resp) {
     entryCount: 'f-entryCount', coeCount: 'f-coeCount', coeDenied: 'f-coeDenied',
     lastEntryFrom: 'f-lastEntryFrom', lastEntryTo: 'f-lastEntryTo',
     firstEntry: 'f-firstEntryStatus',
+    stayPeriod: 'f-curStayPeriod', stayPeriodOther: 'f-curStayPeriodOther',
     eduCountry: 'f-eduCountry', education: 'f-education',
     schoolName: 'f-schoolName', major: 'f-major',
     name: 'f-coName', nameKana: 'f-coNameKana', nameEn: 'f-coNameEn',
