@@ -192,7 +192,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20261027.02'; // 氏名（英字以外）・生年月日（15歳未満）を送信前に知らせる／サーバーで弾かれたら理由を表示（旧 ver.20261023.01: // 2号（所属機関）：第1-32号 新様式の留意事項３〜５に対応（事業所・部署が違う理由／他の２号にも指導を受ける人を理由付きで可／人数が一時的に足りない場合はチェック＋理由で送信可。送信 t2SameOffice・t2Reason3・t2DupReason・t2Short5・t2Reason5）・技能実習2号「内装仕上げ施工」の作業に「カーテン工事」を追加 ／ ver.20261020.04: 技能実習2号「内装仕上げ施工」の作業に「カーテン工事」を追加 ／ ver.20261020.03: support=skip（自社支援を別で管理）：企業情報だけ聞き、【自社支援】タブは出さない ／ ver.20261020.02: 自社支援：受入経験ありでも選任の根拠を聞く／確認用リンク（①企業情報）に【自社支援】タブを付ける ／ ver.20261020.01: 在日親族：1つでも入れた行（「はい」のときは1人目も）は全項目必須（日本国籍は在留カード不要・同居なら住所不要・働いていなければ「なし」） ／ ver.20261019.02: 在日親族に「生年月日」「国籍」を追加（送信 familyMembers[].birth / nationality）・途中保存した在日親族を開き直したときに戻すように ／ ver.20261019.01: 特定技能1号の企業フォームに【自社支援】支援体制・【自社支援】担当者・その他タブを追加（案件の登録支援機関なし＝自社支援のときだけ表示。登録支援機関フォームと同じ部品・同じ送信キー selfSupport ＋ 選任の根拠：①1-11-2号／②1-11-3号・1-20号・1-22号） ／ ver.20261015.04: // 定期健康診断の下に「自己都合退職は何日前までに申し出るか（日）」を追加（必須・初期値30日） ／ ver.20261015.03: // 特定技能2号の確認用リンク：③だけ（part=3）・①②③すべて（part=123）を追加／①＋②（part=12）は③を出さない／①だけ（part=1）で隠れた③の入力チェックに止まっていたのを修正
+var FORM_VERSION = 'ver.20261028.01'; // 企業フォーム：「①と②は同じ窓口ですか？」（はい＝入力は1か所・②にも同じ内容を送る／いいえ＝今までどおり①②）。②にも「代表者と同じ」 ／ ver.20261027.02: 氏名（英字以外）・生年月日（15歳未満）を送信前に知らせる／サーバーで弾かれたら理由を表示（旧 ver.20261023.01: // 2号（所属機関）：第1-32号 新様式の留意事項３〜５に対応（事業所・部署が違う理由／他の２号にも指導を受ける人を理由付きで可／人数が一時的に足りない場合はチェック＋理由で送信可。送信 t2SameOffice・t2Reason3・t2DupReason・t2Short5・t2Reason5）・技能実習2号「内装仕上げ施工」の作業に「カーテン工事」を追加 ／ ver.20261020.04: 技能実習2号「内装仕上げ施工」の作業に「カーテン工事」を追加 ／ ver.20261020.03: support=skip（自社支援を別で管理）：企業情報だけ聞き、【自社支援】タブは出さない ／ ver.20261020.02: 自社支援：受入経験ありでも選任の根拠を聞く／確認用リンク（①企業情報）に【自社支援】タブを付ける ／ ver.20261020.01: 在日親族：1つでも入れた行（「はい」のときは1人目も）は全項目必須（日本国籍は在留カード不要・同居なら住所不要・働いていなければ「なし」） ／ ver.20261019.02: 在日親族に「生年月日」「国籍」を追加（送信 familyMembers[].birth / nationality）・途中保存した在日親族を開き直したときに戻すように ／ ver.20261019.01: 特定技能1号の企業フォームに【自社支援】支援体制・【自社支援】担当者・その他タブを追加（案件の登録支援機関なし＝自社支援のときだけ表示。登録支援機関フォームと同じ部品・同じ送信キー selfSupport ＋ 選任の根拠：①1-11-2号／②1-11-3号・1-20号・1-22号） ／ ver.20261015.04: // 定期健康診断の下に「自己都合退職は何日前までに申し出るか（日）」を追加（必須・初期値30日） ／ ver.20261015.03: // 特定技能2号の確認用リンク：③だけ（part=3）・①②③すべて（part=123）を追加／①＋②（part=12）は③を出さない／①だけ（part=1）で隠れた③の入力チェックに止まっていたのを修正
 // var FORM_VERSION = 'ver.20261015.02'; // 「居住費 適正額の説明」を削除（「住居（支援計画書用）」の「実費相当の説明」と重複のため） ／ ver.20261015.01: // 住居（支援計画書用）は居住費控除「有」のときだけ表示／③タブ名を「2号に関するヒアリング」に／2号の項目で止まったら③へ切り替え ／ ver.20261014.07: // ①＋②の確認用リンク（part=12：会社情報を入れて通常のフォームを開く）
 // var FORM_VERSION = 'ver.20261014.06'; // 就業場所を「＋」で2か所目以降も入力（office2Name〜）
 // var FORM_VERSION = 'ver.20261014.05'; // 昇給の下に「建設分野の場合の記載」の案内と入力ボタン
@@ -2844,6 +2844,27 @@ function _tkLoadAcceptExp() {
     .catch(function(){ _tkApplyToggles(); });
 }
 // 雇用管理相談窓口 ← 代表者
+// ver.20261028.01: ①と②は同じ窓口か（同じ＝②の欄を出さず、送るときに①の内容を②にも入れる）
+function _tkSameOn() { var r = document.querySelector('input[name="f-sameContact"]:checked'); return !!(r && r.value === 'same') && !fieldsFilter; }
+function tkSameContact(v) {
+  var r = document.querySelector('input[name="f-sameContact"][value="' + v + '"]'); if (r) r.checked = true;
+  var same = _tkSameOn();
+  var sh = function(id, on){ var e = document.getElementById(id); if (e) e.style.display = on ? '' : 'none'; };
+  sh('tkConsultCard', !same); sh('tkSameNote', same); sh('tkDiffDescS', same); sh('tkDiffDesc1', !same);
+  var t = document.getElementById('tkDiffTitle'); if (t) t.textContent = same ? '①・② 相談窓口（待遇の相違の説明・雇用管理の相談）' : '① 待遇の相違について説明を求める窓口';
+  document.querySelectorAll('.tk-same-opt').forEach(function(l){ var on = l.querySelector('input').checked; l.style.borderColor = on ? '#4338ca' : '#c7d2fe'; l.style.background = on ? '#eef2ff' : '#fff'; });
+  try { _updateReqRemain(); } catch(e) {}
+}
+// 保存済みの回答を開いたとき：①と②が同じ（または②が空）なら「はい」、違えば「いいえ」。①が空で②だけあれば②を①へ
+function _tkSameFromValues() {
+  if (!document.getElementById('tkSameContactCard')) return;
+  var g = function(id){ return String((document.getElementById(id) || {}).value || '').trim(); };
+  var A = ['f-diffContactDept','f-diffContactPerson','f-diffContactPersonEn','f-diffContactTel'], B = ['f-consultDept','f-consultName','f-consultNameEn','f-consultTel'];
+  var aEmpty = A.every(function(x){ return !g(x); }), bEmpty = B.every(function(x){ return !g(x); });
+  if (aEmpty && !bEmpty) { A.forEach(function(x, k){ var e = document.getElementById(x); if (e) e.value = g(B[k]); }); aEmpty = false; }
+  var same = bEmpty || A.every(function(x, k){ return g(x) === g(B[k]); });
+  tkSameContact(same ? 'same' : 'diff');
+}
 function copyRepToConsult() {
   var g = function(id){ return (document.getElementById(id) || {}).value || ''; };
   var put = function(id, v){ var e = document.getElementById(id); if (e && v) { e.value = v; e.style.background = '#f0fdf4'; setTimeout(function(){ e.style.background = ''; }, 1500); } };
@@ -2861,7 +2882,7 @@ function _tkSetDefaults() {
 }
 // ===== ver.20261009.03: 特定技能の企業フォームを「① 企業情報」「② 雇用条件」のタブに分ける =====
 var TK_TAB1 = ['企業基本情報','所在地','代表者','役員情報','標準の内容'];   // ver.20261009.04: 標準の内容は企業情報の一番下
-var TK_TAB2 = ['雇用条件','就業場所（事業所）','労働時間・休日','契約期間','雇用管理相談窓口','① 待遇の相違について説明を求める窓口','② 雇用管理の改善等に関する事項に係る相談窓口','住居（支援計画書用）','比較対象日本人'];
+var TK_TAB2 = ['雇用条件','就業場所（事業所）','労働時間・休日','契約期間','雇用管理相談窓口','相談窓口','①・② 相談窓口（待遇の相違の説明・雇用管理の相談）','① 待遇の相違について説明を求める窓口','② 雇用管理の改善等に関する事項に係る相談窓口','住居（支援計画書用）','比較対象日本人'];
 var _tkTabCur = 0, _tkTabsOn = false;
 function _tkCardTitle(c){ var t = c.querySelector('.section-title'); return t ? t.textContent.trim() : ''; }
 function _tkBuildTabs() {
@@ -3202,6 +3223,7 @@ function _tkAfterPrefill(resp) {
     var _sso = resp.selfSupport; if (typeof _sso === 'string') { try { _sso = JSON.parse(_sso); } catch(e) { _sso = null; } }
     if (_sso && typeof _sso === 'object') _ssRestore(_sso);
   }
+  try { _tkSameFromValues(); } catch(e) {}   // ver.20261028.01
   _tkApplyToggles();
 }
 
@@ -3269,11 +3291,22 @@ function buildCompanyForm() {
   '</div>' +
 
   // ver.20261014.01: ① 待遇の相違について説明を求める窓口（雇用条件書「4．次の窓口に対して…」）を、②（今までの相談窓口）の上に追加
-  '<div class="card"><div class="section-title">① 待遇の相違について説明を求める窓口</div>' +
-    '<div style="font-size:11px;color:#9ca3af;margin-bottom:10px;line-height:1.6;">申請人が、通常の労働者（日本人社員など）との待遇の違い（内容・理由）について説明を求めることができる窓口<br><span style="color:#64748b;">（雇用条件書「4．次の窓口に対して…」に入ります）</span></div>' +
+  // ver.20261028.01: 「①と②は同じ窓口ですか？」— 同じ（既定）なら入力は1か所、②は同じ内容で送る
+  '<div class="card" id="tkSameContactCard"><div class="section-title">相談窓口</div>' +
+    '<div style="font-size:11.5px;color:#6b7280;margin-bottom:10px;line-height:1.7;">雇用条件書に書く2つの窓口です。<br>① 待遇の相違について説明を求める窓口<br>② 雇用管理の改善等に関する事項に係る相談窓口</div>' +
+    '<div class="field"><label>①と②は同じ窓口（同じ担当者）ですか？<span class="req">*</span></label>' +
+      '<div style="display:flex;gap:8px;flex-wrap:wrap;">' +
+        '<label class="tk-same-opt" style="flex:1;min-width:150px;display:flex;align-items:center;gap:8px;padding:12px 14px;border:2px solid #4338ca;background:#eef2ff;border-radius:10px;cursor:pointer;font-weight:700;font-size:14px;"><input type="radio" name="f-sameContact" value="same" checked onchange="tkSameContact(this.value)" style="width:20px;height:20px;flex:none;padding:0;margin:0;min-height:0;-webkit-appearance:radio;appearance:auto;"> はい（同じ窓口）</label>' +
+        '<label class="tk-same-opt" style="flex:1;min-width:150px;display:flex;align-items:center;gap:8px;padding:12px 14px;border:2px solid #c7d2fe;background:#fff;border-radius:10px;cursor:pointer;font-weight:700;font-size:14px;"><input type="radio" name="f-sameContact" value="diff" onchange="tkSameContact(this.value)" style="width:20px;height:20px;flex:none;padding:0;margin:0;min-height:0;-webkit-appearance:radio;appearance:auto;"> いいえ（別々の窓口）</label>' +
+      '</div>' +
+      '<div id="tkSameNote" style="font-size:11.5px;color:#0f766e;background:#f0fdfa;border:1px solid #99f6e4;border-radius:8px;padding:8px 10px;margin-top:8px;">下の窓口を、①・②の両方として雇用条件書に書きます。</div>' +
+    '</div>' +
+  '</div>' +
+
+  '<div class="card" id="tkDiffCard"><div class="section-title" id="tkDiffTitle">①・② 相談窓口（待遇の相違の説明・雇用管理の相談）</div>' +
+    '<div style="font-size:11px;color:#9ca3af;margin-bottom:10px;line-height:1.6;"><span id="tkDiffDesc1" style="display:none;">申請人が、通常の労働者（日本人社員など）との待遇の違い（内容・理由）について説明を求めることができる窓口<br><span style="color:#64748b;">（雇用条件書「4．次の窓口に対して…」に入ります）</span></span><span id="tkDiffDescS">申請人が、通常の労働者（日本人社員など）との待遇の違いについて説明を求めたり、雇用条件などの相談をしたりできる窓口<br><span style="color:#6b7280;">（雇用条件書の ①・② の両方に入ります）</span></span></div>' +
     '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;">' +
-      '<button type="button" onclick="copyContactFrom(\'diff\',\'rep\')\" style="padding:8px 12px;background:#f0fdf4;color:#15803d;border:1.5px solid #86efac;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;">👤 代表者と同じ</button>' +
-      '<button type="button" onclick="copyContactFrom(\'diff\',\'main\')\" style="padding:8px 12px;background:#eff6ff;color:#1d4ed8;border:1.5px solid #93c5fd;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;">⬇ ②と同じ</button>' +
+      '<button type="button" onclick="copyContactFrom(\'diff\',\'rep\')" style="padding:8px 12px;background:#f0fdf4;color:#15803d;border:1.5px solid #86efac;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;">👤 代表者と同じ</button>' +
     '</div>' +
     field('f-diffContactDept','部署名','text',true,'例: 人事部') +
     '<div class="grid2">' +
@@ -3283,10 +3316,10 @@ function buildCompanyForm() {
     field('f-diffContactTel','電話番号','text',true,'例: 03-1234-5678') +
   '</div>' +
 
-  '<div class="card"><div class="section-title">② 雇用管理の改善等に関する事項に係る相談窓口</div>' +
+  '<div class="card" id="tkConsultCard" style="display:none;"><div class="section-title">② 雇用管理の改善等に関する事項に係る相談窓口</div>' +
     '<div style="font-size:11px;color:#9ca3af;margin-bottom:10px;">申請人の雇用条件の相談等に対応する窓口</div>' +
     '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;">' +
-      '<button type="button" onclick="copyContactFrom(\'main\',\'diff\')\" style="padding:8px 12px;background:#f0fdfa;color:#0f766e;border:1.5px solid #5eead4;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;">⬆ ①と同じ</button>' +
+      '<button type="button" onclick="copyContactFrom(\'main\',\'rep\')" style="padding:8px 12px;background:#f0fdf4;color:#15803d;border:1.5px solid #86efac;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;">👤 代表者と同じ</button>' +
     '</div>' +
     field('f-consultDept','部署名','text',true,'例: 人事部') +
     '<div class="grid2">' +
@@ -4998,6 +5031,9 @@ function collectData() {
     if (document.getElementById('f-contractRenewalCondOther')) {
       d.acceptExp = _tkAcceptExp;   // 案シスの受入経験（あり／なし／空＝未登録）
       d.utilityProvided = val('f-utilityProvided');
+      if (_tkSameOn()) {   // ver.20261028.01: ①と②は同じ窓口
+        d.consultDept = d.diffContactDept; d.consultName = d.diffContactPerson; d.consultNameEn = d.diffContactPersonEn; d.consultTel = d.diffContactTel;
+      }
       d.resignNoticeDays = val('f-resignNoticeDays');   // ver.20261015.04: 自己都合退職 何日前までに申し出るか
       if (d.housingProvided === '無') { d.deductHousing = '0'; d.housingDetail = ''; }
       if (d.foodProvided === '無') { d.deductFood = '0'; d.foodDetail = ''; }
@@ -6235,7 +6271,7 @@ function confirmName(isMatch){
     document.getElementById('nameConfirmName').innerHTML = _escName;
   }
   document.getElementById('formBody').innerHTML = buildForm(type);
-  try { if (document.getElementById('officersWrap')) { _tkSetDefaults(); _ssInit(); _tkLoadAcceptExp(); _tkLoadSupportMode(); _tkBuildTabs(); _tkApplyToggles(); } } catch(e) { console.error('tk init error:', e); }   // ver.20261019.01 ④   // ver.20261009.02 / .03 タブ
+  try { if (document.getElementById('officersWrap')) { _tkSetDefaults(); _ssInit(); _tkLoadAcceptExp(); _tkLoadSupportMode(); _tkBuildTabs(); _tkApplyToggles(); try { tkSameContact(fieldsFilter ? 'diff' : 'same'); } catch(_se) {} } } catch(e) { console.error('tk init error:', e); }   // ver.20261019.01 ④   // ver.20261009.02 / .03 タブ
   if (fieldsFilter && fieldsFilter.length && type === 'company') {
     applyFieldsFilter(fieldsFilter);
   }
