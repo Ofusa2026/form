@@ -192,7 +192,8 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20261029.06'; // 第6-3号 実務経験：最初の案内欄に「第6-3号のひながた（入管庁PDF）」「職種・呼称・必要な就業日数の一覧（国交省PDF）」を開くリンクを追加
+var FORM_VERSION = 'ver.20261029.07'; // 第6-3号 実務経験：経歴証明書（CCUSに全て蓄積されていない場合）に「内容を確認した方」の会社名・氏名を追加（必須。送信 t2Ccus.checkCo・checkName）
+// var FORM_VERSION = 'ver.20261029.06'; // 第6-3号 実務経験：最初の案内欄に「第6-3号のひながた（入管庁PDF）」「職種・呼称・必要な就業日数の一覧（国交省PDF）」を開くリンクを追加
 // var FORM_VERSION = 'ver.20261029.05'; // 第6-3号 実務経験：1リンク＝申請人1人に（人数選択・氏名欄をやめ、案件 case_id で申請人を特定。送信 t2Ccus は1人分のオブジェクト）
 // var FORM_VERSION = 'ver.20261029.04'; // 第6-3号 実務経験ヒアリングを独立したフォーム（type=tokutei2_jitsumu）に。所属機関以外（前の勤め先など）にも送れるよう企業情報は聞かない。対象の人数・氏名＋6-3号（別紙 経歴証明書）。2号企業フォーム③からは外した。送信 t2ccCount・t2Ccus
 // var FORM_VERSION = 'ver.20261029.03'; // 第6-3号：①職種・②呼称をCCUSの記載どおりのプルダウンに（国交省 別表 002018204.pdf の職種166・呼称250行を埋め込み。①で選んだ職種の呼称だけを②に表示、必要日数・業務区分を自動表示。一覧にない職種は手入力で3年（645日））
@@ -4108,6 +4109,10 @@ function _t2ccBlock(p){
   h+='<div class="field">'+lab('建設キャリアアップシステム事業者ID',1)+inp('certCoId','例：12345678901234','inputmode="numeric"')+'</div>';
   h+='<div style="font-size:11px;color:#9a3412;line-height:1.6;">※ 期間ごとに証明する会社が違う場合は、会社ごとに経歴証明書が必要です。担当者までご連絡ください。</div>';
   h+='</div>';
+  // ver.20261029.07: 経歴証明書の内容を誰に確認したか
+  h+='<div style="font-size:12px;font-weight:800;color:#9a3412;margin:12px 0 6px;padding-top:10px;border-top:1px dashed #fdba74;">経歴証明書の内容を確認した方</div>';
+  h+='<div class="field">'+lab('確認した方の会社名',1)+inp('checkCo','例：株式会社〇〇建設')+'</div>';
+  h+='<div class="field">'+lab('確認した方の氏名',1)+inp('checkName','例：山田 太郎')+'</div>';
   h+='</div>';
   h+='<div id="t2ccJudge_'+p+'" style="font-size:12.5px;font-weight:700;margin-top:8px;"></div>';
   h+='</div>';
@@ -4160,6 +4165,7 @@ function _t2ccCollect(){
       var pers=[]; for(var k=1;k<=10;k++){ var f=_t2ccV(b+'per'+k+'_from'), t=_t2ccV(b+'per'+k+'_to'), d=_t2ccV(b+'per'+k+'_days'); if(f||t||d) pers.push({from:f,to:t,days:d}); }
       r.workerId=_t2ccV(b+'workerId'); r.periods=pers; r.careerDays=_t2ccCareerDays(p);
       r.certType=_t2ccV(b+'certType');
+      r.checkCo=_t2ccV(b+'checkCo'); r.checkName=_t2ccV(b+'checkName');
       if(r.certType.indexOf('別の会社')===0){ r.certCo=_t2ccV(b+'certCo'); r.certTitle=_t2ccV(b+'certTitle'); r.certName=_t2ccV(b+'certName'); r.certCoId=_t2ccV(b+'certCoId'); }
     }
     r.totalDays=(parseInt(r.ccusDays||'0',10)||0)+(r.careerDays||0);
@@ -4195,6 +4201,8 @@ function _t2ccValidate(){
         var ks=[['certCo','事業者名'],['certTitle','役職名'],['certName','氏名'],['certCoId','CCUS事業者ID']];
         for(var i=0;i<ks.length;i++){ if(!_t2ccV(b+ks[i][0])) return act(b+ks[i][0],'証明者の'+ks[i][1]+'をご入力ください。'); }
       }
+      if(!_t2ccV(b+'checkCo')) return act(b+'checkCo','経歴証明書の内容を確認した方の会社名をご入力ください。');
+      if(!_t2ccV(b+'checkName')) return act(b+'checkName','経歴証明書の内容を確認した方の氏名をご入力ください。');
     }
     return false;
   });
@@ -4209,7 +4217,7 @@ function _t2ccRestore(list){
     set('jobCode', r.jobCode); _t2ccJobChange(p);
     if(r.jobCode===_T2CC_NONE) set('job', r.job);
     set('call', r.call);
-    ['acc','ccusDays','level','workerId','certType','certCo','certTitle','certName','certCoId'].forEach(function(k){ set(k, k==='acc'?r.accumulated:r[k]); });
+    ['acc','ccusDays','level','workerId','certType','certCo','certTitle','certName','certCoId','checkCo','checkName'].forEach(function(k){ set(k, k==='acc'?r.accumulated:r[k]); });
     (r.periods||[]).forEach(function(v,i){ if(i>0 && !document.getElementById(b+'per'+(i+1)+'_from')) _t2ccAddPeriod(p); set('per'+(i+1)+'_from',v.from); set('per'+(i+1)+'_to',v.to); set('per'+(i+1)+'_days',v.days); });
     _t2ccToggle(p);
   });
