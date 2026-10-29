@@ -192,7 +192,8 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20261029.03'; // 第6-3号：①職種・②呼称をCCUSの記載どおりのプルダウンに（国交省 別表 002018204.pdf の職種166・呼称250行を埋め込み。①で選んだ職種の呼称だけを②に表示、必要日数・業務区分を自動表示。一覧にない職種は手入力で3年（645日））
+var FORM_VERSION = 'ver.20261029.04'; // 第6-3号 実務経験ヒアリングを独立したフォーム（type=tokutei2_jitsumu）に。所属機関以外（前の勤め先など）にも送れるよう企業情報は聞かない。対象の人数・氏名＋6-3号（別紙 経歴証明書）。2号企業フォーム③からは外した。送信 t2ccCount・t2Ccus
+// var FORM_VERSION = 'ver.20261029.03'; // 第6-3号：①職種・②呼称をCCUSの記載どおりのプルダウンに（国交省 別表 002018204.pdf の職種166・呼称250行を埋め込み。①で選んだ職種の呼称だけを②に表示、必要日数・業務区分を自動表示。一覧にない職種は手入力で3年（645日））
 // var FORM_VERSION = 'ver.20261029.02'; // 特定技能2号（企業）③：建設分野のとき今回の２号ごとに第6-3号の実務経験を聞く（CCUSに全て蓄積されている／いない で分岐。いない場合は別紙 経歴証明書：技能者ID・期間ごとの就業日数・証明者。必要日数の自動判定。送信 t2Ccus）
 // var FORM_VERSION = 'ver.20261029.01'; // 推薦票の大房対応（suisen=self）：本国の家族の住所・電話・送り出し機関を必須に（送り出し機関がない人は「なし」）
 // var FORM_VERSION = 'ver.20261028.04'; // 確認の質問を「在留カードの表面または、アプリで在留カードを読み取って、在留期間を確認しましたか？」に変更
@@ -227,7 +228,7 @@ var codir = params.get('codir') || '';   // ver.20260917.08: 会社フォルダ�
 var IU_GAS_URL = 'https://script.google.com/macros/s/AKfycbwOcaCf_Q_m6NMIYEOc-smyY_9pho_2cqZq4fhJB_YC9LtSY2EwPekmXSrMKWY4pDAA2A/exec';   // ver.20260917.09: メール取込GAS(GAS_GMAIL_URL)の正しいURLに修正
 var caseName = params.get('name') ? decodeURIComponent(params.get('name')) : '';
 // ver.20260812: 企業系フォームは翻訳不要（日本人担当者が入力）
-var _isCompanyForm = (type === 'company' || type === 'support_org' || type === 'tokutei2_pledge' || (type||'').indexOf('jaim') >= 0 || (type||'').indexOf('company_') === 0);
+var _isCompanyForm = (type === 'company' || type === 'support_org' || type === 'tokutei2_pledge' || type === 'tokutei2_jitsumu' || (type||'').indexOf('jaim') >= 0 || (type||'').indexOf('company_') === 0);
 // ver.20260812: 国籍→言語の自動判定マップ（案シスの国籍値に対応）
 var _NAT_LANG_MAP = {
   'インドネシア':'id', 'ベトナム':'vi', 'ミャンマー':'my', 'ミヤンマー':'my',
@@ -1366,6 +1367,8 @@ function buildForm(t) {
       return buildCompanyTokutei2Form();
     case 'tokutei2_pledge':
       return buildTokutei2PledgeForm();
+    case 'tokutei2_jitsumu':
+      return buildTokutei2JitsumuForm();
     case 'tokutei2_person_nintei':
       return blockBasic() + blockMarried() + blockTokuteiNintei() + blockSkillProof() + blockJapaneseProof() + blockGinoIten() + blockContact(false, false);
     case 'tokutei2_person_koushin':
@@ -3633,6 +3636,29 @@ function buildCompanyTokutei2Form() {
   return base + blockT2Pledge();
 }
 
+// ver.20261029.04: 建設分野 第6-3号「2号特定技能外国人に求められる実務経験に係る申告書」＋別紙 経歴証明書 の独立フォーム
+//   所属機関以外（前の勤め先など、経歴を証明する会社）にも送れるように、企業情報は聞かず6-3号の内容だけを聞く
+function buildTokutei2JitsumuForm() {
+  var _nm = caseName ? _t2esc(caseName) : '';
+  var h = '<div class="card" style="background:#fff7ed;border-color:#fdba74;">';
+  h += '<div style="font-size:12px;color:#c2410c;font-weight:700;margin-bottom:4px;">🏗️ 特定技能2号（建設）実務経験の確認</div>';
+  if (_nm) h += '<div style="font-size:15px;font-weight:800;color:#0f2040;">' + _nm + '</div>';
+  h += '<div style="font-size:11px;color:#6b7280;margin-top:4px;">分野参考様式第6-3号「２号特定技能外国人に求められる実務経験に係る申告書」（別紙 経歴証明書）の作成に必要な情報をご入力ください。</div>';
+  h += '</div>';
+  h += '<div class="card"><div class="section-title">２号に求められる実務経験（第６－３号）</div>';
+  h += '<div style="font-size:12px;color:#7c2d12;background:#fffbeb;border:1px solid #fcd34d;border-radius:8px;padding:10px 12px;margin-bottom:12px;line-height:1.7;">'
+    + '対象の方ごとに、建設キャリアアップシステム（CCUS）の<b>職長＋班長としての就業日数</b>をご入力ください。<br>'
+    + 'CCUSに必要な日数が<b>全て蓄積されていない</b>場合は、足りない分を「経歴証明書（別紙）」で証明します。その期間と証明する会社もご入力ください。'
+    + '</div>';
+  h += '<div class="field"><label>対象の方の人数<span class="req">*</span></label><select id="f-t2ccCount" onchange="_renderT2Ccus()">';
+  for (var i=1;i<=10;i++) h += '<option value="'+i+'"'+(i===1?' selected':'')+'>'+i+'名</option>';
+  h += '</select></div>';
+  h += '<div id="t2CcusBox"><div id="t2CcusContainer"></div></div>';
+  h += '</div>';
+  setTimeout(function(){ try{ _renderT2Ccus(); }catch(e){} try{ var _lb=document.getElementById('langBar'); if(_lb) _lb.style.display='none'; }catch(e){} }, 0);   // 日本語の担当者が入力するので翻訳バーは出さない
+  return h;
+}
+
 // ver.20260822: 特定技能2号 誓約書だけのシンプル版（企業情報なし・会社名のみ表示）
 function buildTokutei2PledgeForm() {
   var h = '';
@@ -3699,16 +3725,6 @@ function blockT2Pledge() {
     + '<label style="display:flex;align-items:flex-start;gap:8px;cursor:pointer;font-size:12.5px;color:#7f1d1d;line-height:1.6;"><input type="checkbox" id="f-t2Short5" style="width:20px;height:20px;flex-shrink:0;margin-top:1px;">'
     + '<span>今般の申請に当たって、特定産業分野ごとに必要とされる指導対象者数を充足していませんが、この状況は、理由欄記載のとおり一時的なものであり、<b>次回の在留期間更新許可申請の際に指導対象者数を充足していない場合は、次回の在留期間更新許可申請が不許可となり得る</b>ことを理解しています。</span></label>'
     + '<div class="field" style="margin-top:8px;"><label>一時的に足りていない理由<span style="color:#dc2626;">*</span></label><textarea id="f-t2Reason5" rows="2" placeholder="例：1名が採用手続き中（12月入社予定）のため"></textarea></div></div>';
-  h += '</div>';
-
-  // ver.20261029.02: 建設分野のみ 第6-3号「2号特定技能外国人に求められる実務経験に係る申告書」＋別紙 経歴証明書
-  h += '<div id="t2CcusBox" style="display:none;margin-top:18px;">';
-  h += '<div class="sub-label" style="background:#fff7ed;color:#c2410c;border-radius:6px;padding:6px 10px;margin:0 0 8px;font-size:12px;font-weight:700;">【建設分野】２号に求められる実務経験（第６－３号）</div>';
-  h += '<div style="font-size:12px;color:#7c2d12;background:#fffbeb;border:1px solid #fcd34d;border-radius:8px;padding:10px 12px;margin-bottom:10px;line-height:1.7;">'
-    + '今回の２号の方ごとに、建設キャリアアップシステム（CCUS）の<b>職長＋班長としての就業日数</b>をご入力ください。<br>'
-    + 'CCUSに必要な日数が<b>全て蓄積されていない</b>場合は、足りない分を「経歴証明書（別紙）」で証明します。その期間と証明する会社もご入力ください。'
-    + '</div>';
-  h += '<div id="t2CcusContainer"></div>';
   h += '</div>';
 
   // 必須確認チェックボックス
@@ -4022,7 +4038,7 @@ function _t2ccJobChange(p){
   _t2ccCalc(p);
 }
 
-function _t2ccOn(){ return ((document.getElementById('f-t2Field')||{}).value||'')==='construction'; }
+function _t2ccOn(){ return type==='tokutei2_jitsumu'; }
 function _t2ccV(id){ var el=document.getElementById(id); return el?String(el.value||'').trim():''; }
 function _t2ccPeriodRow(p,k,v){
   v=v||{};
@@ -4049,14 +4065,14 @@ function _t2ccSel(id,opts,cur,onch){
 function _t2ccBlock(p){
   var b='f-t2cc_'+p+'_';
   var keep=function(sfx){ return _t2ccV(b+sfx); };
-  var nm=_t2ccV('f-t2NameThis_'+p);
   var inp=function(sfx,ph,extra){ return '<input type="text" id="'+b+sfx+'" value="'+_t2esc(keep(sfx))+'" placeholder="'+ph+'" '+(extra||'')+' style="width:100%;padding:9px 12px;border:1.5px solid #d1d5db;border-radius:8px;font-size:14px;box-sizing:border-box;">'; };
   var lab=function(t,req){ return '<label>'+t+(req?'<span class="req">*</span>':'')+'</label>'; };
   // 経歴の期間（既存の入力は残す）
   var pers=[]; for(var k=1;k<=10;k++){ var f=_t2ccV(b+'per'+k+'_from'), t=_t2ccV(b+'per'+k+'_to'), d=_t2ccV(b+'per'+k+'_days'); if(document.getElementById(b+'per'+k+'_from')) pers.push({from:f,to:t,days:d}); }
   if(!pers.length) pers=[{}];
   var h='<div class="t2cc-person" data-person="'+p+'" style="border-left:3px solid #fdba74;padding-left:10px;margin-bottom:16px;">';
-  h+='<div style="font-size:12.5px;font-weight:800;color:#c2410c;margin-bottom:6px;">今回の２号 '+p+'人目：<span id="t2ccName_'+p+'">'+_t2esc(nm||'（上で氏名を入力してください）')+'</span></div>';
+  h+='<div style="font-size:12.5px;font-weight:800;color:#c2410c;margin-bottom:6px;">'+p+'人目</div>';
+  h+='<div class="field">'+lab('氏名（パスポートどおりローマ字）',1)+inp('name','例：NGUYEN VAN A')+'</div>';
   var _jc=keep('jobCode'), _none=(_jc===_T2CC_NONE);
   h+='<div class="field">'+lab('① 申請する業務区分に対応する職種（CCUSの技能者情報に記載の職種）',1)
     + '<select id="'+b+'jobCode" onchange="_t2ccJobChange('+p+')">'+_t2ccJobOptions(_jc)+'</select>'
@@ -4083,8 +4099,8 @@ function _t2ccBlock(p){
     + '<button type="button" onclick="_t2ccAddPeriod('+p+')" style="padding:7px 12px;border-radius:8px;border:1.5px solid #fdba74;background:#fff;color:#c2410c;font-size:12.5px;font-weight:700;cursor:pointer;">＋ 期間を追加</button>'
     + '<div style="font-size:13px;font-weight:700;color:#7c2d12;margin-top:8px;">④ 経歴証明書に基づく就業日数（合計）：<span id="t2ccTotal_'+p+'">0</span>日</div></div>';
   h+='<div class="field">'+lab('この経歴を証明する会社（証明者）',1)
-    + _t2ccSel(b+'certType',['当社（この会社）','別の会社（前の勤め先など）'],keep('certType'),'_t2ccToggle('+p+')')
-    + '<div style="font-size:11px;color:#6b7280;margin-top:4px;">当社の場合は、登録済みの会社情報（会社名・代表者・CCUS事業者ID）を使います。</div></div>';
+    + _t2ccSel(b+'certType',['所属機関（受入れ企業）','別の会社（前の勤め先など）'],keep('certType'),'_t2ccToggle('+p+')')
+    + '<div style="font-size:11px;color:#6b7280;margin-top:4px;">所属機関の場合は、登録済みの会社情報（会社名・代表者・CCUS事業者ID）を使います。</div></div>';
   h+='<div id="t2ccCert_'+p+'" style="display:none;">';
   h+='<div class="field">'+lab('証明者の事業者名',1)+inp('certCo','例：株式会社〇〇建設')+'</div>';
   h+='<div class="field">'+lab('証明者の役職名',1)+inp('certTitle','例：代表取締役')+'</div>';
@@ -4101,9 +4117,8 @@ function _renderT2Ccus(){
   var box=document.getElementById('t2CcusBox'), c=document.getElementById('t2CcusContainer'); if(!box||!c) return;
   var on=_t2ccOn(); box.style.display=on?'':'none';
   if(!on) return;
-  var n=parseInt((document.getElementById('f-t2CountThis')||{}).value||'0',10)||0;
+  var n=parseInt((document.getElementById('f-t2ccCount')||{}).value||'0',10)||0;
   var html=''; for(var p=1;p<=n;p++) html+=_t2ccBlock(p);
-  if(!n) html='<div style="font-size:12px;color:#6b7280;">今回の２号採用人数を選ぶと入力欄が表示されます。</div>';
   c.innerHTML=html;
   for(var q=1;q<=n;q++){ _t2ccToggle(q); }
 }
@@ -4132,17 +4147,13 @@ function _t2ccCalc(p){
   if(tot>=need.days){ j.style.color='#15803d'; j.textContent='✓ '+(no?('③ '+cd+'日 ＋ ④ '+car+'日 ＝ '):'')+tot+'日（必要 '+need.days+'日以上を満たしています）'; }
   else { j.style.color='#b91c1c'; j.textContent='⚠️ '+(no?('③ '+cd+'日 ＋ ④ '+car+'日 ＝ '):'')+tot+'日です。必要な '+need.days+'日に '+(need.days-tot)+'日足りません。'+(no?'':'CCUSに全て蓄積されていない場合は「いいえ」を選んで、足りない分の期間をご入力ください。'); }
 }
-document.addEventListener('input', function(e){
-  var t=e.target; if(!t||!t.id) return;
-  var m=t.id.match(/^f-t2NameThis_(\d+)$/); if(m){ var s=document.getElementById('t2ccName_'+m[1]); if(s) s.textContent=t.value||'（上で氏名を入力してください）'; }
-});
 function _t2ccCollect(){
   if(!_t2ccOn()) return [];
   var out=[];
   document.querySelectorAll('#t2CcusContainer .t2cc-person').forEach(function(el){
     var p=el.dataset.person, b='f-t2cc_'+p+'_', no=_t2ccV(b+'acc').indexOf('いいえ')===0;
     var need=_t2ccNeed(p), code=_t2ccV(b+'jobCode'), none=(code===_T2CC_NONE);
-    var r={person:p, name:_t2ccV('f-t2NameThis_'+p), jobCode:code, job:none?_t2ccV(b+'job'):_t2ccJobName(code), call:none?'':_t2ccV(b+'call'),
+    var r={person:p, name:_t2ccV(b+'name'), jobCode:code, job:none?_t2ccV(b+'job'):_t2ccJobName(code), call:none?'':_t2ccV(b+'call'),
       noStandard:none?'能力評価基準なし':'', kubun:need?need.kubun:'', needDays:need?need.days:'',
       accumulated:_t2ccV(b+'acc'), ccusDays:_t2ccV(b+'ccusDays'), level:_t2ccV(b+'level')};
     if(no){
@@ -4160,8 +4171,9 @@ function _t2ccValidate(){
   if(!_t2ccOn()) return null;
   var rows=document.querySelectorAll('#t2CcusContainer .t2cc-person'), msg=null;
   [].some.call(rows,function(el){
-    var p=el.dataset.person, b='f-t2cc_'+p+'_', who='今回の２号 '+p+'人目の実務経験（第6-3号）：';
+    var p=el.dataset.person, b='f-t2cc_'+p+'_', who=p+'人目：';
     var act=function(id,m){ msg=who+m; window._t2ccAct=document.getElementById(id); return true; };
+    if(!_t2ccV(b+'name')) return act(b+'name','氏名をご入力ください。');
     var code=_t2ccV(b+'jobCode');
     if(!code) return act(b+'jobCode','①CCUSに記載の職種を選んでください。');
     if(code===_T2CC_NONE){ if(!_t2ccV(b+'job')) return act(b+'job','①職種名をご入力ください。'); }
@@ -4195,7 +4207,7 @@ function _t2ccRestore(list){
   list.forEach(function(r){
     var p=r.person; if(!p) return; var b='f-t2cc_'+p+'_';
     var set=function(sfx,v){ var el=document.getElementById(b+sfx); if(el&&v!=null&&v!=='') el.value=v; };
-    set('jobCode', r.jobCode); _t2ccJobChange(p);
+    set('name', r.name); set('jobCode', r.jobCode); _t2ccJobChange(p);
     if(r.jobCode===_T2CC_NONE) set('job', r.job);
     set('call', r.call);
     ['acc','ccusDays','level','workerId','certType','certCo','certTitle','certName','certCoId'].forEach(function(k){ set(k, k==='acc'?r.accumulated:r[k]); });
@@ -4285,7 +4297,6 @@ function recalcT2Targets(){
   var cntNow = parseInt((document.getElementById('f-t2CountNow')||{}).value || '0', 10);
   var cntThis = parseInt((document.getElementById('f-t2CountThis')||{}).value || '0', 10);
   _renderT2Structure(cntNow, cntThis, perPerson);
-  try{ _renderT2Ccus(); }catch(e){}   // ver.20261029.02: 建設分野 第6-3号
   var total = cntNow + cntThis;
   var need = perPerson * total;  // 必要な指導対象者の総数
   var note = document.getElementById('t2TargetNote');
@@ -4431,7 +4442,6 @@ function _t2StartNew(){
   setV('f-t2CountThis', '1');
   // 2号の氏名・指導対象者の欄を一度空にしてから作り直す
   var c=document.getElementById('t2TargetContainer'); if(c) c.innerHTML='';
-  var _ccc=document.getElementById('t2CcusContainer'); if(_ccc) _ccc.innerHTML='';
   if(typeof recalcT2Targets==='function') recalcT2Targets();
   namesNow.forEach(function(nm,i){ setV('f-t2NameNow_'+(i+1), nm); });
   // 前回の対象者を「現在の２号」の枠へ（前回の今回の２号 j人目 → 現在の２号 (前回の現在の人数+j)人目）
@@ -5476,6 +5486,10 @@ function collectData() {
     d.kzSpIncome = val('f-kzSpIncome');
     return d;
   }
+  // ver.20261029.04: 第6-3号 実務経験の独立フォーム
+  if (t === 'tokutei2_jitsumu') {
+    return { t2ccCount: val('f-t2ccCount'), t2Ccus: _t2ccCollect() };
+  }
   // ver.20260822: 誓約書だけのフォーム（企業情報なし）
   if (t === 'tokutei2_pledge') {
     var d = {};
@@ -5507,8 +5521,7 @@ function collectData() {
       if (nm||cd||dp||po||jb) _t2t.push({name:nm, card:cd, dept:dp, position:po, job:jb, group:(row.dataset.group||''), person:(row.dataset.person||'')});
     });
     d.t2Targets = _t2t;
-    d.t2Ccus = _t2ccCollect();   // ver.20261029.02: 建設分野 第6-3号（実務経験申告書＋別紙 経歴証明書）
-    return d;
+        return d;
   }
 
   if (t === 'company' || t === 'company_tokutei2') {
@@ -5646,8 +5659,7 @@ function collectData() {
         if (nm||cd||dp||po||jb) _t2targets.push({name:nm, card:cd, dept:dp, position:po, job:jb, group:(row.dataset.group||''), person:(row.dataset.person||'')});
       });
       d.t2Targets = _t2targets;
-      d.t2Ccus = _t2ccCollect();   // ver.20261029.02: 建設分野 第6-3号（実務経験申告書＋別紙 経歴証明書）
-    }
+          }
     if (formPart) _tkPartTrim(d);    // ver.20261015.03: ①だけは2号の項目も送らない
     if (formPart3) _tkPart3Trim(d);  // ver.20261015.03: ③だけは③の項目だけ送る
     return d;
@@ -6228,7 +6240,6 @@ function validate() {
       if (_t < 0 && typeof _w.r === 'string' && /特定産業分野|２号|2号|指導を受ける|重複|名以上を選定/.test(_w.r)) {
         var _t2 = document.getElementById('f-t2Field') || document.getElementById('t2TargetContainer');
         if (_t2) { _t = _tkPaneOf(_t2); if (!val('f-t2Field')) _w.act = document.getElementById('f-t2Field'); }
-        if (/第6-3号/.test(_w.r) && window._t2ccAct) _w.act = window._t2ccAct;
       }
       if (_t < 0) { var _f = (_reqEmptyFields() || [])[0]; _t = _tkPaneOf(_f); _w.act = _f; }
       if (_t >= 0 && _t !== _tkTabCur) _tkShowTab(_t, false);
@@ -6239,6 +6250,12 @@ function validate() {
   return _validateInner();
 }
 function _validateInner() {
+  // ver.20261029.04: 第6-3号 実務経験の独立フォーム
+  if (type === 'tokutei2_jitsumu') {
+    var _ccm = _t2ccValidate();
+    if (_ccm) { try{ var _a=window._t2ccAct; if(_a){ _a.scrollIntoView({behavior:'smooth',block:'center'}); _a.focus(); } }catch(e){} return _ccm; }
+    return null;
+  }
   // ver.20260822: 特定技能2号 企業フォームの誓約書チェック（分野別の必要人数）
   // ver.20261015.03: ③を出さない確認用リンク（①だけ part=1／①＋② part=12）では2号の入力チェックをしない
   if ((type === 'company_tokutei2' && !formPart && !formNo3) || type === 'tokutei2_pledge') {
@@ -6280,8 +6297,6 @@ function _validateInner() {
       if (!_so) return '指導を受ける対象者が「全員、同じ事業所・同じ部署か」を選んでください。';
       if (_so === 'いいえ' && !val('f-t2Reason3')) return '指導を受ける対象者の事業所や部署が違う理由をご入力ください。';
     }
-    // ver.20261029.02: 建設分野 第6-3号の入力チェック
-    var _ccMsg = _t2ccValidate(); if (_ccMsg) return _ccMsg;
     // 対象者不要の分野(per=0)ではチェック必須にしない
     if (_need > 0) {
       var _cb = document.getElementById('f-t2Confirm');
@@ -6456,6 +6471,7 @@ function _minKeysForType(t) {
   if (t === 'company') return 1;
   if (t === 'company_tokutei2') return 1;
   if (t === 'tokutei2_pledge') return 1;
+  if (t === 'tokutei2_jitsumu') return 1;
   if (t === 'company_gijinkoku') return 1;
   if (t === 'company_designated46') return 1;
   if (t === 'company_designated9') return 1;
@@ -6515,7 +6531,7 @@ async function submitForm() {
   // 🛡️ 必須項目チェック（申請人フォームのみ）: 氏名・生年月日・国籍・メールが揃っていることを確認
   // ver: company/jaim に加え support_org（登録支援機関）・card_delivery（在留カード送付先）も除外。
   //      これらは applicantNameEn 等を持たないため、除外しないと送信が必ず弾かれる。
-  if (type !== 'company' && type !== 'company_tokutei2' && type !== 'tokutei2_pledge' && type !== 'company_gijinkoku' && type !== 'company_designated46' && type !== 'company_designated9' && type !== 'jaim' && type !== 'support_org' && type !== 'card_delivery' && type !== 'kazoku_nintei' && type !== 'kazoku_henkou' && type !== 'kazoku_koushin') {
+  if (type !== 'company' && type !== 'company_tokutei2' && type !== 'tokutei2_pledge' && type !== 'tokutei2_jitsumu' && type !== 'company_gijinkoku' && type !== 'company_designated46' && type !== 'company_designated9' && type !== 'jaim' && type !== 'support_org' && type !== 'card_delivery' && type !== 'kazoku_nintei' && type !== 'kazoku_henkou' && type !== 'kazoku_koushin') {
     var requiredKeys = ['applicantNameEn', 'birthdate', 'nationality', 'email'];
     var missingKeys = requiredKeys.filter(function(k){
       return !response[k] || String(response[k]).trim() === '';
@@ -6800,6 +6816,7 @@ var TYPE_LABELS = {
   company:          { cat:'企業情報', kind:'', catClass:'badge-company', kindClass:'' },
   company_tokutei2: { cat:'特定技能2号 企業', kind:'', catClass:'badge-tokutei', kindClass:'' },
   tokutei2_pledge:  { cat:'特定技能2号 誓約書', kind:'', catClass:'badge-tokutei', kindClass:'' },
+  tokutei2_jitsumu: { cat:'特定技能2号 実務経験（6-3号）', kind:'', catClass:'badge-tokutei', kindClass:'' },
   company_gijinkoku:{ cat:'技人国 企業', kind:'', catClass:'badge-gijinkoku', kindClass:'' },
   company_designated46:{ cat:'特定活動46号 企業', kind:'', catClass:'badge-gijinkoku', kindClass:'' },
   company_designated9:{ cat:'特定活動9号 企業', kind:'', catClass:'badge-company', kindClass:'' },
@@ -7235,6 +7252,13 @@ function prefillForm(resp) {
     }
   } catch(e) { console.error('gijutsu restore error (ignored):', e); }
 
+  // ver.20261029.04: 第6-3号 実務経験の独立フォームの入力復元
+  try {
+    if (type === 'tokutei2_jitsumu') {
+      var _cc = document.getElementById('f-t2ccCount'); if (_cc && resp.t2ccCount) _cc.value = resp.t2ccCount;
+      _t2ccRestore(resp.t2Ccus || []);
+    }
+  } catch(e) { console.error('t2cc prefill error (ignored):', e); }
   // ver.20260902.28: 特定技能2号 誓約書フォーム（tokutei2_pledge / company_tokutei2）の入力復元
   try {
     if (type === 'tokutei2_pledge' || type === 'company_tokutei2') {
@@ -7283,7 +7307,6 @@ function prefillForm(resp) {
       _t2set('f-t2SameOffice', resp.t2SameOffice); _t2set('f-t2Reason3', resp.t2Reason3); _t2set('f-t2DupReason', resp.t2DupReason); _t2set('f-t2Reason5', resp.t2Reason5);
       var _t2s5 = document.getElementById('f-t2Short5'); if (_t2s5) _t2s5.checked = (resp.t2Short5 === 'checked');
       try{ _t2RulesToggle(); }catch(e){}
-      try{ _t2ccRestore(resp.t2Ccus); }catch(e){}   // ver.20261029.02
     }
   } catch(e) { console.error('t2 pledge prefill error (ignored):', e); }
 }
