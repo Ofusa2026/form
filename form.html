@@ -192,7 +192,8 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20261029.05'; // 第6-3号 実務経験：1リンク＝申請人1人に（人数選択・氏名欄をやめ、案件 case_id で申請人を特定。送信 t2Ccus は1人分のオブジェクト）
+var FORM_VERSION = 'ver.20261029.06'; // 第6-3号 実務経験：最初の案内欄に「第6-3号のひながた（入管庁PDF）」「職種・呼称・必要な就業日数の一覧（国交省PDF）」を開くリンクを追加
+// var FORM_VERSION = 'ver.20261029.05'; // 第6-3号 実務経験：1リンク＝申請人1人に（人数選択・氏名欄をやめ、案件 case_id で申請人を特定。送信 t2Ccus は1人分のオブジェクト）
 // var FORM_VERSION = 'ver.20261029.04'; // 第6-3号 実務経験ヒアリングを独立したフォーム（type=tokutei2_jitsumu）に。所属機関以外（前の勤め先など）にも送れるよう企業情報は聞かない。対象の人数・氏名＋6-3号（別紙 経歴証明書）。2号企業フォーム③からは外した。送信 t2ccCount・t2Ccus
 // var FORM_VERSION = 'ver.20261029.03'; // 第6-3号：①職種・②呼称をCCUSの記載どおりのプルダウンに（国交省 別表 002018204.pdf の職種166・呼称250行を埋め込み。①で選んだ職種の呼称だけを②に表示、必要日数・業務区分を自動表示。一覧にない職種は手入力で3年（645日））
 // var FORM_VERSION = 'ver.20261029.02'; // 特定技能2号（企業）③：建設分野のとき今回の２号ごとに第6-3号の実務経験を聞く（CCUSに全て蓄積されている／いない で分岐。いない場合は別紙 経歴証明書：技能者ID・期間ごとの就業日数・証明者。必要日数の自動判定。送信 t2Ccus）
@@ -3643,6 +3644,11 @@ function buildTokutei2JitsumuForm() {
   var h = '<div class="card" style="background:#fff7ed;border-color:#fdba74;">';   // 申請人の名前は上の案件名の枠に出る
   h += '<div style="font-size:12px;color:#c2410c;font-weight:700;margin-bottom:4px;">🏗️ 特定技能2号（建設）実務経験の確認</div>';
   h += '<div style="font-size:11px;color:#6b7280;margin-top:4px;">分野参考様式第6-3号「２号特定技能外国人に求められる実務経験に係る申告書」（別紙 経歴証明書）の作成に必要な情報をご入力ください。</div>';
+  // ver.20261029.06: 6-3号のひながた（様式）と、職種・呼称・必要日数の一覧（国交省）を開けるように
+  h += '<div style="margin-top:6px;">'
+    + '<a href="https://www.moj.go.jp/isa/content/930004487.pdf" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:8px;padding:10px 12px;margin-top:8px;background:#fff;border:1.5px solid #fdba74;border-radius:10px;text-decoration:none;color:#9a3412;"><span style="font-size:20px;">📄</span><span style="flex:1;"><b style="font-size:13px;">第6-3号のひながた（様式）</b><br><span style="font-size:11px;color:#6b7280;">申告書と別紙 経歴証明書（出入国在留管理庁・PDF）</span></span><span style="font-size:12px;font-weight:700;">開く ›</span></a>'
+    + '<a href="https://www.mlit.go.jp/tochi_fudousan_kensetsugyo/content/002018204.pdf" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:8px;padding:10px 12px;margin-top:8px;background:#fff;border:1.5px solid #fdba74;border-radius:10px;text-decoration:none;color:#9a3412;"><span style="font-size:20px;">📄</span><span style="flex:1;"><b style="font-size:13px;">職種・呼称・必要な就業日数の一覧</b><br><span style="font-size:11px;color:#6b7280;">CCUSの職種ごとの技能評価基準の呼称と日数（国土交通省・PDF）</span></span><span style="font-size:12px;font-weight:700;">開く ›</span></a>'
+    + '</div>';
   h += '</div>';
   h += '<div class="card"><div class="section-title">２号に求められる実務経験（第６－３号）</div>';
   h += '<div style="font-size:12px;color:#7c2d12;background:#fffbeb;border:1px solid #fcd34d;border-radius:8px;padding:10px 12px;margin-bottom:12px;line-height:1.7;">'
