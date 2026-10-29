@@ -192,7 +192,8 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20261028.04'; // 確認の質問を「在留カードの表面または、アプリで在留カードを読み取って、在留期間を確認しましたか？」に変更
+var FORM_VERSION = 'ver.20261029.01'; // 推薦票の大房対応（suisen=self）：本国の家族の住所・電話・送り出し機関を必須に（送り出し機関がない人は「なし」）
+// var FORM_VERSION = 'ver.20261028.04'; // 確認の質問を「在留カードの表面または、アプリで在留カードを読み取って、在留期間を確認しましたか？」に変更
 // var FORM_VERSION = 'ver.20261028.03'; // 現在の在留期間：選んだあとに「アプリで読み取って確認しましたか？」（はい／いいえ・必須、いいえでは送信できない）＋「まちがっていると申請までに時間がかかることがあります」の注意を追加
 // var FORM_VERSION = 'ver.20261028.02'; // 変更・更新：案シスの「許可された在留期間」が空のときだけ「現在の在留期間」を必須で聞く（在留カードの表面または確認用アプリ＝出入国在留管理庁の案内PDF付き・認定は聞かない）
 // var FORM_VERSION = 'ver.20261028.01'; // 企業フォーム：「①と②は同じ窓口ですか？」（はい＝入力は1か所・②にも同じ内容を送る／いいえ＝今までどおり①②）。②にも「代表者と同じ」 ／ ver.20261027.02: 氏名（英字以外）・生年月日（15歳未満）を送信前に知らせる／サーバーで弾かれたら理由を表示（旧 ver.20261023.01: // 2号（所属機関）：第1-32号 新様式の留意事項３〜５に対応（事業所・部署が違う理由／他の２号にも指導を受ける人を理由付きで可／人数が一時的に足りない場合はチェック＋理由で送信可。送信 t2SameOffice・t2Reason3・t2DupReason・t2Short5・t2Reason5）・技能実習2号「内装仕上げ施工」の作業に「カーテン工事」を追加 ／ ver.20261020.04: 技能実習2号「内装仕上げ施工」の作業に「カーテン工事」を追加 ／ ver.20261020.03: support=skip（自社支援を別で管理）：企業情報だけ聞き、【自社支援】タブは出さない ／ ver.20261020.02: 自社支援：受入経験ありでも選任の根拠を聞く／確認用リンク（①企業情報）に【自社支援】タブを付ける ／ ver.20261020.01: 在日親族：1つでも入れた行（「はい」のときは1人目も）は全項目必須（日本国籍は在留カード不要・同居なら住所不要・働いていなければ「なし」） ／ ver.20261019.02: 在日親族に「生年月日」「国籍」を追加（送信 familyMembers[].birth / nationality）・途中保存した在日親族を開き直したときに戻すように ／ ver.20261019.01: 特定技能1号の企業フォームに【自社支援】支援体制・【自社支援】担当者・その他タブを追加（案件の登録支援機関なし＝自社支援のときだけ表示。登録支援機関フォームと同じ部品・同じ送信キー selfSupport ＋ 選任の根拠：①1-11-2号／②1-11-3号・1-20号・1-22号） ／ ver.20261015.04: // 定期健康診断の下に「自己都合退職は何日前までに申し出るか（日）」を追加（必須・初期値30日） ／ ver.20261015.03: // 特定技能2号の確認用リンク：③だけ（part=3）・①②③すべて（part=123）を追加／①＋②（part=12）は③を出さない／①だけ（part=1）で隠れた③の入力チェックに止まっていたのを修正
@@ -669,9 +670,10 @@ function blockContact(showResCard, showExtra) {
   if (isSuisenSelf) {
     h += '<div class="card"><div class="section-title">本国の情報（ほんごくのじょうほう）<div class="trans" data-key="suisenVnTitle"></div></div>';
     h += '<div style="font-size:11px;color:#9ca3af;margin-bottom:10px;">大使館推薦票の申請に必要な情報です。</div>';
-    h += field('f-vnFamilyAddress', 'ベトナムのご家族の住所（かぞくのじゅうしょ）', 'text', false, '例: 123 Le Loi Street, Hanoi', 'vnFamilyAddress');
-    h += field('f-vnFamilyTel', 'ベトナムのご家族の電話番号（でんわばんごう）', 'text', false, '例: +84 90 123 4567', 'vnFamilyTel');
-    h += field('f-vnSendingOrg', '送り出し機関の名前（おくりだしきかんのなまえ）', 'text', false, '例: ○○ Human Resources Co., Ltd.', 'vnSendingOrg');
+    h += field('f-vnFamilyAddress', 'ベトナムのご家族の住所（かぞくのじゅうしょ）', 'text', true, '例: 123 Le Loi Street, Hanoi', 'vnFamilyAddress');
+    h += field('f-vnFamilyTel', 'ベトナムのご家族の電話番号（でんわばんごう）', 'text', true, '例: +84 90 123 4567', 'vnFamilyTel');
+    h += field('f-vnSendingOrg', '送り出し機関の名前（おくりだしきかんのなまえ）', 'text', true, '例: ○○ Human Resources Co., Ltd.', 'vnSendingOrg');
+    h += '<div style="font-size:11px;color:#6b7280;margin:-6px 0 6px;">送り出し機関がない場合（留学生など）は「なし」と入力してください。<br>Nếu không có công ty phái cử (du học sinh, v.v.), vui lòng nhập 「なし」.</div>';
     h += '</div>';
   }
 
@@ -5462,6 +5464,9 @@ var ERR_MSG_I18N = {
   '国籍は必須です。':{fr:'こくせきは ひっすです。',en:'Nationality is required.',vi:'Quốc tịch là bắt buộc.',id:'Kewarganegaraan wajib diisi.',my:'နိုင်ငံသား ဖြည့်ရန်လိုအပ်သည်။',km:'សញ្ជាតិ ត្រូវបំពេញ។',ne:'राष्ट्रियता अनिवार्य छ।',zh:'国籍为必填项。'},
   'メールアドレスは必須です。':{fr:'めーるあどれすは ひっすです。',en:'Email address is required.',vi:'Địa chỉ email là bắt buộc.',id:'Alamat email wajib diisi.',my:'အီးမေးလ်လိပ်စာ ဖြည့်ရန်လိုအပ်သည်။',km:'អាសយដ្ឋានអ៊ីមែល ត្រូវបំពេញ។',ne:'इमेल ठेगाना अनिवार्य छ।',zh:'电子邮件为必填项。'},
   '結婚しているかどうかを選択してください。':{fr:'けっこんして いるか どうかを えらんで ください。',en:'Please select whether you are married.',vi:'Vui lòng chọn tình trạng hôn nhân.',id:'Silakan pilih status pernikahan.',my:'အိမ်ထောင်ရှိမရှိ ရွေးချယ်ပါ။',km:'សូមជ្រើសរើសស្ថានភាពអាពាហ៍ពិពាហ៍។',ne:'विवाहित हो/होइन छान्नुहोस्।',zh:'请选择是否已婚。'},
+  'ベトナムのご家族の住所を入力してください。':{fr:'べとなむの ごかぞくの じゅうしょを にゅうりょくして ください。',en:'Please enter your family\'s address in Vietnam.',vi:'Vui lòng nhập địa chỉ gia đình ở Việt Nam.',id:'Masukkan alamat keluarga di Vietnam.',my:'ဗီယက်နမ်ရှိ မိသားစု၏ လိပ်စာကို ဖြည့်ပါ။',km:'សូមបញ្ចូលអាសយដ្ឋានគ្រួសារនៅវៀតណាម។',ne:'भियतनाममा रहेको परिवारको ठेगाना लेख्नुहोस्।',zh:'请输入在越南的家人地址。'},
+  'ベトナムのご家族の電話番号を入力してください。':{fr:'べとなむの ごかぞくの でんわばんごうを にゅうりょくして ください。',en:'Please enter your family\'s phone number in Vietnam.',vi:'Vui lòng nhập số điện thoại gia đình ở Việt Nam.',id:'Masukkan nomor telepon keluarga di Vietnam.',my:'ဗီယက်နမ်ရှိ မိသားစု၏ ဖုန်းနံပါတ်ကို ဖြည့်ပါ။',km:'សូមបញ្ចូលលេខទូរស័ព្ទគ្រួសារនៅវៀតណាម។',ne:'भियतनाममा रहेको परिवारको फोन नम्बर लेख्नुहोस्।',zh:'请输入在越南的家人电话号码。'},
+  '送り出し機関の名前を入力してください（ない場合は「なし」）。':{fr:'おくりだしきかんの なまえを にゅうりょくして ください（ない ばあいは「なし」）。',en:'Please enter the name of your sending organization (write "なし" if none).',vi:'Vui lòng nhập tên công ty phái cử (nếu không có, ghi "なし").',id:'Masukkan nama lembaga pengirim (tulis "なし" jika tidak ada).',my:'စေလွှတ်သည့်အေဂျင်စီ အမည်ကို ဖြည့်ပါ (မရှိပါက "なし")။',km:'សូមបញ្ចូលឈ្មោះស្ថាប័នបញ្ជូន (បើគ្មាន សរសេរ "なし")។',ne:'पठाउने संस्थाको नाम लेख्नुहोस् (नभए "なし")।',zh:'请输入派遣机构名称（没有请填写“なし”）。'},
   '来日回数を入力してください。':{fr:'らいにちかいすうを にゅうりょくして ください。',en:'Please enter the number of times you have visited Japan.',vi:'Vui lòng nhập số lần đến Nhật.',id:'Masukkan jumlah kedatangan ke Jepang.',my:'ဂျပန်သို့ လာရောက်ခဲ့သည့် အကြိမ်ရေ ဖြည့်ပါ။',km:'សូមបញ្ចូលចំនួនដងដែលបានមកជប៉ុន។',ne:'जापान आएको पटक संख्या लेख्नुहोस्।',zh:'请输入来日次数。'},
   'COE申請回数を入力してください。':{fr:'こーいー（COE）しんせいかいすうを にゅうりょくして ください。',en:'Please enter the number of COE applications.',vi:'Vui lòng nhập số lần xin COE.',id:'Masukkan jumlah pengajuan COE.',my:'COE လျှောက်ထားခဲ့သည့် အကြိမ်ရေ ဖြည့်ပါ။',km:'សូមបញ្ចូលចំនួនដងនៃការស្នើសុំ COE។',ne:'COE आवेदन पटक संख्या लेख्नुहोस्।',zh:'请输入COE申请次数。'},
   '在留カードの有無を選択してください。':{fr:'ざいりゅうかーどの うむを えらんで ください。',en:'Please select whether you have a Residence Card.',vi:'Vui lòng chọn có/không có Thẻ cư trú.',id:'Silakan pilih ada/tidaknya Kartu Izin Tinggal.',my:'နေထိုင်ခွင့်ကတ် ရှိမရှိ ရွေးချယ်ပါ။',km:'សូមជ្រើសរើសថាមាន/គ្មានប័ណ្ណស្នាក់នៅ។',ne:'निवास कार्ड छ/छैन छान्नुहोस्।',zh:'请选择是否持有在留卡。'},
@@ -5861,6 +5866,12 @@ function _validateInner() {
     return {key:'addrPref', field:'f-address', fixes:_computeAddressFixes(_addr)};
   }
   if (!val('f-married')) return '結婚しているかどうかを選択してください。';
+  // ver.20261029.01: 推薦票の大房対応（suisen=self）のとき、本国の情報3項目を必須に
+  if (isSuisenSelf) {
+    if (!val('f-vnFamilyAddress')) return 'ベトナムのご家族の住所を入力してください。';
+    if (!val('f-vnFamilyTel')) return 'ベトナムのご家族の電話番号を入力してください。';
+    if (!val('f-vnSendingOrg')) return '送り出し機関の名前を入力してください（ない場合は「なし」）。';
+  }
   // ver.20261028.02: 現在の在留期間（表示されているときだけ必須）
   if (_cspNeed && _cspIsTarget()) {
     if (!val('f-curStayPeriod')) return '現在の在留期間を選択してください。';
