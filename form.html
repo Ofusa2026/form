@@ -192,7 +192,8 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20261029.12'; // 交代制（シフト制）：「シフトパターン詳細」の自由記述をやめ、シフト1〜5の始業〜終業をプルダウン（15分刻み・最大5つ）で選ぶ形に。所定は休憩を引いて自動計算（日またぎ対応）。送信 shift1Start〜shift5Min（案シスの雇用条件 shift1〜5 にそのまま入る）・shiftDetail は送らない ／ ver.20261029.11: 第6-3号 実務経験：ver.20261029.10 を取り消し、「いいえ」のときは③をロックして経歴証明書の就業日数の合計を自動で入れる形（ver.20261029.08〜09）に戻した
+var FORM_VERSION = 'ver.20261030.01'; // 第6-3号 実務経験：添付書類4点をフォームでアップロード（CCUS画面①本人情報・②就業日数・③就業履歴数・レベル判定結果通知書）。レベル判定・蓄積の答えで必須／任意を切り替え。保存は irai-docs/<case>/t2cc/（cofolder があればドライブにもコピー）。送信 t2Ccus.files
+// var FORM_VERSION = 'ver.20261029.12'; // 交代制（シフト制）：「シフトパターン詳細」の自由記述をやめ、シフト1〜5の始業〜終業をプルダウン（15分刻み・最大5つ）で選ぶ形に。所定は休憩を引いて自動計算（日またぎ対応）。送信 shift1Start〜shift5Min（案シスの雇用条件 shift1〜5 にそのまま入る）・shiftDetail は送らない ／ ver.20261029.11: 第6-3号 実務経験：ver.20261029.10 を取り消し、「いいえ」のときは③をロックして経歴証明書の就業日数の合計を自動で入れる形（ver.20261029.08〜09）に戻した
 // var FORM_VERSION = 'ver.20261029.10'; // （取り消し）「いいえ」のとき③はCCUS分を入力・③＋④の合計を表示
 // var FORM_VERSION = 'ver.20261029.09'; // 第6-3号 実務経験：CCUS技能者IDを数字14桁のみ入力できるように（全角は半角に・数字以外は消す・14桁まで、送信前に14桁か確認）＋末尾2桁（01など）は入れない案内
 // var FORM_VERSION = 'ver.20261029.08'; // 第6-3号 実務経験：「全て蓄積されていない（いいえ）」のときは③を入力できないようにし、下の経歴証明書の就業日数の合計を自動で入れる（はいに戻すと入力できる）
@@ -4187,6 +4188,7 @@ function _t2ccBlock(p){
   h+='<div class="field">'+lab('CCUSのレベル判定（能力評価）を受けていますか？',1)
     + _t2ccSel(b+'level',['受けた（レベル３以上）','受けていない'],keep('level'),'_t2ccToggle('+p+')')
     + '<div id="t2ccLvNote_'+p+'" style="font-size:11.5px;color:#1d4ed8;margin-top:4px;"></div></div>';
+  h+='<div id="t2ccAtt_'+p+'"></div>';   // ver.20261030.01: 添付書類（CCUSの画面3点・レベル判定結果通知書）
   // ↓ 全て蓄積されていない場合（別紙 経歴証明書）
   h+='<div id="t2ccNo_'+p+'" style="display:none;background:#fff7ed;border:1.5px solid #fdba74;border-radius:10px;padding:10px 12px;margin-top:4px;">';
   h+='<div style="font-size:12.5px;font-weight:800;color:#9a3412;margin-bottom:6px;">CCUSに蓄積されていない分（別紙 経歴証明書）</div>';
@@ -4233,8 +4235,91 @@ function _t2ccToggle(p){
   var w=document.getElementById('t2ccNo_'+p); if(w) w.style.display=no?'':'none';
   var cw=document.getElementById('t2ccCert_'+p); if(cw) cw.style.display=(no && _t2ccV(b+'certType').indexOf('別の会社')===0)?'':'none';
   var lv=document.getElementById('t2ccLvNote_'+p), l=_t2ccV(b+'level');
-  if(lv) lv.textContent = l.indexOf('受けた')===0 ? '「能力評価（レベル判定）結果通知書」（レベル３以上）の写しをご用意ください。' : (l ? 'CCUSの就業日数（職長＋班長）が分かる画面の写しをご用意ください。' : '');
+  if(lv) lv.textContent = l ? '必要な添付書類が下に表示されます。' : '';
+  _t2ccAttRender(p);
   _t2ccCalc(p);
+}
+// ===== ver.20261030.01: 6-3号の添付書類（4点）をフォームでアップロード =====
+//   保存先：Supabase Storage irai-docs/<case>/t2cc/<時刻_ファイル名>（URLに cofolder＝ドライブのフォルダIDがあれば、GAS経由でドライブにもコピー）
+//   送信：t2Ccus.files = { ccus1:[{name,path,drive}], ccus2:[…], ccus3:[…], level:[…] }
+var _T2CC_ATT = [
+  {k:'ccus1', l:'CCUS画面① 本人情報（氏名・生年月日・就業日数）', how:'「310 閲覧」→「10 技能者情報」の画面。「技能者氏名」「生年月日」「就業日数」が写るように撮ってください。'},
+  {k:'ccus2', l:'CCUS画面② 就業日数（職長＋班長）', how:'技能者情報の「就業日数」を押すと出る画面。職長・班長それぞれの就業日数の合計が写るように撮ってください。'},
+  {k:'ccus3', l:'CCUS画面③ 就業履歴数（申請する職種）', how:'技能者情報の「就業履歴数」を押すと出る画面。申請する職種が写るように撮ってください。'},
+  {k:'level', l:'能力評価（レベル判定）結果通知書（レベル３以上）', how:'レベル判定を受けたときに届いた結果通知書（レベル３以上のもの）です。'}
+];
+var _t2ccFiles = {};   // p → { k:[{name,path,drive}] }
+function _t2ccAttNeed(p){
+  var b='f-t2cc_'+p+'_', l=_t2ccV(b+'level'), no=_t2ccV(b+'acc').indexOf('いいえ')===0;
+  if(!l) return null;
+  var got=(l.indexOf('受けた')===0);
+  // レベル判定を受けた → 結果通知書が必須。CCUSの画面3点は、受けていない／全て蓄積されていない（③の写しが必要）なら必須、それ以外は任意
+  var ccus=(!got || no) ? 'req' : 'opt';
+  return { ccus1:ccus, ccus2:ccus, ccus3:ccus, level: got ? 'req' : '' };
+}
+function _t2ccAttRender(p){
+  var box=document.getElementById('t2ccAtt_'+p); if(!box) return;
+  var need=_t2ccAttNeed(p);
+  if(!need){ box.innerHTML=''; return; }
+  var fl=_t2ccFiles[p]||{};
+  var h='<div style="background:#f0f9ff;border:1.5px solid #7dd3fc;border-radius:10px;padding:10px 12px;margin:2px 0 14px;">';
+  h+='<div style="font-size:12.5px;font-weight:800;color:#075985;margin-bottom:4px;">📎 添付書類のアップロード</div>';
+  h+='<div style="font-size:11px;color:#0c4a6e;line-height:1.6;margin-bottom:8px;">建設キャリアアップシステムに<b>技能者の権限でログイン</b>して、画面を撮影（スクリーンショット）してください。文字や数字がはっきり読めるものにしてください（白黒でも大丈夫です）。</div>';
+  _T2CC_ATT.forEach(function(a){
+    var st=need[a.k]; if(!st) return;
+    var files=fl[a.k]||[], id='f-t2cc_'+p+'_att_'+a.k;
+    h+='<div class="t2cc-att" data-k="'+a.k+'" style="background:#fff;border:1px solid #e0f2fe;border-radius:8px;padding:8px 10px;margin-bottom:8px;">';
+    h+='<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;"><span style="font-size:12.5px;font-weight:800;color:#0f172a;flex:1;">'+a.l+'</span>'
+      + (st==='req' ? '<span class="req">*</span>' : '<span style="font-size:10.5px;color:#64748b;background:#f1f5f9;border-radius:99px;padding:0 8px;">任意</span>')
+      + '<span style="font-size:10.5px;font-weight:700;border-radius:99px;padding:0 8px;'+(files.length?'background:#dcfce7;color:#166534;">提出済み':'background:#fee2e2;color:#b91c1c;">未提出')+'</span></div>';
+    h+='<div style="font-size:11px;color:#475569;margin:3px 0 6px;line-height:1.6;">'+a.how+'</div>';
+    h+='<input type="file" id="'+id+'" accept="image/*,application/pdf" multiple onchange="_t2ccAttUpload('+p+',\''+a.k+'\',this)" style="font-size:12px;">';
+    if(files.length){
+      h+='<ul style="list-style:none;margin:6px 0 0;padding:0;font-size:11.5px;">';
+      files.forEach(function(f,i){ h+='<li style="display:flex;gap:6px;align-items:center;padding:2px 0;"><span style="color:#16a34a;">✓</span><span style="flex:1;word-break:break-all;">'+_t2esc(f.name)+'</span>'
+        + '<button type="button" onclick="_t2ccAttRemove('+p+',\''+a.k+'\','+i+')" style="font-size:11px;border:1px solid #e5e7eb;background:#fff;border-radius:6px;padding:0 6px;cursor:pointer;" title="一覧から外す">×</button></li>'; });
+      h+='</ul>';
+    }
+    h+='<div class="t2cc-att-st" style="font-size:11px;margin-top:3px;"></div>';
+    h+='</div>';
+  });
+  h+='</div>';
+  box.innerHTML=h;
+}
+function _t2ccAttRemove(p,k,i){ var fl=_t2ccFiles[p]||{}; if(fl[k]){ fl[k].splice(i,1); } _t2ccAttRender(p); _formDirty=true; }
+function _t2ccAttUpload(p,k,input){
+  var files=input && input.files; if(!files||!files.length) return;
+  var card=input.closest('.t2cc-att'), st=card&&card.querySelector('.t2cc-att-st');
+  var say=function(t,c){ if(st){ st.textContent=t; st.style.color=c||'#6b7280'; } };
+  var a=_T2CC_ATT.filter(function(x){ return x.k===k; })[0]||{l:k};
+  _t2ccFiles[p]=_t2ccFiles[p]||{}; var list=_t2ccFiles[p][k]=_t2ccFiles[p][k]||[];
+  var arr=Array.prototype.slice.call(files), left=arr.length, ng=[];
+  var done=function(){ left--; if(left>0) return; _t2ccAttRender(p); _formDirty=true; try{ _updateReqRemain(); }catch(e){}
+    var c2=document.querySelector('#t2ccAtt_'+p+' .t2cc-att[data-k="'+k+'"] .t2cc-att-st'); if(c2 && ng.length){ c2.textContent='⚠️ '+ng.join('／'); c2.style.color='#dc2626'; } };
+  say('アップロード中…');
+  var safeCase=String(caseId||'').replace(/[^\w\-]+/g,'_');
+  arr.forEach(function(f){
+    if(f.size>20*1024*1024){ ng.push(f.name+'：20MB以下にしてください'); done(); return; }
+    if(!safeCase){ list.push({name:f.name, path:'', sample:1}); done(); return; }   // 案件なし（見本表示）は保存しない
+    var path=safeCase+'/t2cc/'+Date.now()+'_'+k+'_'+f.name.replace(/[^\w.\-]+/g,'_');
+    var enc=path.split('/').map(encodeURIComponent).join('/');
+    fetch(SUPABASE_URL+'/storage/v1/object/irai-docs/'+enc,{method:'POST',headers:{'apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY,'Content-Type':f.type||'application/octet-stream'},body:f})
+      .then(function(res){
+        if(!res.ok){ ng.push(f.name+'：失敗（'+res.status+'）'); done(); return; }
+        var rec={name:f.name, path:path, at:new Date().toISOString()};
+        list.push(rec);
+        if(cofolder && typeof _iuGas==='function'){
+          _iuGas({action:'iraiDocToDrive', data:{ path:path, folderId:cofolder, docName:a.l, fileName:f.name, subfolder:(codir||'6-3号 実務経験') }}, function(r){ rec.drive=(r&&r.status==='ok')?1:0; done(); });
+        } else { done(); }
+      })
+      .catch(function(){ ng.push(f.name+'：通信エラー'); done(); });
+  });
+  try{ input.value=''; }catch(e){}
+}
+function _t2ccFilesOut(p){
+  var need=_t2ccAttNeed(p)||{}, fl=_t2ccFiles[p]||{}, out={};
+  _T2CC_ATT.forEach(function(a){ if(need[a.k] && fl[a.k] && fl[a.k].length) out[a.k]=fl[a.k].map(function(f){ return {name:f.name, path:f.path, drive:f.drive?1:0, doc:a.l}; }); });
+  return out;
 }
 function _t2ccCareerDays(p){
   var t=0; for(var k=1;k<=10;k++){ var d=parseInt(_t2ccV('f-t2cc_'+p+'_per'+k+'_days')||'0',10); if(d>0) t+=d; } return t;
@@ -4276,6 +4361,7 @@ function _t2ccCollect(){
       if(r.certType.indexOf('別の会社')===0){ r.certCo=_t2ccV(b+'certCo'); r.certTitle=_t2ccV(b+'certTitle'); r.certName=_t2ccV(b+'certName'); r.certCoId=_t2ccV(b+'certCoId'); }
     }
     r.totalDays=no?(r.careerDays||0):(parseInt(r.ccusDays||'0',10)||0);   // いいえ：③＝経歴の合計（二重に足さない）
+    r.files=_t2ccFilesOut(p);   // ver.20261030.01: 添付書類（アップロード済みのファイル）
     out.push(r);
   });
   return out;
@@ -4312,6 +4398,9 @@ function _t2ccValidate(){
       if(!_t2ccV(b+'checkCo')) return act(b+'checkCo','経歴証明書の内容を確認した方の会社名をご入力ください。');
       if(!_t2ccV(b+'checkName')) return act(b+'checkName','経歴証明書の内容を確認した方の氏名をご入力ください。');
     }
+    // ver.20261030.01: 必須の添付書類
+    var need=_t2ccAttNeed(p)||{}, fl=_t2ccFiles[p]||{};
+    for(var ai=0;ai<_T2CC_ATT.length;ai++){ var a=_T2CC_ATT[ai]; if(need[a.k]==='req' && !(fl[a.k]&&fl[a.k].length)) return act(b+'att_'+a.k,'「'+a.l+'」をアップロードしてください。'); }
     return false;
   });
   return msg;
@@ -4322,6 +4411,7 @@ function _t2ccRestore(list){
   list.forEach(function(r){
     var p=r.person||'1'; var b='f-t2cc_'+p+'_';
     var set=function(sfx,v){ var el=document.getElementById(b+sfx); if(el&&v!=null&&v!=='') el.value=v; };
+    if(r.files && typeof r.files==='object'){ var _fo={}; Object.keys(r.files).forEach(function(k){ _fo[k]=(r.files[k]||[]).map(function(f){ return {name:f.name, path:f.path, drive:f.drive}; }); }); _t2ccFiles[p]=_fo; }
     set('jobCode', r.jobCode); _t2ccJobChange(p);
     if(r.jobCode===_T2CC_NONE) set('job', r.job);
     set('call', r.call);
