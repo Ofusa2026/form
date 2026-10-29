@@ -192,7 +192,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20261029.11'; // 第6-3号 実務経験：ver.20261029.10 を取り消し、「いいえ」のときは③をロックして経歴証明書の就業日数の合計を自動で入れる形（ver.20261029.08〜09）に戻した
+var FORM_VERSION = 'ver.20261029.12'; // 交代制（シフト制）：「シフトパターン詳細」の自由記述をやめ、シフト1〜5の始業〜終業をプルダウン（15分刻み・最大5つ）で選ぶ形に。所定は休憩を引いて自動計算（日またぎ対応）。送信 shift1Start〜shift5Min（案シスの雇用条件 shift1〜5 にそのまま入る）・shiftDetail は送らない ／ ver.20261029.11: 第6-3号 実務経験：ver.20261029.10 を取り消し、「いいえ」のときは③をロックして経歴証明書の就業日数の合計を自動で入れる形（ver.20261029.08〜09）に戻した
 // var FORM_VERSION = 'ver.20261029.10'; // （取り消し）「いいえ」のとき③はCCUS分を入力・③＋④の合計を表示
 // var FORM_VERSION = 'ver.20261029.09'; // 第6-3号 実務経験：CCUS技能者IDを数字14桁のみ入力できるように（全角は半角に・数字以外は消す・14桁まで、送信前に14桁か確認）＋末尾2桁（01など）は入れない案内
 // var FORM_VERSION = 'ver.20261029.08'; // 第6-3号 実務経験：「全て蓄積されていない（いいえ）」のときは③を入力できないようにし、下の経歴証明書の就業日数の合計を自動で入れる（はいに戻すと入力できる）
@@ -3125,6 +3125,83 @@ function _tkCalcWork() {
   set('f-yearlyH', r1(yh)); set('f-monthlyH', r1(yh / 12)); set('f-weeklyH', r1(yh / 52.14));
 }
 // 「有」「なし」などの選択に応じて下の項目を出し入れ
+// ===== ver.20261029.01: 交代制（シフト制）の時間を「始業〜終業」のプルダウンで最大5パターン =====
+//   選んだ値は f-shift1Start〜f-shift5End（送信キー shift1Start〜shift5End。案シスの雇用条件 shift1〜5 に同じ名前で入る）
+//   1日の所定労働時間は 終業−始業−休憩時間（分）で計算し shiftNH / shiftNMin として送る（日をまたぐシフトにも対応）
+//   「シフトパターン詳細」(shiftDetail) は送らない（時間はシフト1〜5で伝わる。1-6号の「シフト詳細（自由記述）」に同じ時間が二重に出ないように）
+var SHIFT_MAX = 5, _shiftShown = 1;
+function _shiftOpts(){
+  var s = '<option value="">--:--</option>';
+  for (var m = 0; m < 24 * 60; m += 15){ var t = ('0' + Math.floor(m / 60)).slice(-2) + ':' + ('0' + (m % 60)).slice(-2); s += '<option value="' + t + '">' + t + '</option>'; }
+  return s;
+}
+function _shiftRowsHtml(){
+  var o = _shiftOpts(), h = '';
+  for (var n = 1; n <= SHIFT_MAX; n++){
+    h += '<div class="shift-row" id="shiftRow' + n + '" style="display:' + (n === 1 ? 'flex' : 'none') + ';align-items:center;gap:6px;margin-bottom:8px;flex-wrap:wrap;">'
+      + '<span style="font-size:12px;font-weight:800;color:#1d4ed8;min-width:3.8em;">シフト' + n + '</span>'
+      + '<select id="f-shift' + n + 'Start" onchange="_shiftRowsRefresh()" style="flex:1 1 7em;min-width:7em;">' + o + '</select>'
+      + '<span style="font-weight:700;color:#64748b;">〜</span>'
+      + '<select id="f-shift' + n + 'End" onchange="_shiftRowsRefresh()" style="flex:1 1 7em;min-width:7em;">' + o + '</select>'
+      + '<span id="shiftHM' + n + '" style="font-size:11px;color:#64748b;min-width:7.5em;"></span>'
+      + (n > 1 ? '<button type="button" onclick="_shiftDelRow(' + n + ')" title="このシフトを削除" style="border:1px solid #fca5a5;background:white;color:#dc2626;border-radius:6px;font-size:11px;padding:3px 8px;cursor:pointer;">削除</button>' : '')
+      + '</div>';
+  }
+  return h;
+}
+function _shiftMin(t){ var m = String(t || '').match(/^(\d{1,2}):(\d{2})$/); return m ? (+m[1] * 60 + +m[2]) : null; }
+function _shiftHM(n){
+  var a = _shiftMin(val('f-shift' + n + 'Start')), b = _shiftMin(val('f-shift' + n + 'End'));
+  if (a === null || b === null) return null;
+  var d = b - a; if (d <= 0) d += 24 * 60;            // 日をまたぐシフト
+  var br = parseInt(String(val('f-breakTime') || '').replace(/[^0-9]/g, ''), 10); if (!isNaN(br) && br > 0 && br < d) d -= br;
+  return { h: Math.floor(d / 60), m: d % 60 };
+}
+function _shiftRowsRefresh(){
+  var last = 1;
+  for (var n = 1; n <= SHIFT_MAX; n++){ if (val('f-shift' + n + 'Start') || val('f-shift' + n + 'End')) last = n; }
+  _shiftShown = Math.max(_shiftShown, last);
+  for (var k = 1; k <= SHIFT_MAX; k++){
+    var row = document.getElementById('shiftRow' + k); if (row) row.style.display = (k <= _shiftShown) ? 'flex' : 'none';
+    var hm = _shiftHM(k), lab = document.getElementById('shiftHM' + k);
+    if (lab) lab.textContent = hm ? ('（所定 ' + hm.h + '時間' + (hm.m ? hm.m + '分' : '') + '）') : '';
+  }
+  var add = document.getElementById('shiftAddBtn'); if (add) add.style.display = (_shiftShown >= SHIFT_MAX) ? 'none' : '';
+}
+function _shiftAddRow(){ if (_shiftShown < SHIFT_MAX) _shiftShown++; _shiftRowsRefresh(); }
+function _shiftDelRow(n){
+  for (var k = n; k < SHIFT_MAX; k++){
+    ['Start','End'].forEach(function(x){ var a = document.getElementById('f-shift' + k + x), b = document.getElementById('f-shift' + (k + 1) + x); if (a && b) a.value = b.value; });
+  }
+  ['Start','End'].forEach(function(x){ var z = document.getElementById('f-shift' + SHIFT_MAX + x); if (z) z.value = ''; });
+  _shiftShown = Math.max(1, _shiftShown - 1);
+  _shiftRowsRefresh();
+}
+function _shiftValidate(){
+  var full = 0;
+  for (var n = 1; n <= SHIFT_MAX; n++){
+    var s = val('f-shift' + n + 'Start'), e = val('f-shift' + n + 'End');
+    if (s && e) { full++; continue; }
+    if (s || e) { try { document.getElementById('f-shift' + n + (s ? 'End' : 'Start')).focus(); } catch(_) {} return '「シフト' + n + '」の始業と終業の両方を選んでください。'; }
+  }
+  if (!full) { try { document.getElementById('f-shift1Start').focus(); } catch(_) {} return '交代制「あり」の場合は、シフトの時間（始業〜終業）を1つ以上選んでください。'; }
+  return null;
+}
+// 送信データにシフト1〜5を入れる（交代制「あり」のときだけ）
+function _shiftCollect(d){
+  var on = (val('f-shiftFlg') === 'あり');
+  for (var n = 1; n <= SHIFT_MAX; n++){
+    var s = on ? val('f-shift' + n + 'Start') : '', e = on ? val('f-shift' + n + 'End') : '';
+    var hm = (s && e) ? _shiftHM(n) : null;
+    d['shift' + n + 'Start'] = (s && e) ? s : '';
+    d['shift' + n + 'End'] = (s && e) ? e : '';
+    d['shift' + n + 'H'] = hm ? String(hm.h) : '';
+    d['shift' + n + 'Min'] = hm ? String(hm.m) : '';
+  }
+  d.shiftDetail = '';   // 時間はシフト1〜5で送る（旧「シフトパターン詳細」の自由記述は送らない）
+  return d;
+}
+document.addEventListener('input', function(e){ try { if (e.target && e.target.id === 'f-breakTime' && document.getElementById('shiftRows')) _shiftRowsRefresh(); } catch(_){} });
 function _tkApplyToggles() {
   var sh = function(id, on){ var e = document.getElementById(id); if (e) e.style.display = on ? '' : 'none'; };
   sh('housingWrap', val('f-housingProvided') === '有');
@@ -3153,6 +3230,8 @@ function _tkApplyToggles() {
     if (formPart) { var _bar = document.getElementById('tkTabBar'); if (_bar) _bar.style.display = _tkSsHidden() ? 'none' : ''; try { _tkPartInfo(); } catch(_e) {} }   // ver.20261020.02
   }
   sh('renewCondWrap', val('f-contractRenewal') === '更新する場合があり得る');
+  sh('shiftRowsField', val('f-shiftFlg') === 'あり');   // ver.20261029.01
+  try { if (document.getElementById('shiftRows')) _shiftRowsRefresh(); } catch(_e) {}
   ['insKenpo','insPension','insEmp','insLabor'].forEach(function(k){ sh(k + 'OtherWrap', val('f-' + k) === 'その他'); });
   // 「有」「あり」を選んだときだけ、条件・内容の欄に * を出す（＝必須）
   [['f-salaryRaiseCond','f-salaryRaise','有'],['f-bonusCond','f-bonus','有'],['f-retirementDetail','f-retirement','有'],
@@ -3542,7 +3621,13 @@ function buildCompanyForm() {
 
     '<div class="sub-label">【交代制（シフト制）】</div>' +
     field('f-shiftFlg','交代制（シフト制）の採用','select',true,'',null,['','あり','なし']) +
-    field('f-shiftDetail','シフトパターン詳細','textarea',true,'例: 早番 7:00-16:00 / 遅番 13:00-22:00（週ごとに交代）') +
+    // ver.20261029.01: シフトは「始業〜終業」のプルダウンで最大5パターン（送信 shift1Start〜shift5End・所定 shiftNH/shiftNMin。案シスの雇用条件 shift1〜5 にそのまま入る）
+    '<div class="field" id="shiftRowsField" style="display:none;"><label>シフトの時間（最大5パターン）<span class="req">*</span></label>' +
+      '<div style="font-size:11px;color:#6b7280;margin-bottom:8px;line-height:1.6;">シフトごとに始業・終業の時刻を選んでください。1日の所定労働時間は、上の「休憩時間（分）」を引いて自動で計算します。</div>' +
+      '<div id="shiftRows">' + _shiftRowsHtml() + '</div>' +
+      '<button type="button" id="shiftAddBtn" onclick="_shiftAddRow()" style="font-size:12px;padding:6px 14px;background:white;border:1.5px dashed #93c5fd;border-radius:8px;color:#1d4ed8;cursor:pointer;font-weight:700;">＋ シフトを追加</button>' +
+      '<input type="hidden" id="f-shiftDetail">' +
+    '</div>' +
 
     field('f-flexFlg','変形時間労働制の適用','select',true,'',null,['','適用あり','適用なし']) +
     '<div id="flexTypeWrap" style="display:none;">' +
@@ -5603,7 +5688,7 @@ function collectData() {
       monthlyDays: val('f-monthlyDays'), monthlyH: val('f-monthlyH'),
       yearlyDays: val('f-yearlyDays'), yearlyH: val('f-yearlyH'),
       overtimeFlg: val('f-overtimeFlg'),
-      shiftFlg: val('f-shiftFlg'), shiftDetail: val('f-shiftDetail'),
+      shiftFlg: val('f-shiftFlg'), shiftDetail: val('f-shiftDetail'),   // shift1Start〜shift5Min は _shiftCollect で追加（ver.20261029.01）
       flexFlg: val('f-flexFlg'), flexType: val('f-flexType'), flexDetail: val('f-flexDetail'),
       holidayType: val('f-holidayType'),
       fixedHolidayMon: val('f-fixedHolidayMon'), fixedHolidayTue: val('f-fixedHolidayTue'),
@@ -5629,6 +5714,7 @@ function collectData() {
       jaimIndustryCode: val('f-jaimIndustryCode'), jaimAgreement: (document.getElementById('f-jaimAgreement') && document.getElementById('f-jaimAgreement').checked) ? '確認済み' : '', jaimProductName: val('f-jaimProductName'), jaimProductPurpose: val('f-jaimProductPurpose'), jaimFinalProductName: val('f-jaimFinalProductName'), jaimFinalProductDesc: val('f-jaimFinalProductDesc'), jaimEquipmentPurpose: val('f-jaimEquipmentPurpose'), jaimEquipmentEffect: val('f-jaimEquipmentEffect'), jaimBranchOfficeFlag: val('f-jaimBranchOfficeFlag'), jaimBranchOfficeName: val('f-jaimBranchOfficeName'), jaimBranchOfficeZip: val('f-jaimBranchOfficeZip'), jaimBranchOfficeAddress: val('f-jaimBranchOfficeAddress'), jaimBranchOfficeContact: val('f-jaimBranchOfficeContact'), jaimBranchOfficeTel: val('f-jaimBranchOfficeTel'), jaimCompanySize: val('f-jaimCompanySize'), jaimMemberOrg: val('f-jaimMemberOrg'), jaimAnnualFee: _jaimFeeValue()
     };
     Object.assign(d, officers);
+    if (document.getElementById('shiftRows')) _shiftCollect(d);   // ver.20261029.01: シフト1〜5（始業・終業・所定）
     // ver.20261009.01: 特定技能の企業フォームの組み替えに合わせて送信データを整える
     if (document.getElementById('f-contractRenewalCondOther')) {
       d.acceptExp = _tkAcceptExp;   // 案シスの受入経験（あり／なし／空＝未登録）
@@ -6219,7 +6305,6 @@ function _tkCompanyValidate() {
     [val('f-salaryRaise') === '有',     'f-salaryRaiseCond',  '昇給 条件・時期（昇給「有」の場合）'],
     [val('f-bonus') === '有',           'f-bonusCond',        '賞与 条件・時期（賞与「有」の場合）'],
     [val('f-retirement') === '有',      'f-retirementDetail', '退職金 制度内容（退職金「有」の場合）'],
-    [val('f-shiftFlg') === 'あり',      'f-shiftDetail',      'シフトパターン詳細（交代制「あり」の場合）'],
     [val('f-flexFlg') === '適用あり',   'f-flexDetail',       '変形労働時間制の詳細（変形労働「適用あり」の場合）']
   ];
   var _insL = { insKenpo:'健康保険', insPension:'厚生年金', insEmp:'雇用保険', insLabor:'労災保険' };
@@ -6231,6 +6316,7 @@ function _tkCompanyValidate() {
       return '「' + c[2] + '」は必須です。';
     }
   }
+  if (val('f-shiftFlg') === 'あり' && _vis('shiftRowsField')) { var _shv = _shiftValidate(); if (_shv) return _shv; }   // ver.20261029.01
   if (val('f-contractRenewal') === '更新する場合があり得る' && _vis('renewCondWrap') && !_tkRenewCondValue()) {
     return '「更新の判断基準」を1つ以上選んでください（契約更新が「更新する場合があり得る」の場合）。';
   }
