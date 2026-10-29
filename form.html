@@ -192,7 +192,8 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20261029.08'; // 第6-3号 実務経験：「全て蓄積されていない（いいえ）」のときは③を入力できないようにし、下の経歴証明書の就業日数の合計を自動で入れる（はいに戻すと入力できる）
+var FORM_VERSION = 'ver.20261029.09'; // 第6-3号 実務経験：CCUS技能者IDを数字14桁のみ入力できるように（全角は半角に・数字以外は消す・14桁まで、送信前に14桁か確認）＋末尾2桁（01など）は入れない案内
+// var FORM_VERSION = 'ver.20261029.08'; // 第6-3号 実務経験：「全て蓄積されていない（いいえ）」のときは③を入力できないようにし、下の経歴証明書の就業日数の合計を自動で入れる（はいに戻すと入力できる）
 // var FORM_VERSION = 'ver.20261029.07'; // 第6-3号 実務経験：経歴証明書（CCUSに全て蓄積されていない場合）に「内容を確認した方」の会社名・氏名を追加（必須。送信 t2Ccus.checkCo・checkName）
 // var FORM_VERSION = 'ver.20261029.06'; // 第6-3号 実務経験：最初の案内欄に「第6-3号のひながた（入管庁PDF）」「職種・呼称・必要な就業日数の一覧（国交省PDF）」を開くリンクを追加
 // var FORM_VERSION = 'ver.20261029.05'; // 第6-3号 実務経験：1リンク＝申請人1人に（人数選択・氏名欄をやめ、案件 case_id で申請人を特定。送信 t2Ccus は1人分のオブジェクト）
@@ -4056,6 +4057,14 @@ function _t2ccPeriodRow(p,k,v){
     + '<input type="number" min="0" id="'+b+'days" value="'+_t2esc(v.days)+'" placeholder="就業日数" oninput="_t2ccCalc('+p+')" style="flex:0 1 110px;'+st+'"><span style="font-size:12px;">日</span>'
     + '</div>';
 }
+// 技能者ID：全角数字は半角に、数字以外は消して14桁まで
+function _t2ccIdInput(el){
+  var v=String(el.value||'').replace(/[０-９]/g,function(c){ return String.fromCharCode(c.charCodeAt(0)-0xFEE0); }).replace(/[^0-9]/g,'');
+  if(v.length>14) v=v.slice(0,14);
+  if(el.value!==v) el.value=v;
+  var m=document.getElementById('t2ccIdMsg_'+(el.id.match(/^f-t2cc_(\d+)_/)||[])[1]);
+  if(m){ if(!v){ m.textContent=''; } else if(v.length<14){ m.style.color='#b91c1c'; m.textContent='あと'+(14-v.length)+'桁です（いま'+v.length+'桁）。'; } else { m.style.color='#15803d'; m.textContent='✓ 14桁'; } }
+}
 function _t2ccAddPeriod(p){
   var box=document.getElementById('t2ccPer_'+p); if(!box) return;
   var n=box.querySelectorAll('.t2cc-per').length; if(n>=10) return;
@@ -4094,7 +4103,10 @@ function _t2ccBlock(p){
   // ↓ 全て蓄積されていない場合（別紙 経歴証明書）
   h+='<div id="t2ccNo_'+p+'" style="display:none;background:#fff7ed;border:1.5px solid #fdba74;border-radius:10px;padding:10px 12px;margin-top:4px;">';
   h+='<div style="font-size:12.5px;font-weight:800;color:#9a3412;margin-bottom:6px;">CCUSに蓄積されていない分（別紙 経歴証明書）</div>';
-  h+='<div class="field">'+lab('建設キャリアアップシステム技能者ID',1)+inp('workerId','14桁の番号','inputmode="numeric"')+'</div>';
+  // ver.20261029.09: 技能者IDは数字14桁だけ（カードの末尾2桁（01など）は入れない）
+  h+='<div class="field">'+lab('建設キャリアアップシステム技能者ID（14桁）',1)+inp('workerId','例：12345678901234','inputmode="numeric" maxlength="14" autocomplete="off" oninput="_t2ccIdInput(this)"')
+    + '<div style="font-size:11px;color:#9a3412;margin-top:4px;line-height:1.6;">数字14桁のみご入力ください。<b>カードなどに記載されている末尾の2桁（「01」など）は入力しないでください</b>（16桁になってしまうため）。</div>'
+    + '<div id="t2ccIdMsg_'+p+'" style="font-size:11.5px;font-weight:700;margin-top:3px;"></div></div>';
   h+='<div class="field">'+lab('職長・班長としての就業期間と就業日数（CCUSに蓄積されていない分）',1)
     + '<div style="font-size:11px;color:#9a3412;margin-bottom:6px;line-height:1.6;">転職や離職などで職長・班長として働いていない期間がある場合は、働いていた期間ごとに分けて入力してください。</div>'
     + '<div id="t2ccPer_'+p+'">'+pers.map(function(v,i){ return _t2ccPeriodRow(p,i+1,v); }).join('')+'</div>'
@@ -4196,6 +4208,7 @@ function _t2ccValidate(){
     if(!_t2ccV(b+'level')) return act(b+'level','CCUSのレベル判定を受けているかを選んでください。');
     if(_t2ccV(b+'acc').indexOf('いいえ')===0){
       if(!_t2ccV(b+'workerId')) return act(b+'workerId','建設キャリアアップシステム技能者IDをご入力ください。');
+      if(!/^[0-9]{14}$/.test(_t2ccV(b+'workerId'))) return act(b+'workerId','建設キャリアアップシステム技能者IDは数字14桁でご入力ください（末尾の2桁「01」などは入れません）。');
       var any=false;
       for(var k=1;k<=10;k++){
         var f=_t2ccV(b+'per'+k+'_from'), t=_t2ccV(b+'per'+k+'_to'), d=_t2ccV(b+'per'+k+'_days');
