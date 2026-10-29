@@ -192,7 +192,8 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20261029.07'; // 第6-3号 実務経験：経歴証明書（CCUSに全て蓄積されていない場合）に「内容を確認した方」の会社名・氏名を追加（必須。送信 t2Ccus.checkCo・checkName）
+var FORM_VERSION = 'ver.20261029.08'; // 第6-3号 実務経験：「全て蓄積されていない（いいえ）」のときは③を入力できないようにし、下の経歴証明書の就業日数の合計を自動で入れる（はいに戻すと入力できる）
+// var FORM_VERSION = 'ver.20261029.07'; // 第6-3号 実務経験：経歴証明書（CCUSに全て蓄積されていない場合）に「内容を確認した方」の会社名・氏名を追加（必須。送信 t2Ccus.checkCo・checkName）
 // var FORM_VERSION = 'ver.20261029.06'; // 第6-3号 実務経験：最初の案内欄に「第6-3号のひながた（入管庁PDF）」「職種・呼称・必要な就業日数の一覧（国交省PDF）」を開くリンクを追加
 // var FORM_VERSION = 'ver.20261029.05'; // 第6-3号 実務経験：1リンク＝申請人1人に（人数選択・氏名欄をやめ、案件 case_id で申請人を特定。送信 t2Ccus は1人分のオブジェクト）
 // var FORM_VERSION = 'ver.20261029.04'; // 第6-3号 実務経験ヒアリングを独立したフォーム（type=tokutei2_jitsumu）に。所属機関以外（前の勤め先など）にも送れるよう企業情報は聞かない。対象の人数・氏名＋6-3号（別紙 経歴証明書）。2号企業フォーム③からは外した。送信 t2ccCount・t2Ccus
@@ -4086,7 +4087,7 @@ function _t2ccBlock(p){
     + _t2ccSel(b+'acc',['はい（全て蓄積されている）','いいえ（全て蓄積されていない）'],keep('acc'),'_t2ccToggle('+p+')')+'</div>';
   h+='<div class="field">'+lab('③ CCUSの技能者情報に基づく就業日数（職長＋班長）',1)
     + '<div style="display:flex;align-items:center;gap:6px;"><input type="number" min="0" id="'+b+'ccusDays" value="'+_t2esc(keep('ccusDays'))+'" oninput="_t2ccCalc('+p+')" placeholder="例：215" style="flex:0 1 160px;padding:9px 12px;border:1.5px solid #d1d5db;border-radius:8px;font-size:14px;"><span style="font-size:13px;">日</span></div>'
-    + '<div style="font-size:11px;color:#6b7280;margin-top:4px;">CCUSに蓄積がない場合は 0 と入力してください。</div></div>';
+    + '<div id="t2ccDaysNote_'+p+'" style="font-size:11px;color:#6b7280;margin-top:4px;">CCUSに蓄積がない場合は 0 と入力してください。</div></div>';
   h+='<div class="field">'+lab('CCUSのレベル判定（能力評価）を受けていますか？',1)
     + _t2ccSel(b+'level',['受けた（レベル３以上）','受けていない'],keep('level'),'_t2ccToggle('+p+')')
     + '<div id="t2ccLvNote_'+p+'" style="font-size:11.5px;color:#1d4ed8;margin-top:4px;"></div></div>';
@@ -4144,13 +4145,20 @@ function _t2ccCalc(p){
   var need=_t2ccNeed(p);
   var ne=document.getElementById('t2ccNeed_'+p); if(ne) ne.innerHTML = need ? ('必要な就業日数（職長＋班長）：<b>'+need.label+'以上</b>'+(need.kubun?('　／　特定技能の業務区分：'+need.kubun):'')) : '';
   var no=_t2ccV(b+'acc').indexOf('いいえ')===0;
-  var cd=parseInt(_t2ccV(b+'ccusDays')||'0',10)||0, car=no?_t2ccCareerDays(p):0;
+  var car=no?_t2ccCareerDays(p):0;
+  // ver.20261029.08: 「いいえ」のときは③を入力できないようにし、下の経歴証明書の就業日数の合計を入れる
+  var di=document.getElementById(b+'ccusDays'), dn=document.getElementById('t2ccDaysNote_'+p);
+  if(di){
+    if(no){ di.readOnly=true; di.value=String(car); di.style.background='#f3f4f6'; di.style.color='#374151'; di.dataset.locked='1'; }
+    else if(di.dataset.locked==='1'){ di.readOnly=false; di.value=''; di.style.background=''; di.style.color=''; di.dataset.locked=''; }
+  }
+  if(dn) dn.textContent = no ? '「いいえ」の場合は、下の経歴証明書の就業日数の合計が自動で入ります（ここは入力できません）。' : 'CCUSに蓄積がない場合は 0 と入力してください。';
   var te=document.getElementById('t2ccTotal_'+p); if(te) te.textContent=String(car);
   var j=document.getElementById('t2ccJudge_'+p); if(!j) return;
-  if(!need || (!_t2ccV(b+'ccusDays') && !car)){ j.textContent=''; return; }
-  var tot=cd+car;
-  if(tot>=need.days){ j.style.color='#15803d'; j.textContent='✓ '+(no?('③ '+cd+'日 ＋ ④ '+car+'日 ＝ '):'')+tot+'日（必要 '+need.days+'日以上を満たしています）'; }
-  else { j.style.color='#b91c1c'; j.textContent='⚠️ '+(no?('③ '+cd+'日 ＋ ④ '+car+'日 ＝ '):'')+tot+'日です。必要な '+need.days+'日に '+(need.days-tot)+'日足りません。'+(no?'':'CCUSに全て蓄積されていない場合は「いいえ」を選んで、足りない分の期間をご入力ください。'); }
+  var tot=no?car:(parseInt(_t2ccV(b+'ccusDays')||'0',10)||0);
+  if(!need || !tot){ j.textContent=''; return; }
+  if(tot>=need.days){ j.style.color='#15803d'; j.textContent='✓ '+tot+'日（必要 '+need.days+'日以上を満たしています）'; }
+  else { j.style.color='#b91c1c'; j.textContent='⚠️ '+tot+'日です。必要な '+need.days+'日に '+(need.days-tot)+'日足りません。'+(no?'':'CCUSに全て蓄積されていない場合は「いいえ」を選んで、経歴証明書の期間をご入力ください。'); }
 }
 function _t2ccCollect(){
   if(!_t2ccOn()) return [];
@@ -4168,7 +4176,7 @@ function _t2ccCollect(){
       r.checkCo=_t2ccV(b+'checkCo'); r.checkName=_t2ccV(b+'checkName');
       if(r.certType.indexOf('別の会社')===0){ r.certCo=_t2ccV(b+'certCo'); r.certTitle=_t2ccV(b+'certTitle'); r.certName=_t2ccV(b+'certName'); r.certCoId=_t2ccV(b+'certCoId'); }
     }
-    r.totalDays=(parseInt(r.ccusDays||'0',10)||0)+(r.careerDays||0);
+    r.totalDays=no?(r.careerDays||0):(parseInt(r.ccusDays||'0',10)||0);   // いいえ：③＝経歴の合計（二重に足さない）
     out.push(r);
   });
   return out;
