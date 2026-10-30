@@ -192,7 +192,8 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20261030.01'; // 第6-3号 実務経験：添付書類4点をフォームでアップロード（CCUS画面①本人情報・②就業日数・③就業履歴数・レベル判定結果通知書）。レベル判定・蓄積の答えで必須／任意を切り替え。保存は irai-docs/<case>/t2cc/（cofolder があればドライブにもコピー）。送信 t2Ccus.files
+var FORM_VERSION = 'ver.20261030.02'; // 第6-3号 実務経験：添付書類は「全て蓄積されている（はい）」ときだけ。①②③は必須、レベル判定（レベル３以上）を受けていれば結果通知書も必須。「いいえ」では添付欄を出さない
+// var FORM_VERSION = 'ver.20261030.01'; // 第6-3号 実務経験：添付書類4点をフォームでアップロード（CCUS画面①本人情報・②就業日数・③就業履歴数・レベル判定結果通知書）。レベル判定・蓄積の答えで必須／任意を切り替え。保存は irai-docs/<case>/t2cc/（cofolder があればドライブにもコピー）。送信 t2Ccus.files
 // var FORM_VERSION = 'ver.20261029.12'; // 交代制（シフト制）：「シフトパターン詳細」の自由記述をやめ、シフト1〜5の始業〜終業をプルダウン（15分刻み・最大5つ）で選ぶ形に。所定は休憩を引いて自動計算（日またぎ対応）。送信 shift1Start〜shift5Min（案シスの雇用条件 shift1〜5 にそのまま入る）・shiftDetail は送らない ／ ver.20261029.11: 第6-3号 実務経験：ver.20261029.10 を取り消し、「いいえ」のときは③をロックして経歴証明書の就業日数の合計を自動で入れる形（ver.20261029.08〜09）に戻した
 // var FORM_VERSION = 'ver.20261029.10'; // （取り消し）「いいえ」のとき③はCCUS分を入力・③＋④の合計を表示
 // var FORM_VERSION = 'ver.20261029.09'; // 第6-3号 実務経験：CCUS技能者IDを数字14桁のみ入力できるように（全角は半角に・数字以外は消す・14桁まで、送信前に14桁か確認）＋末尾2桁（01など）は入れない案内
@@ -4251,11 +4252,10 @@ var _T2CC_ATT = [
 var _t2ccFiles = {};   // p → { k:[{name,path,drive}] }
 function _t2ccAttNeed(p){
   var b='f-t2cc_'+p+'_', l=_t2ccV(b+'level'), no=_t2ccV(b+'acc').indexOf('いいえ')===0;
-  if(!l) return null;
+  // ver.20261030.02: 蓄積されている（はい）場合だけ添付。①②③は必須、レベル判定（レベル３以上）を受けていれば結果通知書も必須。蓄積されていない（いいえ）場合は出さない
+  if(no || !_t2ccV(b+'acc') || !l) return null;
   var got=(l.indexOf('受けた')===0);
-  // レベル判定を受けた → 結果通知書が必須。CCUSの画面3点は、受けていない／全て蓄積されていない（③の写しが必要）なら必須、それ以外は任意
-  var ccus=(!got || no) ? 'req' : 'opt';
-  return { ccus1:ccus, ccus2:ccus, ccus3:ccus, level: got ? 'req' : '' };
+  return { ccus1:'req', ccus2:'req', ccus3:'req', level: got ? 'req' : '' };
 }
 function _t2ccAttRender(p){
   var box=document.getElementById('t2ccAtt_'+p); if(!box) return;
