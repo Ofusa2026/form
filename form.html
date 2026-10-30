@@ -192,7 +192,8 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20261030.05'; // 第6-3号 実務経験：添付書類を申請人アップロードと同じしくみで申請人のドライブのフォルダへ（URL の folder・folder2。同じGAS uploadFileToDrive・upload_notify で案シスに通知）。ファイル名は「CCUS画面①本人情報.png」などにリネーム（2枚目から _2）。folder が無いときは今までどおり irai-docs
+var FORM_VERSION = 'ver.20261030.06'; // 第6-3号 実務経験：添付書類の見た目を申請人アップロードに合わせた（書類ごとのカード・点線の「📷 タップして写真を追加」・写真のプレビューと×・未提出／アップロード済み）。必須の添付がそろうまで・アップロード中は送信できない（残りの項目数にも入れる）
+// var FORM_VERSION = 'ver.20261030.05'; // 第6-3号 実務経験：添付書類を申請人アップロードと同じしくみで申請人のドライブのフォルダへ（URL の folder・folder2。同じGAS uploadFileToDrive・upload_notify で案シスに通知）。ファイル名は「CCUS画面①本人情報.png」などにリネーム（2枚目から _2）。folder が無いときは今までどおり irai-docs
 // var FORM_VERSION = 'ver.20261030.04'; // 第6-3号 実務経験：添付書類の撮り方を提出方法の資料（2025/1/31）どおりに詳しく＋CCUS画面①②③に「見本を見る」（資料の画面・赤枠つき）を追加。③の案内を「就業日数（職長＋班長の合計）を入力」に
 // var FORM_VERSION = 'ver.20261030.03'; // 第6-3号 実務経験：「蓄積あり」のときだけ「レベル３以上ですか？（はい／いいえ）」を聞く順番に（蓄積なしでは聞かない・送らない）
 // var FORM_VERSION = 'ver.20261030.02'; // 第6-3号 実務経験：添付書類は「全て蓄積されている（はい）」ときだけ。①②③は必須、レベル判定（レベル３以上）を受けていれば結果通知書も必須。「いいえ」では添付欄を出さない
@@ -4271,38 +4272,74 @@ function _t2ccAttNeed(p){
   var got=(l.indexOf('受けた')===0);
   return { ccus1:'req', ccus2:'req', ccus3:'req', level: got ? 'req' : '' };
 }
+// ver.20261030.06: 見た目は申請人アップロード（upload/zinzai_dataup.html）に合わせる（書類ごとのカード・点線の「📷 タップして写真を追加」・プレビュー×）
+var _t2ccOpen = {};   // p → { k:true } 開いているカード
+var _t2ccBusy = 0;    // アップロード中の件数（0になるまで送信しない）
+function _t2ccAttCss(){
+  if(document.getElementById('t2uCss')) return;
+  var st=document.createElement('style'); st.id='t2uCss';
+  st.textContent='.t2u-row{border:1.5px solid #dde3ec;border-radius:14px;overflow:hidden;background:#fff;margin-bottom:10px;transition:border-color .2s}'
+    +'.t2u-row.has-file{border-color:#1a56db;background:#eff6ff}'
+    +'.t2u-head{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;cursor:pointer;user-select:none;gap:8px}'
+    +'.t2u-label{font-size:14px;font-weight:600;color:#1a202c;flex:1;line-height:1.5}'
+    +'.t2u-status{font-size:12px;color:#718096;white-space:nowrap}.t2u-status.ready{color:#057a55;font-weight:600}.t2u-status.busy{color:#b45309;font-weight:600}'
+    +'.t2u-chev{font-size:11px;color:#718096;transition:transform .2s;flex-shrink:0}.t2u-row.open .t2u-chev{transform:rotate(180deg)}'
+    +'.t2u-body{border-top:1.5px solid #dde3ec;padding:12px 14px;display:none}.t2u-row.open .t2u-body{display:block}.t2u-row.has-file .t2u-body{border-top-color:#1a56db}'
+    +'.t2u-drop{border:2px dashed #c0cfe0;border-radius:10px;padding:20px 12px;text-align:center;cursor:pointer;position:relative;background:#f8fafc;transition:all .2s}'
+    +'.t2u-drop:hover{border-color:#1a56db;background:#eef4ff}.t2u-drop input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}'
+    +'.t2u-drop-t{font-size:13px;color:#4a5568;font-weight:600}.t2u-drop-h{font-size:11px;color:#a0aec0;margin-top:3px}'
+    +'.t2u-pv{position:relative;display:block;margin-bottom:6px}.t2u-pv img{width:100%;max-height:180px;object-fit:contain;border-radius:8px;background:#eee;display:block}'
+    +'.t2u-pv .t2u-file{padding:12px 40px 12px 12px;background:#f1f5f9;border-radius:8px;font-size:13px;color:#334155;font-weight:600;word-break:break-all}'
+    +'.t2u-rm{position:absolute;top:4px;right:4px;background:rgba(0,0,0,.65);color:#fff;border:none;border-radius:50%;width:26px;height:26px;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center}'
+    +'.t2u-how{background:#dbeafe;border-left:4px solid #3b82f6;border-radius:6px;padding:10px 12px;font-size:13px;color:#1e40af;line-height:1.9;margin-bottom:10px}';
+  document.head.appendChild(st);
+}
+function _t2ccAttToggleOpen(p,k){ _t2ccOpen[p]=_t2ccOpen[p]||{}; _t2ccOpen[p][k]=!_t2ccOpen[p][k]; var r=document.querySelector('#t2ccAtt_'+p+' .t2u-row[data-k="'+k+'"]'); if(r) r.classList.toggle('open', !!_t2ccOpen[p][k]); }
 function _t2ccAttRender(p){
   var box=document.getElementById('t2ccAtt_'+p); if(!box) return;
   var need=_t2ccAttNeed(p);
   if(!need){ box.innerHTML=''; return; }
-  var fl=_t2ccFiles[p]||{};
-  var h='<div style="background:#f0f9ff;border:1.5px solid #7dd3fc;border-radius:10px;padding:10px 12px;margin:2px 0 14px;">';
-  h+='<div style="font-size:12.5px;font-weight:800;color:#075985;margin-bottom:4px;">📎 添付書類のアップロード</div>';
-  h+='<div style="font-size:11px;color:#0c4a6e;line-height:1.6;margin-bottom:8px;">建設キャリアアップシステムに<b>技能者の権限でログイン</b>して、下の<b>3つの画面をすべて</b>撮影（スクリーンショット）してください。文字や数字がはっきり読めるものにしてください（白黒でも大丈夫です）。</div>';
+  _t2ccAttCss();
+  var fl=_t2ccFiles[p]||{}, op=_t2ccOpen[p]=_t2ccOpen[p]||{};
+  // はじめて出すときは、まだ出していない最初の書類だけ開く（申請人アップロードと同じ）
+  if(!op._init){ op._init=1; for(var i0=0;i0<_T2CC_ATT.length;i0++){ var a0=_T2CC_ATT[i0]; if(need[a0.k] && !(fl[a0.k]&&fl[a0.k].length)){ op[a0.k]=true; break; } } }
+  var h='<div style="margin:2px 0 14px;">';
+  h+='<div style="font-size:13px;font-weight:800;color:#1a202c;margin-bottom:4px;">📎 添付書類のアップロード</div>';
+  h+='<div style="font-size:11.5px;color:#4a5568;line-height:1.7;margin-bottom:10px;">建設キャリアアップシステムに<b>技能者の権限でログイン</b>して、下の画面を撮影（スクリーンショット）してください。文字や数字がはっきり読めるものにしてください（白黒でも大丈夫です）。<br><b style="color:#b91c1c;">すべてアップロードするまで送信できません。</b></div>';
   _T2CC_ATT.forEach(function(a){
     var st=need[a.k]; if(!st) return;
-    var files=fl[a.k]||[], id='f-t2cc_'+p+'_att_'+a.k;
-    h+='<div class="t2cc-att" data-k="'+a.k+'" style="background:#fff;border:1px solid #e0f2fe;border-radius:8px;padding:8px 10px;margin-bottom:8px;">';
-    h+='<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;"><span style="font-size:12.5px;font-weight:800;color:#0f172a;flex:1;">'+a.l+'</span>'
-      + (st==='req' ? '<span class="req">*</span>' : '<span style="font-size:10.5px;color:#64748b;background:#f1f5f9;border-radius:99px;padding:0 8px;">任意</span>')
-      + '<span style="font-size:10.5px;font-weight:700;border-radius:99px;padding:0 8px;'+(files.length?'background:#dcfce7;color:#166534;">提出済み':'background:#fee2e2;color:#b91c1c;">未提出')+'</span></div>';
-    h+='<div style="font-size:11px;color:#475569;margin:3px 0 6px;line-height:1.6;">'+a.how+'</div>';
-    if(_T2CC_SAMPLE[a.k]) h+='<details style="margin:0 0 6px;"><summary style="cursor:pointer;font-size:11.5px;font-weight:700;color:#0369a1;">📷 見本を見る（赤い枠のところが写るように）</summary>'
-      + '<img src="'+_T2CC_SAMPLE[a.k]+'" alt="見本" style="display:block;width:100%;height:auto;margin-top:6px;border:1px solid #e2e8f0;border-radius:6px;"></details>';
-    h+='<input type="file" id="'+id+'" accept="image/*,application/pdf" multiple onchange="_t2ccAttUpload('+p+',\''+a.k+'\',this)" style="font-size:12px;">';
-    if(files.length){
-      h+='<ul style="list-style:none;margin:6px 0 0;padding:0;font-size:11.5px;">';
-      files.forEach(function(f,i){ h+='<li style="display:flex;gap:6px;align-items:center;padding:2px 0;"><span style="color:#16a34a;">✓</span><span style="flex:1;word-break:break-all;">'+_t2esc(f.name)+(f.orig&&f.orig!==f.name?' <span style="color:#94a3b8;font-size:10.5px;">（'+_t2esc(f.orig)+'）</span>':'')+'</span>'
-        + '<button type="button" onclick="_t2ccAttRemove('+p+',\''+a.k+'\','+i+')" style="font-size:11px;border:1px solid #e5e7eb;background:#fff;border-radius:6px;padding:0 6px;cursor:pointer;" title="一覧から外す">×</button></li>'; });
-      h+='</ul>';
-    }
-    h+='<div class="t2cc-att-st" style="font-size:11px;margin-top:3px;"></div>';
-    h+='</div>';
+    var files=fl[a.k]||[], has=files.length>0, busy=!!(fl['_busy_'+a.k]), id='f-t2cc_'+p+'_att_'+a.k;
+    h+='<div class="t2u-row'+(has?' has-file':'')+(op[a.k]?' open':'')+'" data-k="'+a.k+'">';
+    h+='<div class="t2u-head" onclick="_t2ccAttToggleOpen('+p+',\''+a.k+'\')"><span class="t2u-label">'+a.l+(st==='req'?' <span class="req">*</span>':'')+'</span>'
+      + '<span class="t2u-status'+(busy?' busy':(has?' ready':''))+'">'+(busy?'⏳ アップロード中…':(has?('✓ アップロード済み（'+files.length+'）'):'未提出'))+'</span><span class="t2u-chev">▼</span></div>';
+    h+='<div class="t2u-body">';
+    h+='<div class="t2u-how"><div style="font-weight:700;margin-bottom:4px;">📝 説明（撮る画面）</div>'+a.how+'</div>';
+    if(_T2CC_SAMPLE[a.k]) h+='<details style="margin:0 0 10px;"><summary style="cursor:pointer;font-size:12px;font-weight:700;color:#1d4ed8;">📷 見本を見る（赤い枠のところが写るように）</summary>'
+      + '<div style="background:#f9fafb;border-radius:8px;padding:6px;margin-top:6px;"><img src="'+_T2CC_SAMPLE[a.k]+'" alt="見本" style="display:block;width:100%;height:auto;border-radius:4px;"></div></details>';
+    files.forEach(function(f,i){
+      h+='<div class="t2u-pv">'+(f.preview ? '<img src="'+f.preview+'" alt="">' : '<div class="t2u-file">📄 '+_t2esc(f.name)+'</div>')
+        + '<button type="button" class="t2u-rm" title="外す" onclick="_t2ccAttRemove('+p+',\''+a.k+'\','+i+')">×</button></div>';
+      if(f.preview) h+='<div style="font-size:11px;color:#64748b;margin:-2px 0 8px;word-break:break-all;">'+_t2esc(f.name)+(f.orig&&f.orig!==f.name?'（'+_t2esc(f.orig)+'）':'')+'</div>';
+    });
+    h+='<div class="t2u-drop"'+(has?' style="padding:12px;"':'')+'><input type="file" id="'+id+'" accept="image/*,image/heic,image/heif,application/pdf" multiple onchange="_t2ccAttUpload('+p+',\''+a.k+'\',this)">'
+      + '<div class="t2u-drop-t">'+(has?'➕ 追加':'📷 タップして写真を追加')+'</div>'+(has?'':'<div class="t2u-drop-h">JPG / PNG / PDF</div>')+'</div>';
+    h+='<div class="t2cc-att-st" style="font-size:11.5px;margin-top:6px;"></div>';
+    h+='</div></div>';
   });
   h+='</div>';
   box.innerHTML=h;
 }
-function _t2ccAttRemove(p,k,i){ var fl=_t2ccFiles[p]||{}; if(fl[k]){ fl[k].splice(i,1); } _t2ccAttRender(p); _formDirty=true; }
+// 送信前：必須の添付で、まだ無いもの（未入力の数・「ここを押すと未入力へ」に使う）
+function _t2ccAttMissing(){
+  if(type!=='tokutei2_jitsumu') return [];
+  var out=[];
+  document.querySelectorAll('#t2CcusContainer .t2cc-person').forEach(function(el){
+    var p=el.dataset.person, need=_t2ccAttNeed(p)||{}, fl=_t2ccFiles[p]||{};
+    _T2CC_ATT.forEach(function(a){ if(need[a.k]==='req' && !(fl[a.k]&&fl[a.k].length)){ var hd=document.querySelector('#t2ccAtt_'+p+' .t2u-row[data-k="'+a.k+'"] .t2u-head'); if(hd) out.push(hd); } });
+  });
+  return out;
+}
+function _t2ccAttRemove(p,k,i){ var fl=_t2ccFiles[p]||{}; if(fl[k]){ fl[k].splice(i,1); } _t2ccAttRender(p); _formDirty=true; try{ _updateReqRemain(); }catch(e){} }
 // ver.20261030.05: 申請人アップロード（upload/zinzai_dataup.html）と同じしくみで、申請人のドライブのフォルダに入れる
 //   URL の folder（＝人材フォルダID。旧 cofolder も可）があれば → 申請人アップロードと同じ GAS（uploadFileToDrive）で
 //   「書類名[_連番].拡張子」にリネームして保存し、upload_notify で案シスに知らせる（folder2 があれば2つ目のフォルダにも）
@@ -4331,9 +4368,16 @@ function _t2ccAttUpload(p,k,input){
   _t2ccFiles[p]=_t2ccFiles[p]||{}; var list=_t2ccFiles[p][k]=_t2ccFiles[p][k]||[];
   var arr=Array.prototype.slice.call(files), ng=[];
   try{ input.value=''; }catch(e){}
+  _t2ccBusy++; _t2ccFiles[p]['_busy_'+k]=1; _t2ccOpen[p]=_t2ccOpen[p]||{}; _t2ccOpen[p][k]=true; _t2ccAttRender(p);
+  card=document.querySelector('#t2ccAtt_'+p+' .t2u-row[data-k="'+k+'"]'); st=card&&card.querySelector('.t2cc-att-st');
+  var _pv=function(f){ try{ return /^image\/(png|jpe?g|gif|webp)$/i.test(f.type||'') ? URL.createObjectURL(f) : ''; }catch(e){ return ''; } };
   var safeCase=String(caseId||'').replace(/[^\w\-]+/g,'_');
-  var finish=function(){ _t2ccAttRender(p); _formDirty=true; try{ _updateReqRemain(); }catch(e){}
-    var c2=document.querySelector('#t2ccAtt_'+p+' .t2cc-att[data-k="'+k+'"] .t2cc-att-st'); if(c2 && ng.length){ c2.textContent='⚠️ '+ng.join('／'); c2.style.color='#dc2626'; } };
+  var finish=function(){ _t2ccBusy=Math.max(0,_t2ccBusy-1); delete _t2ccFiles[p]['_busy_'+k];
+    // 出し終えたら、次のまだ出していない書類を開く
+    var need=_t2ccAttNeed(p)||{}, fl2=_t2ccFiles[p]||{};
+    if(fl2[k]&&fl2[k].length){ var nx=_T2CC_ATT.filter(function(x){ return need[x.k] && !(fl2[x.k]&&fl2[x.k].length); })[0]; if(nx){ _t2ccOpen[p][k]=false; _t2ccOpen[p][nx.k]=true; } }
+    _t2ccAttRender(p); _formDirty=true; try{ _updateReqRemain(); }catch(e){}
+    var c2=document.querySelector('#t2ccAtt_'+p+' .t2u-row[data-k="'+k+'"] .t2cc-att-st'); if(c2 && ng.length){ c2.textContent='⚠️ '+ng.join('／'); c2.style.color='#dc2626'; } };
   // 1ファイルずつ順に（連番がずれないように）
   var i=0;
   var next=function(){
@@ -4341,13 +4385,13 @@ function _t2ccAttUpload(p,k,input){
     var f=arr[i++];
     say('アップロード中…（'+i+'/'+arr.length+'）');
     if(f.size>20*1024*1024){ ng.push(f.name+'：20MB以下にしてください'); next(); return; }
-    if(!safeCase){ list.push({name:f.name, path:'', sample:1}); next(); return; }   // 案件なし（見本表示）は保存しない
+    if(!safeCase){ list.push({name:f.name, path:'', sample:1, preview:_pv(f)}); next(); return; }   // 案件なし（見本表示）は保存しない
     var n=list.length+1, fileName=a.fn+(n>1?('_'+n):'')+'.'+_t2ccExt(f.name);
     if(T2CC_FOLDER){
       _t2ccB64(f).then(function(b64){
         return _t2ccToDrive(T2CC_FOLDER, b64, fileName, f.type).then(function(j){
           var url=_t2ccDriveUrl(j);
-          var rec={name:fileName, orig:f.name, folder:T2CC_FOLDER, drive:1, url:url, at:new Date().toISOString()};
+          var rec={name:fileName, orig:f.name, folder:T2CC_FOLDER, drive:1, url:url, at:new Date().toISOString(), preview:_pv(f)};
           list.push(rec);
           return _t2ccNotify(T2CC_FOLDER, fileName, a.l, url).then(function(){
             if(!T2CC_FOLDER2 || T2CC_FOLDER2===T2CC_FOLDER) return;
@@ -4363,7 +4407,7 @@ function _t2ccAttUpload(p,k,input){
     fetch(SUPABASE_URL+'/storage/v1/object/irai-docs/'+enc,{method:'POST',headers:{'apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY,'Content-Type':f.type||'application/octet-stream'},body:f})
       .then(function(res){
         if(!res.ok){ ng.push(f.name+'：失敗（'+res.status+'）'); next(); return; }
-        list.push({name:fileName, orig:f.name, path:path, drive:0, at:new Date().toISOString()}); next();
+        list.push({name:fileName, orig:f.name, path:path, drive:0, at:new Date().toISOString(), preview:_pv(f)}); next();
       })
       .catch(function(){ ng.push(f.name+'：通信エラー'); next(); });
   };
@@ -4452,8 +4496,9 @@ function _t2ccValidate(){
       if(!_t2ccV(b+'checkName')) return act(b+'checkName','経歴証明書の内容を確認した方の氏名をご入力ください。');
     }
     // ver.20261030.01: 必須の添付書類
+    if(_t2ccBusy>0) return act(b+'acc','添付書類をアップロードしています。終わるまでお待ちください。');
     var need=_t2ccAttNeed(p)||{}, fl=_t2ccFiles[p]||{};
-    for(var ai=0;ai<_T2CC_ATT.length;ai++){ var a=_T2CC_ATT[ai]; if(need[a.k]==='req' && !(fl[a.k]&&fl[a.k].length)) return act(b+'att_'+a.k,'「'+a.l+'」をアップロードしてください。'); }
+    for(var ai=0;ai<_T2CC_ATT.length;ai++){ var a=_T2CC_ATT[ai]; if(need[a.k]==='req' && !(fl[a.k]&&fl[a.k].length)){ _t2ccOpen[p]=_t2ccOpen[p]||{}; _t2ccOpen[p][a.k]=true; _t2ccAttRender(p); return act(b+'att_'+a.k,'「'+a.l+'」をアップロードしてください（すべてアップロードするまで送信できません）。'); } }
     return false;
   });
   return msg;
@@ -6993,6 +7038,7 @@ function _reqEmptyFieldsRaw(){
     var filled=vis.some(function(i){ if(i.type==='radio'||i.type==='checkbox') return i.checked; return String(i.value||'').trim()!==''; });
     if(!filled) out.push(vis[0]);
   });
+  try{ if(typeof _t2ccAttMissing==='function') out=out.concat(_t2ccAttMissing()); }catch(e){}   // ver.20261030.06: 6-3号の必須の添付書類
   return out;
 }
 var _reqTimer=null, _formSentClean=false, _formDirty=false;
