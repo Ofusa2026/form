@@ -192,7 +192,8 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20261030.02'; // 第6-3号 実務経験：添付書類は「全て蓄積されている（はい）」ときだけ。①②③は必須、レベル判定（レベル３以上）を受けていれば結果通知書も必須。「いいえ」では添付欄を出さない
+var FORM_VERSION = 'ver.20261030.03'; // 第6-3号 実務経験：「蓄積あり」のときだけ「レベル３以上ですか？（はい／いいえ）」を聞く順番に（蓄積なしでは聞かない・送らない）
+// var FORM_VERSION = 'ver.20261030.02'; // 第6-3号 実務経験：添付書類は「全て蓄積されている（はい）」ときだけ。①②③は必須、レベル判定（レベル３以上）を受けていれば結果通知書も必須。「いいえ」では添付欄を出さない
 // var FORM_VERSION = 'ver.20261030.01'; // 第6-3号 実務経験：添付書類4点をフォームでアップロード（CCUS画面①本人情報・②就業日数・③就業履歴数・レベル判定結果通知書）。レベル判定・蓄積の答えで必須／任意を切り替え。保存は irai-docs/<case>/t2cc/（cofolder があればドライブにもコピー）。送信 t2Ccus.files
 // var FORM_VERSION = 'ver.20261029.12'; // 交代制（シフト制）：「シフトパターン詳細」の自由記述をやめ、シフト1〜5の始業〜終業をプルダウン（15分刻み・最大5つ）で選ぶ形に。所定は休憩を引いて自動計算（日またぎ対応）。送信 shift1Start〜shift5Min（案シスの雇用条件 shift1〜5 にそのまま入る）・shiftDetail は送らない ／ ver.20261029.11: 第6-3号 実務経験：ver.20261029.10 を取り消し、「いいえ」のときは③をロックして経歴証明書の就業日数の合計を自動で入れる形（ver.20261029.08〜09）に戻した
 // var FORM_VERSION = 'ver.20261029.10'; // （取り消し）「いいえ」のとき③はCCUS分を入力・③＋④の合計を表示
@@ -4183,12 +4184,16 @@ function _t2ccBlock(p){
   h+='<div id="t2ccNeed_'+p+'" style="font-size:11.5px;color:#6b7280;margin:-6px 0 10px;"></div>';
   h+='<div class="field">'+lab('CCUSに、２号に必要な実務経験（職長＋班長の就業日数）が全て蓄積されていますか？',1)
     + _t2ccSel(b+'acc',['はい（全て蓄積されている）','いいえ（全て蓄積されていない）'],keep('acc'),'_t2ccToggle('+p+')')+'</div>';
+  // ver.20261030.03: 蓄積「あり」のときだけ聞く（レベル３以上か はい／いいえ）
+  var _lv=keep('level');
+  h+='<div class="field" id="t2ccLvW_'+p+'" style="display:none;">'+lab('CCUSのレベル判定（能力評価）で、レベル３以上ですか？',1)
+    + '<select id="'+b+'level" onchange="_t2ccToggle('+p+')"><option value="">--- 選んでください ---</option>'
+    + '<option value="受けた（レベル３以上）"'+(_lv.indexOf('受けた')===0?' selected':'')+'>はい（レベル３以上）</option>'
+    + '<option value="受けていない"'+(_lv==='受けていない'?' selected':'')+'>いいえ（レベル判定を受けていない・レベル３未満）</option></select>'
+    + '<div id="t2ccLvNote_'+p+'" style="font-size:11.5px;color:#1d4ed8;margin-top:4px;"></div></div>';
   h+='<div class="field">'+lab('③ CCUSの技能者情報に基づく就業日数（職長＋班長）',1)
     + '<div style="display:flex;align-items:center;gap:6px;"><input type="number" min="0" id="'+b+'ccusDays" value="'+_t2esc(keep('ccusDays'))+'" oninput="_t2ccCalc('+p+')" placeholder="例：215" style="flex:0 1 160px;padding:9px 12px;border:1.5px solid #d1d5db;border-radius:8px;font-size:14px;"><span style="font-size:13px;">日</span></div>'
     + '<div id="t2ccDaysNote_'+p+'" style="font-size:11px;color:#6b7280;margin-top:4px;">CCUSに蓄積がない場合は 0 と入力してください。</div></div>';
-  h+='<div class="field">'+lab('CCUSのレベル判定（能力評価）を受けていますか？',1)
-    + _t2ccSel(b+'level',['受けた（レベル３以上）','受けていない'],keep('level'),'_t2ccToggle('+p+')')
-    + '<div id="t2ccLvNote_'+p+'" style="font-size:11.5px;color:#1d4ed8;margin-top:4px;"></div></div>';
   h+='<div id="t2ccAtt_'+p+'"></div>';   // ver.20261030.01: 添付書類（CCUSの画面3点・レベル判定結果通知書）
   // ↓ 全て蓄積されていない場合（別紙 経歴証明書）
   h+='<div id="t2ccNo_'+p+'" style="display:none;background:#fff7ed;border:1.5px solid #fdba74;border-radius:10px;padding:10px 12px;margin-top:4px;">';
@@ -4234,6 +4239,7 @@ function _t2ccToggle(p){
   var b='f-t2cc_'+p+'_';
   var no=_t2ccV(b+'acc').indexOf('いいえ')===0;
   var w=document.getElementById('t2ccNo_'+p); if(w) w.style.display=no?'':'none';
+  var yes=_t2ccV(b+'acc').indexOf('はい')===0, lw=document.getElementById('t2ccLvW_'+p); if(lw) lw.style.display=yes?'':'none';
   var cw=document.getElementById('t2ccCert_'+p); if(cw) cw.style.display=(no && _t2ccV(b+'certType').indexOf('別の会社')===0)?'':'none';
   var lv=document.getElementById('t2ccLvNote_'+p), l=_t2ccV(b+'level');
   if(lv) lv.textContent = l ? '必要な添付書類が下に表示されます。' : '';
@@ -4352,7 +4358,7 @@ function _t2ccCollect(){
     var need=_t2ccNeed(p), code=_t2ccV(b+'jobCode'), none=(code===_T2CC_NONE);
     var r={jobCode:code, job:none?_t2ccV(b+'job'):_t2ccJobName(code), call:none?'':_t2ccV(b+'call'),
       noStandard:none?'能力評価基準なし':'', kubun:need?need.kubun:'', needDays:need?need.days:'',
-      accumulated:_t2ccV(b+'acc'), ccusDays:_t2ccV(b+'ccusDays'), level:_t2ccV(b+'level')};
+      accumulated:_t2ccV(b+'acc'), ccusDays:_t2ccV(b+'ccusDays'), level:(_t2ccV(b+'acc').indexOf('はい')===0?_t2ccV(b+'level'):'')};
     if(no){
       var pers=[]; for(var k=1;k<=10;k++){ var f=_t2ccV(b+'per'+k+'_from'), t=_t2ccV(b+'per'+k+'_to'), d=_t2ccV(b+'per'+k+'_days'); if(f||t||d) pers.push({from:f,to:t,days:d}); }
       r.workerId=_t2ccV(b+'workerId'); r.periods=pers; r.careerDays=_t2ccCareerDays(p);
@@ -4378,7 +4384,7 @@ function _t2ccValidate(){
     else if(!_t2ccV(b+'call')) return act(b+'call','②CCUSに記載の技能評価基準の呼称を選んでください。');
     if(!_t2ccV(b+'acc')) return act(b+'acc','CCUSに全て蓄積されているかを選んでください。');
     if(_t2ccV(b+'ccusDays')==='') return act(b+'ccusDays','③CCUSの就業日数をご入力ください（ない場合は0）。');
-    if(!_t2ccV(b+'level')) return act(b+'level','CCUSのレベル判定を受けているかを選んでください。');
+    if(_t2ccV(b+'acc').indexOf('はい')===0 && !_t2ccV(b+'level')) return act(b+'level','CCUSのレベル判定でレベル３以上かを選んでください。');
     if(_t2ccV(b+'acc').indexOf('いいえ')===0){
       if(!_t2ccV(b+'workerId')) return act(b+'workerId','建設キャリアアップシステム技能者IDをご入力ください。');
       if(!/^[0-9]{14}$/.test(_t2ccV(b+'workerId'))) return act(b+'workerId','建設キャリアアップシステム技能者IDは数字14桁でご入力ください（末尾の2桁「01」などは入れません）。');
