@@ -23,6 +23,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 .header .form-type-badge { display: inline-block; font-size: 11px; font-weight: 700; padding: 2px 10px; border-radius: 20px; margin-top: 4px; }
 .badge-tokutei { background: #0ea5e9; color: white; }
 .badge-gijinkoku { background: #10b981; color: white; }
+.badge-jisshu { background: #f59e0b; color: white; }
 .badge-company { background: #f59e0b; color: white; }
 .badge-nintei { background: rgba(255,255,255,.2); color: white; margin-left: 4px; }
 .badge-koushin { background: rgba(255,255,255,.2); color: white; margin-left: 4px; }
@@ -192,7 +193,12 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20261030.06'; // 第6-3号 実務経験：添付書類の見た目を申請人アップロードに合わせた（書類ごとのカード・点線の「📷 タップして写真を追加」・写真のプレビューと×・未提出／アップロード済み）。必須の添付がそろうまで・アップロード中は送信できない（残りの項目数にも入れる）
+var FORM_VERSION = 'ver.20261102.05'; // 技能実習：出生地・パスポート番号・パスポート有効期限を必須に（入管オンラインシステムで必須の項目）
+// var FORM_VERSION = 'ver.20261102.04'; // 技能実習3号の認定（type=jisshu3_nintei）を追加：2号修了後に帰国し3号で再入国する人向け。1号認定と同じ質問＋随時3級（実技）の合格日
+// var FORM_VERSION = 'ver.20261102.03'; // 技能実習を特定技能1号のフォームをベースに：在留カード・日本の住所・一時帰国を特定技能1号と同じ「あり／なし」形式に（認定は出さない）。特定技能だけの質問（技能・日本語の試験、特定技能で初めて来日した日）は出さない
+// var FORM_VERSION = 'ver.20261102.02'; // 技能実習：入管オンラインシステムの入力項目に合わせて、性別・本国の住所・携帯電話・犯罪歴・職歴（最大10件）・在留カード番号（変更/更新）・本国での職業・上陸予定港・同伴者・退去強制歴（1号認定）を追加。回答の項目名は人材情報（persons）と同じ名前にしてそのまま取り込めるように
+// var FORM_VERSION = 'ver.20261102.01'; // 技能実習の申請人ヒアリングを追加（type= jisshu1_nintei／jisshu2_henkou／jisshu2_koushin／jisshu3_henkou／jisshu3_koushin）。号ごとに基礎級・随時3級の合格日、3号の一時帰国、1号認定の入国予定・来日歴などを聞く
+// var FORM_VERSION = 'ver.20261030.06'; // 第6-3号 実務経験：添付書類の見た目を申請人アップロードに合わせた（書類ごとのカード・点線の「📷 タップして写真を追加」・写真のプレビューと×・未提出／アップロード済み）。必須の添付がそろうまで・アップロード中は送信できない（残りの項目数にも入れる）
 // var FORM_VERSION = 'ver.20261030.05'; // 第6-3号 実務経験：添付書類を申請人アップロードと同じしくみで申請人のドライブのフォルダへ（URL の folder・folder2。同じGAS uploadFileToDrive・upload_notify で案シスに通知）。ファイル名は「CCUS画面①本人情報.png」などにリネーム（2枚目から _2）。folder が無いときは今までどおり irai-docs
 // var FORM_VERSION = 'ver.20261030.04'; // 第6-3号 実務経験：添付書類の撮り方を提出方法の資料（2025/1/31）どおりに詳しく＋CCUS画面①②③に「見本を見る」（資料の画面・赤枠つき）を追加。③の案内を「就業日数（職長＋班長の合計）を入力」に
 // var FORM_VERSION = 'ver.20261030.03'; // 第6-3号 実務経験：「蓄積あり」のときだけ「レベル３以上ですか？（はい／いいえ）」を聞く順番に（蓄積なしでは聞かない・送らない）
@@ -286,6 +292,12 @@ var isTokutei = (type === 'tokutei_nintei' || type === 'tokutei_koushin' || type
 
 // 技人国フラグ（type=gijinkoku_* のとき true）
 var isGijinkoku = (type === 'gijinkoku_nintei' || type === 'gijinkoku_koushin' || type === 'gijinkoku_henkou');
+
+// ver.20261102.01: 技能実習フラグ（type=jisshu1_nintei / jisshu2_henkou / jisshu2_koushin / jisshu3_henkou / jisshu3_koushin）
+var isJisshu = /^jisshu[123]_(nintei|henkou|koushin)$/.test(type||'');
+// ver.20261102.03: 技能実習は特定技能1号のフォームがベース（在留カード・住所・一時帰国の部品を共用）
+var isTokuteiBase = isTokutei || isJisshu;
+var _isNinteiType = (type === 'tokutei_nintei' || /^jisshu[13]_nintei$/.test(type));
 
 // ===== 翻訳辞書 =====
 var TRANS = {
@@ -566,10 +578,10 @@ function blockBasic() {
       field('f-nationality', '国籍（こくせき）', 'select', true, '', 'nationality',
         ['','ベトナム','インドネシア','ミャンマー','カンボジア','ネパール','フィリピン','中国','タイ','モンゴル','その他']) +
     '</div>' +
-    field('f-birthPlace', '出生地（しゅっせいち） / Place of birth', 'text', false, '例: Ho Chi Minh City', 'birthPlace') +
+    field('f-birthPlace', '出生地（しゅっせいち） / Place of birth', 'text', isJisshu, '例: Ho Chi Minh City', 'birthPlace') +
     '<div class="grid2">' +
-      field('f-passport', 'パスポート番号（ばんごう）', 'text', false, '例: AB1234567', 'passport') +
-      field('f-passExpiry', 'パスポート有効期限（ゆうこうきげん）', 'date', false, '', 'passExpiry') +
+      field('f-passport', 'パスポート番号（ばんごう）', 'text', isJisshu, '例: AB1234567', 'passport') +
+      field('f-passExpiry', 'パスポート有効期限（ゆうこうきげん）', 'date', isJisshu, '', 'passExpiry') +
     '</div>' +
   '</div>';
 }
@@ -629,10 +641,11 @@ function blockContact(showResCard, showExtra) {
   var h = '<div class="card"><div class="section-title">連絡先・住所（れんらくさき・じゅうしょ）</div>';
   h += field('f-email', 'メールアドレス', 'text', true, '例: your@email.com', 'email');
 
-  if (isTokutei) {
+  if (isTokuteiBase) {
     // 特定技能：在留カード・住所・一時帰国を統一仕様で表示（あり/なし切替）
     // ver.20260803.10: 認定申請は日本国外からの申請のため、在留カード・現住所・一時帰国は表示しない
-    if (type !== 'tokutei_nintei') {
+    // ver.20261102.03: 技能実習も同じ（1号認定は出さない）
+    if (!_isNinteiType) {
       h += blockResidenceCardTokutei();
       h += blockAddressTokutei();
       h += blockTempReturnTokutei();
@@ -780,7 +793,7 @@ function blockMarried() { return ''; }
 // ver.20261028.02: 変更・更新で案シスの「許可された在留期間」が空のときだけ表示する「現在の在留期間」（必須）
 var _CSP_OPTS = (function(){ var a=['']; for(var m=1;m<=60;m++){ var y=Math.floor(m/12), mo=m%12, l=''; if(y>0) l+=y+'年'; if(mo>0) l+=mo+'月'; a.push(l);} a.push('その他'); return a; })();
 var _cspNeed = false;
-function _cspIsTarget(){ return /^(tokutei|gijinkoku|tokutei2_person)_(koushin|henkou)$/.test(type||''); }
+function _cspIsTarget(){ return /^(tokutei|gijinkoku|tokutei2_person|jisshu2|jisshu3)_(koushin|henkou)$/.test(type||''); }
 function blockCurStayPeriod() {
   var h = '<div class="card" id="curStayCard" style="display:none;"><div class="section-title">現在の在留期間（げんざいの ざいりゅうきかん）</div>';
   h += '<div class="field"><label>今もっている在留カードの在留期間（いま もっている ざいりゅうカードの ざいりゅうきかん）<span class="req">*</span></label>';
@@ -1356,6 +1369,150 @@ function toggleGijinkokuExp(val) {
   }
 }
 
+// ===== 技能実習：入管オンラインシステムの「申請人の基本情報」で足りない項目（ver.20261102.02） =====
+function blockJisshuPersonal(t) {
+  var h = '<div class="card"><div class="section-title">本人のこと（ほんにんのこと）</div>';
+  h += field('f-jsGender', '性別（せいべつ）/ Sex', 'select', true, '', '', ['','男 / Male','女 / Female']);
+  h += field('f-jsHomeAddress', '本国の住所（ほんごくの じゅうしょ）/ Address in your home country', 'text', true, '例: 123 Le Loi Street, Hai Ba Trung, Hanoi', '');
+  h += field('f-jsCelPhone', '携帯電話番号（けいたいでんわ ばんごう）/ Mobile phone number', 'tel', (!/^jisshu[13]_nintei$/.test(t)), (/^jisshu[13]_nintei$/.test(t) ? '例: +84 90 123 4567' : '例: 080-1234-5678'), '');
+  h += '<div class="field"><label>犯罪（はんざい）で処分（しょぶん）を受けたことがありますか？（日本以外もふくむ）<span class="req">*</span><br><span style="font-size:11px;color:#6366f1;font-weight:500;">Have you ever been punished for a crime? (in Japan or overseas)</span></label>';
+  h += '<select id="f-jsCrime" onchange="toggleJisshuCrime(this.value)"><option value="">---</option><option value="無">ない / No</option><option value="有">ある / Yes</option></select></div>';
+  h += '<div id="jsCrimeWrap" style="display:none;">';
+  h += field('f-jsCrimeDetail', 'どんな処分か（いつ・どこで・内容）/ Details (when, where, what)', 'textarea', true, '例: 2020年 ベトナムで交通違反の罰金 / 2020 traffic fine in Vietnam', '');
+  h += '</div>';
+  h += '</div>';
+  return h;
+}
+function toggleJisshuCrime(v) { var el = document.getElementById('jsCrimeWrap'); if (el) el.style.display = (v === '有') ? 'block' : 'none'; }
+function toggleJisshuDeport(v) { var el = document.getElementById('jsDeportWrap'); if (el) el.style.display = (v === '有') ? 'block' : 'none'; }
+
+// 職歴（日本以外もふくむ・最大10件）
+var _jsWorkCount = 0;
+function _jsWorkRow(i) {
+  return '<div class="js-work-row" data-wi="' + i + '" style="border:1px dashed #d1d5db;border-radius:10px;padding:10px 12px;margin-bottom:10px;">' +
+    '<div style="font-size:12px;font-weight:700;color:#6b7280;margin-bottom:6px;">職歴 ' + i + ' / Job ' + i + '</div>' +
+    field('f-jsWork' + i + 'Name', '会社の名前（かいしゃの なまえ）/ Company name', 'text', true, '例: ABC Garment Co., Ltd.', '') +
+    '<div class="grid2">' +
+      field('f-jsWork' + i + 'From', '入社した年月 / Joined (year-month)', 'month', true, '', '') +
+      field('f-jsWork' + i + 'To', 'やめた年月 / Left (year-month)', 'month', false, '', '') +
+    '</div>' +
+    '<div style="font-size:11px;color:#9ca3af;margin-top:-6px;">※ 今も働いている場合は「やめた年月」は空欄 / Leave blank if you still work there</div>' +
+  '</div>';
+}
+function blockJisshuWork() {
+  _jsWorkCount = 1;
+  var h = '<div class="card"><div class="section-title">職歴（しょくれき・日本以外もふくむ）/ Work experience</div>';
+  h += '<div style="font-size:11px;color:#9ca3af;margin-bottom:10px;">技能実習の前にしていた仕事も書いてください。新しいものから順に、最大10件まで。<br>Please include jobs before Technical Intern Training. Newest first, up to 10.</div>';
+  h += field('f-jsWorkStatus', '職歴はありますか？（しょくれき）/ Do you have work experience?', 'select', true, '', '', ['','ある / Yes','ない / No']);
+  h += '<div id="jsWorkWrap" style="display:none;"><div id="jsWorkRows">' + _jsWorkRow(1) + '</div>';
+  h += '<button type="button" id="jsWorkAddBtn" onclick="addJisshuWork()" style="font-size:12px;padding:6px 14px;background:white;border:1.5px dashed #c7d2fe;border-radius:6px;color:#6366f1;cursor:pointer;font-weight:700;">＋ 職歴を追加 / Add job</button></div>';
+  h += '</div>';
+  return h;
+}
+function addJisshuWork() {
+  if (_jsWorkCount >= 10) return;
+  _jsWorkCount++;
+  var div = document.createElement('div'); div.innerHTML = _jsWorkRow(_jsWorkCount);
+  document.getElementById('jsWorkRows').appendChild(div.firstChild);
+  if (_jsWorkCount >= 10) { var b = document.getElementById('jsWorkAddBtn'); if (b) b.style.display = 'none'; }
+}
+document.addEventListener('change', function(e){ try { if (e.target && e.target.id === 'f-jsWorkStatus') { var w = document.getElementById('jsWorkWrap'); if (w) w.style.display = (e.target.value.indexOf('ある') === 0) ? 'block' : 'none'; } } catch(_){} });
+function _jsWorkList() {
+  var out = [];
+  for (var i = 1; i <= _jsWorkCount; i++) {
+    var n = val('f-jsWork' + i + 'Name'), f = val('f-jsWork' + i + 'From'), t2 = val('f-jsWork' + i + 'To');
+    if (n || f || t2) out.push({ name: n, from: f, to: t2 });
+  }
+  return out;
+}
+
+// ===== 技能実習専用ブロック（ver.20261102.01） =====
+// 計画・会社・監理団体の情報は認定申請書の写しから取るので、申請人には「認定申請書に載っていないこと」だけを聞く
+function blockJisshuExtra(t) {
+  var h = '<div class="card"><div class="section-title">技能実習について（ぎのうじっしゅうについて）</div>';
+  if (/^jisshu[13]_nintei$/.test(t)) {
+    h += field('f-jsEntryPlan', '日本に来る予定の日（にほんにくる よていのひ）/ Planned date of entry to Japan', 'date', false, '', '');
+    h += '<div style="font-size:11px;color:#9ca3af;margin:-6px 0 10px;">※ まだ決まっていない場合は空欄でかまいません / Leave blank if not decided</div>';
+    h += field('f-jsVisaPlace', 'ビザを申請する日本大使館・領事館（にほんたいしかん・りょうじかん）/ Japanese Embassy or Consulate where you will apply for a visa', 'text', true, '例: 在ベトナム日本国大使館（ハノイ）/ Embassy of Japan in Vietnam (Hanoi)', '');
+    h += field('f-jsPort', '日本に着く予定の空港（くうこう）/ Airport where you will arrive in Japan', 'select', true, '', '',
+      ['','成田空港','羽田空港','関西空港','中部空港','福岡空港','新千歳空港','その他','未定']);
+    h += field('f-jsOccupation', '今の仕事（いまの しごと・本国）/ Your current job in your home country', 'text', true, '例: 工場作業員 / Factory worker（仕事をしていない場合は「なし」）', '');
+    h += field('f-jsCompanion', '一緒に日本に来る家族はいますか？（いっしょに くる かぞく）/ Will any family member come to Japan with you?', 'select', true, '', '', ['','いない / No','いる / Yes']);
+    h += '<div class="field"><label>日本から強制送還（きょうせいそうかん）または出国命令（しゅっこくめいれい）で出国したことがありますか？<span class="req">*</span><br><span style="font-size:11px;color:#6366f1;font-weight:500;">Have you ever left Japan due to deportation or a departure order?</span></label>';
+    h += '<select id="f-jsDeport" onchange="toggleJisshuDeport(this.value)"><option value="">---</option><option value="無">ない / No</option><option value="有">ある / Yes</option></select></div>';
+    h += '<div id="jsDeportWrap" style="display:none;"><div class="grid2">';
+    h += field('f-jsDeportCount', '回数（かいすう）/ Number of times', 'number', true, '例: 1', '');
+    h += field('f-jsDeportDate', '最後に出国した日 / Date of the latest departure', 'date', true, '', '');
+    h += '</div></div>';
+  }
+  if (t === 'jisshu3_nintei') {
+    h += field('f-js3kyuDate', '技能検定 随時3級（実技）に合格した日（ごうかくしたひ）/ Date you passed the Grade 3 practical skill test', 'date', true, '', '');
+    h += '<div style="font-size:11px;color:#9ca3af;margin:-6px 0 10px;">※ 合格証の写真もアップロードフォームから送ってください / Please also upload a photo of the certificate</div>';
+  }
+  if (t === 'jisshu2_henkou') {
+    h += field('f-jsKisoDate', '技能検定 基礎級（またはそれに相当する試験）に合格した日（ごうかくしたひ）/ Date you passed the Basic Grade skill test', 'date', true, '', '');
+    h += '<div style="font-size:11px;color:#9ca3af;margin:-6px 0 10px;">※ 合格証の写真もアップロードフォームから送ってください / Please also upload a photo of the certificate</div>';
+  }
+  if (t === 'jisshu3_henkou') {
+    h += field('f-js3kyuDate', '技能検定 随時3級（実技）に合格した日（ごうかくしたひ）/ Date you passed the Grade 3 practical skill test', 'date', true, '', '');
+    h += '<div style="font-size:11px;color:#9ca3af;margin:-6px 0 10px;">※ 合格証の写真もアップロードフォームから送ってください / Please also upload a photo of the certificate</div>';
+    h += '<div class="field"><label>3号のための一時帰国（1か月以上）はいつですか？（いちじきこく）<span class="req">*</span><br><span style="font-size:11px;color:#6366f1;font-weight:500;">When will you return home temporarily (1 month or more) for Technical Intern Training (iii)?</span></label>';
+    h += '<select id="f-jsTrPlan" onchange="toggleJisshuTr(this.value)">';
+    h += '<option value="">---</option>';
+    h += '<option value="3号が始まる前に帰る">3号が始まる前に帰る / Before (iii) starts</option>';
+    h += '<option value="3号が始まってから1年以内に帰る">3号が始まってから1年以内に帰る / Within 1 year after (iii) starts</option>';
+    h += '<option value="もう帰った">もう帰った / Already returned</option>';
+    h += '<option value="未定">未定 / Undecided</option>';
+    h += '</select></div>';
+    h += '<div id="jsTrDateWrap" style="display:none;"><div class="grid2">';
+    h += field('f-jsTrFrom', '日本を出る日（予定）/ Leaving Japan', 'date', false, '', '');
+    h += field('f-jsTrTo', '日本に戻る日（予定）/ Coming back to Japan', 'date', false, '', '');
+    h += '</div></div>';
+  }
+  if (t === 'jisshu3_koushin') {
+    h += '<div class="field"><label>3号のための一時帰国（1か月以上）はしましたか？（いちじきこく）<span class="req">*</span><br><span style="font-size:11px;color:#6366f1;font-weight:500;">Have you returned home temporarily (1 month or more) for Technical Intern Training (iii)?</span></label>';
+    h += '<select id="f-jsTrDone" onchange="toggleJisshuTrDone(this.value)">';
+    h += '<option value="">---</option>';
+    h += '<option value="した">した / Yes</option>';
+    h += '<option value="まだ">まだ / Not yet</option>';
+    h += '</select></div>';
+    h += '<div id="jsTrDoneWrap" style="display:none;"><div class="grid2">';
+    h += field('f-jsTrFrom', '日本を出た日 / Date you left Japan', 'date', true, '', '');
+    h += field('f-jsTrTo', '日本に戻った日 / Date you came back to Japan', 'date', true, '', '');
+    h += '</div></div>';
+    h += '<div id="jsTrYetWrap" style="display:none;"><div class="grid2">';
+    h += field('f-jsTrPlanFrom', '日本を出る予定の日 / Planned date to leave Japan', 'date', false, '', '');
+    h += field('f-jsTrPlanTo', '日本に戻る予定の日 / Planned date to come back', 'date', false, '', '');
+    h += '</div></div>';
+  }
+  if (!/^jisshu[13]_nintei$/.test(t)) {
+    h += '<div class="field"><label>前の申請から変わったことはありますか？（まえのしんせいから かわったこと）<span class="req">*</span><br><span style="font-size:11px;color:#6366f1;font-weight:500;">Has anything changed since your last application? (name, workplace, etc.)</span></label>';
+    h += '<select id="f-jsChanged" onchange="toggleJisshuChanged(this.value)">';
+    h += '<option value="">---</option>';
+    h += '<option value="ない">ない / No</option>';
+    h += '<option value="ある">ある / Yes</option>';
+    h += '</select></div>';
+    h += '<div id="jsChangedWrap" style="display:none;">';
+    h += field('f-jsChangedNote', '変わったこと（かわったこと）/ What changed', 'textarea', true, '例: 働く場所が○○工場に変わった / My workplace changed to ○○ factory', '');
+    h += '</div>';
+  }
+  h += '</div>';
+  return h;
+}
+function toggleJisshuTr(v) {
+  var el = document.getElementById('jsTrDateWrap');
+  if (el) el.style.display = (v && v !== '未定') ? 'block' : 'none';
+}
+function toggleJisshuTrDone(v) {
+  var a = document.getElementById('jsTrDoneWrap'), b = document.getElementById('jsTrYetWrap');
+  if (a) a.style.display = (v === 'した') ? 'block' : 'none';
+  if (b) b.style.display = (v === 'まだ') ? 'block' : 'none';
+}
+function toggleJisshuChanged(v) {
+  var el = document.getElementById('jsChangedWrap');
+  if (el) el.style.display = (v === 'ある') ? 'block' : 'none';
+}
+
 // ===== フォームHTML生成 =====
 function buildForm(t) {
   switch(t) {
@@ -1370,6 +1527,16 @@ function buildForm(t) {
     case 'gijinkoku_koushin':
     case 'gijinkoku_henkou':
       return blockBasic() + blockMarried() + blockCurStayPeriod() + blockEducation() + blockGijinkokuExtra() + blockContact(false, true);
+    case 'jisshu1_nintei':
+    case 'jisshu3_nintei':
+      // ver.20261102.03: 特定技能1号・認定がベース。削除＝技能試験・日本語試験／追加＝本人のこと（性別・本国住所・携帯・犯罪歴）・技能実習について（入国予定・査証申請地・空港・職業・同伴者・退去強制歴）・職歴
+      return blockBasic() + blockJisshuPersonal(t) + blockMarried() + blockTokuteiNintei() + blockJisshuExtra(t) + blockJisshuWork() + blockContact(false, false);
+    case 'jisshu2_henkou':
+    case 'jisshu2_koushin':
+    case 'jisshu3_henkou':
+    case 'jisshu3_koushin':
+      // ver.20261102.03: 特定技能1号・変更/更新がベース。削除＝特定技能で初めて来日した日・技能試験・日本語試験／追加＝本人のこと・技能実習について（基礎級/随時3級の合格日・3号の一時帰国・前回からの変更）・職歴
+      return blockBasic() + blockJisshuPersonal(t) + blockMarried() + blockCurStayPeriod() + blockJisshuExtra(t) + blockJisshuWork() + blockContact(false, true);
     case 'kazoku_nintei':
     case 'kazoku_henkou':
     case 'kazoku_koushin':
@@ -6140,7 +6307,7 @@ function collectData() {
   }
 
   // 特定技能：在留カード・住所・一時帰国（あり/なし＋条件付き入力）
-  if (isTokutei) {
+  if (isTokuteiBase) {
     var rcStatus = val('f-residenceCardStatus');
     d.residenceCardStatus = rcStatus;
     d.residenceCard = (rcStatus === 'あり') ? val('f-residenceCard') : 'なし';
@@ -6177,7 +6344,7 @@ function collectData() {
     }
   }
 
-  if (t === 'tokutei_nintei' || t === 'gijinkoku_nintei') {
+  if (t === 'tokutei_nintei' || t === 'gijinkoku_nintei' || /^jisshu[13]_nintei$/.test(t)) {
     d.entryCount = val('f-entryCount');
     d.coeCount   = val('f-coeCount');
     d.coeDenied  = val('f-coeDenied');
@@ -6215,8 +6382,56 @@ function collectData() {
     }
   }
 
-  // 技能証明・日本語証明は特定技能のみ（技人国は不要）
-  if (t !== 'company' && !isGijinkoku) {
+  // ver.20261102.01: 技能実習の項目
+  if (isJisshu) {
+    d.jisshuType = t;
+    // ver.20261102.02: 人材情報（persons）と同じ項目名で送る＝アンシスがそのまま取り込む
+    var _g = val('f-jsGender'); d.gender = _g ? _g.split(' ')[0] : '';   // 男／女
+    d.homeCountryAddress = val('f-jsHomeAddress');
+    d.celPhone = val('f-jsCelPhone');
+    d.crimeRecord = val('f-jsCrime');
+    if (d.crimeRecord === '有') d.crimeDetail = val('f-jsCrimeDetail');
+    var _ws = val('f-jsWorkStatus'); d.workHistoryStatus = _ws ? (_ws.indexOf('ある') === 0 ? '有' : '無') : '';
+    d.workHistory = (d.workHistoryStatus === '有') ? _jsWorkList() : [];
+    if (/^jisshu[13]_nintei$/.test(t)) {
+      d.entryDate = val('f-jsEntryPlan');          // 入国予定年月日
+      d.visaPlace = val('f-jsVisaPlace');          // 査証申請予定地
+      d.arrivalPort = val('f-jsPort');             // 上陸予定港
+      d.occupation = val('f-jsOccupation');        // 職業（本国）
+      var _cp = val('f-jsCompanion'); d.companion = _cp ? _cp.split(' ')[0] : '';
+      d.deportation = val('f-jsDeport');           // 退去強制・出国命令による出国 有／無
+      if (d.deportation === '有') { d.deportationCount = val('f-jsDeportCount'); d.deportationDate = val('f-jsDeportDate'); }
+      d.pastEntry = (Number(val('f-entryCount')) > 0) ? '有' : '無';
+      d.pastCOE = (Number(val('f-coeCount')) > 0) ? '有' : '無';
+    }
+    if (t === 'jisshu2_henkou') d.jisshuKisokyuDate = val('f-jsKisoDate');
+    if (t === 'jisshu3_nintei') d.jisshu3kyuDate = val('f-js3kyuDate');
+    if (t === 'jisshu3_henkou') {
+      d.jisshu3kyuDate = val('f-js3kyuDate');
+      d.jisshuTempReturnPlan = val('f-jsTrPlan');
+      if (d.jisshuTempReturnPlan && d.jisshuTempReturnPlan !== '未定') {
+        d.jisshuTempReturnFrom = val('f-jsTrFrom');
+        d.jisshuTempReturnTo = val('f-jsTrTo');
+      }
+    }
+    if (t === 'jisshu3_koushin') {
+      d.jisshuTempReturnDone = val('f-jsTrDone');
+      if (d.jisshuTempReturnDone === 'した') {
+        d.jisshuTempReturnFrom = val('f-jsTrFrom');
+        d.jisshuTempReturnTo = val('f-jsTrTo');
+      } else if (d.jisshuTempReturnDone === 'まだ') {
+        d.jisshuTempReturnFrom = val('f-jsTrPlanFrom');
+        d.jisshuTempReturnTo = val('f-jsTrPlanTo');
+      }
+    }
+    if (!/^jisshu[13]_nintei$/.test(t)) {
+      d.jisshuChanged = val('f-jsChanged');
+      if (d.jisshuChanged === 'ある') d.jisshuChangedNote = val('f-jsChangedNote');
+    }
+  }
+
+  // 技能証明・日本語証明は特定技能のみ（技人国・技能実習は不要）
+  if (t !== 'company' && !isGijinkoku && !isJisshu) {
     d.skillEvalType  = val('f-skillEvalType');
     d.skillExam1     = val('f-skillExam1');
     d.skillExamLoc1  = val('f-skillExamLoc1');
@@ -6698,11 +6913,53 @@ function _validateInner() {
     if (!val('f-curStayAppChecked')) return '在留カードの表面またはアプリで在留期間を確認したかどうか（はい／いいえ）を選んでください。';
     if (val('f-curStayAppChecked') === 'いいえ') return '在留カードの表面またはアプリで在留期間をご確認のうえ「はい」を選んでください。';
   }
-  if ((type==='tokutei_nintei' || type==='gijinkoku_nintei') && !val('f-entryCount')) return '来日回数を入力してください。';
-  if ((type==='tokutei_nintei' || type==='gijinkoku_nintei') && !val('f-coeCount')) return 'COE申請回数を入力してください。';
+  if ((type==='tokutei_nintei' || type==='gijinkoku_nintei' || /^jisshu[13]_nintei$/.test(type)) && !val('f-entryCount')) return '来日回数を入力してください。';
+  if ((type==='tokutei_nintei' || type==='gijinkoku_nintei' || /^jisshu[13]_nintei$/.test(type)) && !val('f-coeCount')) return 'COE申請回数を入力してください。';
+
+  // ver.20261102.01: 技能実習の必須チェック
+  if (isJisshu) {
+    if (!val('f-birthPlace')) return '出生地を入力してください。';
+    if (!val('f-passport')) return 'パスポート番号を入力してください。';
+    if (!val('f-passExpiry')) return 'パスポートの有効期限を入力してください。';
+    if (!val('f-jsGender')) return '性別を選択してください。';
+    if (!val('f-jsHomeAddress')) return '本国の住所を入力してください。';
+    if (!/^jisshu[13]_nintei$/.test(type) && !val('f-jsCelPhone')) return '携帯電話番号を入力してください。';
+    if (!val('f-jsCrime')) return '犯罪で処分を受けたことがあるかどうかを選択してください。';
+    if (val('f-jsCrime') === '有' && !val('f-jsCrimeDetail')) return '処分の内容を入力してください。';
+    if (!val('f-jsWorkStatus')) return '職歴があるかどうかを選択してください。';
+    if (val('f-jsWorkStatus').indexOf('ある') === 0) {
+      for (var _wi = 1; _wi <= _jsWorkCount; _wi++) {
+        if (!val('f-jsWork' + _wi + 'Name')) return '職歴' + _wi + 'の会社の名前を入力してください。';
+        if (!val('f-jsWork' + _wi + 'From')) return '職歴' + _wi + 'の入社した年月を入力してください。';
+      }
+    }
+    if (/^jisshu[13]_nintei$/.test(type)) {
+      if (!val('f-jsVisaPlace')) return 'ビザを申請する日本大使館・領事館を入力してください。';
+      if (!val('f-jsPort')) return '日本に着く予定の空港を選択してください。';
+      if (!val('f-jsOccupation')) return '今の仕事を入力してください（していない場合は「なし」）。';
+      if (!val('f-jsCompanion')) return '一緒に日本に来る家族がいるかどうかを選択してください。';
+      if (!val('f-jsDeport')) return '強制送還・出国命令で出国したことがあるかどうかを選択してください。';
+      if (val('f-jsDeport') === '有' && (!val('f-jsDeportCount') || !val('f-jsDeportDate'))) return '強制送還・出国命令の回数と最後に出国した日を入力してください。';
+    }
+    if (type === 'jisshu3_nintei' && !val('f-js3kyuDate')) return '技能検定 随時3級（実技）に合格した日を入力してください。';
+    if (type === 'jisshu2_henkou' && !val('f-jsKisoDate')) return '技能検定 基礎級に合格した日を入力してください。';
+    if (type === 'jisshu3_henkou') {
+      if (!val('f-js3kyuDate')) return '技能検定 随時3級（実技）に合格した日を入力してください。';
+      if (!val('f-jsTrPlan')) return '3号のための一時帰国の時期を選んでください。';
+      if (val('f-jsTrPlan') === 'もう帰った' && (!val('f-jsTrFrom') || !val('f-jsTrTo'))) return '一時帰国で日本を出た日・戻った日を入力してください。';
+    }
+    if (type === 'jisshu3_koushin') {
+      if (!val('f-jsTrDone')) return '3号のための一時帰国をしたかどうかを選んでください。';
+      if (val('f-jsTrDone') === 'した' && (!val('f-jsTrFrom') || !val('f-jsTrTo'))) return '一時帰国で日本を出た日・戻った日を入力してください。';
+    }
+    if (!/^jisshu[13]_nintei$/.test(type)) {
+      if (!val('f-jsChanged')) return '前の申請から変わったことがあるかどうかを選んでください。';
+      if (val('f-jsChanged') === 'ある' && !val('f-jsChangedNote')) return '変わったことを入力してください。';
+    }
+  }
 
   // 特定技能：在留カード・現住所・一時帰国の必須チェック（認定は日本国外のため対象外）
-  if (isTokutei && type !== 'tokutei_nintei') {
+  if (isTokuteiBase && !_isNinteiType) {
     var rcStatus = val('f-residenceCardStatus');
     if (!rcStatus) return '在留カードの有無を選択してください。';
     if (rcStatus === 'あり' && !val('f-residenceCard')) return '在留カード番号を入力してください。';
@@ -6741,8 +6998,8 @@ function _validateInner() {
       if (!yy && !mm) return '実務経験の年数または月数を入力してください。';
       if (!val('f-gijinkokuWorkHistory')) return '職歴（会社名・期間・仕事の内容）を入力してください。';
     }
-  } else {
-    // 特定技能：従来通りの技能水準・日本語能力のチェック
+  } else if (!isJisshu) {
+    // 特定技能：従来通りの技能水準・日本語能力のチェック（ver.20261102.01: 技能実習は対象外）
     var sk = val('f-skillEvalType');
     if (!sk) return '技能水準 評価区分を選択してください。';
     if (sk === SKILL_EVAL_TYPES[0]) {
@@ -7115,6 +7372,12 @@ var TYPE_LABELS = {
   gijinkoku_nintei: { cat:'技人国', kind:'認定', catClass:'badge-gijinkoku', kindClass:'badge-nintei' },
   gijinkoku_koushin:{ cat:'技人国', kind:'更新', catClass:'badge-gijinkoku', kindClass:'badge-koushin' },
   gijinkoku_henkou: { cat:'技人国', kind:'変更', catClass:'badge-gijinkoku', kindClass:'badge-koushin' },
+  jisshu1_nintei:   { cat:'技能実習1号', kind:'認定', catClass:'badge-jisshu', kindClass:'badge-nintei' },
+  jisshu3_nintei:   { cat:'技能実習3号', kind:'認定', catClass:'badge-jisshu', kindClass:'badge-nintei' },
+  jisshu2_henkou:   { cat:'技能実習2号', kind:'変更', catClass:'badge-jisshu', kindClass:'badge-koushin' },
+  jisshu2_koushin:  { cat:'技能実習2号', kind:'更新', catClass:'badge-jisshu', kindClass:'badge-koushin' },
+  jisshu3_henkou:   { cat:'技能実習3号', kind:'変更', catClass:'badge-jisshu', kindClass:'badge-koushin' },
+  jisshu3_koushin:  { cat:'技能実習3号', kind:'更新', catClass:'badge-jisshu', kindClass:'badge-koushin' },
   kazoku_nintei:    { cat:'家族滞在', kind:'認定', catClass:'badge-tokutei', kindClass:'badge-nintei' },
   kazoku_henkou:    { cat:'家族滞在', kind:'変更', catClass:'badge-tokutei', kindClass:'badge-koushin' },
   kazoku_koushin:   { cat:'家族滞在', kind:'更新', catClass:'badge-tokutei', kindClass:'badge-koushin' },
@@ -7354,8 +7617,38 @@ function _familyRestore(resp) {
   _familyTrans();
   _famReqUpdate();
 }
+// ver.20261102.02: 技能実習の項目を途中保存・修正リンクから戻す
+function _jisshuPrefill(resp) {
+  if (!isJisshu || !resp) return;
+  var set = function(id, v){ var e = document.getElementById(id); if (e && v != null && v !== '') e.value = v; };
+  var setSel = function(id, v){ var e = document.getElementById(id); if (!e || v == null || v === '') return; for (var i = 0; i < e.options.length; i++) { if (e.options[i].value === v || e.options[i].value.split(' ')[0] === v) { e.value = e.options[i].value; return; } } };
+  setSel('f-jsGender', resp.gender);
+  set('f-jsHomeAddress', resp.homeCountryAddress);
+  set('f-jsCelPhone', resp.celPhone);
+  setSel('f-jsCrime', resp.crimeRecord); toggleJisshuCrime(resp.crimeRecord); set('f-jsCrimeDetail', resp.crimeDetail);
+  set('f-jsEntryPlan', resp.entryDate); set('f-jsVisaPlace', resp.visaPlace); setSel('f-jsPort', resp.arrivalPort);
+  set('f-jsOccupation', resp.occupation); setSel('f-jsCompanion', resp.companion);
+  setSel('f-jsDeport', resp.deportation); toggleJisshuDeport(resp.deportation); set('f-jsDeportCount', resp.deportationCount); set('f-jsDeportDate', resp.deportationDate);
+  set('f-jsKisoDate', resp.jisshuKisokyuDate); set('f-js3kyuDate', resp.jisshu3kyuDate);
+  setSel('f-jsTrPlan', resp.jisshuTempReturnPlan); toggleJisshuTr(resp.jisshuTempReturnPlan || '');
+  setSel('f-jsTrDone', resp.jisshuTempReturnDone); toggleJisshuTrDone(resp.jisshuTempReturnDone || '');
+  if (resp.jisshuTempReturnDone === 'まだ') { set('f-jsTrPlanFrom', resp.jisshuTempReturnFrom); set('f-jsTrPlanTo', resp.jisshuTempReturnTo); }
+  else { set('f-jsTrFrom', resp.jisshuTempReturnFrom); set('f-jsTrTo', resp.jisshuTempReturnTo); }
+  setSel('f-jsChanged', resp.jisshuChanged); toggleJisshuChanged(resp.jisshuChanged || ''); set('f-jsChangedNote', resp.jisshuChangedNote);
+  if (resp.workHistoryStatus) {
+    var ws = document.getElementById('f-jsWorkStatus');
+    if (ws) { ws.value = (resp.workHistoryStatus === '有') ? 'ある / Yes' : 'ない / No'; var w = document.getElementById('jsWorkWrap'); if (w) w.style.display = (resp.workHistoryStatus === '有') ? 'block' : 'none'; }
+  }
+  var list = resp.workHistory;
+  if (typeof list === 'string') { try { list = JSON.parse(list); } catch(_){ list = []; } }
+  if (Array.isArray(list)) {
+    while (_jsWorkCount < Math.min(list.length, 10)) addJisshuWork();
+    list.slice(0, 10).forEach(function(r, i){ set('f-jsWork' + (i+1) + 'Name', r.name); set('f-jsWork' + (i+1) + 'From', r.from); set('f-jsWork' + (i+1) + 'To', r.to); });
+  }
+}
 function prefillForm(resp) {
   if (type === 'support_org') { _soFormPrefill(resp); return; }
+  try { _jisshuPrefill(resp); } catch (_jpe) { console.error('jisshu prefill error (ignored):', _jpe); }
   try { _familyRestore(resp); } catch (_fre) { console.error('family prefill error (ignored):', _fre); }
   // ver.20261014.04: 企業フォームの町名番地（address）は f-coAddress に入れる／役員が4人以上なら欄を足してから入れる
   try {
@@ -7427,7 +7720,7 @@ function prefillForm(resp) {
   }
 
   // 特定技能の場合、residenceCard="なし" はステータスを「なし」として扱う
-  if (isTokutei) {
+  if (isTokuteiBase) {
     if (resp.residenceCard === 'なし' && !resp.residenceCardStatus) resp.residenceCardStatus = 'なし';
     else if (resp.residenceCard && resp.residenceCard !== 'なし' && !resp.residenceCardStatus) resp.residenceCardStatus = 'あり';
 
