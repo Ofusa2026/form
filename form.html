@@ -193,7 +193,8 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20261102.08'; // 技能実習の申請人フォームをブラッシュアップ：①質問・案内・選択肢を各言語（英・越・尼・緬・クメール・ネパール・中）に ②入力チェックのメッセージも各言語に ③3号の変更・更新で共通の「一時帰国予定」に「3号のための一時帰国とは別」と補足 ④3号認定で「2号を終えて日本を出た日」を聞く ⑤国籍「その他」の英語表記（Philippines など）でも結核・ミャンマーの判定 ⑥年月の入力欄が使えないブラウザでは「2018-04」の文字入力に
+var FORM_VERSION = 'ver.20261102.09'; // 技能実習の所属機関フォーム：会社から答えにくい項目を任意に（監理団体の欄は名称以外・届出受理年月日・月額給与）。冒頭に「監理団体の方が代わりに記入しても構いません」
+// var FORM_VERSION = 'ver.20261102.08'; // 技能実習の申請人フォームをブラッシュアップ：①質問・案内・選択肢を各言語（英・越・尼・緬・クメール・ネパール・中）に ②入力チェックのメッセージも各言語に ③3号の変更・更新で共通の「一時帰国予定」に「3号のための一時帰国とは別」と補足 ④3号認定で「2号を終えて日本を出た日」を聞く ⑤国籍「その他」の英語表記（Philippines など）でも結核・ミャンマーの判定 ⑥年月の入力欄が使えないブラウザでは「2018-04」の文字入力に
 // var FORM_VERSION = 'ver.20261102.07'; // 技能実習：国籍で出し分け。認定（1号・3号）で入国前結核スクリーニングの対象国（フィリピン・ネパール・ベトナム、インドネシアは2027/1/4以降の申請から）なら結核非発病証明書の案内と取得状況を聞く。3号更新でミャンマー・一時帰国まだなら説明書（参考様式）の案内と理由を聞く
 // var FORM_VERSION = 'ver.20261102.06'; // 技能実習の所属機関（実習実施者）ヒアリングを追加（type=company_jisshu）。特定技能1号の企業フォームの企業基本情報・所在地・代表者を同じ項目名で使い、実習実施者の届出・監理団体（団体監理型のみ）・職種と月額給与を追加。雇用条件書・相談窓口・支援計画などの特定技能の書類用の項目は出さない
 // var FORM_VERSION = 'ver.20261102.05'; // 技能実習：出生地・パスポート番号・パスポート有効期限を必須に（入管オンラインシステムで必須の項目）
@@ -1622,7 +1623,7 @@ function buildCompanyJisshuForm() {
   return (
   '<div class="info-box" style="background:#fffbeb;color:#92400e;border-color:#fcd34d;">' +
     '<span class="case-name">技能実習</span>' +
-    'このフォームは、技能実習の在留資格の申請（認定・変更・更新）にあたり、実習実施者（受入れ企業）と監理団体の情報をお伺いするものです。技能実習計画の認定申請書と同じ内容でご記入ください。' +
+    'このフォームは、技能実習の在留資格の申請（認定・変更・更新）にあたり、実習実施者（受入れ企業）と監理団体の情報をお伺いするものです。技能実習計画の認定申請書と同じ内容でご記入ください。<br><b>監理団体の方が代わりにご記入いただいても構いません。</b>' +
   '</div>' +
 
   '<div class="card"><div class="section-title">企業基本情報（実習実施者）</div>' +
@@ -1645,9 +1646,9 @@ function buildCompanyJisshuForm() {
     field('f-coAnnualSales','年間売上金額（円・直近年度）','number',true,'例: 500000000') +
     '<div class="grid2">' +
       field('f-jcNotifNo','実習実施者届出受理番号','text',true,'例: 1234567') +
-      field('f-jcNotifDate','実習実施者届出受理年月日','date',true,'') +
+      field('f-jcNotifDate','実習実施者届出受理年月日','date',false,'') +
     '</div>' +
-    '<div style="font-size:11px;color:#9ca3af;margin-top:-4px;">※ 外国人技能実習機構から届いた「実習実施者届出受理書」に書かれています</div>' +
+    '<div style="font-size:11px;color:#9ca3af;margin-top:-4px;">※ 外国人技能実習機構から届いた「実習実施者届出受理書」に書かれています。受理年月日がわからない場合は空欄で構いません</div>' +
   '</div>' +
 
   '<div class="card"><div class="section-title">所在地</div>' +
@@ -1681,35 +1682,36 @@ function buildCompanyJisshuForm() {
         '<option value="企業単独型">企業単独型（海外の支店・取引先などから受け入れ）＝イ</option>' +
       '</select></div>' +
     field('f-jcJobType','職種・作業（主なもの）','text',true,'例: 惣菜製造業・惣菜加工作業') +
-    field('f-jcSalary','月額給与（税引前の支払額・円）','number',true,'例: 180000') +
-    '<div style="font-size:11px;color:#9ca3af;margin-top:-4px;">※ 技能実習計画に書いた月額の報酬です。申請人によって違う場合は、いちばん多い金額を書き、下の備考に詳しく書いてください</div>' +
+    field('f-jcSalary','月額給与（税引前の支払額・円）','number',false,'例: 180000') +
+    '<div style="font-size:11px;color:#9ca3af;margin-top:-4px;">※ 技能実習計画（認定申請書）のとおりなら空欄で構いません。申請人によって違う場合は、下の備考に書いてください</div>' +
   '</div>' +
 
   '<div class="card" id="jcKanriCard" style="display:none;"><div class="section-title">監理団体</div>' +
+    '<div style="font-size:11.5px;color:#0f766e;background:#f0fdfa;border:1px solid #99f6e4;border-radius:8px;padding:8px 10px;margin-bottom:10px;line-height:1.6;">名称以外は、わからなければ空欄で構いません（監理団体に確認します）。監理団体許可証の写しがあれば、それを見てご記入ください。</div>' +
     field('f-kanriName','監理団体の名称','text',true,'例: 〇〇事業協同組合') +
     '<div class="grid2">' +
-      field('f-kanriCorpNo','法人番号（13桁）','text',true,'例: 1234567890123') +
+      field('f-kanriCorpNo','法人番号（13桁）','text',false,'例: 1234567890123') +
       field('f-kanriEmpInsNo','雇用保険適用事業所番号（11桁）','text',false,'例: 1234-567890-1') +
     '</div>' +
-    field('f-kanriOrgType','団体の区分','select',true,'',null,_JC_KANRI_TYPES) +
-    field('f-kanriIndustry','業種（主たる業種）','text',true,'例: 協同組合') +
+    field('f-kanriOrgType','団体の区分','select',false,'',null,_JC_KANRI_TYPES) +
+    field('f-kanriIndustry','業種（主たる業種）','text',false,'例: 協同組合') +
     '<div class="grid2">' +
-      field('f-kanriPref','都道府県','text',true,'例: 東京都') +
-      field('f-kanriCity','市区町村','text',true,'例: 千代田区') +
+      field('f-kanriPref','都道府県','text',false,'例: 東京都') +
+      field('f-kanriCity','市区町村','text',false,'例: 千代田区') +
     '</div>' +
-    field('f-kanriAddress','町名番地','text',true,'例: 丸の内1丁目1番1号') +
+    field('f-kanriAddress','町名番地','text',false,'例: 丸の内1丁目1番1号') +
     '<div class="grid2">' +
-      field('f-kanriTel','電話番号','text',true,'例: 03-1234-5678') +
-      field('f-kanriEmployees','常勤職員数','number',true,'例: 10') +
+      field('f-kanriTel','電話番号','text',false,'例: 03-1234-5678') +
+      field('f-kanriEmployees','常勤職員数','number',false,'例: 10') +
     '</div>' +
-    field('f-kanriPermitType','監理団体許可の事業区分','select',true,'',null,['','一般監理事業','特定監理事業']) +
+    field('f-kanriPermitType','監理団体許可の事業区分','select',false,'',null,['','一般監理事業','特定監理事業']) +
     '<div class="grid2">' +
-      field('f-kanriPermitNo','監理団体許可番号','text',true,'例: 許1234567890') +
-      field('f-kanriPermitDate','許可年月日','date',true,'') +
+      field('f-kanriPermitNo','監理団体許可番号','text',false,'例: 許1234567890') +
+      field('f-kanriPermitDate','許可年月日','date',false,'') +
     '</div>' +
     '<div class="grid2">' +
-      field('f-kanriPermitFrom','許可の有効期間（はじめ）','date',true,'') +
-      field('f-kanriPermitTo','許可の有効期間（おわり）','date',true,'') +
+      field('f-kanriPermitFrom','許可の有効期間（はじめ）','date',false,'') +
+      field('f-kanriPermitTo','許可の有効期間（おわり）','date',false,'') +
     '</div>' +
     '<div style="font-size:11px;color:#9ca3af;margin-top:-4px;">※ 監理団体許可証に書かれています</div>' +
   '</div>' +
