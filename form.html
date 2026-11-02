@@ -193,7 +193,8 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20261102.06'; // 技能実習の所属機関（実習実施者）ヒアリングを追加（type=company_jisshu）。特定技能1号の企業フォームの企業基本情報・所在地・代表者を同じ項目名で使い、実習実施者の届出・監理団体（団体監理型のみ）・職種と月額給与を追加。雇用条件書・相談窓口・支援計画などの特定技能の書類用の項目は出さない
+var FORM_VERSION = 'ver.20261102.07'; // 技能実習：国籍で出し分け。認定（1号・3号）で入国前結核スクリーニングの対象国（フィリピン・ネパール・ベトナム、インドネシアは2027/1/4以降の申請から）なら結核非発病証明書の案内と取得状況を聞く。3号更新でミャンマー・一時帰国まだなら説明書（参考様式）の案内と理由を聞く
+// var FORM_VERSION = 'ver.20261102.06'; // 技能実習の所属機関（実習実施者）ヒアリングを追加（type=company_jisshu）。特定技能1号の企業フォームの企業基本情報・所在地・代表者を同じ項目名で使い、実習実施者の届出・監理団体（団体監理型のみ）・職種と月額給与を追加。雇用条件書・相談窓口・支援計画などの特定技能の書類用の項目は出さない
 // var FORM_VERSION = 'ver.20261102.05'; // 技能実習：出生地・パスポート番号・パスポート有効期限を必須に（入管オンラインシステムで必須の項目）
 // var FORM_VERSION = 'ver.20261102.04'; // 技能実習3号の認定（type=jisshu3_nintei）を追加：2号修了後に帰国し3号で再入国する人向け。1号認定と同じ質問＋随時3級（実技）の合格日
 // var FORM_VERSION = 'ver.20261102.03'; // 技能実習を特定技能1号のフォームをベースに：在留カード・日本の住所・一時帰国を特定技能1号と同じ「あり／なし」形式に（認定は出さない）。特定技能だけの質問（技能・日本語の試験、特定技能で初めて来日した日）は出さない
@@ -1427,6 +1428,34 @@ function _jsWorkList() {
   return out;
 }
 
+// ===== 技能実習：国籍による出し分け（ver.20261102.07） =====
+// 入国前結核スクリーニング（JPETS）の対象国。認定（COE）申請のときに結核非発病証明書が必要
+//   今：フィリピン・ネパール・ベトナム／インドネシアは 2027-01-04 以降の申請から（ミャンマー・中国は今後追加予定・日付未定）
+var _JS_TB_NOW = ['フィリピン','ネパール','ベトナム'];
+var _JS_TB_LATER = { 'インドネシア':'2027-01-04' };
+function _jsNat() { var v = val('f-nationality'); if (v === 'その他') v = val('f-nationalityOther'); return String(v||'').trim(); }
+function _jsTbNeed() {
+  if (!/^jisshu[13]_nintei$/.test(type||'')) return '';
+  var n = _jsNat();
+  if (_JS_TB_NOW.indexOf(n) >= 0) return 'now';
+  if (_JS_TB_LATER[n]) return 'later';
+  return '';
+}
+function _jsMmNeed() { return type === 'jisshu3_koushin' && _jsNat() === 'ミャンマー' && val('f-jsTrDone') === 'まだ'; }
+function _jsNatRefresh() {
+  try {
+    var tb = _jsTbNeed(), w = document.getElementById('jsTbWrap'), msg = document.getElementById('jsTbMsg');
+    if (w) w.style.display = tb ? 'block' : 'none';
+    if (msg) msg.innerHTML = (tb === 'later')
+      ? 'インドネシアの方は、<b>2027年1月4日以降</b>に在留資格認定証明書を申請する場合、日本の指定する健診医療機関で受けた<b>結核非発病証明書</b>が必要です。<br>For Indonesian nationals, a Tuberculosis-free certificate from a designated clinic is required for COE applications from January 4, 2027.'
+      : '日本の指定する健診医療機関で受けた<b>結核非発病証明書</b>が必要です。取得したら、書類アップロードから写真を送ってください。<br>A Tuberculosis-free certificate from a clinic designated by Japan is required. Please upload a photo once you have it.';
+    var m = document.getElementById('jsMmWrap'); if (m) m.style.display = _jsMmNeed() ? 'block' : 'none';
+  } catch (e) {}
+}
+document.addEventListener('change', function(e){ try { if (isJisshu && e.target && (e.target.id === 'f-nationality' || e.target.id === 'f-nationalityOther' || e.target.id === 'f-jsTrDone')) _jsNatRefresh(); } catch(_){} });
+document.addEventListener('input', function(e){ try { if (isJisshu && e.target && e.target.id === 'f-nationalityOther') _jsNatRefresh(); } catch(_){} });
+if (isJisshu) { setTimeout(_jsNatRefresh, 800); setTimeout(_jsNatRefresh, 2500); }   // 案シスから国籍が入っている場合
+
 // ===== 技能実習専用ブロック（ver.20261102.01） =====
 // 計画・会社・監理団体の情報は認定申請書の写しから取るので、申請人には「認定申請書に載っていないこと」だけを聞く
 function blockJisshuExtra(t) {
@@ -1445,6 +1474,12 @@ function blockJisshuExtra(t) {
     h += field('f-jsDeportCount', '回数（かいすう）/ Number of times', 'number', true, '例: 1', '');
     h += field('f-jsDeportDate', '最後に出国した日 / Date of the latest departure', 'date', true, '', '');
     h += '</div></div>';
+    // ver.20261102.07: 入国前結核スクリーニングの対象国だけ
+    h += '<div id="jsTbWrap" style="display:none;">';
+    h += '<div id="jsTbMsg" style="font-size:12.5px;color:#92400e;background:#fffbeb;border:1px solid #fcd34d;border-radius:8px;padding:10px 12px;margin:4px 0 10px;line-height:1.7;"></div>';
+    h += field('f-jsTbStatus', '結核非発病証明書はありますか？（けっかく ひはつびょう しょうめいしょ）/ Do you have a Tuberculosis-free certificate?', 'select', true, '', '',
+      ['','ある（取得済み）/ Yes','健診の予約をした / Appointment made','まだ / Not yet']);
+    h += '</div>';
   }
   if (t === 'jisshu3_nintei') {
     h += field('f-js3kyuDate', '技能検定 随時3級（実技）に合格した日（ごうかくしたひ）/ Date you passed the Grade 3 practical skill test', 'date', true, '', '');
@@ -1485,6 +1520,12 @@ function blockJisshuExtra(t) {
     h += field('f-jsTrPlanFrom', '日本を出る予定の日 / Planned date to leave Japan', 'date', false, '', '');
     h += field('f-jsTrPlanTo', '日本に戻る予定の日 / Planned date to come back', 'date', false, '', '');
     h += '</div></div>';
+    // ver.20261102.07: ミャンマーで3号の一時帰国をしていない場合（情勢不安）は説明書（参考様式）が必要
+    h += '<div id="jsMmWrap" style="display:none;">';
+    h += '<div style="font-size:12.5px;color:#92400e;background:#fffbeb;border:1px solid #fcd34d;border-radius:8px;padding:10px 12px;margin:4px 0 10px;line-height:1.7;">ミャンマーの情勢不安のため3号の一時帰国をしていない場合、更新の申請に<b>説明書（参考様式）</b>が必要です。会社・監理団体と一緒に準備します。<br>If you have not returned home for (iii) because of the situation in Myanmar, an explanation form is required for the extension.</div>';
+    h += field('f-jsMmReason', '一時帰国をしていない理由（りゆう）/ Reason for not returning home', 'select', true, '', '',
+      ['','ミャンマーの情勢不安のため / Due to the situation in Myanmar','これから帰る予定 / I plan to return','その他 / Other']);
+    h += '</div>';
   }
   if (!/^jisshu[13]_nintei$/.test(t)) {
     h += '<div class="field"><label>前の申請から変わったことはありますか？（まえのしんせいから かわったこと）<span class="req">*</span><br><span style="font-size:11px;color:#6366f1;font-weight:500;">Has anything changed since your last application? (name, workplace, etc.)</span></label>';
@@ -6546,6 +6587,8 @@ function collectData() {
     }
     if (t === 'jisshu2_henkou') d.jisshuKisokyuDate = val('f-jsKisoDate');
     if (t === 'jisshu3_nintei') d.jisshu3kyuDate = val('f-js3kyuDate');
+    var _tb = _jsTbNeed(); if (_tb) { var _ts = val('f-jsTbStatus'); d.tbCertStatus = _ts ? _ts.split(' / ')[0] : ''; d.tbCertNeed = (_tb === 'later') ? '2027-01-04以降の申請から必要' : '必要'; }
+    if (_jsMmNeed()) { var _mr = val('f-jsMmReason'); d.jisshuMmNoReturnReason = _mr ? _mr.split(' / ')[0] : ''; }
     if (t === 'jisshu3_henkou') {
       d.jisshu3kyuDate = val('f-js3kyuDate');
       d.jisshuTempReturnPlan = val('f-jsTrPlan');
@@ -7092,6 +7135,8 @@ function _validateInner() {
       if (!val('f-jsDeport')) return '強制送還・出国命令で出国したことがあるかどうかを選択してください。';
       if (val('f-jsDeport') === '有' && (!val('f-jsDeportCount') || !val('f-jsDeportDate'))) return '強制送還・出国命令の回数と最後に出国した日を入力してください。';
     }
+    if (_jsTbNeed() && !val('f-jsTbStatus')) return '結核非発病証明書があるかどうかを選択してください。';
+    if (_jsMmNeed() && !val('f-jsMmReason')) return '一時帰国をしていない理由を選択してください。';
     if (type === 'jisshu3_nintei' && !val('f-js3kyuDate')) return '技能検定 随時3級（実技）に合格した日を入力してください。';
     if (type === 'jisshu2_henkou' && !val('f-jsKisoDate')) return '技能検定 基礎級に合格した日を入力してください。';
     if (type === 'jisshu3_henkou') {
@@ -7774,7 +7819,7 @@ function _familyRestore(resp) {
 function _jisshuPrefill(resp) {
   if (!isJisshu || !resp) return;
   var set = function(id, v){ var e = document.getElementById(id); if (e && v != null && v !== '') e.value = v; };
-  var setSel = function(id, v){ var e = document.getElementById(id); if (!e || v == null || v === '') return; for (var i = 0; i < e.options.length; i++) { if (e.options[i].value === v || e.options[i].value.split(' ')[0] === v) { e.value = e.options[i].value; return; } } };
+  var setSel = function(id, v){ var e = document.getElementById(id); if (!e || v == null || v === '') return; for (var i = 0; i < e.options.length; i++) { if (e.options[i].value === v || e.options[i].value.split(' ')[0] === v || e.options[i].value.split(' / ')[0] === v) { e.value = e.options[i].value; return; } } };
   setSel('f-jsGender', resp.gender);
   set('f-jsHomeAddress', resp.homeCountryAddress);
   set('f-jsCelPhone', resp.celPhone);
@@ -7782,7 +7827,9 @@ function _jisshuPrefill(resp) {
   set('f-jsEntryPlan', resp.entryDate); set('f-jsVisaPlace', resp.visaPlace); setSel('f-jsPort', resp.arrivalPort);
   set('f-jsOccupation', resp.occupation); setSel('f-jsCompanion', resp.companion);
   setSel('f-jsDeport', resp.deportation); toggleJisshuDeport(resp.deportation); set('f-jsDeportCount', resp.deportationCount); set('f-jsDeportDate', resp.deportationDate);
-  set('f-jsKisoDate', resp.jisshuKisokyuDate); set('f-js3kyuDate', resp.jisshu3kyuDate);
+  set('f-jsKisoDate', resp.jisshuKisokyuDate);
+  setSel('f-jsTbStatus', resp.tbCertStatus); setSel('f-jsMmReason', resp.jisshuMmNoReturnReason);
+  setTimeout(function(){ try { _jsNatRefresh(); setSel('f-jsTbStatus', resp.tbCertStatus); setSel('f-jsMmReason', resp.jisshuMmNoReturnReason); } catch(_){} }, 0); set('f-js3kyuDate', resp.jisshu3kyuDate);
   setSel('f-jsTrPlan', resp.jisshuTempReturnPlan); toggleJisshuTr(resp.jisshuTempReturnPlan || '');
   setSel('f-jsTrDone', resp.jisshuTempReturnDone); toggleJisshuTrDone(resp.jisshuTempReturnDone || '');
   if (resp.jisshuTempReturnDone === 'まだ') { set('f-jsTrPlanFrom', resp.jisshuTempReturnFrom); set('f-jsTrPlanTo', resp.jisshuTempReturnTo); }
