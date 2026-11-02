@@ -193,7 +193,8 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20261102.05'; // 技能実習：出生地・パスポート番号・パスポート有効期限を必須に（入管オンラインシステムで必須の項目）
+var FORM_VERSION = 'ver.20261102.06'; // 技能実習の所属機関（実習実施者）ヒアリングを追加（type=company_jisshu）。特定技能1号の企業フォームの企業基本情報・所在地・代表者を同じ項目名で使い、実習実施者の届出・監理団体（団体監理型のみ）・職種と月額給与を追加。雇用条件書・相談窓口・支援計画などの特定技能の書類用の項目は出さない
+// var FORM_VERSION = 'ver.20261102.05'; // 技能実習：出生地・パスポート番号・パスポート有効期限を必須に（入管オンラインシステムで必須の項目）
 // var FORM_VERSION = 'ver.20261102.04'; // 技能実習3号の認定（type=jisshu3_nintei）を追加：2号修了後に帰国し3号で再入国する人向け。1号認定と同じ質問＋随時3級（実技）の合格日
 // var FORM_VERSION = 'ver.20261102.03'; // 技能実習を特定技能1号のフォームをベースに：在留カード・日本の住所・一時帰国を特定技能1号と同じ「あり／なし」形式に（認定は出さない）。特定技能だけの質問（技能・日本語の試験、特定技能で初めて来日した日）は出さない
 // var FORM_VERSION = 'ver.20261102.02'; // 技能実習：入管オンラインシステムの入力項目に合わせて、性別・本国の住所・携帯電話・犯罪歴・職歴（最大10件）・在留カード番号（変更/更新）・本国での職業・上陸予定港・同伴者・退去強制歴（1号認定）を追加。回答の項目名は人材情報（persons）と同じ名前にしてそのまま取り込めるように
@@ -1513,6 +1514,121 @@ function toggleJisshuChanged(v) {
   if (el) el.style.display = (v === 'ある') ? 'block' : 'none';
 }
 
+// ===== 技能実習 所属機関（実習実施者）ヒアリングフォーム（type=company_jisshu）ver.20261102.06 =====
+//   特定技能1号の企業フォーム（buildCompanyForm）の「企業基本情報・所在地・代表者」を同じIDで使う（アンシスの所属機関情報にそのまま入る）。
+//   入管オンラインシステム（技能実習）の「実習実施者」「監理団体」の入力項目に合わせて追加。
+//   計画の認定番号・期間など申請人ごとの内容は、認定通知書・認定申請書の写し（アップロード）から取る。
+var _JC_KANRI_TYPES = ['','商工会議所','商工会','中小企業団体','職業訓練法人','農業協同組合','漁業協同組合','公益社団法人','公益財団法人','その他'];
+function buildCompanyJisshuForm() {
+  return (
+  '<div class="info-box" style="background:#fffbeb;color:#92400e;border-color:#fcd34d;">' +
+    '<span class="case-name">技能実習</span>' +
+    'このフォームは、技能実習の在留資格の申請（認定・変更・更新）にあたり、実習実施者（受入れ企業）と監理団体の情報をお伺いするものです。技能実習計画の認定申請書と同じ内容でご記入ください。' +
+  '</div>' +
+
+  '<div class="card"><div class="section-title">企業基本情報（実習実施者）</div>' +
+    '<div class="field"><label>会社名<span class="req">*</span></label><input type="text" id="f-coName" placeholder="例: 株式会社〇〇食品" oninput="coNameKanaHelper(this.value)"></div>' +
+    '<div class="field"><label>会社名（ひらがな）<span class="req">*</span></label><input type="text" id="f-coNameKana" placeholder="例: かぶしきかいしゃ〇〇しょくひん"><div id="co-kana-suggestion" style="font-size:11px;color:#6366f1;margin-top:4px;"></div></div>' +
+    '<div class="grid2">' +
+      field('f-coCorpNo','法人番号（13桁）','text',true,'例: 1234567890123') +
+      field('f-coEmpInsNo','雇用保険適用事業所番号（11桁）','text',true,'例: 1234-567890-1') +
+    '</div>' +
+    field('f-jcBusiness','事業内容','text',true,'例: 惣菜の製造・販売') +
+    field('f-jcIndustry','業種（主たる業種）','text',true,'例: 食料品製造業') +
+    '<div class="grid2">' +
+      field('f-coEmployees','常勤職員数','number',true,'例: 25') +
+      field('f-coForeignEmployees','うち外国人職員数','number',true,'例: 3') +
+    '</div>' +
+    '<div class="grid2">' +
+      field('f-coTrainees','技能実習生数','number',true,'例: 2') +
+      field('f-coCapital','資本金（円）','number',true,'例: 10000000') +
+    '</div>' +
+    field('f-coAnnualSales','年間売上金額（円・直近年度）','number',true,'例: 500000000') +
+    '<div class="grid2">' +
+      field('f-jcNotifNo','実習実施者届出受理番号','text',true,'例: 1234567') +
+      field('f-jcNotifDate','実習実施者届出受理年月日','date',true,'') +
+    '</div>' +
+    '<div style="font-size:11px;color:#9ca3af;margin-top:-4px;">※ 外国人技能実習機構から届いた「実習実施者届出受理書」に書かれています</div>' +
+  '</div>' +
+
+  '<div class="card"><div class="section-title">所在地</div>' +
+    '<div class="field"><label>郵便番号<span class="req">*</span></label>' +
+      '<div style="display:flex;gap:8px;align-items:center;">' +
+        '<input type="text" id="f-coZip" placeholder="例: 160-0022" style="flex:1;" oninput="coZipAutoFill(this.value)" inputmode="numeric">' +
+        '<button type="button" onclick="coZipAutoFill(document.getElementById(\'f-coZip\').value, true)" style="white-space:nowrap;padding:10px 14px;background:#3b82f6;color:white;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;">住所検索</button>' +
+      '</div>' +
+      '<div id="co-zip-msg" style="font-size:11px;margin-top:4px;"></div>' +
+    '</div>' +
+    '<div class="grid2">' +
+      field('f-coPref','都道府県','text',true,'例: 東京都') +
+      field('f-coCity','市区町村','text',true,'例: 新宿区') +
+    '</div>' +
+    field('f-coAddress','町名番地','text',true,'例: 新宿2丁目1番1号 〇〇ビル3F') +
+    field('f-coTel','電話番号','text',true,'例: 03-1234-5678') +
+  '</div>' +
+
+  '<div class="card"><div class="section-title">代表者</div>' +
+    '<div class="grid2">' +
+      field('f-coRepName','代表者氏名','text',true,'例: 山田 太郎') +
+      field('f-coRepTitle','代表者役職','text',true,'例: 代表取締役') +
+    '</div>' +
+  '</div>' +
+
+  '<div class="card"><div class="section-title">技能実習の内容</div>' +
+    '<div class="field"><label>技能実習の区分<span class="req">*</span></label>' +
+      '<select id="f-jcKubun" onchange="_jcKubunToggle(this.value)">' +
+        '<option value="">---</option>' +
+        '<option value="団体監理型">団体監理型（監理団体を通じて受け入れ）＝ロ</option>' +
+        '<option value="企業単独型">企業単独型（海外の支店・取引先などから受け入れ）＝イ</option>' +
+      '</select></div>' +
+    field('f-jcJobType','職種・作業（主なもの）','text',true,'例: 惣菜製造業・惣菜加工作業') +
+    field('f-jcSalary','月額給与（税引前の支払額・円）','number',true,'例: 180000') +
+    '<div style="font-size:11px;color:#9ca3af;margin-top:-4px;">※ 技能実習計画に書いた月額の報酬です。申請人によって違う場合は、いちばん多い金額を書き、下の備考に詳しく書いてください</div>' +
+  '</div>' +
+
+  '<div class="card" id="jcKanriCard" style="display:none;"><div class="section-title">監理団体</div>' +
+    field('f-kanriName','監理団体の名称','text',true,'例: 〇〇事業協同組合') +
+    '<div class="grid2">' +
+      field('f-kanriCorpNo','法人番号（13桁）','text',true,'例: 1234567890123') +
+      field('f-kanriEmpInsNo','雇用保険適用事業所番号（11桁）','text',false,'例: 1234-567890-1') +
+    '</div>' +
+    field('f-kanriOrgType','団体の区分','select',true,'',null,_JC_KANRI_TYPES) +
+    field('f-kanriIndustry','業種（主たる業種）','text',true,'例: 協同組合') +
+    '<div class="grid2">' +
+      field('f-kanriPref','都道府県','text',true,'例: 東京都') +
+      field('f-kanriCity','市区町村','text',true,'例: 千代田区') +
+    '</div>' +
+    field('f-kanriAddress','町名番地','text',true,'例: 丸の内1丁目1番1号') +
+    '<div class="grid2">' +
+      field('f-kanriTel','電話番号','text',true,'例: 03-1234-5678') +
+      field('f-kanriEmployees','常勤職員数','number',true,'例: 10') +
+    '</div>' +
+    field('f-kanriPermitType','監理団体許可の事業区分','select',true,'',null,['','一般監理事業','特定監理事業']) +
+    '<div class="grid2">' +
+      field('f-kanriPermitNo','監理団体許可番号','text',true,'例: 許1234567890') +
+      field('f-kanriPermitDate','許可年月日','date',true,'') +
+    '</div>' +
+    '<div class="grid2">' +
+      field('f-kanriPermitFrom','許可の有効期間（はじめ）','date',true,'') +
+      field('f-kanriPermitTo','許可の有効期間（おわり）','date',true,'') +
+    '</div>' +
+    '<div style="font-size:11px;color:#9ca3af;margin-top:-4px;">※ 監理団体許可証に書かれています</div>' +
+  '</div>' +
+
+  '<div class="card"><div class="section-title">担当者・備考</div>' +
+    '<div class="grid2">' +
+      field('f-coAuthorName','ご担当者名','text',true,'例: 田中 一郎') +
+      field('f-coAuthorTitle','ご担当者の役職・部署','text',false,'例: 総務部 課長') +
+    '</div>' +
+    field('f-jcRemarks','備考','textarea',false,'例: 申請人によって月額給与が違います（Aさん 18万円、Bさん 19万円）') +
+  '</div>'
+  );
+}
+function _jcKubunToggle(v) {
+  var el = document.getElementById('jcKanriCard');
+  if (el) el.style.display = (v === '団体監理型') ? 'block' : 'none';
+}
+
 // ===== フォームHTML生成 =====
 function buildForm(t) {
   switch(t) {
@@ -1558,6 +1674,8 @@ function buildForm(t) {
       return buildCompanyGijinkokuForm();
     case 'company_designated46':
       return buildCompanyDesignated46Form();
+    case 'company_jisshu':
+      return buildCompanyJisshuForm();
     case 'company_designated9':
       return buildCompanyDesignated9Form();
     case 'jaim':
@@ -6217,6 +6335,28 @@ function collectData() {
     return d;
   }
 
+  // ver.20261102.06: 技能実習 所属機関（実習実施者）ヒアリング（type=company_jisshu）。共通部分は特定技能1号の企業フォームと同じ項目名
+  if (t === 'company_jisshu') {
+    var d = {
+      name: val('f-coName'), nameKana: val('f-coNameKana'),
+      corpNo: val('f-coCorpNo'), empInsNo: val('f-coEmpInsNo'),
+      employees: val('f-coEmployees'), foreignEmployees: val('f-coForeignEmployees'),
+      trainees: val('f-coTrainees'), capital: val('f-coCapital'), annualSales: val('f-coAnnualSales'),
+      zip: val('f-coZip'), pref: val('f-coPref'), city: val('f-coCity'),
+      address: val('f-coAddress'), tel: val('f-coTel'),
+      repName: val('f-coRepName'), repTitle: val('f-coRepTitle'),
+      authorName: val('f-coAuthorName'), authorTitle: val('f-coAuthorTitle'),
+      jcBusiness: val('f-jcBusiness'), jcIndustry: val('f-jcIndustry'),
+      jcNotifNo: val('f-jcNotifNo'), jcNotifDate: val('f-jcNotifDate'),
+      jcKubun: val('f-jcKubun'), jcJobType: val('f-jcJobType'), jcSalary: val('f-jcSalary'),
+      jcRemarks: val('f-jcRemarks')
+    };
+    if (d.jcKubun === '団体監理型') {
+      ['kanriName','kanriCorpNo','kanriEmpInsNo','kanriOrgType','kanriIndustry','kanriPref','kanriCity','kanriAddress','kanriTel','kanriEmployees','kanriPermitType','kanriPermitNo','kanriPermitDate','kanriPermitFrom','kanriPermitTo'].forEach(function(k){ d[k] = val('f-' + k); });
+    }
+    return d;
+  }
+
   // ver.20260818.04: 特定活動（告示第9号）企業ヒアリング（type=company_designated9）
   if (t === 'company_designated9') {
     var d = {
@@ -6828,11 +6968,22 @@ function _validateInner() {
     //   「氏名（パスポート表記）は必須です」で送信不能になるバグを修正。
     if (type === 'tokutei2_pledge') return null;
   }
-    if (type === 'company' || type === 'company_tokutei2' || type === 'company_gijinkoku' || type === 'company_designated46' || type === 'company_designated9') {
+    if (type === 'company' || type === 'company_tokutei2' || type === 'company_gijinkoku' || type === 'company_designated46' || type === 'company_designated9' || type === 'company_jisshu') {
     var _numErr = _coNumCheck(); if (_numErr) return _numErr;   // ver.20261006.02
   }
     if (type === 'company_gijinkoku' || type === 'company_designated46') {
     return _gjCompanyValidate();
+  }
+    // ver.20261102.06: 技能実習の所属機関フォームは「*」の項目をすべて必須（表示されている欄だけ）
+    if (type === 'company_jisshu') {
+    var _jcEmpty = _reqEmptyFieldsRaw();
+    if (_jcEmpty.length) {
+      var _lb = _jcEmpty[0].closest('.field') ? _jcEmpty[0].closest('.field').querySelector('label') : null;
+      var _nm = _lb ? _lb.textContent.replace('*','').trim() : '必須の項目';
+      try { _jcEmpty[0].focus(); } catch (e) {}
+      return _nm + 'を入力してください。';
+    }
+    return null;
   }
     // ver.20261009.01: 特定技能の企業フォームは基本すべて必須（追完の項目しぼり込みリンクは除く）
   if ((type === 'company' || type === 'company_tokutei2') && !(fieldsFilter && fieldsFilter.length)) {
@@ -7036,6 +7187,7 @@ function _minKeysForType(t) {
   if (t === 'company_gijinkoku') return 1;
   if (t === 'company_designated46') return 1;
   if (t === 'company_designated9') return 1;
+  if (t === 'company_jisshu') return 1;
   if (t === 'jaim') return 1;  // JAIM: 該当性確認のみ必須（他は任意）
   if ((t||'').indexOf('kazoku_') === 0) return 3;  // 家族滞在
   return 6;
@@ -7092,7 +7244,7 @@ async function submitForm() {
   // 🛡️ 必須項目チェック（申請人フォームのみ）: 氏名・生年月日・国籍・メールが揃っていることを確認
   // ver: company/jaim に加え support_org（登録支援機関）・card_delivery（在留カード送付先）も除外。
   //      これらは applicantNameEn 等を持たないため、除外しないと送信が必ず弾かれる。
-  if (type !== 'company' && type !== 'company_tokutei2' && type !== 'tokutei2_pledge' && type !== 'tokutei2_jitsumu' && type !== 'company_gijinkoku' && type !== 'company_designated46' && type !== 'company_designated9' && type !== 'jaim' && type !== 'support_org' && type !== 'card_delivery' && type !== 'kazoku_nintei' && type !== 'kazoku_henkou' && type !== 'kazoku_koushin') {
+  if (type !== 'company' && type !== 'company_tokutei2' && type !== 'tokutei2_pledge' && type !== 'tokutei2_jitsumu' && type !== 'company_gijinkoku' && type !== 'company_designated46' && type !== 'company_designated9' && type !== 'company_jisshu' && type !== 'jaim' && type !== 'support_org' && type !== 'card_delivery' && type !== 'kazoku_nintei' && type !== 'kazoku_henkou' && type !== 'kazoku_koushin') {
     var requiredKeys = ['applicantNameEn', 'birthdate', 'nationality', 'email'];
     var missingKeys = requiredKeys.filter(function(k){
       return !response[k] || String(response[k]).trim() === '';
@@ -7210,7 +7362,7 @@ async function saveDraft(auto) {
     }
     // 既知バグパターン2: residenceCard='なし'+address='なし'+他1〜2項目だけ（必須項目が一切無い状態）
     // → 「なし」系のデフォルト値しか入っていない=DOMが破壊された状態と判断
-    if (_keyCount <= 4 && type !== 'company' && type !== 'company_gijinkoku' && type !== 'company_designated46' && type !== 'company_designated9' && type !== 'kazoku_nintei' && type !== 'kazoku_henkou' && type !== 'kazoku_koushin') {
+    if (_keyCount <= 4 && type !== 'company' && type !== 'company_gijinkoku' && type !== 'company_designated46' && type !== 'company_designated9' && type !== 'company_jisshu' && type !== 'kazoku_nintei' && type !== 'kazoku_henkou' && type !== 'kazoku_koushin') {
       var hasRcNashi = response.residenceCard === 'なし';
       var hasAdNashi = response.address === 'なし';
       var hasRequiredField = !!(response.applicantNameEn || response.birthdate || response.nationality || response.email);
@@ -7387,6 +7539,7 @@ var TYPE_LABELS = {
   tokutei2_jitsumu: { cat:'特定技能2号 実務経験（6-3号）', kind:'', catClass:'badge-tokutei', kindClass:'' },
   company_gijinkoku:{ cat:'技人国 企業', kind:'', catClass:'badge-gijinkoku', kindClass:'' },
   company_designated46:{ cat:'特定活動46号 企業', kind:'', catClass:'badge-gijinkoku', kindClass:'' },
+  company_jisshu:   { cat:'技能実習 所属機関', kind:'', catClass:'badge-jisshu', kindClass:'' },
   company_designated9:{ cat:'特定活動9号 企業', kind:'', catClass:'badge-company', kindClass:'' },
   support_org:      { cat:'登録支援機関', kind:'', catClass:'badge-company', kindClass:'' }
 };
@@ -7649,6 +7802,7 @@ function _jisshuPrefill(resp) {
 function prefillForm(resp) {
   if (type === 'support_org') { _soFormPrefill(resp); return; }
   try { _jisshuPrefill(resp); } catch (_jpe) { console.error('jisshu prefill error (ignored):', _jpe); }
+  if (type === 'company_jisshu') setTimeout(function(){ try { _jcKubunToggle(val('f-jcKubun')); } catch (_e) {} }, 0);   // ver.20261102.06
   try { _familyRestore(resp); } catch (_fre) { console.error('family prefill error (ignored):', _fre); }
   // ver.20261014.04: 企業フォームの町名番地（address）は f-coAddress に入れる／役員が4人以上なら欄を足してから入れる
   try {
