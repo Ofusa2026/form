@@ -193,7 +193,8 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20261102.07'; // 技能実習：国籍で出し分け。認定（1号・3号）で入国前結核スクリーニングの対象国（フィリピン・ネパール・ベトナム、インドネシアは2027/1/4以降の申請から）なら結核非発病証明書の案内と取得状況を聞く。3号更新でミャンマー・一時帰国まだなら説明書（参考様式）の案内と理由を聞く
+var FORM_VERSION = 'ver.20261102.08'; // 技能実習の申請人フォームをブラッシュアップ：①質問・案内・選択肢を各言語（英・越・尼・緬・クメール・ネパール・中）に ②入力チェックのメッセージも各言語に ③3号の変更・更新で共通の「一時帰国予定」に「3号のための一時帰国とは別」と補足 ④3号認定で「2号を終えて日本を出た日」を聞く ⑤国籍「その他」の英語表記（Philippines など）でも結核・ミャンマーの判定 ⑥年月の入力欄が使えないブラウザでは「2018-04」の文字入力に
+// var FORM_VERSION = 'ver.20261102.07'; // 技能実習：国籍で出し分け。認定（1号・3号）で入国前結核スクリーニングの対象国（フィリピン・ネパール・ベトナム、インドネシアは2027/1/4以降の申請から）なら結核非発病証明書の案内と取得状況を聞く。3号更新でミャンマー・一時帰国まだなら説明書（参考様式）の案内と理由を聞く
 // var FORM_VERSION = 'ver.20261102.06'; // 技能実習の所属機関（実習実施者）ヒアリングを追加（type=company_jisshu）。特定技能1号の企業フォームの企業基本情報・所在地・代表者を同じ項目名で使い、実習実施者の届出・監理団体（団体監理型のみ）・職種と月額給与を追加。雇用条件書・相談窓口・支援計画などの特定技能の書類用の項目は出さない
 // var FORM_VERSION = 'ver.20261102.05'; // 技能実習：出生地・パスポート番号・パスポート有効期限を必須に（入管オンラインシステムで必須の項目）
 // var FORM_VERSION = 'ver.20261102.04'; // 技能実習3号の認定（type=jisshu3_nintei）を追加：2号修了後に帰国し3号で再入国する人向け。1号認定と同じ質問＋随時3級（実技）の合格日
@@ -1371,43 +1372,100 @@ function toggleGijinkokuExp(val) {
   }
 }
 
-// ===== 技能実習：入管オンラインシステムの「申請人の基本情報」で足りない項目（ver.20261102.02） =====
+// ===== 技能実習：申請人フォームの部品（ver.20261102.08 書き直し：翻訳・国籍の英語表記・3号の一時帰国の補足・3号認定の帰国日・年月入力の代わり） =====
+//   質問は日本語（ふりがな付き）。選んだ言語の訳を質問の下に出す（既存の TRANS と同じ方式）。
+//   選択肢の値は日本語のまま（保存・取り込みは変わらない）。表示だけ「日本語 / 訳」にする。
+var JS_TRANS = {"en":{"js_secPersonal":"About you","js_secJisshu":"About Technical Intern Training","js_secWork":"Work experience (including outside Japan)","js_gender":"Sex","js_homeAddr":"Address in your home country","js_cel":"Mobile phone number","js_crime":"Have you ever been punished for a crime? (in Japan or in other countries)","js_crimeDetail":"Details (when, where, what)","js_entryPlan":"Planned date of entry to Japan","js_visaPlace":"Japanese Embassy or Consulate where you will apply for a visa","js_port":"Airport where you will arrive in Japan","js_occ":"Your current job in your home country (write \"なし\" if none)","js_companion":"Will any family member come to Japan with you?","js_deport":"Have you ever left Japan due to deportation or a departure order?","js_deportCount":"Number of times","js_deportDate":"Date of the latest departure","js_tbStatus":"Do you have a Tuberculosis-free certificate?","js_2endLeave":"Date you left Japan after finishing Technical Intern Training (ii)","js_3kyu":"Date you passed the Grade 3 practical skill test (Ginou Kentei)","js_kiso":"Date you passed the Basic Grade skill test (or an equivalent test)","js_trPlan":"When will you return home temporarily (1 month or more) for Technical Intern Training (iii)?","js_trFrom":"Leaving Japan (planned)","js_trTo":"Coming back to Japan (planned)","js_trDone":"Have you returned home temporarily (1 month or more) for Technical Intern Training (iii)?","js_trDoneFrom":"Date you left Japan","js_trDoneTo":"Date you came back to Japan","js_trPlanFrom":"Planned date to leave Japan","js_trPlanTo":"Planned date to come back to Japan","js_mmReason":"Reason for not returning home","js_changed":"Has anything changed since your last application? (name, workplace, etc.)","js_changedNote":"What changed","js_workStatus":"Do you have work experience?","js_workName":"Company name","js_workFrom":"Joined (year-month)","js_workTo":"Left (year-month)"},"vi":{"js_secPersonal":"Thông tin về bạn","js_secJisshu":"Về thực tập kỹ năng","js_secWork":"Kinh nghiệm làm việc (kể cả ngoài Nhật Bản)","js_gender":"Giới tính","js_homeAddr":"Địa chỉ ở nước nhà","js_cel":"Số điện thoại di động","js_crime":"Bạn đã từng bị xử phạt vì phạm tội chưa? (kể cả ở nước ngoài)","js_crimeDetail":"Chi tiết (khi nào, ở đâu, nội dung)","js_entryPlan":"Ngày dự kiến nhập cảnh Nhật Bản","js_visaPlace":"Đại sứ quán/Lãnh sự quán Nhật Bản nơi bạn xin visa","js_port":"Sân bay đến tại Nhật Bản","js_occ":"Công việc hiện tại ở nước nhà (nếu không có, ghi \"なし\")","js_companion":"Có người thân đi cùng bạn sang Nhật không?","js_deport":"Bạn đã từng rời Nhật Bản do bị trục xuất hoặc lệnh xuất cảnh chưa?","js_deportCount":"Số lần","js_deportDate":"Ngày xuất cảnh gần nhất","js_tbStatus":"Bạn đã có giấy chứng nhận không mắc bệnh lao chưa?","js_2endLeave":"Ngày bạn rời Nhật Bản sau khi kết thúc thực tập số 2","js_3kyu":"Ngày bạn đỗ kỳ thi kỹ năng cấp 3 (thực hành)","js_kiso":"Ngày bạn đỗ kỳ thi kỹ năng cấp cơ bản (hoặc kỳ thi tương đương)","js_trPlan":"Bạn sẽ tạm về nước (từ 1 tháng trở lên) cho thực tập số 3 khi nào?","js_trFrom":"Ngày rời Nhật Bản (dự kiến)","js_trTo":"Ngày quay lại Nhật Bản (dự kiến)","js_trDone":"Bạn đã tạm về nước (từ 1 tháng trở lên) cho thực tập số 3 chưa?","js_trDoneFrom":"Ngày bạn rời Nhật Bản","js_trDoneTo":"Ngày bạn quay lại Nhật Bản","js_trPlanFrom":"Ngày dự kiến rời Nhật Bản","js_trPlanTo":"Ngày dự kiến quay lại Nhật Bản","js_mmReason":"Lý do chưa về nước","js_changed":"Có gì thay đổi so với lần nộp đơn trước không? (họ tên, nơi làm việc, v.v.)","js_changedNote":"Nội dung thay đổi","js_workStatus":"Bạn có kinh nghiệm làm việc không?","js_workName":"Tên công ty","js_workFrom":"Năm-tháng vào làm","js_workTo":"Năm-tháng nghỉ việc"},"id":{"js_secPersonal":"Tentang Anda","js_secJisshu":"Tentang Pemagangan Teknis","js_secWork":"Riwayat pekerjaan (termasuk di luar Jepang)","js_gender":"Jenis kelamin","js_homeAddr":"Alamat di negara asal","js_cel":"Nomor ponsel","js_crime":"Apakah Anda pernah dihukum karena tindak pidana? (termasuk di luar Jepang)","js_crimeDetail":"Rincian (kapan, di mana, apa)","js_entryPlan":"Tanggal rencana masuk ke Jepang","js_visaPlace":"Kedutaan/Konsulat Jepang tempat Anda mengajukan visa","js_port":"Bandara kedatangan di Jepang","js_occ":"Pekerjaan Anda saat ini di negara asal (tulis \"なし\" jika tidak ada)","js_companion":"Apakah ada anggota keluarga yang ikut ke Jepang bersama Anda?","js_deport":"Apakah Anda pernah meninggalkan Jepang karena deportasi atau perintah keluar?","js_deportCount":"Jumlah kali","js_deportDate":"Tanggal keberangkatan terakhir","js_tbStatus":"Apakah Anda memiliki sertifikat bebas TBC?","js_2endLeave":"Tanggal Anda meninggalkan Jepang setelah menyelesaikan Pemagangan (ii)","js_3kyu":"Tanggal Anda lulus ujian keterampilan tingkat 3 (praktik)","js_kiso":"Tanggal Anda lulus ujian keterampilan tingkat dasar (atau yang setara)","js_trPlan":"Kapan Anda pulang sementara (1 bulan atau lebih) untuk Pemagangan (iii)?","js_trFrom":"Tanggal keluar Jepang (rencana)","js_trTo":"Tanggal kembali ke Jepang (rencana)","js_trDone":"Apakah Anda sudah pulang sementara (1 bulan atau lebih) untuk Pemagangan (iii)?","js_trDoneFrom":"Tanggal Anda keluar Jepang","js_trDoneTo":"Tanggal Anda kembali ke Jepang","js_trPlanFrom":"Tanggal rencana keluar Jepang","js_trPlanTo":"Tanggal rencana kembali ke Jepang","js_mmReason":"Alasan belum pulang","js_changed":"Apakah ada perubahan sejak pengajuan terakhir? (nama, tempat kerja, dll.)","js_changedNote":"Apa yang berubah","js_workStatus":"Apakah Anda memiliki riwayat pekerjaan?","js_workName":"Nama perusahaan","js_workFrom":"Mulai bekerja (tahun-bulan)","js_workTo":"Berhenti (tahun-bulan)"},"my":{"js_secPersonal":"သင့်အကြောင်း","js_secJisshu":"နည်းပညာအလုပ်သင်အကြောင်း","js_secWork":"အလုပ်အတွေ့အကြုံ (ဂျပန်ပြင်ပ အပါအဝင်)","js_gender":"ကျား/မ","js_homeAddr":"မိခင်နိုင်ငံရှိ နေရပ်လိပ်စာ","js_cel":"မိုဘိုင်းဖုန်းနံပါတ်","js_crime":"ရာဇဝတ်မှုဖြင့် ပြစ်ဒဏ်ခံရဖူးပါသလား။ (ဂျပန်ပြင်ပ အပါအဝင်)","js_crimeDetail":"အသေးစိတ် (ဘယ်အချိန်၊ ဘယ်နေရာ၊ ဘာ)","js_entryPlan":"ဂျပန်သို့ ဝင်ရောက်မည့် ရက်စွဲ","js_visaPlace":"ဗီဇာလျှောက်မည့် ဂျပန်သံရုံး/ကောင်စစ်ဝန်ရုံး","js_port":"ဂျပန်တွင် ဆိုက်ရောက်မည့် လေဆိပ်","js_occ":"မိခင်နိုင်ငံရှိ လက်ရှိအလုပ် (မရှိလျှင် \"なし\" ဟုရေးပါ)","js_companion":"သင်နှင့်အတူ ဂျပန်သို့ လိုက်လာမည့် မိသားစုဝင် ရှိပါသလား။","js_deport":"ဂျပန်မှ နှင်ထုတ်ခံရ၍ သို့မဟုတ် ထွက်ခွာရန်အမိန့်ဖြင့် ထွက်ခွာဖူးပါသလား။","js_deportCount":"အကြိမ်ရေ","js_deportDate":"နောက်ဆုံး ထွက်ခွာသည့်ရက်","js_tbStatus":"တီဘီရောဂါ မဖြစ်ကြောင်း လက်မှတ် ရှိပါသလား။","js_2endLeave":"အလုပ်သင် (၂) ပြီးဆုံးပြီး ဂျပန်မှ ထွက်ခွာသည့်ရက်","js_3kyu":"အဆင့် ၃ လက်တွေ့ကျွမ်းကျင်မှုစာမေးပွဲ အောင်သည့်ရက်","js_kiso":"အခြေခံအဆင့် ကျွမ်းကျင်မှုစာမေးပွဲ (သို့မဟုတ် တူညီသောစာမေးပွဲ) အောင်သည့်ရက်","js_trPlan":"အလုပ်သင် (၃) အတွက် ယာယီပြန်မည့်အချိန် (၁ လ နှင့်အထက်) ဘယ်တော့လဲ။","js_trFrom":"ဂျပန်မှ ထွက်ခွာမည့်ရက် (စီစဉ်)","js_trTo":"ဂျပန်သို့ ပြန်လာမည့်ရက် (စီစဉ်)","js_trDone":"အလုပ်သင် (၃) အတွက် ယာယီပြန် (၁ လ နှင့်အထက်) ပြီးပြီလား။","js_trDoneFrom":"ဂျပန်မှ ထွက်ခွာသည့်ရက်","js_trDoneTo":"ဂျပန်သို့ ပြန်လာသည့်ရက်","js_trPlanFrom":"ဂျပန်မှ ထွက်ခွာရန် စီစဉ်ထားသည့်ရက်","js_trPlanTo":"ဂျပန်သို့ ပြန်လာရန် စီစဉ်ထားသည့်ရက်","js_mmReason":"မပြန်ရသေးသည့် အကြောင်းရင်း","js_changed":"ယခင်လျှောက်ထားချိန်နှင့် ပြောင်းလဲမှု ရှိပါသလား။ (အမည်၊ အလုပ်နေရာ စသည်)","js_changedNote":"ပြောင်းလဲသည့်အရာ","js_workStatus":"အလုပ်အတွေ့အကြုံ ရှိပါသလား။","js_workName":"ကုမ္ပဏီအမည်","js_workFrom":"စတင်ဝင်ရောက်သည့် နှစ်-လ","js_workTo":"ထွက်သည့် နှစ်-လ"},"km":{"js_secPersonal":"អំពីអ្នក","js_secJisshu":"អំពីការហ្វឹកហាត់បច្ចេកទេស","js_secWork":"បទពិសោធន៍ការងារ (រួមទាំងក្រៅប្រទេសជប៉ុន)","js_gender":"ភេទ","js_homeAddr":"អាសយដ្ឋាននៅប្រទេសកំណើត","js_cel":"លេខទូរស័ព្ទដៃ","js_crime":"តើអ្នកធ្លាប់ត្រូវបានផ្តន្ទាទោសពីបទឧក្រិដ្ឋដែរឬទេ? (រួមទាំងនៅក្រៅប្រទេសជប៉ុន)","js_crimeDetail":"ព័ត៌មានលម្អិត (ពេលណា កន្លែងណា អ្វី)","js_entryPlan":"កាលបរិច្ឆេទគ្រោងចូលប្រទេសជប៉ុន","js_visaPlace":"ស្ថានទូត ឬកុងស៊ុលជប៉ុនដែលអ្នកនឹងដាក់ពាក្យសុំទិដ្ឋាការ","js_port":"ព្រលានយន្តហោះដែលអ្នកនឹងមកដល់ជប៉ុន","js_occ":"ការងារបច្ចុប្បន្ននៅប្រទេសកំណើត (បើគ្មាន សរសេរ \"なし\")","js_companion":"តើមានសមាជិកគ្រួសារមកជប៉ុនជាមួយអ្នកទេ?","js_deport":"តើអ្នកធ្លាប់ចាកចេញពីជប៉ុនដោយសារការបណ្តេញចេញ ឬបញ្ជាឱ្យចាកចេញដែរឬទេ?","js_deportCount":"ចំនួនដង","js_deportDate":"កាលបរិច្ឆេទចាកចេញចុងក្រោយ","js_tbStatus":"តើអ្នកមានវិញ្ញាបនបត្របញ្ជាក់ថាមិនមានជំងឺរបេងទេ?","js_2endLeave":"កាលបរិច្ឆេទដែលអ្នកចាកចេញពីជប៉ុន បន្ទាប់ពីបញ្ចប់ការហ្វឹកហាត់លេខ២","js_3kyu":"កាលបរិច្ឆេទដែលអ្នកប្រឡងជាប់ការប្រឡងជំនាញកម្រិត៣ (អនុវត្ត)","js_kiso":"កាលបរិច្ឆេទដែលអ្នកប្រឡងជាប់ការប្រឡងជំនាញកម្រិតមូលដ្ឋាន (ឬស្មើ)","js_trPlan":"តើអ្នកនឹងត្រឡប់ទៅស្រុកបណ្តោះអាសន្ន (១ខែ ឬច្រើនជាងនេះ) សម្រាប់ការហ្វឹកហាត់លេខ៣ ពេលណា?","js_trFrom":"ចាកចេញពីជប៉ុន (គ្រោង)","js_trTo":"ត្រឡប់មកជប៉ុនវិញ (គ្រោង)","js_trDone":"តើអ្នកបានត្រឡប់ទៅស្រុកបណ្តោះអាសន្ន (១ខែ ឬច្រើនជាងនេះ) សម្រាប់ការហ្វឹកហាត់លេខ៣ ហើយឬនៅ?","js_trDoneFrom":"កាលបរិច្ឆេទចាកចេញពីជប៉ុន","js_trDoneTo":"កាលបរិច្ឆេទត្រឡប់មកជប៉ុនវិញ","js_trPlanFrom":"កាលបរិច្ឆេទគ្រោងចាកចេញពីជប៉ុន","js_trPlanTo":"កាលបរិច្ឆេទគ្រោងត្រឡប់មកជប៉ុនវិញ","js_mmReason":"មូលហេតុដែលមិនទាន់ត្រឡប់ទៅស្រុក","js_changed":"តើមានអ្វីផ្លាស់ប្តូរពីការដាក់ពាក្យលើកមុនដែរឬទេ? (ឈ្មោះ កន្លែងធ្វើការ ។ល។)","js_changedNote":"អ្វីដែលបានផ្លាស់ប្តូរ","js_workStatus":"តើអ្នកមានបទពិសោធន៍ការងារទេ?","js_workName":"ឈ្មោះក្រុមហ៊ុន","js_workFrom":"ឆ្នាំ-ខែ ចូលធ្វើការ","js_workTo":"ឆ្នាំ-ខែ ឈប់ធ្វើការ"},"ne":{"js_secPersonal":"तपाईंको बारेमा","js_secJisshu":"प्राविधिक इन्टर्न तालिमको बारेमा","js_secWork":"कामको अनुभव (जापान बाहिर समेत)","js_gender":"लिङ्ग","js_homeAddr":"आफ्नो देशको ठेगाना","js_cel":"मोबाइल नम्बर","js_crime":"के तपाईंलाई कहिल्यै अपराधमा सजाय भएको छ? (जापान बाहिर समेत)","js_crimeDetail":"विवरण (कहिले, कहाँ, के)","js_entryPlan":"जापान प्रवेश गर्ने योजना गरिएको मिति","js_visaPlace":"भिसा आवेदन दिने जापानी दूतावास वा वाणिज्य दूतावास","js_port":"जापानमा आइपुग्ने विमानस्थल","js_occ":"आफ्नो देशमा हालको काम (नभए \"なし\" लेख्नुहोस्)","js_companion":"के कुनै परिवारका सदस्य तपाईंसँग जापान आउनुहुन्छ?","js_deport":"के तपाईंले कहिल्यै देश निकाला वा प्रस्थान आदेशका कारण जापान छोड्नुभएको छ?","js_deportCount":"पटक","js_deportDate":"पछिल्लो प्रस्थान मिति","js_tbStatus":"के तपाईंसँग क्षयरोग नभएको प्रमाणपत्र छ?","js_2endLeave":"प्राविधिक इन्टर्न तालिम (ii) सकेर जापान छोडेको मिति","js_3kyu":"ग्रेड ३ व्यावहारिक सीप परीक्षा उत्तीर्ण गरेको मिति","js_kiso":"आधारभूत स्तरको सीप परीक्षा (वा समान परीक्षा) उत्तीर्ण गरेको मिति","js_trPlan":"प्राविधिक इन्टर्न तालिम (iii) का लागि अस्थायी रूपमा घर (१ महिना वा बढी) कहिले फर्कनुहुन्छ?","js_trFrom":"जापान छोड्ने (योजना)","js_trTo":"जापान फर्कने (योजना)","js_trDone":"के तपाईं प्राविधिक इन्टर्न तालिम (iii) का लागि अस्थायी रूपमा घर (१ महिना वा बढी) फर्किसक्नुभयो?","js_trDoneFrom":"जापान छोडेको मिति","js_trDoneTo":"जापान फर्केको मिति","js_trPlanFrom":"जापान छोड्ने योजना गरिएको मिति","js_trPlanTo":"जापान फर्कने योजना गरिएको मिति","js_mmReason":"घर नफर्कनुको कारण","js_changed":"पछिल्लो आवेदनपछि केही परिवर्तन भएको छ? (नाम, कार्यस्थल आदि)","js_changedNote":"के परिवर्तन भयो","js_workStatus":"के तपाईंसँग कामको अनुभव छ?","js_workName":"कम्पनीको नाम","js_workFrom":"काम सुरु गरेको (वर्ष-महिना)","js_workTo":"काम छोडेको (वर्ष-महिना)"},"zh":{"js_secPersonal":"关于您本人","js_secJisshu":"关于技能实习","js_secWork":"工作经历（包括日本以外）","js_gender":"性别","js_homeAddr":"本国住址","js_cel":"手机号码","js_crime":"您是否曾因犯罪受到处分？（包括在日本以外）","js_crimeDetail":"详情（时间、地点、内容）","js_entryPlan":"预计入境日本日期","js_visaPlace":"申请签证的日本大使馆或领事馆","js_port":"抵达日本的机场","js_occ":"目前在本国的工作（没有请填写\"なし\"）","js_companion":"是否有家人与您一同来日本？","js_deport":"您是否曾因被驱逐出境或出境命令离开日本？","js_deportCount":"次数","js_deportDate":"最近一次出境日期","js_tbStatus":"您是否有未患结核病证明书？","js_2endLeave":"技能实习2号结束后离开日本的日期","js_3kyu":"技能检定随时3级（实技）合格日期","js_kiso":"技能检定基础级（或同等考试）合格日期","js_trPlan":"您何时为技能实习3号临时回国（1个月以上）？","js_trFrom":"离开日本（预计）","js_trTo":"返回日本（预计）","js_trDone":"您是否已为技能实习3号临时回国（1个月以上）？","js_trDoneFrom":"离开日本的日期","js_trDoneTo":"返回日本的日期","js_trPlanFrom":"计划离开日本的日期","js_trPlanTo":"计划返回日本的日期","js_mmReason":"未回国的原因","js_changed":"与上次申请相比有无变化？（姓名、工作地点等）","js_changedNote":"变化内容","js_workStatus":"您有工作经历吗？","js_workName":"公司名称","js_workFrom":"入职年月","js_workTo":"离职年月"}};
+var JS_HINTS = {"h_blankIfUndecided":{"ja":"※ まだ決まっていない場合は空欄でかまいません","en":"Leave blank if not decided yet.","vi":"Để trống nếu chưa quyết định.","id":"Kosongkan jika belum ditentukan.","my":"မဆုံးဖြတ်ရသေးလျှင် ကွက်လပ်ထားပါ။","km":"ទុកទទេប្រសិនបើមិនទាន់សម្រេច។","ne":"निर्णय नभएमा खाली छोड्नुहोस्।","zh":"如尚未确定可留空。"},"h_certUpload":{"ja":"※ 合格証の写真も書類アップロードから送ってください","en":"Please also send a photo of the certificate from the document upload page.","vi":"Vui lòng gửi cả ảnh giấy chứng nhận qua trang tải tài liệu.","id":"Kirim juga foto sertifikatnya melalui halaman unggah dokumen.","my":"လက်မှတ်ဓာတ်ပုံကိုလည်း စာရွက်စာတမ်းတင်သည့်စာမျက်နှာမှ ပို့ပေးပါ။","km":"សូមផ្ញើរូបថតវិញ្ញាបនបត្រតាមទំព័រផ្ញើឯកសារផងដែរ។","ne":"प्रमाणपत्रको फोटो पनि कागजात अपलोड पृष्ठबाट पठाउनुहोस्।","zh":"请同时通过资料上传页面发送合格证照片。"},"h_workIntro":{"ja":"技能実習の前にしていた仕事も書いてください。新しいものから順に、最大10件まで。","en":"Please include jobs before Technical Intern Training. Newest first, up to 10.","vi":"Hãy ghi cả công việc trước khi thực tập. Từ mới nhất, tối đa 10.","id":"Termasuk pekerjaan sebelum pemagangan. Dari yang terbaru, maksimal 10.","my":"အလုပ်သင်မလာမီ လုပ်ခဲ့သည့်အလုပ်များလည်း ရေးပါ။ နောက်ဆုံးမှ စ၍ အများဆုံး ၁၀ ခု။","km":"សូមសរសេរការងារមុនពេលហ្វឹកហាត់ផងដែរ។ ពីថ្មីបំផុត អតិបរមា១០។","ne":"तालिम अघिका कामहरू पनि लेख्नुहोस्। नयाँबाट सुरु गरेर बढीमा १०।","zh":"请同时填写技能实习之前的工作。从最近的开始，最多10项。"},"h_workTo":{"ja":"※ 今も働いている場合は「やめた年月」は空欄","en":"Leave \"Left\" blank if you still work there.","vi":"Nếu vẫn đang làm, để trống năm-tháng nghỉ việc.","id":"Kosongkan jika masih bekerja di sana.","my":"ယခုထိ လုပ်နေဆဲဖြစ်လျှင် ထွက်သည့်နှစ်-လ ကို ကွက်လပ်ထားပါ။","km":"ប្រសិនបើនៅធ្វើការនៅឡើយ ទុកឆ្នាំ-ខែឈប់ទទេ។","ne":"अझै काम गर्दै हुनुहुन्छ भने छोडेको मिति खाली राख्नुहोस्।","zh":"如仍在职，离职年月请留空。"},"h_tbNow":{"ja":"日本の指定する健診医療機関で受けた<b>結核非発病証明書</b>が必要です。取得したら、書類アップロードから写真を送ってください。","en":"A Tuberculosis-free certificate from a clinic designated by Japan is required. Please upload a photo once you have it.","vi":"Cần giấy chứng nhận không mắc bệnh lao do cơ sở y tế được Nhật Bản chỉ định cấp. Khi có, vui lòng tải ảnh lên.","id":"Diperlukan sertifikat bebas TBC dari klinik yang ditunjuk Jepang. Setelah didapat, unggah fotonya.","my":"ဂျပန်က သတ်မှတ်ထားသော ဆေးခန်းမှ တီဘီမဖြစ်ကြောင်း လက်မှတ် လိုအပ်ပါသည်။ ရရှိပါက ဓာတ်ပုံ တင်ပေးပါ။","km":"ត្រូវការវិញ្ញាបនបត្រមិនមានជំងឺរបេងពីគ្លីនិកដែលជប៉ុនកំណត់។ ពេលទទួលបាន សូមផ្ញើរូបថត។","ne":"जापानले तोकेको क्लिनिकबाट क्षयरोग नभएको प्रमाणपत्र आवश्यक छ। पाएपछि फोटो अपलोड गर्नुहोस्।","zh":"需要日本指定医疗机构出具的未患结核病证明书。取得后请上传照片。"},"h_tbLater":{"ja":"インドネシアの方は、<b>2027年1月4日以降</b>に在留資格認定証明書を申請する場合、日本の指定する健診医療機関で受けた<b>結核非発病証明書</b>が必要です。","en":"For Indonesian nationals, a Tuberculosis-free certificate from a clinic designated by Japan is required for applications from January 4, 2027.","vi":"Đối với công dân Indonesia, cần giấy chứng nhận không mắc bệnh lao cho hồ sơ nộp từ ngày 4/1/2027.","id":"Bagi warga negara Indonesia, sertifikat bebas TBC dari klinik yang ditunjuk Jepang diperlukan untuk pengajuan mulai 4 Januari 2027.","my":"အင်ဒိုနီးရှားနိုင်ငံသားများအတွက် ၂၀၂၇ ဇန်နဝါရီ ၄ ရက်မှစ၍ လျှောက်ထားပါက တီဘီမဖြစ်ကြောင်း လက်မှတ် လိုအပ်ပါသည်။","km":"សម្រាប់ជនជាតិឥណ្ឌូនេស៊ី ត្រូវការវិញ្ញាបនបត្រមិនមានជំងឺរបេង សម្រាប់ពាក្យស្នើសុំចាប់ពីថ្ងៃទី៤ មករា ២០២៧។","ne":"इन्डोनेसियाली नागरिकका लागि २०२७ जनवरी ४ देखिका आवेदनमा क्षयरोग नभएको प्रमाणपत्र आवश्यक छ।","zh":"印度尼西亚国籍者自2027年1月4日起申请时，需要日本指定医疗机构出具的未患结核病证明书。"},"h_mm":{"ja":"ミャンマーの情勢不安のため3号の一時帰国をしていない場合、更新の申請に<b>説明書（参考様式）</b>が必要です。会社・監理団体と一緒に準備します。","en":"If you have not returned home for (iii) because of the situation in Myanmar, an explanation form is required for the extension. We will prepare it with your company and supervising organization.","vi":"Nếu bạn chưa tạm về nước cho thực tập số 3 do tình hình Myanmar, cần có bản giải trình khi gia hạn. Chúng tôi sẽ chuẩn bị cùng công ty và nghiệp đoàn.","id":"Jika Anda belum pulang untuk (iii) karena situasi di Myanmar, formulir penjelasan diperlukan untuk perpanjangan. Kami akan menyiapkannya bersama perusahaan dan lembaga pengawas.","my":"မြန်မာနိုင်ငံ အခြေအနေကြောင့် (၃) အတွက် ယာယီမပြန်ရသေးလျှင် သက်တမ်းတိုးရာတွင် ရှင်းလင်းချက်ပုံစံ လိုအပ်ပါသည်။ ကုမ္ပဏီနှင့် ကြီးကြပ်အဖွဲ့နှင့်အတူ ပြင်ဆင်ပါမည်။","km":"ប្រសិនបើអ្នកមិនទាន់ត្រឡប់ទៅស្រុកសម្រាប់លេខ៣ ដោយសារស្ថានភាពមីយ៉ាន់ម៉ា ត្រូវការលិខិតពន្យល់សម្រាប់ការបន្ត។ យើងនឹងរៀបចំជាមួយក្រុមហ៊ុន និងអង្គភាពគ្រប់គ្រង។","ne":"म्यानमारको अवस्थाका कारण (iii) का लागि घर नफर्किनुभएको भए, नवीकरणका लागि स्पष्टीकरण फारम चाहिन्छ। हामी कम्पनी र सुपरभाइजिङ संस्थासँग तयार गर्नेछौं।","zh":"如因缅甸局势未能为3号临时回国，更新申请时需要说明书（参考格式）。我们将与公司及监理团体一起准备。"},"h_trCommon":{"ja":"※ ここは「申請してから結果が出るまでの間に、国へ帰る予定があるか」です。3号のための一時帰国は、上の「技能実習について」で答えてください。","en":"This question is about going home while your application is being reviewed. Please answer about the temporary return for (iii) in \"About Technical Intern Training\" above.","vi":"Câu này hỏi về việc về nước trong thời gian chờ kết quả hồ sơ. Việc tạm về nước cho thực tập số 3, vui lòng trả lời ở phần \"Về thực tập kỹ năng\" phía trên.","id":"Pertanyaan ini tentang pulang selama pengajuan Anda diproses. Untuk pulang sementara (iii), jawab di bagian \"Tentang Pemagangan Teknis\" di atas.","my":"ဤမေးခွန်းမှာ လျှောက်လွှာ စိစစ်နေစဉ် အိမ်ပြန်မည့်အကြောင်းဖြစ်သည်။ (၃) အတွက် ယာယီပြန်ခြင်းကို အထက်ပါ \"နည်းပညာအလုပ်သင်အကြောင်း\" တွင် ဖြေပါ။","km":"សំណួរនេះគឺអំពីការត្រឡប់ទៅស្រុក ក្នុងពេលពិនិត្យពាក្យស្នើសុំ។ ការត្រឡប់បណ្តោះអាសន្នសម្រាប់លេខ៣ សូមឆ្លើយនៅ \"អំពីការហ្វឹកហាត់បច្ចេកទេស\" ខាងលើ។","ne":"यो प्रश्न आवेदन जाँच हुँदै गर्दा घर जाने बारेमा हो। (iii) का लागि अस्थायी फिर्ती माथिको \"प्राविधिक इन्टर्न तालिमको बारेमा\" मा जवाफ दिनुहोस्।","zh":"此问题是指申请审查期间是否有回国计划。为3号临时回国的情况，请在上方\"关于技能实习\"中回答。"},"h_ym":{"ja":"※ 「2018-04」のように 年-月 で入力してください","en":"Enter as year-month, e.g. 2018-04.","vi":"Nhập theo năm-tháng, ví dụ 2018-04.","id":"Masukkan tahun-bulan, misalnya 2018-04.","my":"နှစ်-လ ပုံစံဖြင့် ရိုက်ထည့်ပါ (ဥပမာ 2018-04)။","km":"បញ្ចូលជា ឆ្នាំ-ខែ ឧ. 2018-04។","ne":"वर्ष-महिना ढाँचामा लेख्नुहोस्, जस्तै 2018-04।","zh":"请按\"年-月\"格式填写，例如 2018-04。"}};
+var JS_OPTS = {"男":{"en":"Male","vi":"Nam","id":"Laki-laki","my":"ကျား","km":"ប្រុស","ne":"पुरुष","zh":"男"},"女":{"en":"Female","vi":"Nữ","id":"Perempuan","my":"မ","km":"ស្រី","ne":"महिला","zh":"女"},"ない":{"en":"No","vi":"Không","id":"Tidak","my":"မရှိ","km":"ទេ","ne":"छैन","zh":"没有"},"ある":{"en":"Yes","vi":"Có","id":"Ya","my":"ရှိ","km":"មាន","ne":"छ","zh":"有"},"無":{"en":"No","vi":"Không","id":"Tidak","my":"မရှိ","km":"ទេ","ne":"छैन","zh":"没有"},"有":{"en":"Yes","vi":"Có","id":"Ya","my":"ရှိ","km":"មាន","ne":"छ","zh":"有"},"いない":{"en":"No","vi":"Không","id":"Tidak","my":"မရှိ","km":"ទេ","ne":"छैन","zh":"没有"},"いる":{"en":"Yes","vi":"Có","id":"Ya","my":"ရှိ","km":"មាន","ne":"छ","zh":"有"},"した":{"en":"Yes, I returned","vi":"Rồi","id":"Sudah","my":"ပြန်ပြီးပြီ","km":"រួចហើយ","ne":"फर्किसकें","zh":"已回国"},"まだ":{"en":"Not yet","vi":"Chưa","id":"Belum","my":"မရှိသေး","km":"មិនទាន់","ne":"अझै छैन","zh":"还没有"},"ある（取得済み）":{"en":"Yes, I have it","vi":"Đã có","id":"Sudah punya","my":"ရှိပြီ","km":"មានហើយ","ne":"छ","zh":"已取得"},"健診の予約をした":{"en":"I made an appointment for the check-up","vi":"Đã đặt lịch khám","id":"Sudah membuat janji pemeriksaan","my":"ဆေးစစ်ရန် ချိန်းဆိုပြီး","km":"បានណាត់ពេលពិនិត្យ","ne":"जाँचको समय लिइसकें","zh":"已预约体检"},"成田空港":{"en":"Narita Airport","vi":"Sân bay Narita","id":"Bandara Narita","my":"နာရီတာ လေဆိပ်","km":"ព្រលានយន្តហោះ Narita","ne":"नारिता विमानस्थल","zh":"成田机场"},"羽田空港":{"en":"Haneda Airport","vi":"Sân bay Haneda","id":"Bandara Haneda","my":"ဟာနေဒါ လေဆိပ်","km":"ព្រលានយន្តហោះ Haneda","ne":"हानेदा विमानस्थल","zh":"羽田机场"},"関西空港":{"en":"Kansai Airport","vi":"Sân bay Kansai","id":"Bandara Kansai","my":"ခန်ဆိုင်း လေဆိပ်","km":"ព្រលានយន្តហោះ Kansai","ne":"कन्साई विमानस्थल","zh":"关西机场"},"中部空港":{"en":"Chubu Airport (Nagoya)","vi":"Sân bay Chubu (Nagoya)","id":"Bandara Chubu (Nagoya)","my":"ချူးဘု လေဆိပ် (နာဂိုယာ)","km":"ព្រលានយន្តហោះ Chubu (Nagoya)","ne":"चुबु विमानस्थल (नागोया)","zh":"中部机场（名古屋）"},"福岡空港":{"en":"Fukuoka Airport","vi":"Sân bay Fukuoka","id":"Bandara Fukuoka","my":"ဖူကူအိုကာ လေဆိပ်","km":"ព្រលានយន្តហោះ Fukuoka","ne":"फुकुओका विमानस्थल","zh":"福冈机场"},"新千歳空港":{"en":"New Chitose Airport (Sapporo)","vi":"Sân bay New Chitose (Sapporo)","id":"Bandara New Chitose (Sapporo)","my":"နယူးချီတိုဆေး လေဆိပ် (ဆပ်ပိုရို)","km":"ព្រលានយន្តហោះ New Chitose (Sapporo)","ne":"न्यू चितोसे विमानस्थल (साप्पोरो)","zh":"新千岁机场（札幌）"},"その他":{"en":"Other","vi":"Khác","id":"Lainnya","my":"အခြား","km":"ផ្សេងៗ","ne":"अन्य","zh":"其他"},"未定":{"en":"Undecided","vi":"Chưa quyết định","id":"Belum ditentukan","my":"မဆုံးဖြတ်ရသေး","km":"មិនទាន់សម្រេច","ne":"निर्णय भएको छैन","zh":"未定"},"3号が始まる前に帰る":{"en":"Before (iii) starts","vi":"Trước khi bắt đầu số 3","id":"Sebelum (iii) dimulai","my":"(၃) မစတင်မီ","km":"មុនពេលចាប់ផ្តើមលេខ៣","ne":"(iii) सुरु हुनुअघि","zh":"3号开始前"},"3号が始まってから1年以内に帰る":{"en":"Within 1 year after (iii) starts","vi":"Trong vòng 1 năm sau khi bắt đầu số 3","id":"Dalam 1 tahun setelah (iii) dimulai","my":"(၃) စတင်ပြီး ၁ နှစ်အတွင်း","km":"ក្នុងរយៈពេល១ឆ្នាំ បន្ទាប់ពីចាប់ផ្តើមលេខ៣","ne":"(iii) सुरु भएको १ वर्षभित्र","zh":"3号开始后1年内"},"もう帰った":{"en":"Already returned","vi":"Đã về rồi","id":"Sudah pulang","my":"ပြန်ပြီးပြီ","km":"បានត្រឡប់ហើយ","ne":"फर्किसकें","zh":"已经回国"},"ミャンマーの情勢不安のため":{"en":"Due to the situation in Myanmar","vi":"Do tình hình bất ổn ở Myanmar","id":"Karena situasi di Myanmar","my":"မြန်မာနိုင်ငံ အခြေအနေ မတည်ငြိမ်မှုကြောင့်","km":"ដោយសារស្ថានភាពនៅមីយ៉ាន់ម៉ា","ne":"म्यानमारको अस्थिर अवस्थाका कारण","zh":"由于缅甸局势不稳"},"これから帰る予定":{"en":"I plan to return","vi":"Dự định sẽ về","id":"Berencana pulang","my":"ပြန်ရန် စီစဉ်ထား","km":"គ្រោងនឹងត្រឡប់","ne":"फर्कने योजना छ","zh":"计划回国"}};
+(function(){ for (var l in JS_TRANS) { if (!TRANS[l]) TRANS[l] = {}; for (var k in JS_TRANS[l]) TRANS[l][k] = JS_TRANS[l][k]; } })();
+
+function _jsEsc(s) { return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;'); }
+// 案内・補足（日本語＋選んだ言語）
+function _jsHint(k, style) {
+  var h = JS_HINTS[k] || {ja:''};
+  return '<div class="js-i18n" data-jsk="' + k + '" style="font-size:11px;color:#9ca3af;margin:-6px 0 10px;line-height:1.6;' + (style||'') + '">' + h.ja + '</div>';
+}
+function _jsNotice(id, k) {
+  var h = JS_HINTS[k] || {ja:''};
+  return '<div id="' + id + '" class="js-i18n" data-jsk="' + k + '" style="font-size:12.5px;color:#92400e;background:#fffbeb;border:1px solid #fcd34d;border-radius:8px;padding:10px 12px;margin:4px 0 10px;line-height:1.7;">' + h.ja + '</div>';
+}
+// 選択肢（opts = [[値, 表示する日本語], ...]）
+function _jsSelect(id, label, tk, required, opts, onchange) {
+  var h = '<div class="field"><label>' + label + (required ? '<span class="req">*</span>' : '') + '</label>';
+  if (tk) h += '<div class="trans" data-key="' + tk + '"></div>';
+  h += '<select id="' + id + '"' + (onchange ? ' onchange="' + onchange + '"' : '') + '><option value="">---</option>';
+  opts.forEach(function(o){ h += '<option value="' + _jsEsc(o[0]) + '" data-ja="' + _jsEsc(o[1]) + '">' + _jsEsc(o[1]) + '</option>'; });
+  return h + '</select></div>';
+}
+function _jsSectionTitle(ja, tk) { return '<div class="section-title">' + ja + '<span class="trans" data-key="' + tk + '" style="font-weight:400;font-size:11px;margin-left:6px;color:#6b7280;border:none;padding:0;"></span></div>'; }
+// 言語を切り替えたとき（setLang から呼ぶ）
+function _jsApplyLang(l) {
+  if (!isJisshu) return;
+  try {
+    document.querySelectorAll('.js-i18n[data-jsk]').forEach(function(el){
+      var h = JS_HINTS[el.getAttribute('data-jsk')]; if (!h) return;
+      var tr = l ? h[l] : '';
+      el.innerHTML = h.ja + (tr ? '<br><span style="color:#6366f1;">' + tr + '</span>' : '');
+    });
+    document.querySelectorAll('select[id^="f-js"] option').forEach(function(o){
+      if (!o.value) return;
+      var ja = o.getAttribute('data-ja') || o.value, t = JS_OPTS[ja];
+      o.textContent = ja + ((l && t && t[l]) ? ' / ' + t[l] : '');
+    });
+    var dict = TRANS[l] || {};
+    document.querySelectorAll('#formBody .trans[data-key^="js_"]').forEach(function(el){
+      var txt = dict[el.getAttribute('data-key')] || ''; el.textContent = txt; el.classList.toggle('show', !!txt);
+    });
+  } catch (e) {}
+}
+
+// 年月の入力欄（使えないブラウザでは文字入力＋「2018-04」の形）
+var _JS_MONTH_OK = (function(){ try { var i = document.createElement('input'); i.setAttribute('type','month'); return i.type === 'month'; } catch (e) { return false; } })();
+function _jsYm(v) {
+  v = String(v||'').trim().replace(/[０-９]/g, function(c){ return String.fromCharCode(c.charCodeAt(0) - 0xFEE0); });
+  var m = v.match(/^(\d{4})\s*[-\/.年]\s*(\d{1,2})\s*月?$/);
+  return m ? (m[1] + '-' + ('0' + m[2]).slice(-2)) : v;
+}
+
+// ===== 本人のこと（入管オンラインシステムの「申請人の基本情報」で足りない項目） =====
 function blockJisshuPersonal(t) {
-  var h = '<div class="card"><div class="section-title">本人のこと（ほんにんのこと）</div>';
-  h += field('f-jsGender', '性別（せいべつ）/ Sex', 'select', true, '', '', ['','男 / Male','女 / Female']);
-  h += field('f-jsHomeAddress', '本国の住所（ほんごくの じゅうしょ）/ Address in your home country', 'text', true, '例: 123 Le Loi Street, Hai Ba Trung, Hanoi', '');
-  h += field('f-jsCelPhone', '携帯電話番号（けいたいでんわ ばんごう）/ Mobile phone number', 'tel', (!/^jisshu[13]_nintei$/.test(t)), (/^jisshu[13]_nintei$/.test(t) ? '例: +84 90 123 4567' : '例: 080-1234-5678'), '');
-  h += '<div class="field"><label>犯罪（はんざい）で処分（しょぶん）を受けたことがありますか？（日本以外もふくむ）<span class="req">*</span><br><span style="font-size:11px;color:#6366f1;font-weight:500;">Have you ever been punished for a crime? (in Japan or overseas)</span></label>';
-  h += '<select id="f-jsCrime" onchange="toggleJisshuCrime(this.value)"><option value="">---</option><option value="無">ない / No</option><option value="有">ある / Yes</option></select></div>';
+  var nin = /^jisshu[13]_nintei$/.test(t);
+  var h = '<div class="card">' + _jsSectionTitle('本人のこと（ほんにんのこと）', 'js_secPersonal');
+  h += _jsSelect('f-jsGender', '性別（せいべつ）', 'js_gender', true, [['男','男'],['女','女']]);
+  h += field('f-jsHomeAddress', '本国の住所（ほんごくの じゅうしょ）', 'text', true, '例: 123 Le Loi Street, Hai Ba Trung, Hanoi', 'js_homeAddr');
+  h += field('f-jsCelPhone', '携帯電話番号（けいたいでんわ ばんごう）', 'tel', !nin, (nin ? '例: +84 90 123 4567' : '例: 080-1234-5678'), 'js_cel');
+  h += _jsSelect('f-jsCrime', '犯罪（はんざい）で処分（しょぶん）を受けたことがありますか？（日本以外もふくむ）', 'js_crime', true, [['無','ない'],['有','ある']], 'toggleJisshuCrime(this.value)');
   h += '<div id="jsCrimeWrap" style="display:none;">';
-  h += field('f-jsCrimeDetail', 'どんな処分か（いつ・どこで・内容）/ Details (when, where, what)', 'textarea', true, '例: 2020年 ベトナムで交通違反の罰金 / 2020 traffic fine in Vietnam', '');
-  h += '</div>';
-  h += '</div>';
+  h += field('f-jsCrimeDetail', 'どんな処分か（いつ・どこで・内容）', 'textarea', true, '例: 2020年 ベトナムで交通違反の罰金', 'js_crimeDetail');
+  h += '</div></div>';
   return h;
 }
 function toggleJisshuCrime(v) { var el = document.getElementById('jsCrimeWrap'); if (el) el.style.display = (v === '有') ? 'block' : 'none'; }
 function toggleJisshuDeport(v) { var el = document.getElementById('jsDeportWrap'); if (el) el.style.display = (v === '有') ? 'block' : 'none'; }
 
-// 職歴（日本以外もふくむ・最大10件）
+// ===== 職歴（日本以外もふくむ・最大10件） =====
 var _jsWorkCount = 0;
 function _jsWorkRow(i) {
+  var mt = _JS_MONTH_OK ? 'month' : 'text';
   return '<div class="js-work-row" data-wi="' + i + '" style="border:1px dashed #d1d5db;border-radius:10px;padding:10px 12px;margin-bottom:10px;">' +
-    '<div style="font-size:12px;font-weight:700;color:#6b7280;margin-bottom:6px;">職歴 ' + i + ' / Job ' + i + '</div>' +
-    field('f-jsWork' + i + 'Name', '会社の名前（かいしゃの なまえ）/ Company name', 'text', true, '例: ABC Garment Co., Ltd.', '') +
+    '<div style="font-size:12px;font-weight:700;color:#6b7280;margin-bottom:6px;">職歴 ' + i + '</div>' +
+    field('f-jsWork' + i + 'Name', '会社の名前（かいしゃの なまえ）', 'text', true, '例: ABC Garment Co., Ltd.', 'js_workName') +
     '<div class="grid2">' +
-      field('f-jsWork' + i + 'From', '入社した年月 / Joined (year-month)', 'month', true, '', '') +
-      field('f-jsWork' + i + 'To', 'やめた年月 / Left (year-month)', 'month', false, '', '') +
+      field('f-jsWork' + i + 'From', '入社した年月（にゅうしゃ した ねんげつ）', mt, true, '例: 2018-04', 'js_workFrom') +
+      field('f-jsWork' + i + 'To', 'やめた年月（やめた ねんげつ）', mt, false, '例: 2022-03', 'js_workTo') +
     '</div>' +
-    '<div style="font-size:11px;color:#9ca3af;margin-top:-6px;">※ 今も働いている場合は「やめた年月」は空欄 / Leave blank if you still work there</div>' +
+    (_JS_MONTH_OK ? '' : _jsHint('h_ym')) +
+    _jsHint('h_workTo') +
   '</div>';
 }
 function blockJisshuWork() {
   _jsWorkCount = 1;
-  var h = '<div class="card"><div class="section-title">職歴（しょくれき・日本以外もふくむ）/ Work experience</div>';
-  h += '<div style="font-size:11px;color:#9ca3af;margin-bottom:10px;">技能実習の前にしていた仕事も書いてください。新しいものから順に、最大10件まで。<br>Please include jobs before Technical Intern Training. Newest first, up to 10.</div>';
-  h += field('f-jsWorkStatus', '職歴はありますか？（しょくれき）/ Do you have work experience?', 'select', true, '', '', ['','ある / Yes','ない / No']);
+  var h = '<div class="card">' + _jsSectionTitle('職歴（しょくれき・日本以外もふくむ）', 'js_secWork');
+  h += _jsHint('h_workIntro', 'margin-top:0;');
+  h += _jsSelect('f-jsWorkStatus', '職歴はありますか？（しょくれき）', 'js_workStatus', true, [['ある','ある'],['ない','ない']]);
   h += '<div id="jsWorkWrap" style="display:none;"><div id="jsWorkRows">' + _jsWorkRow(1) + '</div>';
-  h += '<button type="button" id="jsWorkAddBtn" onclick="addJisshuWork()" style="font-size:12px;padding:6px 14px;background:white;border:1.5px dashed #c7d2fe;border-radius:6px;color:#6366f1;cursor:pointer;font-weight:700;">＋ 職歴を追加 / Add job</button></div>';
+  h += '<button type="button" id="jsWorkAddBtn" onclick="addJisshuWork()" style="font-size:12px;padding:6px 14px;background:white;border:1.5px dashed #c7d2fe;border-radius:6px;color:#6366f1;cursor:pointer;font-weight:700;">＋ 職歴を追加 / Add</button></div>';
   h += '</div>';
   return h;
 }
@@ -1417,23 +1475,30 @@ function addJisshuWork() {
   var div = document.createElement('div'); div.innerHTML = _jsWorkRow(_jsWorkCount);
   document.getElementById('jsWorkRows').appendChild(div.firstChild);
   if (_jsWorkCount >= 10) { var b = document.getElementById('jsWorkAddBtn'); if (b) b.style.display = 'none'; }
+  _jsApplyLang(currentLang);
 }
-document.addEventListener('change', function(e){ try { if (e.target && e.target.id === 'f-jsWorkStatus') { var w = document.getElementById('jsWorkWrap'); if (w) w.style.display = (e.target.value.indexOf('ある') === 0) ? 'block' : 'none'; } } catch(_){} });
+document.addEventListener('change', function(e){ try { if (e.target && e.target.id === 'f-jsWorkStatus') { var w = document.getElementById('jsWorkWrap'); if (w) w.style.display = (e.target.value === 'ある') ? 'block' : 'none'; } } catch(_){} });
 function _jsWorkList() {
   var out = [];
   for (var i = 1; i <= _jsWorkCount; i++) {
-    var n = val('f-jsWork' + i + 'Name'), f = val('f-jsWork' + i + 'From'), t2 = val('f-jsWork' + i + 'To');
+    var n = val('f-jsWork' + i + 'Name'), f = _jsYm(val('f-jsWork' + i + 'From')), t2 = _jsYm(val('f-jsWork' + i + 'To'));
     if (n || f || t2) out.push({ name: n, from: f, to: t2 });
   }
   return out;
 }
 
-// ===== 技能実習：国籍による出し分け（ver.20261102.07） =====
+// ===== 国籍による出し分け（ver.20261102.07・英語表記にも対応 ver.20261102.08） =====
 // 入国前結核スクリーニング（JPETS）の対象国。認定（COE）申請のときに結核非発病証明書が必要
 //   今：フィリピン・ネパール・ベトナム／インドネシアは 2027-01-04 以降の申請から（ミャンマー・中国は今後追加予定・日付未定）
 var _JS_TB_NOW = ['フィリピン','ネパール','ベトナム'];
 var _JS_TB_LATER = { 'インドネシア':'2027-01-04' };
-function _jsNat() { var v = val('f-nationality'); if (v === 'その他') v = val('f-nationalityOther'); return String(v||'').trim(); }
+var _JS_NAT_ALIAS = [['フィリピン',/philippin|filipin|pilipinas|フィリピン/i],['ネパール',/nepal|ネパール/i],['ベトナム',/viet\s*nam|ベトナム/i],['インドネシア',/indonesia|インドネシア/i],['ミャンマー',/myanmar|burma|ミャンマー|ミヤンマー/i]];
+function _jsNat() {
+  var v = val('f-nationality'); if (v === 'その他') v = val('f-nationalityOther');
+  v = String(v||'').trim();
+  for (var i = 0; i < _JS_NAT_ALIAS.length; i++) { if (_JS_NAT_ALIAS[i][1].test(v)) return _JS_NAT_ALIAS[i][0]; }
+  return v;
+}
 function _jsTbNeed() {
   if (!/^jisshu[13]_nintei$/.test(type||'')) return '';
   var n = _jsNat();
@@ -1442,100 +1507,93 @@ function _jsTbNeed() {
   return '';
 }
 function _jsMmNeed() { return type === 'jisshu3_koushin' && _jsNat() === 'ミャンマー' && val('f-jsTrDone') === 'まだ'; }
+// 3号の変更・更新：共通の「一時帰国予定」に、3号のための一時帰国とは別の質問だと補足
+function _jsDecorate() {
+  try {
+    if (type !== 'jisshu3_henkou' && type !== 'jisshu3_koushin') return;
+    var s = document.getElementById('f-tempReturnStatus'); if (!s) return;
+    var f = s.closest('.field'); if (!f || f.nextElementSibling && f.nextElementSibling.getAttribute('data-jsk') === 'h_trCommon') return;
+    f.insertAdjacentHTML('afterend', _jsHint('h_trCommon', 'margin-top:-4px;color:#6b7280;'));
+  } catch (e) {}
+}
 function _jsNatRefresh() {
   try {
     var tb = _jsTbNeed(), w = document.getElementById('jsTbWrap'), msg = document.getElementById('jsTbMsg');
     if (w) w.style.display = tb ? 'block' : 'none';
-    if (msg) msg.innerHTML = (tb === 'later')
-      ? 'インドネシアの方は、<b>2027年1月4日以降</b>に在留資格認定証明書を申請する場合、日本の指定する健診医療機関で受けた<b>結核非発病証明書</b>が必要です。<br>For Indonesian nationals, a Tuberculosis-free certificate from a designated clinic is required for COE applications from January 4, 2027.'
-      : '日本の指定する健診医療機関で受けた<b>結核非発病証明書</b>が必要です。取得したら、書類アップロードから写真を送ってください。<br>A Tuberculosis-free certificate from a clinic designated by Japan is required. Please upload a photo once you have it.';
+    if (msg) msg.setAttribute('data-jsk', tb === 'later' ? 'h_tbLater' : 'h_tbNow');
     var m = document.getElementById('jsMmWrap'); if (m) m.style.display = _jsMmNeed() ? 'block' : 'none';
+    _jsDecorate();
+    _jsApplyLang(currentLang);
   } catch (e) {}
 }
 document.addEventListener('change', function(e){ try { if (isJisshu && e.target && (e.target.id === 'f-nationality' || e.target.id === 'f-nationalityOther' || e.target.id === 'f-jsTrDone')) _jsNatRefresh(); } catch(_){} });
 document.addEventListener('input', function(e){ try { if (isJisshu && e.target && e.target.id === 'f-nationalityOther') _jsNatRefresh(); } catch(_){} });
-if (isJisshu) { setTimeout(_jsNatRefresh, 800); setTimeout(_jsNatRefresh, 2500); }   // 案シスから国籍が入っている場合
+if (isJisshu) { setTimeout(_jsNatRefresh, 300); setTimeout(_jsNatRefresh, 800); setTimeout(_jsNatRefresh, 2500); }   // 案シスから国籍が入っている場合・最初の表示
 
-// ===== 技能実習専用ブロック（ver.20261102.01） =====
+// ===== 技能実習について =====
 // 計画・会社・監理団体の情報は認定申請書の写しから取るので、申請人には「認定申請書に載っていないこと」だけを聞く
 function blockJisshuExtra(t) {
-  var h = '<div class="card"><div class="section-title">技能実習について（ぎのうじっしゅうについて）</div>';
+  var h = '<div class="card">' + _jsSectionTitle('技能実習について（ぎのうじっしゅうについて）', 'js_secJisshu');
   if (/^jisshu[13]_nintei$/.test(t)) {
-    h += field('f-jsEntryPlan', '日本に来る予定の日（にほんにくる よていのひ）/ Planned date of entry to Japan', 'date', false, '', '');
-    h += '<div style="font-size:11px;color:#9ca3af;margin:-6px 0 10px;">※ まだ決まっていない場合は空欄でかまいません / Leave blank if not decided</div>';
-    h += field('f-jsVisaPlace', 'ビザを申請する日本大使館・領事館（にほんたいしかん・りょうじかん）/ Japanese Embassy or Consulate where you will apply for a visa', 'text', true, '例: 在ベトナム日本国大使館（ハノイ）/ Embassy of Japan in Vietnam (Hanoi)', '');
-    h += field('f-jsPort', '日本に着く予定の空港（くうこう）/ Airport where you will arrive in Japan', 'select', true, '', '',
-      ['','成田空港','羽田空港','関西空港','中部空港','福岡空港','新千歳空港','その他','未定']);
-    h += field('f-jsOccupation', '今の仕事（いまの しごと・本国）/ Your current job in your home country', 'text', true, '例: 工場作業員 / Factory worker（仕事をしていない場合は「なし」）', '');
-    h += field('f-jsCompanion', '一緒に日本に来る家族はいますか？（いっしょに くる かぞく）/ Will any family member come to Japan with you?', 'select', true, '', '', ['','いない / No','いる / Yes']);
-    h += '<div class="field"><label>日本から強制送還（きょうせいそうかん）または出国命令（しゅっこくめいれい）で出国したことがありますか？<span class="req">*</span><br><span style="font-size:11px;color:#6366f1;font-weight:500;">Have you ever left Japan due to deportation or a departure order?</span></label>';
-    h += '<select id="f-jsDeport" onchange="toggleJisshuDeport(this.value)"><option value="">---</option><option value="無">ない / No</option><option value="有">ある / Yes</option></select></div>';
+    h += field('f-jsEntryPlan', '日本に来る予定の日（にほんに くる よていの ひ）', 'date', false, '', 'js_entryPlan');
+    h += _jsHint('h_blankIfUndecided');
+    if (t === 'jisshu3_nintei') {
+      h += field('f-js2EndLeave', '2号を終えて日本を出た日（2ごうを おえて にほんを でた ひ）', 'date', true, '', 'js_2endLeave');
+    }
+    h += field('f-jsVisaPlace', 'ビザを申請する日本大使館・領事館（にほん たいしかん・りょうじかん）', 'text', true, '例: 在ベトナム日本国大使館（ハノイ）', 'js_visaPlace');
+    h += _jsSelect('f-jsPort', '日本に着く予定の空港（くうこう）', 'js_port', true,
+      [['成田空港','成田空港'],['羽田空港','羽田空港'],['関西空港','関西空港'],['中部空港','中部空港'],['福岡空港','福岡空港'],['新千歳空港','新千歳空港'],['その他','その他'],['未定','未定']]);
+    h += field('f-jsOccupation', '今の仕事（いまの しごと・本国）', 'text', true, '例: 工場作業員（仕事をしていない場合は「なし」）', 'js_occ');
+    h += _jsSelect('f-jsCompanion', '一緒に日本に来る家族はいますか？（いっしょに くる かぞく）', 'js_companion', true, [['いない','いない'],['いる','いる']]);
+    h += _jsSelect('f-jsDeport', '日本から強制送還（きょうせいそうかん）または出国命令（しゅっこくめいれい）で出国したことがありますか？', 'js_deport', true, [['無','ない'],['有','ある']], 'toggleJisshuDeport(this.value)');
     h += '<div id="jsDeportWrap" style="display:none;"><div class="grid2">';
-    h += field('f-jsDeportCount', '回数（かいすう）/ Number of times', 'number', true, '例: 1', '');
-    h += field('f-jsDeportDate', '最後に出国した日 / Date of the latest departure', 'date', true, '', '');
+    h += field('f-jsDeportCount', '回数（かいすう）', 'number', true, '例: 1', 'js_deportCount');
+    h += field('f-jsDeportDate', '最後に出国した日（さいごに しゅっこくした ひ）', 'date', true, '', 'js_deportDate');
     h += '</div></div>';
-    // ver.20261102.07: 入国前結核スクリーニングの対象国だけ
+    // 入国前結核スクリーニングの対象国だけ
     h += '<div id="jsTbWrap" style="display:none;">';
-    h += '<div id="jsTbMsg" style="font-size:12.5px;color:#92400e;background:#fffbeb;border:1px solid #fcd34d;border-radius:8px;padding:10px 12px;margin:4px 0 10px;line-height:1.7;"></div>';
-    h += field('f-jsTbStatus', '結核非発病証明書はありますか？（けっかく ひはつびょう しょうめいしょ）/ Do you have a Tuberculosis-free certificate?', 'select', true, '', '',
-      ['','ある（取得済み）/ Yes','健診の予約をした / Appointment made','まだ / Not yet']);
+    h += _jsNotice('jsTbMsg', 'h_tbNow');
+    h += _jsSelect('f-jsTbStatus', '結核非発病証明書はありますか？（けっかく ひはつびょう しょうめいしょ）', 'js_tbStatus', true,
+      [['ある（取得済み）','ある（取得済み）'],['健診の予約をした','健診の予約をした'],['まだ','まだ']]);
     h += '</div>';
   }
-  if (t === 'jisshu3_nintei') {
-    h += field('f-js3kyuDate', '技能検定 随時3級（実技）に合格した日（ごうかくしたひ）/ Date you passed the Grade 3 practical skill test', 'date', true, '', '');
-    h += '<div style="font-size:11px;color:#9ca3af;margin:-6px 0 10px;">※ 合格証の写真もアップロードフォームから送ってください / Please also upload a photo of the certificate</div>';
+  if (t === 'jisshu3_nintei' || t === 'jisshu3_henkou') {
+    h += field('f-js3kyuDate', '技能検定 随時3級（実技）に合格した日（ごうかくした ひ）', 'date', true, '', 'js_3kyu');
+    h += _jsHint('h_certUpload');
   }
   if (t === 'jisshu2_henkou') {
-    h += field('f-jsKisoDate', '技能検定 基礎級（またはそれに相当する試験）に合格した日（ごうかくしたひ）/ Date you passed the Basic Grade skill test', 'date', true, '', '');
-    h += '<div style="font-size:11px;color:#9ca3af;margin:-6px 0 10px;">※ 合格証の写真もアップロードフォームから送ってください / Please also upload a photo of the certificate</div>';
+    h += field('f-jsKisoDate', '技能検定 基礎級（またはそれに相当する試験）に合格した日（ごうかくした ひ）', 'date', true, '', 'js_kiso');
+    h += _jsHint('h_certUpload');
   }
   if (t === 'jisshu3_henkou') {
-    h += field('f-js3kyuDate', '技能検定 随時3級（実技）に合格した日（ごうかくしたひ）/ Date you passed the Grade 3 practical skill test', 'date', true, '', '');
-    h += '<div style="font-size:11px;color:#9ca3af;margin:-6px 0 10px;">※ 合格証の写真もアップロードフォームから送ってください / Please also upload a photo of the certificate</div>';
-    h += '<div class="field"><label>3号のための一時帰国（1か月以上）はいつですか？（いちじきこく）<span class="req">*</span><br><span style="font-size:11px;color:#6366f1;font-weight:500;">When will you return home temporarily (1 month or more) for Technical Intern Training (iii)?</span></label>';
-    h += '<select id="f-jsTrPlan" onchange="toggleJisshuTr(this.value)">';
-    h += '<option value="">---</option>';
-    h += '<option value="3号が始まる前に帰る">3号が始まる前に帰る / Before (iii) starts</option>';
-    h += '<option value="3号が始まってから1年以内に帰る">3号が始まってから1年以内に帰る / Within 1 year after (iii) starts</option>';
-    h += '<option value="もう帰った">もう帰った / Already returned</option>';
-    h += '<option value="未定">未定 / Undecided</option>';
-    h += '</select></div>';
+    h += _jsSelect('f-jsTrPlan', '3号のための一時帰国（1か月以上）はいつですか？（いちじきこく）', 'js_trPlan', true,
+      [['3号が始まる前に帰る','3号が始まる前に帰る'],['3号が始まってから1年以内に帰る','3号が始まってから1年以内に帰る'],['もう帰った','もう帰った'],['未定','未定']], 'toggleJisshuTr(this.value)');
     h += '<div id="jsTrDateWrap" style="display:none;"><div class="grid2">';
-    h += field('f-jsTrFrom', '日本を出る日（予定）/ Leaving Japan', 'date', false, '', '');
-    h += field('f-jsTrTo', '日本に戻る日（予定）/ Coming back to Japan', 'date', false, '', '');
+    h += field('f-jsTrFrom', '日本を出る日（にほんを でる ひ）', 'date', false, '', 'js_trFrom');
+    h += field('f-jsTrTo', '日本に戻る日（にほんに もどる ひ）', 'date', false, '', 'js_trTo');
     h += '</div></div>';
   }
   if (t === 'jisshu3_koushin') {
-    h += '<div class="field"><label>3号のための一時帰国（1か月以上）はしましたか？（いちじきこく）<span class="req">*</span><br><span style="font-size:11px;color:#6366f1;font-weight:500;">Have you returned home temporarily (1 month or more) for Technical Intern Training (iii)?</span></label>';
-    h += '<select id="f-jsTrDone" onchange="toggleJisshuTrDone(this.value)">';
-    h += '<option value="">---</option>';
-    h += '<option value="した">した / Yes</option>';
-    h += '<option value="まだ">まだ / Not yet</option>';
-    h += '</select></div>';
+    h += _jsSelect('f-jsTrDone', '3号のための一時帰国（1か月以上）はしましたか？（いちじきこく）', 'js_trDone', true, [['した','した'],['まだ','まだ']], 'toggleJisshuTrDone(this.value)');
     h += '<div id="jsTrDoneWrap" style="display:none;"><div class="grid2">';
-    h += field('f-jsTrFrom', '日本を出た日 / Date you left Japan', 'date', true, '', '');
-    h += field('f-jsTrTo', '日本に戻った日 / Date you came back to Japan', 'date', true, '', '');
+    h += field('f-jsTrFrom', '日本を出た日（にほんを でた ひ）', 'date', true, '', 'js_trDoneFrom');
+    h += field('f-jsTrTo', '日本に戻った日（にほんに もどった ひ）', 'date', true, '', 'js_trDoneTo');
     h += '</div></div>';
     h += '<div id="jsTrYetWrap" style="display:none;"><div class="grid2">';
-    h += field('f-jsTrPlanFrom', '日本を出る予定の日 / Planned date to leave Japan', 'date', false, '', '');
-    h += field('f-jsTrPlanTo', '日本に戻る予定の日 / Planned date to come back', 'date', false, '', '');
+    h += field('f-jsTrPlanFrom', '日本を出る予定の日（にほんを でる よていの ひ）', 'date', false, '', 'js_trPlanFrom');
+    h += field('f-jsTrPlanTo', '日本に戻る予定の日（にほんに もどる よていの ひ）', 'date', false, '', 'js_trPlanTo');
     h += '</div></div>';
-    // ver.20261102.07: ミャンマーで3号の一時帰国をしていない場合（情勢不安）は説明書（参考様式）が必要
+    // ミャンマーで3号の一時帰国をしていない場合（情勢不安）は説明書（参考様式）が必要
     h += '<div id="jsMmWrap" style="display:none;">';
-    h += '<div style="font-size:12.5px;color:#92400e;background:#fffbeb;border:1px solid #fcd34d;border-radius:8px;padding:10px 12px;margin:4px 0 10px;line-height:1.7;">ミャンマーの情勢不安のため3号の一時帰国をしていない場合、更新の申請に<b>説明書（参考様式）</b>が必要です。会社・監理団体と一緒に準備します。<br>If you have not returned home for (iii) because of the situation in Myanmar, an explanation form is required for the extension.</div>';
-    h += field('f-jsMmReason', '一時帰国をしていない理由（りゆう）/ Reason for not returning home', 'select', true, '', '',
-      ['','ミャンマーの情勢不安のため / Due to the situation in Myanmar','これから帰る予定 / I plan to return','その他 / Other']);
+    h += _jsNotice('jsMmMsg', 'h_mm');
+    h += _jsSelect('f-jsMmReason', '一時帰国をしていない理由（りゆう）', 'js_mmReason', true,
+      [['ミャンマーの情勢不安のため','ミャンマーの情勢不安のため'],['これから帰る予定','これから帰る予定'],['その他','その他']]);
     h += '</div>';
   }
   if (!/^jisshu[13]_nintei$/.test(t)) {
-    h += '<div class="field"><label>前の申請から変わったことはありますか？（まえのしんせいから かわったこと）<span class="req">*</span><br><span style="font-size:11px;color:#6366f1;font-weight:500;">Has anything changed since your last application? (name, workplace, etc.)</span></label>';
-    h += '<select id="f-jsChanged" onchange="toggleJisshuChanged(this.value)">';
-    h += '<option value="">---</option>';
-    h += '<option value="ない">ない / No</option>';
-    h += '<option value="ある">ある / Yes</option>';
-    h += '</select></div>';
+    h += _jsSelect('f-jsChanged', '前の申請から変わったことはありますか？（まえの しんせいから かわったこと）', 'js_changed', true, [['ない','ない'],['ある','ある']], 'toggleJisshuChanged(this.value)');
     h += '<div id="jsChangedWrap" style="display:none;">';
-    h += field('f-jsChangedNote', '変わったこと（かわったこと）/ What changed', 'textarea', true, '例: 働く場所が○○工場に変わった / My workplace changed to ○○ factory', '');
+    h += field('f-jsChangedNote', '変わったこと（かわったこと）', 'textarea', true, '例: 働く場所が○○工場に変わった', 'js_changedNote');
     h += '</div>';
   }
   h += '</div>';
@@ -6586,7 +6644,7 @@ function collectData() {
       d.pastCOE = (Number(val('f-coeCount')) > 0) ? '有' : '無';
     }
     if (t === 'jisshu2_henkou') d.jisshuKisokyuDate = val('f-jsKisoDate');
-    if (t === 'jisshu3_nintei') d.jisshu3kyuDate = val('f-js3kyuDate');
+    if (t === 'jisshu3_nintei') { d.jisshu3kyuDate = val('f-js3kyuDate'); d.jisshuTempReturnFrom = val('f-js2EndLeave'); d.jisshuTempReturnTo = val('f-jsEntryPlan'); }   // ver.20261102.08: 3号認定の一時帰国＝2号を終えて出国した日〜入国予定日
     var _tb = _jsTbNeed(); if (_tb) { var _ts = val('f-jsTbStatus'); d.tbCertStatus = _ts ? _ts.split(' / ')[0] : ''; d.tbCertNeed = (_tb === 'later') ? '2027-01-04以降の申請から必要' : '必要'; }
     if (_jsMmNeed()) { var _mr = val('f-jsMmReason'); d.jisshuMmNoReturnReason = _mr ? _mr.split(' / ')[0] : ''; }
     if (t === 'jisshu3_henkou') {
@@ -6702,6 +6760,8 @@ var ERR_MSG_I18N = {
   '日本語試験名①を選択してください。':{fr:'にほんごしけんめい①を えらんで ください。',en:'Please select Japanese exam name ①.',vi:'Vui lòng chọn tên kỳ thi tiếng Nhật ①.',id:'Silakan pilih nama ujian bahasa Jepang ①.',my:'ဂျပန်ဘာသာစာမေးပွဲအမည် ① ရွေးပါ။',km:'សូមជ្រើសរើសឈ្មោះការប្រឡងភាសាជប៉ុន ①។',ne:'जापानी परीक्षा नाम ① छान्नुहोस्।',zh:'请选择日语考试名称①。'},
   '日本語試験 受験地①を選択してください。':{fr:'にほんごしけん じゅけんち①を えらんで ください。',en:'Please select Japanese exam location ①.',vi:'Vui lòng chọn nơi thi tiếng Nhật ①.',id:'Silakan pilih lokasi ujian bahasa Jepang ①.',my:'ဂျပန်ဘာသာစာမေးပွဲ ဖြေဆိုသည့်နေရာ ① ရွေးပါ။',km:'សូមជ្រើសរើសទីតាំងប្រឡងភាសាជប៉ុន ①។',ne:'जापानी परीक्षा स्थान ① छान्नुहोस्।',zh:'请选择日语考试地点①。'}
 };
+// ver.20261102.08: 技能実習の入力チェックのメッセージ
+(function(){ var m = {"出生地を入力してください。":{"fr":"しゅっせいちを にゅうりょくして ください。","en":"Please enter your place of birth.","vi":"Vui lòng nhập nơi sinh.","id":"Silakan masukkan tempat lahir.","my":"မွေးရပ်ကို ရိုက်ထည့်ပါ။","km":"សូមបញ្ចូលទីកន្លែងកំណើត។","ne":"जन्मस्थान लेख्नुहोस्।","zh":"请填写出生地。"},"パスポート番号を入力してください。":{"fr":"ぱすぽーと ばんごうを にゅうりょくして ください。","en":"Please enter your passport number.","vi":"Vui lòng nhập số hộ chiếu.","id":"Silakan masukkan nomor paspor.","my":"ပတ်စပို့နံပါတ်ကို ရိုက်ထည့်ပါ။","km":"សូមបញ្ចូលលេខលិខិតឆ្លងដែន។","ne":"राहदानी नम्बर लेख्नुहोस्।","zh":"请填写护照号码。"},"パスポートの有効期限を入力してください。":{"fr":"ぱすぽーとの ゆうこうきげんを にゅうりょくして ください。","en":"Please enter your passport expiry date.","vi":"Vui lòng nhập ngày hết hạn hộ chiếu.","id":"Silakan masukkan tanggal habis berlaku paspor.","my":"ပတ်စပို့ သက်တမ်းကုန်ရက်ကို ရိုက်ထည့်ပါ။","km":"សូមបញ្ចូលថ្ងៃផុតកំណត់លិខិតឆ្លងដែន។","ne":"राहदानीको म्याद सकिने मिति लेख्नुहोस्।","zh":"请填写护照有效期。"},"性別を選択してください。":{"fr":"せいべつを えらんで ください。","en":"Please select your sex.","vi":"Vui lòng chọn giới tính.","id":"Silakan pilih jenis kelamin.","my":"ကျား/မ ကို ရွေးပါ။","km":"សូមជ្រើសរើសភេទ។","ne":"लिङ्ग छान्नुहोस्।","zh":"请选择性别。"},"本国の住所を入力してください。":{"fr":"ほんごくの じゅうしょを にゅうりょくして ください。","en":"Please enter your address in your home country.","vi":"Vui lòng nhập địa chỉ ở nước nhà.","id":"Silakan masukkan alamat di negara asal.","my":"မိခင်နိုင်ငံရှိ လိပ်စာကို ရိုက်ထည့်ပါ။","km":"សូមបញ្ចូលអាសយដ្ឋាននៅប្រទេសកំណើត។","ne":"आफ्नो देशको ठेगाना लेख्नुहोस्।","zh":"请填写本国住址。"},"携帯電話番号を入力してください。":{"fr":"けいたいでんわ ばんごうを にゅうりょくして ください。","en":"Please enter your mobile phone number.","vi":"Vui lòng nhập số điện thoại di động.","id":"Silakan masukkan nomor ponsel.","my":"မိုဘိုင်းဖုန်းနံပါတ်ကို ရိုက်ထည့်ပါ။","km":"សូមបញ្ចូលលេខទូរស័ព្ទដៃ។","ne":"मोबाइल नम्बर लेख्नुहोस्।","zh":"请填写手机号码。"},"犯罪で処分を受けたことがあるかどうかを選択してください。":{"fr":"はんざいで しょぶんを うけたことが あるか えらんで ください。","en":"Please select whether you have ever been punished for a crime.","vi":"Vui lòng chọn bạn đã từng bị xử phạt vì phạm tội hay chưa.","id":"Silakan pilih apakah Anda pernah dihukum karena tindak pidana.","my":"ရာဇဝတ်မှုဖြင့် ပြစ်ဒဏ်ခံရဖူးခြင်း ရှိ/မရှိ ရွေးပါ။","km":"សូមជ្រើសរើសថាតើអ្នកធ្លាប់ត្រូវបានផ្តន្ទាទោសពីបទឧក្រិដ្ឋឬទេ។","ne":"अपराधमा सजाय भएको छ कि छैन छान्नुहोस्।","zh":"请选择是否曾因犯罪受到处分。"},"処分の内容を入力してください。":{"fr":"しょぶんの ないようを にゅうりょくして ください。","en":"Please enter the details of the punishment.","vi":"Vui lòng nhập nội dung xử phạt.","id":"Silakan masukkan rincian hukuman.","my":"ပြစ်ဒဏ်၏ အသေးစိတ်ကို ရိုက်ထည့်ပါ။","km":"សូមបញ្ចូលព័ត៌មានលម្អិតនៃការផ្តន្ទាទោស។","ne":"सजायको विवरण लेख्नुहोस्।","zh":"请填写处分内容。"},"職歴があるかどうかを選択してください。":{"fr":"しょくれきが あるか えらんで ください。","en":"Please select whether you have work experience.","vi":"Vui lòng chọn bạn có kinh nghiệm làm việc hay không.","id":"Silakan pilih apakah Anda memiliki riwayat pekerjaan.","my":"အလုပ်အတွေ့အကြုံ ရှိ/မရှိ ရွေးပါ။","km":"សូមជ្រើសរើសថាតើអ្នកមានបទពិសោធន៍ការងារឬទេ។","ne":"कामको अनुभव छ कि छैन छान्नुहोस्।","zh":"请选择是否有工作经历。"},"職歴の会社の名前を入力してください。":{"fr":"しょくれきの かいしゃの なまえを にゅうりょくして ください。","en":"Please enter the company name in your work experience.","vi":"Vui lòng nhập tên công ty trong kinh nghiệm làm việc.","id":"Silakan masukkan nama perusahaan pada riwayat pekerjaan.","my":"အလုပ်အတွေ့အကြုံရှိ ကုမ္ပဏီအမည်ကို ရိုက်ထည့်ပါ။","km":"សូមបញ្ចូលឈ្មោះក្រុមហ៊ុនក្នុងបទពិសោធន៍ការងារ។","ne":"कामको अनुभवमा कम्पनीको नाम लेख्नुहोस्।","zh":"请填写工作经历中的公司名称。"},"職歴の入社した年月を入力してください。":{"fr":"しょくれきの にゅうしゃした ねんげつを にゅうりょくして ください。","en":"Please enter the year and month you joined.","vi":"Vui lòng nhập năm-tháng vào làm.","id":"Silakan masukkan tahun-bulan mulai bekerja.","my":"စတင်ဝင်ရောက်သည့် နှစ်-လ ကို ရိုက်ထည့်ပါ။","km":"សូមបញ្ចូលឆ្នាំ-ខែចូលធ្វើការ។","ne":"काम सुरु गरेको वर्ष-महिना लेख्नुहोस्।","zh":"请填写入职年月。"},"職歴の年月は「2018-04」のように入力してください。":{"fr":"しょくれきの ねんげつは 「2018-04」の ように にゅうりょくして ください。","en":"Please enter the year-month like \"2018-04\".","vi":"Vui lòng nhập năm-tháng theo dạng \"2018-04\".","id":"Silakan masukkan tahun-bulan seperti \"2018-04\".","my":"နှစ်-လ ကို \"2018-04\" ကဲ့သို့ ရိုက်ထည့်ပါ။","km":"សូមបញ្ចូលឆ្នាំ-ខែ ដូចជា \"2018-04\"។","ne":"वर्ष-महिना \"2018-04\" जस्तै लेख्नुहोस्।","zh":"请按\"2018-04\"的格式填写年月。"},"ビザを申請する日本大使館・領事館を入力してください。":{"fr":"びざを しんせいする にほん たいしかん・りょうじかんを にゅうりょくして ください。","en":"Please enter the Japanese Embassy or Consulate where you will apply for a visa.","vi":"Vui lòng nhập Đại sứ quán/Lãnh sự quán Nhật Bản nơi bạn xin visa.","id":"Silakan masukkan Kedutaan/Konsulat Jepang tempat Anda mengajukan visa.","my":"ဗီဇာလျှောက်မည့် ဂျပန်သံရုံး/ကောင်စစ်ဝန်ရုံးကို ရိုက်ထည့်ပါ။","km":"សូមបញ្ចូលស្ថានទូត ឬកុងស៊ុលជប៉ុនដែលអ្នកនឹងដាក់ពាក្យសុំទិដ្ឋាការ។","ne":"भिसा आवेदन दिने जापानी दूतावास वा वाणिज्य दूतावास लेख्नुहोस्।","zh":"请填写申请签证的日本大使馆或领事馆。"},"日本に着く予定の空港を選択してください。":{"fr":"にほんに つく よていの くうこうを えらんで ください。","en":"Please select the airport where you will arrive in Japan.","vi":"Vui lòng chọn sân bay đến tại Nhật Bản.","id":"Silakan pilih bandara kedatangan di Jepang.","my":"ဂျပန်တွင် ဆိုက်ရောက်မည့် လေဆိပ်ကို ရွေးပါ။","km":"សូមជ្រើសរើសព្រលានយន្តហោះដែលអ្នកនឹងមកដល់ជប៉ុន។","ne":"जापानमा आइपुग्ने विमानस्थल छान्नुहोस्।","zh":"请选择抵达日本的机场。"},"今の仕事を入力してください（していない場合は「なし」）。":{"fr":"いまの しごとを にゅうりょくして ください（して いない ばあいは「なし」）。","en":"Please enter your current job (write \"なし\" if none).","vi":"Vui lòng nhập công việc hiện tại (nếu không có, ghi \"なし\").","id":"Silakan masukkan pekerjaan saat ini (tulis \"なし\" jika tidak ada).","my":"လက်ရှိအလုပ်ကို ရိုက်ထည့်ပါ (မရှိလျှင် \"なし\")။","km":"សូមបញ្ចូលការងារបច្ចុប្បន្ន (បើគ្មាន សរសេរ \"なし\")។","ne":"हालको काम लेख्नुहोस् (नभए \"なし\")।","zh":"请填写目前的工作（没有请填写\"なし\"）。"},"一緒に日本に来る家族がいるかどうかを選択してください。":{"fr":"いっしょに にほんに くる かぞくが いるか えらんで ください。","en":"Please select whether any family member will come to Japan with you.","vi":"Vui lòng chọn có người thân đi cùng sang Nhật hay không.","id":"Silakan pilih apakah ada keluarga yang ikut ke Jepang.","my":"အတူလိုက်လာမည့် မိသားစုဝင် ရှိ/မရှိ ရွေးပါ။","km":"សូមជ្រើសរើសថាតើមានសមាជិកគ្រួសារមកជាមួយឬទេ។","ne":"परिवारका सदस्य सँगै आउनुहुन्छ कि छैन छान्नुहोस्।","zh":"请选择是否有家人一同来日本。"},"強制送還・出国命令で出国したことがあるかどうかを選択してください。":{"fr":"きょうせいそうかん・しゅっこくめいれいで しゅっこく したことが あるか えらんで ください。","en":"Please select whether you have ever left Japan due to deportation or a departure order.","vi":"Vui lòng chọn bạn đã từng bị trục xuất hoặc có lệnh xuất cảnh hay chưa.","id":"Silakan pilih apakah Anda pernah dideportasi atau diperintahkan keluar.","my":"နှင်ထုတ်ခံရဖူးခြင်း/ထွက်ခွာရန်အမိန့် ရှိ/မရှိ ရွေးပါ။","km":"សូមជ្រើសរើសថាតើអ្នកធ្លាប់ត្រូវបានបណ្តេញចេញ ឬបញ្ជាឱ្យចាកចេញឬទេ។","ne":"देश निकाला वा प्रस्थान आदेश भएको छ कि छैन छान्नुहोस्।","zh":"请选择是否曾因被驱逐出境或出境命令离开日本。"},"強制送還・出国命令の回数と最後に出国した日を入力してください。":{"fr":"きょうせいそうかん・しゅっこくめいれいの かいすうと さいごに しゅっこくした ひを にゅうりょくして ください。","en":"Please enter the number of times and the date of the latest departure.","vi":"Vui lòng nhập số lần và ngày xuất cảnh gần nhất.","id":"Silakan masukkan jumlah kali dan tanggal keberangkatan terakhir.","my":"အကြိမ်ရေနှင့် နောက်ဆုံးထွက်ခွာသည့်ရက်ကို ရိုက်ထည့်ပါ။","km":"សូមបញ្ចូលចំនួនដង និងកាលបរិច្ឆេទចាកចេញចុងក្រោយ។","ne":"पटक र पछिल्लो प्रस्थान मिति लेख्नुहोस्।","zh":"请填写次数和最近一次出境日期。"},"結核非発病証明書があるかどうかを選択してください。":{"fr":"けっかく ひはつびょう しょうめいしょが あるか えらんで ください。","en":"Please select whether you have a Tuberculosis-free certificate.","vi":"Vui lòng chọn bạn đã có giấy chứng nhận không mắc bệnh lao hay chưa.","id":"Silakan pilih apakah Anda memiliki sertifikat bebas TBC.","my":"တီဘီမဖြစ်ကြောင်း လက်မှတ် ရှိ/မရှိ ရွေးပါ။","km":"សូមជ្រើសរើសថាតើអ្នកមានវិញ្ញាបនបត្រមិនមានជំងឺរបេងឬទេ។","ne":"क्षयरोग नभएको प्रमाणपत्र छ कि छैन छान्नुहोस्।","zh":"请选择是否有未患结核病证明书。"},"一時帰国をしていない理由を選択してください。":{"fr":"いちじきこくを していない りゆうを えらんで ください。","en":"Please select the reason for not returning home.","vi":"Vui lòng chọn lý do chưa về nước.","id":"Silakan pilih alasan belum pulang.","my":"မပြန်ရသေးသည့် အကြောင်းရင်းကို ရွေးပါ။","km":"សូមជ្រើសរើសមូលហេតុដែលមិនទាន់ត្រឡប់ទៅស្រុក។","ne":"घर नफर्कनुको कारण छान्नुहोस्।","zh":"请选择未回国的原因。"},"技能検定 随時3級（実技）に合格した日を入力してください。":{"fr":"ぎのうけんてい ずいじ3きゅう（じつぎ）に ごうかくした ひを にゅうりょくして ください。","en":"Please enter the date you passed the Grade 3 practical skill test.","vi":"Vui lòng nhập ngày đỗ kỳ thi kỹ năng cấp 3 (thực hành).","id":"Silakan masukkan tanggal lulus ujian keterampilan tingkat 3 (praktik).","my":"အဆင့် ၃ လက်တွေ့စာမေးပွဲ အောင်သည့်ရက်ကို ရိုက်ထည့်ပါ။","km":"សូមបញ្ចូលកាលបរិច្ឆេទប្រឡងជាប់កម្រិត៣ (អនុវត្ត)។","ne":"ग्रेड ३ व्यावहारिक परीक्षा उत्तीर्ण मिति लेख्नुहोस्।","zh":"请填写技能检定随时3级（实技）合格日期。"},"技能検定 基礎級に合格した日を入力してください。":{"fr":"ぎのうけんてい きそきゅうに ごうかくした ひを にゅうりょくして ください。","en":"Please enter the date you passed the Basic Grade skill test.","vi":"Vui lòng nhập ngày đỗ kỳ thi kỹ năng cấp cơ bản.","id":"Silakan masukkan tanggal lulus ujian keterampilan tingkat dasar.","my":"အခြေခံအဆင့် စာမေးပွဲ အောင်သည့်ရက်ကို ရိုက်ထည့်ပါ။","km":"សូមបញ្ចូលកាលបរិច្ឆេទប្រឡងជាប់កម្រិតមូលដ្ឋាន។","ne":"आधारभूत स्तर परीक्षा उत्तीर्ण मिति लेख्नुहोस्।","zh":"请填写技能检定基础级合格日期。"},"3号のための一時帰国の時期を選んでください。":{"fr":"3ごうの ための いちじきこくの じきを えらんで ください。","en":"Please select when you will return home temporarily for (iii).","vi":"Vui lòng chọn thời điểm tạm về nước cho thực tập số 3.","id":"Silakan pilih kapan Anda pulang sementara untuk (iii).","my":"(၃) အတွက် ယာယီပြန်မည့်အချိန်ကို ရွေးပါ။","km":"សូមជ្រើសរើសពេលត្រឡប់ទៅស្រុកបណ្តោះអាសន្នសម្រាប់លេខ៣។","ne":"(iii) का लागि अस्थायी फिर्ती कहिले हो छान्नुहोस्।","zh":"请选择为3号临时回国的时间。"},"一時帰国で日本を出た日・戻った日を入力してください。":{"fr":"いちじきこくで にほんを でた ひ・もどった ひを にゅうりょくして ください。","en":"Please enter the dates you left and came back to Japan.","vi":"Vui lòng nhập ngày rời và ngày quay lại Nhật Bản.","id":"Silakan masukkan tanggal keluar dan kembali ke Jepang.","my":"ဂျပန်မှ ထွက်ခွာသည့်ရက်နှင့် ပြန်လာသည့်ရက်ကို ရိုက်ထည့်ပါ။","km":"សូមបញ្ចូលកាលបរិច្ឆេទចាកចេញ និងត្រឡប់មកជប៉ុនវិញ។","ne":"जापान छोडेको र फर्केको मिति लेख्नुहोस्।","zh":"请填写离开和返回日本的日期。"},"3号のための一時帰国をしたかどうかを選んでください。":{"fr":"3ごうの ための いちじきこくを したか えらんで ください。","en":"Please select whether you have returned home temporarily for (iii).","vi":"Vui lòng chọn bạn đã tạm về nước cho thực tập số 3 chưa.","id":"Silakan pilih apakah Anda sudah pulang sementara untuk (iii).","my":"(၃) အတွက် ယာယီပြန်ပြီး/မပြန်ရသေး ရွေးပါ။","km":"សូមជ្រើសរើសថាតើអ្នកបានត្រឡប់ទៅស្រុកបណ្តោះអាសន្នសម្រាប់លេខ៣ ហើយឬនៅ។","ne":"(iii) का लागि अस्थायी फिर्ती गर्नुभयो कि छैन छान्नुहोस्।","zh":"请选择是否已为3号临时回国。"},"前の申請から変わったことがあるかどうかを選んでください。":{"fr":"まえの しんせいから かわったことが あるか えらんで ください。","en":"Please select whether anything has changed since your last application.","vi":"Vui lòng chọn có gì thay đổi so với lần nộp trước hay không.","id":"Silakan pilih apakah ada perubahan sejak pengajuan terakhir.","my":"ယခင်လျှောက်ထားချိန်မှ ပြောင်းလဲမှု ရှိ/မရှိ ရွေးပါ။","km":"សូមជ្រើសរើសថាតើមានអ្វីផ្លាស់ប្តូរពីលើកមុនឬទេ។","ne":"पछिल्लो आवेदनपछि परिवर्तन छ कि छैन छान्नुहोस्।","zh":"请选择与上次申请相比有无变化。"},"変わったことを入力してください。":{"fr":"かわったことを にゅうりょくして ください。","en":"Please enter what changed.","vi":"Vui lòng nhập nội dung thay đổi.","id":"Silakan masukkan apa yang berubah.","my":"ပြောင်းလဲသည့်အရာကို ရိုက်ထည့်ပါ။","km":"សូមបញ្ចូលអ្វីដែលបានផ្លាស់ប្តូរ។","ne":"के परिवर्तन भयो लेख्नुहोस्।","zh":"请填写变化内容。"},"2号を終えて日本を出た日を入力してください。":{"fr":"2ごうを おえて にほんを でた ひを にゅうりょくして ください。","en":"Please enter the date you left Japan after finishing (ii).","vi":"Vui lòng nhập ngày rời Nhật Bản sau khi kết thúc thực tập số 2.","id":"Silakan masukkan tanggal Anda meninggalkan Jepang setelah (ii) selesai.","my":"(၂) ပြီးဆုံးပြီး ဂျပန်မှ ထွက်ခွာသည့်ရက်ကို ရိုက်ထည့်ပါ။","km":"សូមបញ្ចូលកាលបរិច្ឆេទចាកចេញពីជប៉ុន បន្ទាប់ពីបញ្ចប់លេខ២។","ne":"(ii) सकेर जापान छोडेको मिति लेख्नुहोस्।","zh":"请填写2号结束后离开日本的日期。"}}; for (var k in m) ERR_MSG_I18N[k] = m[k]; })();
 function _renderPlainError(str){
   var m = ERR_MSG_I18N[str];
   if(!m) return null;
@@ -7123,8 +7183,10 @@ function _validateInner() {
     if (!val('f-jsWorkStatus')) return '職歴があるかどうかを選択してください。';
     if (val('f-jsWorkStatus').indexOf('ある') === 0) {
       for (var _wi = 1; _wi <= _jsWorkCount; _wi++) {
-        if (!val('f-jsWork' + _wi + 'Name')) return '職歴' + _wi + 'の会社の名前を入力してください。';
-        if (!val('f-jsWork' + _wi + 'From')) return '職歴' + _wi + 'の入社した年月を入力してください。';
+        if (!val('f-jsWork' + _wi + 'Name')) { try { document.getElementById('f-jsWork' + _wi + 'Name').focus(); } catch(_){} return '職歴の会社の名前を入力してください。'; }
+        if (!val('f-jsWork' + _wi + 'From')) { try { document.getElementById('f-jsWork' + _wi + 'From').focus(); } catch(_){} return '職歴の入社した年月を入力してください。'; }
+        var _yf = _jsYm(val('f-jsWork' + _wi + 'From')), _yt = _jsYm(val('f-jsWork' + _wi + 'To'));
+        if (!/^\d{4}-(0[1-9]|1[0-2])$/.test(_yf) || (_yt && !/^\d{4}-(0[1-9]|1[0-2])$/.test(_yt))) return '職歴の年月は「2018-04」のように入力してください。';
       }
     }
     if (/^jisshu[13]_nintei$/.test(type)) {
@@ -7137,6 +7199,7 @@ function _validateInner() {
     }
     if (_jsTbNeed() && !val('f-jsTbStatus')) return '結核非発病証明書があるかどうかを選択してください。';
     if (_jsMmNeed() && !val('f-jsMmReason')) return '一時帰国をしていない理由を選択してください。';
+    if (type === 'jisshu3_nintei' && !val('f-js2EndLeave')) return '2号を終えて日本を出た日を入力してください。';
     if (type === 'jisshu3_nintei' && !val('f-js3kyuDate')) return '技能検定 随時3級（実技）に合格した日を入力してください。';
     if (type === 'jisshu2_henkou' && !val('f-jsKisoDate')) return '技能検定 基礎級に合格した日を入力してください。';
     if (type === 'jisshu3_henkou') {
@@ -7557,6 +7620,7 @@ function setLang(l) {
   if (typeof applyProofOptionLang === 'function') applyProofOptionLang(l);
   if (typeof applyGijutsuProofLang === 'function') applyGijutsuProofLang(l);
   if (typeof applyJpBlockLang === 'function') applyJpBlockLang(l);
+  if (typeof _jsApplyLang === 'function') _jsApplyLang(l);   // ver.20261102.08: 技能実習の質問・選択肢
 }
 
 var TYPE_LABELS = {
@@ -7828,8 +7892,17 @@ function _jisshuPrefill(resp) {
   set('f-jsOccupation', resp.occupation); setSel('f-jsCompanion', resp.companion);
   setSel('f-jsDeport', resp.deportation); toggleJisshuDeport(resp.deportation); set('f-jsDeportCount', resp.deportationCount); set('f-jsDeportDate', resp.deportationDate);
   set('f-jsKisoDate', resp.jisshuKisokyuDate);
+  if (type === 'jisshu3_nintei') set('f-js2EndLeave', resp.jisshuTempReturnFrom);
   setSel('f-jsTbStatus', resp.tbCertStatus); setSel('f-jsMmReason', resp.jisshuMmNoReturnReason);
-  setTimeout(function(){ try { _jsNatRefresh(); setSel('f-jsTbStatus', resp.tbCertStatus); setSel('f-jsMmReason', resp.jisshuMmNoReturnReason); } catch(_){} }, 0); set('f-js3kyuDate', resp.jisshu3kyuDate);
+  setTimeout(function(){ try {
+    // ver.20261102.08: 国籍が選択肢にない（「その他」で手入力した）ときは「その他」＋手入力欄に戻す（技能実習のフォームだけ）
+    var _ns = document.getElementById('f-nationality'), _nv = String(resp.nationality || '').trim();
+    if (_ns && _nv && ![].some.call(_ns.options, function(o){ return o.value === _nv; })) {
+      _ns.value = 'その他'; try { toggleNationalityOther('その他'); } catch(_){}
+      var _no = document.getElementById('f-nationalityOther'); if (_no) { _no.style.display = ''; _no.value = _nv; }
+    }
+    _jsNatRefresh(); setSel('f-jsTbStatus', resp.tbCertStatus); setSel('f-jsMmReason', resp.jisshuMmNoReturnReason);
+  } catch(_){} }, 0); set('f-js3kyuDate', resp.jisshu3kyuDate);
   setSel('f-jsTrPlan', resp.jisshuTempReturnPlan); toggleJisshuTr(resp.jisshuTempReturnPlan || '');
   setSel('f-jsTrDone', resp.jisshuTempReturnDone); toggleJisshuTrDone(resp.jisshuTempReturnDone || '');
   if (resp.jisshuTempReturnDone === 'まだ') { set('f-jsTrPlanFrom', resp.jisshuTempReturnFrom); set('f-jsTrPlanTo', resp.jisshuTempReturnTo); }
@@ -7837,7 +7910,7 @@ function _jisshuPrefill(resp) {
   setSel('f-jsChanged', resp.jisshuChanged); toggleJisshuChanged(resp.jisshuChanged || ''); set('f-jsChangedNote', resp.jisshuChangedNote);
   if (resp.workHistoryStatus) {
     var ws = document.getElementById('f-jsWorkStatus');
-    if (ws) { ws.value = (resp.workHistoryStatus === '有') ? 'ある / Yes' : 'ない / No'; var w = document.getElementById('jsWorkWrap'); if (w) w.style.display = (resp.workHistoryStatus === '有') ? 'block' : 'none'; }
+    if (ws) { ws.value = (resp.workHistoryStatus === '有') ? 'ある' : 'ない'; var w = document.getElementById('jsWorkWrap'); if (w) w.style.display = (resp.workHistoryStatus === '有') ? 'block' : 'none'; }
   }
   var list = resp.workHistory;
   if (typeof list === 'string') { try { list = JSON.parse(list); } catch(_){ list = []; } }
