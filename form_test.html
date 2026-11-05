@@ -194,7 +194,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20261105.01-test'; // 一本化フォーム（テスト）：URLに upload=1 を付けると、特定技能1号の申請人フォームの最初に「書類の写真」欄が出る。O-Link等で受け取り済みの在留カード表裏・パスポートは「受け取り済み」でスキップ。撮った写真から番号などを自動入力。送信後に人材フォルダへ（フォルダが無いときはプールへ）。本番 ver.20261102.09 と同期 ／  // 技能実習の所属機関フォーム：会社から答えにくい項目を任意に（監理団体の欄は名称以外・届出受理年月日・月額給与）。冒頭に「監理団体の方が代わりに記入しても構いません」
+var FORM_VERSION = 'ver.20261105.02-test'; // 一本化フォーム：受け取り済みの在留カード・パスポートから読み取った内容（氏名・生年月日・国籍・パスポート番号/期限・在留カード番号）を、本人が生年月日を入れて合ったときだけ欄に入れる（24時間で5回まちがえると止める）。自動で入れたときは「合っているか確認しました」のチェックが必須 ／ ver.20261105.01-test: // 一本化フォーム（テスト）：URLに upload=1 を付けると、特定技能1号の申請人フォームの最初に「書類の写真」欄が出る。O-Link等で受け取り済みの在留カード表裏・パスポートは「受け取り済み」でスキップ。撮った写真から番号などを自動入力。送信後に人材フォルダへ（フォルダが無いときはプールへ）。本番 ver.20261102.09 と同期 ／  // 技能実習の所属機関フォーム：会社から答えにくい項目を任意に（監理団体の欄は名称以外・届出受理年月日・月額給与）。冒頭に「監理団体の方が代わりに記入しても構いません」
 // var FORM_VERSION = 'ver.20261102.08'; // 技能実習の申請人フォームをブラッシュアップ：①質問・案内・選択肢を各言語（英・越・尼・緬・クメール・ネパール・中）に ②入力チェックのメッセージも各言語に ③3号の変更・更新で共通の「一時帰国予定」に「3号のための一時帰国とは別」と補足 ④3号認定で「2号を終えて日本を出た日」を聞く ⑤国籍「その他」の英語表記（Philippines など）でも結核・ミャンマーの判定 ⑥年月の入力欄が使えないブラウザでは「2018-04」の文字入力に
 // var FORM_VERSION = 'ver.20261102.07'; // 技能実習：国籍で出し分け。認定（1号・3号）で入国前結核スクリーニングの対象国（フィリピン・ネパール・ベトナム、インドネシアは2027/1/4以降の申請から）なら結核非発病証明書の案内と取得状況を聞く。3号更新でミャンマー・一時帰国まだなら説明書（参考様式）の案内と理由を聞く
 // var FORM_VERSION = 'ver.20261102.06'; // 技能実習の所属機関（実習実施者）ヒアリングを追加（type=company_jisshu）。特定技能1号の企業フォームの企業基本情報・所在地・代表者を同じ項目名で使い、実習実施者の届出・監理団体（団体監理型のみ）・職種と月額給与を追加。雇用条件書・相談窓口・支援計画などの特定技能の書類用の項目は出さない
@@ -8207,6 +8207,7 @@ function prefillForm(resp) {
   var KEYMAP = { '在留カード（表）':'zairyu_front', '在留カード（裏）':'zairyu_back', 'パスポート':'passport' };
   var EN = { '在留カード（表）':'Residence card (front)', '在留カード（裏）':'Residence card (back)', 'パスポート':'Passport', '顔写真':'Photo', 'その他':'Other' };
   var docs = [], files = {}, got = {}, olink = false;
+  var hasExt = false, prefillDone = false, autoFilled = false, confirmed = false;   // ver.20261105.02-test: 受け取り済みの写真から読み取った内容を入れて確認してもらう
   var isNintei = (type === 'tokutei_nintei');
 
   function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); }
@@ -8250,14 +8251,29 @@ function prefillForm(resp) {
   }
   function render(){
     var el = document.getElementById('udocCard'); if (!el) return;
+    var _bdKeep = (document.getElementById('udocBd')||{}).value || '';
     var allRec = docs.length && docs.every(function(d,i){ return got[i] || !d.r; });
     var h = '<div class="section-title">📷 書類の写真（しゃしん） / Photos of documents</div>';
     if (olink) h += '<div style="background:#ecfdf5;border:1px solid #a7f3d0;color:#065f46;border-radius:10px;padding:10px 12px;font-size:12.5px;line-height:1.7;margin-bottom:6px;">在留カード・パスポートは、受け取り済みのものがあります。<b>✅ のついた書類は出さなくて大丈夫です。</b><br><span style="color:#047857;">Documents marked ✅ have already been received. You do not need to send them again.</span></div>';
     h += '<div style="font-size:12px;color:#475569;line-height:1.7;margin-bottom:4px;">はっきり写るように撮ってください。在留カードは<b>表と裏の両方</b>が必要です。<br>Please take clear photos. For the residence card, <b>both front and back</b> are required.</div>';
     docs.forEach(function(d,i){ h += rowHtml(d,i); });
     h += '<div id="udocMsg" style="display:none;margin-top:8px;font-size:12px;line-height:1.6;border-radius:8px;padding:8px 10px;"></div>';
+    if (hasExt && !prefillDone) {
+      h += '<div style="margin-top:10px;border:2px solid #3b82f6;background:#eff6ff;border-radius:10px;padding:10px 12px;">'
+        + '<div style="font-size:13px;font-weight:800;color:#1e3a8a;line-height:1.6;">受け取った在留カード・パスポートから読み取った内容を、下の質問に入れます。<br><span style="font-weight:600;font-size:12px;color:#1d4ed8;">We will fill in the form using your received documents.</span></div>'
+        + '<div style="font-size:12px;color:#334155;margin:6px 0;line-height:1.6;">ご本人の確認のため、<b>生年月日</b>を入れてください。 / For your identity, please enter your <b>date of birth</b>.</div>'
+        + '<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;"><input type="date" id="udocBd" style="padding:8px 10px;border:1.5px solid #93c5fd;border-radius:8px;font-size:14px;">'
+        + '<button type="button" id="udocBdBtn" onclick="_udocPrefill()" style="padding:9px 14px;background:#2563eb;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:800;cursor:pointer;">内容を入れる / Fill in</button></div>'
+        + '<div id="udocBdMsg" style="font-size:12px;margin-top:6px;"></div></div>';
+    }
+    if (autoFilled) {
+      h += '<label style="display:flex;gap:8px;align-items:flex-start;margin-top:10px;border:2px solid ' + (confirmed?'#16a34a':'#f59e0b') + ';background:' + (confirmed?'#f0fdf4':'#fffbeb') + ';border-radius:10px;padding:10px 12px;cursor:pointer;">'
+        + '<input type="checkbox" id="udocConfirm" ' + (confirmed?'checked ':'') + 'onchange="_udocConfirm(this.checked)" style="width:20px;height:20px;margin-top:2px;flex-shrink:0;">'
+        + '<span style="font-size:13px;line-height:1.6;color:#1e293b;"><b>下の<span style="background:#fef9c3;padding:0 4px;">黄色</span>の欄（氏名・生年月日・国籍・番号・期限）が、在留カード・パスポートと合っているか確認しました。</b> <span class="req">*</span><br><span style="font-size:12px;color:#475569;">I have checked that the yellow fields match my residence card and passport. If anything is wrong, please correct it.</span></span></label>';
+    }
     if (allRec) h += '<div style="margin-top:6px;font-size:12px;color:#15803d;font-weight:700;">必要な書類はそろっています。下の質問に進んでください。 / All required documents are received.</div>';
     el.innerHTML = h;
+    if (_bdKeep) { var _bi = document.getElementById('udocBd'); if (_bi) _bi.value = _bdKeep; }
   }
   function msg(kind, html){ var m=document.getElementById('udocMsg'); if(!m) return; var c={info:['#eff6ff','#1e40af','#bfdbfe'],ok:['#f0fdf4','#166534','#bbf7d0'],warn:['#fffbeb','#92400e','#fde68a'],err:['#fef2f2','#991b1b','#fecaca']}[kind]; m.style.cssText='display:block;margin-top:8px;font-size:12px;line-height:1.6;border-radius:8px;padding:8px 10px;background:'+c[0]+';color:'+c[1]+';border:1px solid '+c[2]+';'; m.innerHTML=html; }
 
@@ -8290,6 +8306,7 @@ function prefillForm(resp) {
         if (setVal('f-residenceCard', d.residenceCard)) n.push('在留カード番号');
       }
       try { _formDirty = true; _updateReqRemain(); } catch(e){}
+      if (n.length) markFilled();
       if (n.length) msg('ok','写真から <b>' + n.join('・') + '</b> を入れました（<span style="background:#fef9c3;padding:0 4px;">黄色</span>の欄）。<b>まちがいがないか確認してください。</b><br>Filled from the photo (yellow fields). Please check them.');
       else msg('info','写真は受け付けました。入力欄はご自身で入れてください。 / Photo received. Please fill in the fields yourself.');
     } catch(e) {
@@ -8309,6 +8326,36 @@ function prefillForm(resp) {
     aiRead(i, files[i][0]);
   };
   window._udocClear = function(i){ delete files[i]; render(); };
+  window._udocConfirm = function(v){ confirmed = !!v; render(); };
+  function markFilled(){ autoFilled = true; confirmed = false; render(); }
+  // 生年月日が合えば、受け取った写真から読み取った内容を入れる
+  window._udocPrefill = async function(){
+    var bd = (document.getElementById('udocBd')||{}).value || '', m = document.getElementById('udocBdMsg'), b = document.getElementById('udocBdBtn');
+    if (!bd) { m.innerHTML = '<span style="color:#b91c1c;">生年月日を入れてください / Please enter your date of birth</span>'; return; }
+    b.disabled = true; b.textContent = '確認中… / Checking…';
+    try {
+      var r = await callRpc('doc_pool_prefill', { p_case_id: caseId, p_birthdate: bd });
+      var j = r.ok ? await r.json() : null;
+      if (j && j.ok && j.data) {
+        var d = j.data, n = [];
+        if (setVal('f-name', d.name)) n.push('氏名');
+        if (setVal('f-birth', d.birthdate)) n.push('生年月日');
+        if (setVal('f-nationality', d.nationality)) n.push('国籍');
+        if (setVal('f-passport', d.passport)) n.push('パスポート番号');
+        if (setVal('f-passExpiry', d.passportExpiry)) n.push('パスポート有効期限');
+        if (d.residenceCard) { var cs = document.getElementById('f-residenceCardStatus'); if (cs && !cs.value) { cs.value = 'あり'; try { toggleResidenceCardInput('あり'); } catch(e){} } if (setVal('f-residenceCard', d.residenceCard)) n.push('在留カード番号'); }
+        prefillDone = true;
+        try { _formDirty = true; _updateReqRemain(); } catch(e){}
+        markFilled();
+        msg('ok', n.length ? ('<b>' + n.join('・') + '</b> を入れました（黄色の欄）。<b>まちがいがないか確認して、下のチェックを入れてください。</b><br>Filled in (yellow). Please check them and tick the box.') : 'すでに入力されている欄はそのままにしています。内容を確認して、チェックを入れてください。');
+        return;
+      }
+      if (j && j.error === 'mismatch') m.innerHTML = '<span style="color:#b91c1c;">生年月日が合いません。もう一度確認してください' + (j.left >= 0 ? '（あと' + j.left + '回）' : '') + '。<br>Date of birth does not match.</span>';
+      else if (j && j.error === 'locked') { m.innerHTML = '<span style="color:#b91c1c;">何度もまちがえたため、今は入れられません。下の質問はご自身で入力してください。<br>Too many attempts. Please fill in by hand.</span>'; }
+      else { prefillDone = true; render(); }
+    } catch(e) { m.innerHTML = '<span style="color:#b91c1c;">通信できませんでした。もう一度押してください。 / Connection error.</span>'; }
+    b.disabled = false; b.textContent = '内容を入れる / Fill in';
+  };
 
   // ---- 送信前のチェック（在留カードは表裏セット） ----
   function idxOf(k){ for (var i=0;i<docs.length;i++) if (KEYMAP[docs[i].l]===k) return i; return -1; }
@@ -8370,6 +8417,7 @@ function prefillForm(resp) {
   submitForm = async function(){
     var pe = pairError();
     if (pe) { var em = document.getElementById('errorMsg'); em.innerHTML = '⚠️ ' + pe; em.style.display='block'; document.getElementById('udocCard').scrollIntoView({behavior:'smooth',block:'start'}); return; }
+    if (autoFilled && !confirmed) { var em2 = document.getElementById('errorMsg'); em2.innerHTML = '⚠️ 黄色の欄が在留カード・パスポートと合っているか確認して、チェックを入れてください。<br>Please check the yellow fields and tick the confirmation box.'; em2.style.display='block'; document.getElementById('udocCard').scrollIntoView({behavior:'smooth',block:'start'}); return; }
     var miss = missingRequired();
     if (miss.length && !confirm('まだ出していない書類があります：\n・' + miss.join('\n・') + '\n\nこのまま送信しますか？（あとで出すこともできます）\nSome documents are missing. Send anyway?')) return;
     await _orig();
@@ -8398,6 +8446,7 @@ function prefillForm(resp) {
       docs = list;
       var st = a[1] || {};
       olink = !!st.from_olink;
+      hasExt = !!st.has_extracted;
       docs.forEach(function(d,i){ var k = KEYMAP[d.l]; got[i] = !!d.done || (k ? !!st[k] : false); });
       // 在留カードは表裏そろって初めて受け取り済み
       var fa = idxOf('zairyu_front'), fbk = idxOf('zairyu_back');
@@ -8407,8 +8456,8 @@ function prefillForm(resp) {
       // 受け取り済みの書類から読み取るので、番号の欄は空でよいと案内
       var note = function(id, t){ var el = document.getElementById(id); if (!el || el.parentNode.querySelector('.udoc-note')) return; var s = document.createElement('div'); s.className = 'udoc-note'; s.style.cssText = 'font-size:11px;color:#047857;margin-top:3px;'; s.textContent = t; el.parentNode.appendChild(s); };
       var pi = idxOf('passport');
-      if (pi >= 0 && got[pi]) { note('f-passport','受け取り済みのパスポートから読み取るので、分からなければ空欄で大丈夫です / You may leave this blank'); note('f-passExpiry','空欄で大丈夫です / You may leave this blank'); }
-      if (fa >= 0 && got[fa]) note('f-residenceCard','受け取り済みの在留カードから読み取るので、分からなければ空欄で大丈夫です / You may leave this blank');
+      if (!hasExt && pi >= 0 && got[pi]) { note('f-passport','受け取り済みのパスポートから読み取るので、分からなければ空欄で大丈夫です / You may leave this blank'); note('f-passExpiry','空欄で大丈夫です / You may leave this blank'); }
+      if (!hasExt && fa >= 0 && got[fa]) note('f-residenceCard','受け取り済みの在留カードから読み取るので、分からなければ空欄で大丈夫です / You may leave this blank');
     });
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start); else start();
