@@ -194,7 +194,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20261105.03-test'; // 一本化フォーム：生年月日の入力をやめ、開いたときに受け取り済みの在留カード・パスポートから読み取った内容を自動で欄に入れる（URLの申請人名が案件と一致するときだけ）。確認チェックは必須のまま ／ ver.20261105.02-test: // 一本化フォーム：受け取り済みの在留カード・パスポートから読み取った内容（氏名・生年月日・国籍・パスポート番号/期限・在留カード番号）を、本人が生年月日を入れて合ったときだけ欄に入れる（24時間で5回まちがえると止める）。自動で入れたときは「合っているか確認しました」のチェックが必須 ／ ver.20261105.01-test: // 一本化フォーム（テスト）：URLに upload=1 を付けると、特定技能1号の申請人フォームの最初に「書類の写真」欄が出る。O-Link等で受け取り済みの在留カード表裏・パスポートは「受け取り済み」でスキップ。撮った写真から番号などを自動入力。送信後に人材フォルダへ（フォルダが無いときはプールへ）。本番 ver.20261102.09 と同期 ／  // 技能実習の所属機関フォーム：会社から答えにくい項目を任意に（監理団体の欄は名称以外・届出受理年月日・月額給与）。冒頭に「監理団体の方が代わりに記入しても構いません」
+var FORM_VERSION = 'ver.20261105.04-test'; // 一本化フォーム：写真から自動で入れるとき、出生地にも国籍と同じ国名を入れる ／ ver.20261105.03-test: // 一本化フォーム：生年月日の入力をやめ、開いたときに受け取り済みの在留カード・パスポートから読み取った内容を自動で欄に入れる（URLの申請人名が案件と一致するときだけ）。確認チェックは必須のまま ／ ver.20261105.02-test: // 一本化フォーム：受け取り済みの在留カード・パスポートから読み取った内容（氏名・生年月日・国籍・パスポート番号/期限・在留カード番号）を、本人が生年月日を入れて合ったときだけ欄に入れる（24時間で5回まちがえると止める）。自動で入れたときは「合っているか確認しました」のチェックが必須 ／ ver.20261105.01-test: // 一本化フォーム（テスト）：URLに upload=1 を付けると、特定技能1号の申請人フォームの最初に「書類の写真」欄が出る。O-Link等で受け取り済みの在留カード表裏・パスポートは「受け取り済み」でスキップ。撮った写真から番号などを自動入力。送信後に人材フォルダへ（フォルダが無いときはプールへ）。本番 ver.20261102.09 と同期 ／  // 技能実習の所属機関フォーム：会社から答えにくい項目を任意に（監理団体の欄は名称以外・届出受理年月日・月額給与）。冒頭に「監理団体の方が代わりに記入しても構いません」
 // var FORM_VERSION = 'ver.20261102.08'; // 技能実習の申請人フォームをブラッシュアップ：①質問・案内・選択肢を各言語（英・越・尼・緬・クメール・ネパール・中）に ②入力チェックのメッセージも各言語に ③3号の変更・更新で共通の「一時帰国予定」に「3号のための一時帰国とは別」と補足 ④3号認定で「2号を終えて日本を出た日」を聞く ⑤国籍「その他」の英語表記（Philippines など）でも結核・ミャンマーの判定 ⑥年月の入力欄が使えないブラウザでは「2018-04」の文字入力に
 // var FORM_VERSION = 'ver.20261102.07'; // 技能実習：国籍で出し分け。認定（1号・3号）で入国前結核スクリーニングの対象国（フィリピン・ネパール・ベトナム、インドネシアは2027/1/4以降の申請から）なら結核非発病証明書の案内と取得状況を聞く。3号更新でミャンマー・一時帰国まだなら説明書（参考様式）の案内と理由を聞く
 // var FORM_VERSION = 'ver.20261102.06'; // 技能実習の所属機関（実習実施者）ヒアリングを追加（type=company_jisshu）。特定技能1号の企業フォームの企業基本情報・所在地・代表者を同じ項目名で使い、実習実施者の届出・監理団体（団体監理型のみ）・職種と月額給与を追加。雇用条件書・相談窓口・支援計画などの特定技能の書類用の項目は出さない
@@ -8261,7 +8261,7 @@ function prefillForm(resp) {
     if (autoFilled) {
       h += '<label style="display:flex;gap:8px;align-items:flex-start;margin-top:10px;border:2px solid ' + (confirmed?'#16a34a':'#f59e0b') + ';background:' + (confirmed?'#f0fdf4':'#fffbeb') + ';border-radius:10px;padding:10px 12px;cursor:pointer;">'
         + '<input type="checkbox" id="udocConfirm" ' + (confirmed?'checked ':'') + 'onchange="_udocConfirm(this.checked)" style="width:20px;height:20px;margin-top:2px;flex-shrink:0;">'
-        + '<span style="font-size:13px;line-height:1.6;color:#1e293b;"><b>下の<span style="background:#fef9c3;padding:0 4px;">黄色</span>の欄（氏名・生年月日・国籍・番号・期限）が、在留カード・パスポートと合っているか確認しました。</b> <span class="req">*</span><br><span style="font-size:12px;color:#475569;">I have checked that the yellow fields match my residence card and passport. If anything is wrong, please correct it.</span></span></label>';
+        + '<span style="font-size:13px;line-height:1.6;color:#1e293b;"><b>下の<span style="background:#fef9c3;padding:0 4px;">黄色</span>の欄（氏名・生年月日・国籍・出生地・番号・期限）が、在留カード・パスポートと合っているか確認しました。</b> <span class="req">*</span><br><span style="font-size:12px;color:#475569;">I have checked that the yellow fields match my residence card and passport. If anything is wrong, please correct it.</span></span></label>';
     }
     if (allRec) h += '<div style="margin-top:6px;font-size:12px;color:#15803d;font-weight:700;">必要な書類はそろっています。下の質問に進んでください。 / All required documents are received.</div>';
     el.innerHTML = h;
@@ -8291,6 +8291,7 @@ function prefillForm(resp) {
       if (setVal('f-name', d.name)) n.push('氏名');
       if (setVal('f-birth', d.birthdate)) n.push('生年月日');
       if (setVal('f-nationality', d.nationality)) n.push('国籍');
+      if (d.nationality && setVal('f-birthPlace', d.nationality)) n.push('出生地');   // 出生地は国籍と同じ国名を入れる
       if (k === 'passport') { if (setVal('f-passport', d.passport)) n.push('パスポート番号'); if (setVal('f-passExpiry', d.passportExpiry)) n.push('パスポート有効期限'); }
       if (k === 'zairyu_front' && d.residenceCard) {
         var cs = document.getElementById('f-residenceCardStatus');
@@ -8332,6 +8333,7 @@ function prefillForm(resp) {
       if (setVal('f-name', d.name)) n.push('氏名');
       if (setVal('f-birth', d.birthdate)) n.push('生年月日');
       if (setVal('f-nationality', d.nationality)) n.push('国籍');
+      if (d.nationality && setVal('f-birthPlace', d.nationality)) n.push('出生地');   // 出生地は国籍と同じ国名を入れる
       if (setVal('f-passport', d.passport)) n.push('パスポート番号');
       if (setVal('f-passExpiry', d.passportExpiry)) n.push('パスポート有効期限');
       if (d.residenceCard) { var cs = document.getElementById('f-residenceCardStatus'); if (cs && !cs.value) { cs.value = 'あり'; try { toggleResidenceCardInput('あり'); } catch(e){} } if (setVal('f-residenceCard', d.residenceCard)) n.push('在留カード番号'); }
