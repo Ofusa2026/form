@@ -194,7 +194,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20261105.10-test'; // 一本化フォーム：①書類欄・確認・見出しの文言を各言語（英・越・尼・緬・クメール・ネパール・中）に ②違う書類・写りの悪い写真・期限切れをその場で知らせて撮り直してもらう ③在留カード（表）を案シスの在留期限・在留資格と照合し、食い違いはアップロード通知のメモに「⚠️」（申請人には出さない） ④途中保存で選んだ写真も保存 ／ ver.20261105.09-test: // 一本化フォーム：案シスの書類リストが無い案件でも、課税・納税・源泉徴収票・健康診断票・合格証・その他を出す（書類名は案シスと同じ）。英語の書類名を追加 ／ ver.20261105.08-test: // 一本化フォーム（upload=1のときだけ）：並び順を ①書類の写真 → ②写真から入った内容の確認（基本情報・在留カード番号・住所・在留期間）＋確認チェック → ③入力が必要な質問 に ／ ver.20261105.07-test: // 一本化フォーム（upload=1のときだけ）：在留カード「あり／なし」・日本の現住所「あり／なし」（変更・更新は「あり」）と出生地（送信時に国籍と同じ国名）の質問をかくす。現在の在留期間を在留カードの表から読み取って入れ、「アプリで確認しましたか？」を不要に ／ ver.20261105.06-test: // 一本化フォーム：受け取り済みの写真から住所が入ったあとに在留カードの裏を撮り直したら、裏の新しい住所で入れ直す（本人が直した住所は上書きしない） ／ ver.20261105.05-test: // 一本化フォーム：在留カードの住居地（表の印字、裏に書き足しがあれば新しい住所を優先）を読み取って「日本の現住所」に入れる（「あり」も自動で選ぶ） ／ ver.20261105.04-test: // 一本化フォーム：写真から自動で入れるとき、出生地にも国籍と同じ国名を入れる ／ ver.20261105.03-test: // 一本化フォーム：生年月日の入力をやめ、開いたときに受け取り済みの在留カード・パスポートから読み取った内容を自動で欄に入れる（URLの申請人名が案件と一致するときだけ）。確認チェックは必須のまま ／ ver.20261105.02-test: // 一本化フォーム：受け取り済みの在留カード・パスポートから読み取った内容（氏名・生年月日・国籍・パスポート番号/期限・在留カード番号）を、本人が生年月日を入れて合ったときだけ欄に入れる（24時間で5回まちがえると止める）。自動で入れたときは「合っているか確認しました」のチェックが必須 ／ ver.20261105.01-test: // 一本化フォーム（テスト）：URLに upload=1 を付けると、特定技能1号の申請人フォームの最初に「書類の写真」欄が出る。O-Link等で受け取り済みの在留カード表裏・パスポートは「受け取り済み」でスキップ。撮った写真から番号などを自動入力。送信後に人材フォルダへ（フォルダが無いときはプールへ）。本番 ver.20261102.09 と同期 ／  // 技能実習の所属機関フォーム：会社から答えにくい項目を任意に（監理団体の欄は名称以外・届出受理年月日・月額給与）。冒頭に「監理団体の方が代わりに記入しても構いません」
+var FORM_VERSION = 'ver.20261106.01-test'; // 一本化フォーム：合格証（技能）・（日本語）の写真から、資格の区分・分野・試験名・受験地を読み取って入れる（空いている欄だけ・黄色）。不合格・日本語のレベル不足はその場で知らせる ／ ver.20261105.10-test: // 一本化フォーム：①書類欄・確認・見出しの文言を各言語（英・越・尼・緬・クメール・ネパール・中）に ②違う書類・写りの悪い写真・期限切れをその場で知らせて撮り直してもらう ③在留カード（表）を案シスの在留期限・在留資格と照合し、食い違いはアップロード通知のメモに「⚠️」（申請人には出さない） ④途中保存で選んだ写真も保存 ／ ver.20261105.09-test: // 一本化フォーム：案シスの書類リストが無い案件でも、課税・納税・源泉徴収票・健康診断票・合格証・その他を出す（書類名は案シスと同じ）。英語の書類名を追加 ／ ver.20261105.08-test: // 一本化フォーム（upload=1のときだけ）：並び順を ①書類の写真 → ②写真から入った内容の確認（基本情報・在留カード番号・住所・在留期間）＋確認チェック → ③入力が必要な質問 に ／ ver.20261105.07-test: // 一本化フォーム（upload=1のときだけ）：在留カード「あり／なし」・日本の現住所「あり／なし」（変更・更新は「あり」）と出生地（送信時に国籍と同じ国名）の質問をかくす。現在の在留期間を在留カードの表から読み取って入れ、「アプリで確認しましたか？」を不要に ／ ver.20261105.06-test: // 一本化フォーム：受け取り済みの写真から住所が入ったあとに在留カードの裏を撮り直したら、裏の新しい住所で入れ直す（本人が直した住所は上書きしない） ／ ver.20261105.05-test: // 一本化フォーム：在留カードの住居地（表の印字、裏に書き足しがあれば新しい住所を優先）を読み取って「日本の現住所」に入れる（「あり」も自動で選ぶ） ／ ver.20261105.04-test: // 一本化フォーム：写真から自動で入れるとき、出生地にも国籍と同じ国名を入れる ／ ver.20261105.03-test: // 一本化フォーム：生年月日の入力をやめ、開いたときに受け取り済みの在留カード・パスポートから読み取った内容を自動で欄に入れる（URLの申請人名が案件と一致するときだけ）。確認チェックは必須のまま ／ ver.20261105.02-test: // 一本化フォーム：受け取り済みの在留カード・パスポートから読み取った内容（氏名・生年月日・国籍・パスポート番号/期限・在留カード番号）を、本人が生年月日を入れて合ったときだけ欄に入れる（24時間で5回まちがえると止める）。自動で入れたときは「合っているか確認しました」のチェックが必須 ／ ver.20261105.01-test: // 一本化フォーム（テスト）：URLに upload=1 を付けると、特定技能1号の申請人フォームの最初に「書類の写真」欄が出る。O-Link等で受け取り済みの在留カード表裏・パスポートは「受け取り済み」でスキップ。撮った写真から番号などを自動入力。送信後に人材フォルダへ（フォルダが無いときはプールへ）。本番 ver.20261102.09 と同期 ／  // 技能実習の所属機関フォーム：会社から答えにくい項目を任意に（監理団体の欄は名称以外・届出受理年月日・月額給与）。冒頭に「監理団体の方が代わりに記入しても構いません」
 // var FORM_VERSION = 'ver.20261102.08'; // 技能実習の申請人フォームをブラッシュアップ：①質問・案内・選択肢を各言語（英・越・尼・緬・クメール・ネパール・中）に ②入力チェックのメッセージも各言語に ③3号の変更・更新で共通の「一時帰国予定」に「3号のための一時帰国とは別」と補足 ④3号認定で「2号を終えて日本を出た日」を聞く ⑤国籍「その他」の英語表記（Philippines など）でも結核・ミャンマーの判定 ⑥年月の入力欄が使えないブラウザでは「2018-04」の文字入力に
 // var FORM_VERSION = 'ver.20261102.07'; // 技能実習：国籍で出し分け。認定（1号・3号）で入国前結核スクリーニングの対象国（フィリピン・ネパール・ベトナム、インドネシアは2027/1/4以降の申請から）なら結核非発病証明書の案内と取得状況を聞く。3号更新でミャンマー・一時帰国まだなら説明書（参考様式）の案内と理由を聞く
 // var FORM_VERSION = 'ver.20261102.06'; // 技能実習の所属機関（実習実施者）ヒアリングを追加（type=company_jisshu）。特定技能1号の企業フォームの企業基本情報・所在地・代表者を同じ項目名で使い、実習実施者の届出・監理団体（団体監理型のみ）・職種と月額給与を追加。雇用条件書・相談窓口・支援計画などの特定技能の書類用の項目は出さない
@@ -8225,7 +8225,7 @@ function prefillForm(resp) {
     change:     { ja:'選び直す', en:'Change', vi:'Đổi ảnh', id:'Ganti', my:'ပြောင်း', km:'ប្តូរ', ne:'बदल्नुहोस्', zh:'更换' },
     clear:      { ja:'取り消す', en:'Remove', vi:'Xóa', id:'Hapus', my:'ဖျက်', km:'លុប', ne:'हटाउनुहोस्', zh:'删除' },
     allOk:      { ja:'必要な書類はそろっています。下の質問に進んでください。', en:'All required documents are received.', vi:'Đã đủ giấy tờ cần thiết.', id:'Semua dokumen wajib sudah lengkap.', my:'လိုအပ်သော စာရွက်များ ပြည့်စုံပါပြီ။', km:'ឯកសារចាំបាច់បានគ្រប់គ្រាន់ហើយ។', ne:'आवश्यक सबै कागजात पूरा भए।', zh:'所需证件已齐全。' },
-    confirm:    { ja:'この<span style="background:#fef9c3;padding:0 4px;">黄色</span>の欄（氏名・生年月日・国籍・番号・期限・住所・在留期間）が、在留カード・パスポートと合っているか確認しました。', en:'I have checked that the yellow fields match my residence card and passport. If anything is wrong, please correct it.', vi:'Tôi đã kiểm tra các ô màu vàng khớp với thẻ cư trú và hộ chiếu. Nếu sai, vui lòng sửa lại.', id:'Saya sudah memeriksa bahwa kolom kuning sesuai dengan kartu izin tinggal dan paspor. Jika salah, perbaiki.', my:'အဝါရောင်အကွက်များသည် နေထိုင်ခွင့်ကတ်နှင့် ပတ်စ်ပို့နှင့် ကိုက်ညီကြောင်း စစ်ဆေးပြီးပါပြီ။ မှားလျှင် ပြင်ပါ။', km:'ខ្ញុំបានពិនិត្យថាប្រអប់ពណ៌លឿងត្រូវនឹងប័ណ្ណស្នាក់នៅ និងលិខិតឆ្លងដែន។ បើខុស សូមកែ។', ne:'पहेँलो खानाहरू निवास कार्ड र राहदानीसँग मिल्छन् भनी जाँचें। गलत भए सच्याउनुहोस्।', zh:'我已确认黄色栏与在留卡和护照一致。如有错误，请更正。' },
+    confirm:    { ja:'この<span style="background:#fef9c3;padding:0 4px;">黄色</span>の欄（氏名・生年月日・国籍・番号・期限・住所・在留期間・試験）が、在留カード・パスポートと合っているか確認しました。', en:'I have checked that the yellow fields match my residence card and passport. If anything is wrong, please correct it.', vi:'Tôi đã kiểm tra các ô màu vàng khớp với thẻ cư trú và hộ chiếu. Nếu sai, vui lòng sửa lại.', id:'Saya sudah memeriksa bahwa kolom kuning sesuai dengan kartu izin tinggal dan paspor. Jika salah, perbaiki.', my:'အဝါရောင်အကွက်များသည် နေထိုင်ခွင့်ကတ်နှင့် ပတ်စ်ပို့နှင့် ကိုက်ညီကြောင်း စစ်ဆေးပြီးပါပြီ။ မှားလျှင် ပြင်ပါ။', km:'ខ្ញុំបានពិនិត្យថាប្រអប់ពណ៌លឿងត្រូវនឹងប័ណ្ណស្នាក់នៅ និងលិខិតឆ្លងដែន។ បើខុស សូមកែ។', ne:'पहेँलो खानाहरू निवास कार्ड र राहदानीसँग मिल्छन् भनी जाँचें। गलत भए सच्याउनुहोस्।', zh:'我已确认黄色栏与在留卡和护照一致。如有错误，请更正。' },
     headCheckT: { ja:'✅ 確認してください', en:'Please check', vi:'Vui lòng kiểm tra', id:'Silakan periksa', my:'စစ်ဆေးပါ', km:'សូមពិនិត្យ', ne:'जाँच गर्नुहोस्', zh:'请确认' },
     headCheckS: { ja:'写真から入った内容です。まちがいがないか見て、ちがうところだけ直してください。', en:'These were filled from your photos. Please correct only what is wrong.', vi:'Nội dung được điền từ ảnh. Chỉ sửa chỗ sai.', id:'Diisi dari foto. Perbaiki hanya yang salah.', my:'ဓာတ်ပုံမှ ဖြည့်ထားသည်။ မှားသည့်နေရာကိုသာ ပြင်ပါ။', km:'បានបំពេញពីរូបថត។ សូមកែតែកន្លែងខុស។', ne:'फोटोबाट भरिएको हो। गलत भएको मात्र सच्याउनुहोस्।', zh:'以下内容由照片自动填写。只需更正错误之处。' },
     headInputT: { ja:'✏️ ここから入力してください', en:'Please answer', vi:'Vui lòng trả lời', id:'Silakan jawab', my:'ဖြေဆိုပါ', km:'សូមឆ្លើយ', ne:'उत्तर दिनुहोस्', zh:'请填写' },
@@ -8250,6 +8250,8 @@ function prefillForm(resp) {
     qcut:       { ja:'一部が写っていません。全体が入るように撮り直してください。', en:'Part of the document is cut off. Please retake the whole document.', vi:'Ảnh bị mất một phần. Vui lòng chụp toàn bộ.', id:'Sebagian terpotong. Ambil ulang seluruh dokumen.', my:'တစ်စိတ်တစ်ပိုင်း မပါပါ။ အပြည့်ရိုက်ပါ။', km:'ខ្វះផ្នែកខ្លះ។ សូមថតទាំងមូល។', ne:'केही भाग छुट्यो। पूरा देखिने गरी खिच्नुहोस्।', zh:'部分未拍到，请拍摄完整证件。' },
     qdark:      { ja:'暗くて読みにくいです。明るい所で撮り直してください。', en:'The photo is too dark. Please retake it in a bright place.', vi:'Ảnh quá tối. Vui lòng chụp ở nơi sáng.', id:'Foto terlalu gelap. Ambil ulang di tempat terang.', my:'မှောင်နေသည်။ အလင်းရှိရာတွင် ပြန်ရိုက်ပါ။', km:'រូបងងឹតពេក។ សូមថតនៅកន្លែងភ្លឺ។', ne:'फोटो अँध्यारो छ। उज्यालोमा खिच्नुहोस्।', zh:'照片太暗，请在明亮处重拍。' },
     wExpCard:   { ja:'この在留カードは期限が切れています。今の在留カードを撮ってください。', en:'This residence card has expired. Please take your current card.', vi:'Thẻ cư trú này đã hết hạn. Vui lòng chụp thẻ hiện tại.', id:'Kartu ini sudah kedaluwarsa. Foto kartu yang berlaku.', my:'ဤကတ် သက်တမ်းကုန်ပြီ။ လက်ရှိကတ်ကို ရိုက်ပါ။', km:'ប័ណ្ណនេះផុតកំណត់។ សូមថតប័ណ្ណបច្ចុប្បន្ន។', ne:'यो कार्डको म्याद सकियो। हालको कार्ड खिच्नुहोस्।', zh:'此在留卡已过期，请拍摄现在的在留卡。' },
+    wNotPass:   { ja:'「不合格」と書かれているようです。合格した証明書を撮ってください。', en:'This seems to say "not passed". Please take the certificate you passed.', vi:'Có vẻ ghi là "không đạt". Vui lòng chụp giấy chứng nhận đã đỗ.', id:'Tertulis "tidak lulus". Foto sertifikat yang lulus.', my:'"မအောင်" ဟု ရေးထားပုံရသည်။ အောင်လက်မှတ်ကို ရိုက်ပါ။', km:'ហាក់សរសេរថា "មិនជាប់"។ សូមថតវិញ្ញាបនបត្រដែលជាប់។', ne:'"अनुत्तीर्ण" लेखिएको जस्तो छ। उत्तीर्ण प्रमाणपत्र खिच्नुहोस्।', zh:'似乎写着"不合格"。请拍摄合格的证书。' },
+    wJpLevel:   { ja:'特定技能1号には、日本語能力試験N4以上またはJFT-Basic 200点以上が必要です。合っているか確認してください。', en:'SSW (i) needs JLPT N4 or higher, or JFT-Basic 200+. Please check.', vi:'Kỹ năng đặc định số 1 cần JLPT N4 trở lên hoặc JFT-Basic 200 điểm trở lên. Vui lòng kiểm tra.', id:'SSW (i) perlu JLPT N4 ke atas atau JFT-Basic 200+. Periksa kembali.', my:'SSW (i) အတွက် JLPT N4 နှင့်အထက် သို့မဟုတ် JFT-Basic 200 မှတ်အထက် လိုသည်။ စစ်ဆေးပါ။', km:'SSW (i) ត្រូវការ JLPT N4 ឡើង ឬ JFT-Basic 200 ពិន្ទុឡើង។ សូមពិនិត្យ។', ne:'SSW (i) का लागि JLPT N4 वा माथि, वा JFT-Basic 200+ चाहिन्छ। जाँच गर्नुहोस्।', zh:'特定技能1号需要日语能力考试N4以上或JFT-Basic 200分以上。请确认。' },
     wExpPp:     { ja:'このパスポートは期限が切れています。今のパスポートを撮ってください。', en:'This passport has expired. Please take your current passport.', vi:'Hộ chiếu này đã hết hạn. Vui lòng chụp hộ chiếu hiện tại.', id:'Paspor ini kedaluwarsa. Foto paspor yang berlaku.', my:'ဤပတ်စ်ပို့ သက်တမ်းကုန်ပြီ။ လက်ရှိပတ်စ်ပို့ကို ရိုက်ပါ။', km:'លិខិតឆ្លងដែននេះផុតកំណត់។ សូមថតលិខិតឆ្លងដែនបច្ចុប្បន្ន។', ne:'यो राहदानीको म्याद सकियो। हालको राहदानी खिच्नुहोस्।', zh:'此护照已过期，请拍摄现在的护照。' }
   };
   var UDL = {   // 書類名の訳（無いものは日本語だけ）
@@ -8400,13 +8402,48 @@ function prefillForm(resp) {
     set(b, T('headInputT').ja + ' / ' + T('headInputT').tr, TH('headInputS'));
   }
   // 申請人に見せる注意（違う書類・写り・期限切れ）。案シスとの照合はサーバー側でスタッフにだけ
-  var KEYLABEL = { passport:'パスポート', zairyu_front:'在留カード（表）', zairyu_back:'在留カード（裏）' };
+  var KEYLABEL = { passport:'パスポート', zairyu_front:'在留カード（表）', zairyu_back:'在留カード（裏）', cert_skill:'合格証（技能）', cert_jp:'合格証（日本語）' };
+  var CERTMAP = { '合格証（技能）':'cert_skill', '合格証（日本語）':'cert_jp' };
+  var SSW_EVAL = '分野別運用方針に定める評価方法による証明';
+  function certOptions(k){
+    if (k === 'cert_skill') return (typeof SKILL_EXAM_LIST !== 'undefined' ? SKILL_EXAM_LIST : []).filter(function(x){ return x !== '試験免除'; });
+    return ['国際交流基金日本語基礎テスト','日本語能力試験'];
+  }
+  function countryOpt(c){
+    c = String(c||'').trim(); if (!c || typeof COUNTRY_LIST_ONLINE === 'undefined') return '';
+    for (var i = 0; i < COUNTRY_LIST_ONLINE.length; i++) { var o = COUNTRY_LIST_ONLINE[i]; if (o === c || o.indexOf(c + ' ') === 0) return o; }
+    return '';
+  }
+  // 合格証の読み取り結果を「技能水準」「日本語能力」の欄へ（空いている欄だけ・黄色）
+  function fillCert(k, d){
+    var n = [];
+    if (k === 'cert_skill') {
+      var g = (typeof SKILL_FIELD_GROUPS !== 'undefined' ? SKILL_FIELD_GROUPS : []).filter(function(x){ return x.exams.indexOf(d.exam) >= 0; })[0];
+      if (!d.exam || !g) return n;
+      setVal('f-skillEvalType', SSW_EVAL);
+      if (setVal('f-skillField1', g.field)) n.push('技能試験の分野');
+      if (setVal('f-skillExam1', d.exam)) n.push('技能試験名');
+      if (setVal('f-skillExamLoc1', countryOpt(d.country))) n.push('技能試験の受験地');
+    } else {
+      if (!d.exam) return n;
+      setVal('f-jpEvalType', SSW_EVAL);
+      if (setVal('f-jpField1', '日本語試験（にほんごしけん）')) n.push('日本語試験の分野');
+      if (setVal('f-jpExam1', d.exam)) n.push('日本語試験名');
+      if (setVal('f-jpExamLoc1', countryOpt(d.country))) n.push('日本語試験の受験地');
+    }
+    return n;
+  }
   function applicantWarnings(k, d){
     var w = [], today = new Date(Date.now() + 9*3600e3).toISOString().slice(0,10);
     if (d.docType && d.docType !== k && (d.docType === 'other' || KEYLABEL[d.docType])) w.push({ k:'wWrong', x:{ ja: KEYLABEL[k], tr: DL(KEYLABEL[k]) || KEYLABEL[k] } });
     if (d.quality && d.quality !== 'ok' && UT['q' + d.quality]) w.push({ k: 'q' + d.quality });
     if (k === 'zairyu_front' && d.stayExpiry && d.stayExpiry < today) w.push({ k:'wExpCard' });
     if (k === 'passport' && d.passportExpiry && d.passportExpiry < today) w.push({ k:'wExpPp' });
+    if (CERTMAP[KEYLABEL[k]] && d.passed === 'no') w.push({ k:'wNotPass' });
+    if (k === 'cert_jp' && d.exam) {
+      var lv = String(d.level||'').toUpperCase(), sc = parseInt(lv, 10);
+      if ((/^N5$/.test(lv)) || (d.exam === '国際交流基金日本語基礎テスト' && sc > 0 && sc < 200)) w.push({ k:'wJpLevel' });
+    }
     return w;
   }
   function staffNote(f){ return (f.warn || []).map(function(w){ return '⚠️ ' + T(w.k, w.x).ja.replace(/<[^>]+>/g,'').split('。')[0] + '（申請人に撮り直しを案内済み）'; }).join('\n'); }
@@ -8417,12 +8454,12 @@ function prefillForm(resp) {
     if (n) bp.value = n;
   }
   async function aiRead(i, f){
-    var k = KEYMAP[docs[i].l];
-    if (k !== 'passport' && k !== 'zairyu_front' && k !== 'zairyu_back') return;
+    var k = KEYMAP[docs[i].l] || CERTMAP[docs[i].l];
+    if (!k) return;
     if (!/^image\/(jpeg|png|webp|gif)$/.test(f.mt)) return;
     msg('info', TH('reading'));
     try {
-      var r = await fetch(FN + 'doc-ai-read', { method:'POST', headers:{'Content-Type':'application/json','apikey':SUPABASE_KEY}, body: JSON.stringify({ case_id: caseId, doc_key: k, media_type: f.mt, data: f.b64 }) });
+      var r = await fetch(FN + 'doc-ai-read', { method:'POST', headers:{'Content-Type':'application/json','apikey':SUPABASE_KEY}, body: JSON.stringify({ case_id: caseId, doc_key: k, media_type: f.mt, data: f.b64, options: CERTMAP[docs[i].l] ? certOptions(k) : undefined }) });
       var j = await r.json().catch(function(){ return null; });
       if (!j || !j.ok) throw new Error((j && j.error) || ('HTTP ' + r.status));
       var d = j.data || {}, n = [];
@@ -8430,7 +8467,16 @@ function prefillForm(resp) {
       if (f.warn.length) {   // 違う書類・期限切れなどは欄に入れず、撮り直してもらう
         render();
         msg('warn', f.warn.map(function(w){ return '⚠️ ' + TH(w.k, w.x); }).join('<br>'));
-        if (f.warn.some(function(w){ return w.k === 'wWrong' || w.k === 'wExpCard' || w.k === 'wExpPp'; })) return;
+        if (f.warn.some(function(w){ return w.k === 'wWrong' || w.k === 'wExpCard' || w.k === 'wExpPp' || w.k === 'wNotPass'; })) return;
+      }
+      if (CERTMAP[docs[i].l]) {   // 合格証：試験の欄だけ
+        n = fillCert(k, d);
+        try { _formDirty = true; _updateReqRemain(); } catch(e){}
+        if (n.length) markFilled();
+        if (f.warn.length) { msg('warn', f.warn.map(function(w){ return '⚠️ ' + TH(w.k, w.x); }).join('<br>')); return; }
+        if (n.length) msg('ok', '<b>' + n.join('・') + '</b><br>' + TH('filled'));
+        else msg('info', TH('noRead'));
+        return;
       }
       if (setVal('f-name', d.name)) n.push('氏名');
       if (setVal('f-birth', d.birthdate)) n.push('生年月日');
