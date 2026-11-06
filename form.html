@@ -193,7 +193,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20261102.09'; // 技能実習の所属機関フォーム：会社から答えにくい項目を任意に（監理団体の欄は名称以外・届出受理年月日・月額給与）。冒頭に「監理団体の方が代わりに記入しても構いません」
+var FORM_VERSION = 'ver.20261106.05'; // 2号フォーム：指導対象者を入れたのに、その２号の方の氏名が空なら送る前に止める（Saysay 1-32号で誰の対象者か分からず反映されなかったため） ／ previous: ver.20261102.09 技能実習の所属機関フォーム：会社から答えにくい項目を任意に（監理団体の欄は名称以外・届出受理年月日・月額給与）。冒頭に「監理団体の方が代わりに記入しても構いません」
 // var FORM_VERSION = 'ver.20261102.08'; // 技能実習の申請人フォームをブラッシュアップ：①質問・案内・選択肢を各言語（英・越・尼・緬・クメール・ネパール・中）に ②入力チェックのメッセージも各言語に ③3号の変更・更新で共通の「一時帰国予定」に「3号のための一時帰国とは別」と補足 ④3号認定で「2号を終えて日本を出た日」を聞く ⑤国籍「その他」の英語表記（Philippines など）でも結核・ミャンマーの判定 ⑥年月の入力欄が使えないブラウザでは「2018-04」の文字入力に
 // var FORM_VERSION = 'ver.20261102.07'; // 技能実習：国籍で出し分け。認定（1号・3号）で入国前結核スクリーニングの対象国（フィリピン・ネパール・ベトナム、インドネシアは2027/1/4以降の申請から）なら結核非発病証明書の案内と取得状況を聞く。3号更新でミャンマー・一時帰国まだなら説明書（参考様式）の案内と理由を聞く
 // var FORM_VERSION = 'ver.20261102.06'; // 技能実習の所属機関（実習実施者）ヒアリングを追加（type=company_jisshu）。特定技能1号の企業フォームの企業基本情報・所在地・代表者を同じ項目名で使い、実習実施者の届出・監理団体（団体監理型のみ）・職種と月額給与を追加。雇用条件書・相談窓口・支援計画などの特定技能の書類用の項目は出さない
@@ -7044,6 +7044,20 @@ function _validateInner() {
       if (nm !== '') _filled++;
     });
     try{ _t2RulesToggle(); }catch(e){}
+    // ver.20261106.05: 指導対象者を入れたのに、その上の「２号特定技能外国人の氏名」が空だと、
+    //   書類（Saysay 1-32号）で誰の対象者か分からず反映できなかったため、氏名を必須にする
+    var _t2blocks = document.querySelectorAll('#t2TargetContainer .t2-person-block');
+    for (var _bi = 0; _bi < _t2blocks.length; _bi++) {
+      var _blk = _t2blocks[_bi];
+      var _nmEl = _blk.querySelector('input[id^="f-t2NameNow_"],input[id^="f-t2NameThis_"]');
+      if (!_nmEl || (_nmEl.value || '').trim()) continue;
+      var _hasTg = Array.prototype.some.call(_blk.querySelectorAll('.t2-target-row [data-fld="name"]'), function(el){ return (el.value || '').trim() !== ''; });
+      if (_hasTg) {
+        try { _nmEl.focus(); _nmEl.scrollIntoView({block:'center'}); } catch(_f) {}
+        var _lb = _blk.querySelector('div');
+        return '「' + ((_lb && _lb.textContent) || '２号特定技能外国人') + '」の氏名をご入力ください（指導を受ける対象者が、どの２号の方の対象か分かるようにするため）。';
+      }
+    }
     // ver.20261023.01: 第1-32号 新様式 留意事項５ … 人数が足りないときは「一時的に充足していない」のチェック＋理由があれば送信できる
     if (_need > 0 && _filled < _need) {
       var _sh5 = document.getElementById('f-t2Short5');
