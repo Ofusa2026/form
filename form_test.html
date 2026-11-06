@@ -194,7 +194,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20261106.07-test'; // 一本化フォーム：自動で入れた欄はラベル横に小さな「🤖 自動」、説明は②の見出しに1行だけ ／ ver.20261106.05-test: // 2号フォーム：指導対象者を入れたのに、その２号の方の氏名が空なら送る前に止める（Saysay 1-32号で誰の対象者か分からず反映されなかったため） ／ previous: ver.20261106.04-test 一本化フォーム：①書類に「💡見本」（アップロードページと同じ画像・取得方法） ②選択肢が2〜4つの質問はボタンで選ぶ ③下の「残り◯項目」にまだの書類・確認チェックも数え、押すと次の項目へ ④送信後に受け取った書類・まだの書類を一覧で表示 ／ ver.20261106.03-test: // 一本化フォーム：入力の並びを 連絡先→在留歴→家族→一時帰国→転出届 に ／ ver.20261106.02-test: // 一本化フォーム：並び順を整理（①書類の写真 ②確認：基本情報→在留カード（番号・住所）→在留期間→試験（合格証を頼んでいる案件）→確認チェック ③入力：連絡先→一時帰国→在留歴→家族→転出届）。在留カードと一時帰国をそれぞれ1枚にまとめ、連絡先の見出しから「住所」を外した ／ ver.20261106.01-test: // 一本化フォーム：合格証（技能）・（日本語）の写真から、資格の区分・分野・試験名・受験地を読み取って入れる（空いている欄だけ・黄色）。不合格・日本語のレベル不足はその場で知らせる ／ ver.20261105.10-test: // 一本化フォーム：①書類欄・確認・見出しの文言を各言語（英・越・尼・緬・クメール・ネパール・中）に ②違う書類・写りの悪い写真・期限切れをその場で知らせて撮り直してもらう ③在留カード（表）を案シスの在留期限・在留資格と照合し、食い違いはアップロード通知のメモに「⚠️」（申請人には出さない） ④途中保存で選んだ写真も保存 ／ ver.20261105.09-test: // 一本化フォーム：案シスの書類リストが無い案件でも、課税・納税・源泉徴収票・健康診断票・合格証・その他を出す（書類名は案シスと同じ）。英語の書類名を追加 ／ ver.20261105.08-test: // 一本化フォーム（upload=1のときだけ）：並び順を ①書類の写真 → ②写真から入った内容の確認（基本情報・在留カード番号・住所・在留期間）＋確認チェック → ③入力が必要な質問 に ／ ver.20261105.07-test: // 一本化フォーム（upload=1のときだけ）：在留カード「あり／なし」・日本の現住所「あり／なし」（変更・更新は「あり」）と出生地（送信時に国籍と同じ国名）の質問をかくす。現在の在留期間を在留カードの表から読み取って入れ、「アプリで確認しましたか？」を不要に ／ ver.20261105.06-test: // 一本化フォーム：受け取り済みの写真から住所が入ったあとに在留カードの裏を撮り直したら、裏の新しい住所で入れ直す（本人が直した住所は上書きしない） ／ ver.20261105.05-test: // 一本化フォーム：在留カードの住居地（表の印字、裏に書き足しがあれば新しい住所を優先）を読み取って「日本の現住所」に入れる（「あり」も自動で選ぶ） ／ ver.20261105.04-test: // 一本化フォーム：写真から自動で入れるとき、出生地にも国籍と同じ国名を入れる ／ ver.20261105.03-test: // 一本化フォーム：生年月日の入力をやめ、開いたときに受け取り済みの在留カード・パスポートから読み取った内容を自動で欄に入れる（URLの申請人名が案件と一致するときだけ）。確認チェックは必須のまま ／ ver.20261105.02-test: // 一本化フォーム：受け取り済みの在留カード・パスポートから読み取った内容（氏名・生年月日・国籍・パスポート番号/期限・在留カード番号）を、本人が生年月日を入れて合ったときだけ欄に入れる（24時間で5回まちがえると止める）。自動で入れたときは「合っているか確認しました」のチェックが必須 ／ ver.20261105.01-test: // 一本化フォーム（テスト）：URLに upload=1 を付けると、特定技能1号の申請人フォームの最初に「書類の写真」欄が出る。O-Link等で受け取り済みの在留カード表裏・パスポートは「受け取り済み」でスキップ。撮った写真から番号などを自動入力。送信後に人材フォルダへ（フォルダが無いときはプールへ）。本番 ver.20261102.09 と同期 ／  // 技能実習の所属機関フォーム：会社から答えにくい項目を任意に（監理団体の欄は名称以外・届出受理年月日・月額給与）。冒頭に「監理団体の方が代わりに記入しても構いません」
+var FORM_VERSION = 'ver.20261106.08-test'; // 一本化フォーム：家族ごとに「📷 在留カード（表）／裏」ボタン。撮ると家族の氏名・生年月日・国籍・在留カード番号・住所（本人と同じなら「一緒に住んでいる：はい」）が入る（写真は保存しない）。続柄はボタンでも選べる ／ ver.20261106.07-test: 一本化フォーム：自動で入れた欄はラベル横に小さな「🤖 自動」、説明は②の見出しに1行だけ ／ ver.20261106.05-test: // 2号フォーム：指導対象者を入れたのに、その２号の方の氏名が空なら送る前に止める（Saysay 1-32号で誰の対象者か分からず反映されなかったため） ／ previous: ver.20261106.04-test 一本化フォーム：①書類に「💡見本」（アップロードページと同じ画像・取得方法） ②選択肢が2〜4つの質問はボタンで選ぶ ③下の「残り◯項目」にまだの書類・確認チェックも数え、押すと次の項目へ ④送信後に受け取った書類・まだの書類を一覧で表示 ／ ver.20261106.03-test: // 一本化フォーム：入力の並びを 連絡先→在留歴→家族→一時帰国→転出届 に ／ ver.20261106.02-test: // 一本化フォーム：並び順を整理（①書類の写真 ②確認：基本情報→在留カード（番号・住所）→在留期間→試験（合格証を頼んでいる案件）→確認チェック ③入力：連絡先→一時帰国→在留歴→家族→転出届）。在留カードと一時帰国をそれぞれ1枚にまとめ、連絡先の見出しから「住所」を外した ／ ver.20261106.01-test: // 一本化フォーム：合格証（技能）・（日本語）の写真から、資格の区分・分野・試験名・受験地を読み取って入れる（空いている欄だけ・黄色）。不合格・日本語のレベル不足はその場で知らせる ／ ver.20261105.10-test: // 一本化フォーム：①書類欄・確認・見出しの文言を各言語（英・越・尼・緬・クメール・ネパール・中）に ②違う書類・写りの悪い写真・期限切れをその場で知らせて撮り直してもらう ③在留カード（表）を案シスの在留期限・在留資格と照合し、食い違いはアップロード通知のメモに「⚠️」（申請人には出さない） ④途中保存で選んだ写真も保存 ／ ver.20261105.09-test: // 一本化フォーム：案シスの書類リストが無い案件でも、課税・納税・源泉徴収票・健康診断票・合格証・その他を出す（書類名は案シスと同じ）。英語の書類名を追加 ／ ver.20261105.08-test: // 一本化フォーム（upload=1のときだけ）：並び順を ①書類の写真 → ②写真から入った内容の確認（基本情報・在留カード番号・住所・在留期間）＋確認チェック → ③入力が必要な質問 に ／ ver.20261105.07-test: // 一本化フォーム（upload=1のときだけ）：在留カード「あり／なし」・日本の現住所「あり／なし」（変更・更新は「あり」）と出生地（送信時に国籍と同じ国名）の質問をかくす。現在の在留期間を在留カードの表から読み取って入れ、「アプリで確認しましたか？」を不要に ／ ver.20261105.06-test: // 一本化フォーム：受け取り済みの写真から住所が入ったあとに在留カードの裏を撮り直したら、裏の新しい住所で入れ直す（本人が直した住所は上書きしない） ／ ver.20261105.05-test: // 一本化フォーム：在留カードの住居地（表の印字、裏に書き足しがあれば新しい住所を優先）を読み取って「日本の現住所」に入れる（「あり」も自動で選ぶ） ／ ver.20261105.04-test: // 一本化フォーム：写真から自動で入れるとき、出生地にも国籍と同じ国名を入れる ／ ver.20261105.03-test: // 一本化フォーム：生年月日の入力をやめ、開いたときに受け取り済みの在留カード・パスポートから読み取った内容を自動で欄に入れる（URLの申請人名が案件と一致するときだけ）。確認チェックは必須のまま ／ ver.20261105.02-test: // 一本化フォーム：受け取り済みの在留カード・パスポートから読み取った内容（氏名・生年月日・国籍・パスポート番号/期限・在留カード番号）を、本人が生年月日を入れて合ったときだけ欄に入れる（24時間で5回まちがえると止める）。自動で入れたときは「合っているか確認しました」のチェックが必須 ／ ver.20261105.01-test: // 一本化フォーム（テスト）：URLに upload=1 を付けると、特定技能1号の申請人フォームの最初に「書類の写真」欄が出る。O-Link等で受け取り済みの在留カード表裏・パスポートは「受け取り済み」でスキップ。撮った写真から番号などを自動入力。送信後に人材フォルダへ（フォルダが無いときはプールへ）。本番 ver.20261102.09 と同期 ／  // 技能実習の所属機関フォーム：会社から答えにくい項目を任意に（監理団体の欄は名称以外・届出受理年月日・月額給与）。冒頭に「監理団体の方が代わりに記入しても構いません」
 // var FORM_VERSION = 'ver.20261102.08'; // 技能実習の申請人フォームをブラッシュアップ：①質問・案内・選択肢を各言語（英・越・尼・緬・クメール・ネパール・中）に ②入力チェックのメッセージも各言語に ③3号の変更・更新で共通の「一時帰国予定」に「3号のための一時帰国とは別」と補足 ④3号認定で「2号を終えて日本を出た日」を聞く ⑤国籍「その他」の英語表記（Philippines など）でも結核・ミャンマーの判定 ⑥年月の入力欄が使えないブラウザでは「2018-04」の文字入力に
 // var FORM_VERSION = 'ver.20261102.07'; // 技能実習：国籍で出し分け。認定（1号・3号）で入国前結核スクリーニングの対象国（フィリピン・ネパール・ベトナム、インドネシアは2027/1/4以降の申請から）なら結核非発病証明書の案内と取得状況を聞く。3号更新でミャンマー・一時帰国まだなら説明書（参考様式）の案内と理由を聞く
 // var FORM_VERSION = 'ver.20261102.06'; // 技能実習の所属機関（実習実施者）ヒアリングを追加（type=company_jisshu）。特定技能1号の企業フォームの企業基本情報・所在地・代表者を同じ項目名で使い、実習実施者の届出・監理団体（団体監理型のみ）・職種と月額給与を追加。雇用条件書・相談窓口・支援計画などの特定技能の書類用の項目は出さない
@@ -8768,6 +8768,129 @@ function prefillForm(resp) {
     });
   }
   setInterval(function(){ try { buttonize(); } catch(e){} }, 700);   // 途中保存の読み込み・言語の切り替え・選択肢の入れ替えにも追いつく
+
+  // ---- ver.20261106.08: 家族の在留カードを撮ると、その家族の欄に入れる（写真は保存しない・読み取りだけ） ----
+  var FUT = {
+    famHint:  { ja:'家族の在留カードを撮ると、氏名・生年月日・国籍・番号・住所が入ります（写真は保存しません）', en:'Take a photo of the family member\'s residence card to fill in name, birth date, nationality, card number and address (the photo is not saved).', vi:'Chụp thẻ cư trú của người thân để tự điền họ tên, ngày sinh, quốc tịch, số thẻ, địa chỉ (ảnh không được lưu).', id:'Foto kartu izin tinggal anggota keluarga untuk mengisi nama, tanggal lahir, kewarganegaraan, nomor kartu, alamat (foto tidak disimpan).', my:'မိသားစုဝင်၏ နေထိုင်ခွင့်ကတ်ကို ဓာတ်ပုံရိုက်ပါက အမည်၊ မွေးနေ့၊ နိုင်ငံသား၊ ကတ်နံပါတ်၊ လိပ်စာ ဖြည့်ပေးပါမည် (ဓာတ်ပုံ မသိမ်းပါ)။', km:'ថតប័ណ្ណស្នាក់នៅរបស់សមាជិកគ្រួសារ ដើម្បីបំពេញឈ្មោះ ថ្ងៃកំណើត សញ្ជាតិ លេខប័ណ្ណ អាសយដ្ឋាន (មិនរក្សាទុករូបថតទេ)។', ne:'परिवारको निवास कार्डको फोटो खिच्दा नाम, जन्ममिति, राष्ट्रियता, कार्ड नम्बर, ठेगाना भरिन्छ (फोटो सेभ हुँदैन)।', zh:'拍摄家人的在留卡，即可填入姓名、出生日期、国籍、卡号、住址（照片不会保存）。' },
+    famF:     { ja:'📷 在留カード（表）', en:'Residence card (front)', vi:'Thẻ cư trú (mặt trước)', id:'Kartu izin tinggal (depan)', my:'နေထိုင်ခွင့်ကတ် (ရှေ့)', km:'ប័ណ្ណស្នាក់នៅ (មុខ)', ne:'निवास कार्ड (अगाडि)', zh:'在留卡（正面）' },
+    famB:     { ja:'📷 裏（住所の書き足しがあるとき）', en:'Back (if a new address is written)', vi:'Mặt sau (nếu có ghi địa chỉ mới)', id:'Belakang (jika ada alamat baru)', my:'နောက် (လိပ်စာအသစ် ရေးထားလျှင်)', km:'ខាងក្រោយ (បើមានអាសយដ្ឋានថ្មី)', ne:'पछाडि (नयाँ ठेगाना लेखिएको भए)', zh:'背面（有新增住址时）' },
+    famRead:  { ja:'読み取り中…', en:'Reading…', vi:'Đang đọc…', id:'Membaca…', my:'ဖတ်နေသည်…', km:'កំពុងអាន…', ne:'पढ्दै…', zh:'读取中…' },
+    famOk:    { ja:'写真から入れました。続柄・働いている会社は入力してください。', en:'Filled in from the photo. Please enter the relation and workplace.', vi:'Đã điền từ ảnh. Vui lòng nhập quan hệ và nơi làm việc.', id:'Sudah diisi dari foto. Silakan isi hubungan dan tempat kerja.', my:'ဓာတ်ပုံမှ ဖြည့်ပြီးပါပြီ။ ဆွေမျိုးတော်စပ်ပုံနှင့် အလုပ်ကို ဖြည့်ပါ။', km:'បានបំពេញពីរូបថត។ សូមបញ្ចូលទំនាក់ទំនង និងកន្លែងធ្វើការ។', ne:'फोटोबाट भरियो। नाता र काम गर्ने ठाउँ लेख्नुहोस्।', zh:'已根据照片填写。请填写关系和工作单位。' },
+    famNone:  { ja:'読み取れる内容がありませんでした。手で入力してください。', en:'Nothing could be read. Please enter it by hand.', vi:'Không đọc được. Vui lòng nhập tay.', id:'Tidak terbaca. Silakan isi manual.', my:'ဖတ်၍မရပါ။ ကိုယ်တိုင် ဖြည့်ပါ။', km:'មិនអាចអានបានទេ។ សូមបញ្ចូលដោយដៃ។', ne:'पढ्न सकिएन। आफैं लेख्नुहोस्।', zh:'未能读取。请手动填写。' },
+    famFail:  { ja:'読み取りに失敗しました。手で入力してください。', en:'Could not read it. Please enter it by hand.', vi:'Đọc thất bại. Vui lòng nhập tay.', id:'Gagal membaca. Silakan isi manual.', my:'ဖတ်၍ မအောင်မြင်ပါ။ ကိုယ်တိုင် ဖြည့်ပါ။', km:'អានមិនបាន។ សូមបញ្ចូលដោយដៃ។', ne:'पढ्न असफल। आफैं लेख्नुहोस्।', zh:'读取失败。请手动填写。' },
+    famOwn:   { ja:'これは申請人本人の在留カードです。家族の在留カードを撮ってください。', en:'This is your own residence card. Please take a photo of your family member\'s card.', vi:'Đây là thẻ của chính bạn. Vui lòng chụp thẻ của người thân.', id:'Ini kartu Anda sendiri. Silakan foto kartu anggota keluarga.', my:'ဤသည်မှာ သင့်ကိုယ်ပိုင်ကတ် ဖြစ်သည်။ မိသားစုဝင်၏ကတ်ကို ရိုက်ပါ။', km:'នេះជាប័ណ្ណរបស់អ្នកផ្ទាល់។ សូមថតប័ណ្ណរបស់សមាជិកគ្រួសារ។', ne:'यो तपाईंकै कार्ड हो। परिवारको कार्डको फोटो खिच्नुहोस्।', zh:'这是申请人本人的在留卡。请拍摄家人的在留卡。' },
+    famWrong: { ja:'在留カードではないようです。もう一度撮ってください。', en:'This does not look like a residence card. Please try again.', vi:'Có vẻ không phải thẻ cư trú. Vui lòng chụp lại.', id:'Sepertinya bukan kartu izin tinggal. Silakan foto ulang.', my:'နေထိုင်ခွင့်ကတ် မဟုတ်ပုံရသည်။ ထပ်ရိုက်ပါ။', km:'មើលទៅមិនមែនជាប័ណ្ណស្នាក់នៅទេ។ សូមថតម្តងទៀត។', ne:'निवास कार्ड जस्तो देखिँदैन। फेरि खिच्नुहोस्।', zh:'这似乎不是在留卡。请重新拍摄。' },
+    rel_spouse:{ ja:'配偶者', en:'Spouse', vi:'Vợ/Chồng', id:'Suami/Istri', my:'အိမ်ထောင်ဖက်', km:'ប្តី/ប្រពន្ធ', ne:'पति/पत्नी', zh:'配偶' },
+    rel_child: { ja:'子', en:'Child', vi:'Con', id:'Anak', my:'သားသမီး', km:'កូន', ne:'छोराछोरी', zh:'子女' },
+    rel_father:{ ja:'父', en:'Father', vi:'Bố', id:'Ayah', my:'အဖေ', km:'ឪពុក', ne:'बुबा', zh:'父亲' },
+    rel_mother:{ ja:'母', en:'Mother', vi:'Mẹ', id:'Ibu', my:'အမေ', km:'ម្តាយ', ne:'आमा', zh:'母亲' },
+    rel_sib:   { ja:'兄弟姉妹', en:'Sibling', vi:'Anh chị em', id:'Saudara', my:'မောင်နှမ', km:'បងប្អូន', ne:'दाजुभाइ/दिदीबहिनी', zh:'兄弟姐妹' }
+  };
+  for (var _fk in FUT) UT[_fk] = FUT[_fk];
+  var REL_KEYS = ['rel_spouse','rel_child','rel_father','rel_mother','rel_sib'];
+  function normAddr(a){
+    return String(a||'').replace(/[Ａ-Ｚａ-ｚ０-９]/g, function(c){ return String.fromCharCode(c.charCodeAt(0) - 0xFEE0); })
+      .replace(/[\s　]/g,'').replace(/[‐－―ー−–—]/g,'-').replace(/丁目|番地|番|号/g,'-').replace(/-+/g,'-').replace(/-$/,'');
+  }
+  function famMsg(i, kind, html){
+    var m = document.getElementById('udocFamMsg' + i); if (!m) return;
+    var c = { info:['#eff6ff','#1e40af'], ok:['#f0fdf4','#166534'], warn:['#fffbeb','#92400e'] }[kind];
+    m.style.cssText = 'display:block;margin-top:6px;font-size:11.5px;line-height:1.5;border-radius:8px;padding:6px 9px;background:' + c[0] + ';color:' + c[1] + ';';
+    m.innerHTML = html;
+  }
+  function famSetNat(i, v){
+    var sel = document.getElementById('f-family' + i + 'Nationality'); if (!sel || !v || sel.value) return false;
+    if (setVal('f-family' + i + 'Nationality', v)) { try { toggleFamilyNatOther(i, v); } catch(e){} return true; }
+    if (!setVal('f-family' + i + 'Nationality', 'その他')) return false;
+    try { toggleFamilyNatOther(i, 'その他'); } catch(e){}
+    setVal('f-family' + i + 'NationalityOther', v); return true;
+  }
+  function famSetAddr(i, v, back){
+    if (!v) return false;
+    var lt = document.getElementById('f-family' + i + 'LiveTogether'), ad = document.getElementById('f-family' + i + 'Address');
+    if (!lt || !ad) return false;
+    var mine = (document.getElementById('f-address')||{}).value || '';
+    var same = mine && normAddr(mine) === normAddr(v);
+    var auto = lt._udocAuto;   // 前に写真で入れた答えなら、裏の新しい住所で入れ直してよい
+    if (lt.value && !(back && auto)) return false;
+    lt.value = same ? 'yes' : 'no'; lt.style.background = '#fef9c3'; lt._udocAuto = true; markAuto(lt);
+    try { toggleFamilyAddress(i, lt.value); lt.dispatchEvent(new Event('change',{bubbles:true})); } catch(e){}
+    if (!same && (!String(ad.value||'').trim() || (back && ad._udocAuto))) {
+      ad.value = v; ad.style.background = '#fef9c3'; ad._udocAuto = true; markAuto(ad);
+      try { ad.dispatchEvent(new Event('input',{bubbles:true})); } catch(e){}
+    }
+    return true;
+  }
+  async function famRead(i, inp, back){
+    var file = inp.files && inp.files[0]; inp.value = ''; if (!file) return;
+    if (file.size > 20*1024*1024) { famMsg(i, 'warn', TH('tooLarge')); return; }
+    famMsg(i, 'info', TH('famRead'));
+    try {
+      var f = await prep(file);
+      if (!/^image\/(jpeg|png|webp|gif)$/.test(f.mt)) { famMsg(i, 'warn', TH('famFail')); return; }
+      var k = back ? 'zairyu_back' : 'zairyu_front';
+      var r = await fetch(FN + 'doc-ai-read', { method:'POST', headers:{'Content-Type':'application/json','apikey':SUPABASE_KEY}, body: JSON.stringify({ case_id: caseId, doc_key: k, media_type: f.mt, data: f.b64 }) });
+      var j = await r.json().catch(function(){ return null; });
+      if (!j || !j.ok) throw new Error((j && j.error) || ('HTTP ' + r.status));
+      var d = j.data || {};
+      if (d.docType && d.docType !== k && d.docType !== 'zairyu_front' && d.docType !== 'zairyu_back') { famMsg(i, 'warn', '⚠️ ' + TH('famWrong')); return; }
+      var own = String((document.getElementById('f-residenceCard')||{}).value || '').replace(/\s/g,'').toUpperCase();
+      if (!back && own && d.residenceCard && own === String(d.residenceCard).replace(/\s/g,'').toUpperCase()) { famMsg(i, 'warn', '⚠️ ' + TH('famOwn')); return; }
+      var n = 0;
+      if (!back) {
+        if (setVal('f-family' + i + 'Name', d.name)) n++;
+        if (setVal('f-family' + i + 'Birth', d.birthdate)) n++;
+        if (famSetNat(i, d.nationality)) n++;
+        if (setVal('f-family' + i + 'ResidenceCard', d.residenceCard)) n++;
+      }
+      if (famSetAddr(i, d.address, back)) n++;
+      try { _formDirty = true; _famReqUpdate(); _updateReqRemain(); } catch(e){}
+      var warn = (d.quality && d.quality !== 'ok' && UT['q' + d.quality]) ? '<div style="color:#b91c1c;font-weight:700;margin-top:3px;">⚠️ ' + TH('q' + d.quality) + '</div>' : '';
+      famMsg(i, n ? 'ok' : 'warn', (n ? TH('famOk') : TH('famNone')) + warn);
+    } catch(e) { famMsg(i, 'warn', TH('famFail')); }
+  }
+  window._udocFamPick = function(i, inp, back){ famRead(i, inp, back); };
+  window._udocRel = function(i, k){
+    var el = document.getElementById('f-family' + i + 'Relation'); if (!el) return;
+    el.value = T(k).ja; try { el.dispatchEvent(new Event('input',{bubbles:true})); el.dispatchEvent(new Event('change',{bubbles:true})); } catch(e){}
+    famDecorate();
+  };
+  function famDecorate(){
+    document.querySelectorAll('#familyMembersContainer [id^="familyRow"][data-fidx]').forEach(function(row){
+      var i = row.getAttribute('data-fidx'), L = lg();
+      var tl = function(k){ var t = T(k); return t.ja + (L !== 'ja' && t.tr ? ' / ' + t.tr : ''); };
+      var box = row.querySelector('.udoc-fam');
+      if (!box) {
+        box = document.createElement('div'); box.className = 'udoc-fam';
+        box.style.cssText = 'margin:0 0 10px;padding:8px 10px;border:1.5px dashed #93c5fd;border-radius:10px;background:#f8fbff;';
+        var head = row.firstElementChild; row.insertBefore(box, head ? head.nextSibling : row.firstChild);
+      }
+      var lang = L + '|' + i;
+      if (box._lang !== lang) {
+        box._lang = lang;
+        var b = 'display:inline-block;padding:6px 11px;border:1.5px solid #3b82f6;border-radius:8px;font-size:12px;font-weight:700;color:#1d4ed8;background:#fff;cursor:pointer;margin:0 6px 4px 0;';
+        box.innerHTML = '<div style="font-size:11.5px;color:#1e3a8a;line-height:1.5;margin-bottom:6px;">' + esc(T('famHint').ja) + (L !== 'ja' && T('famHint').tr ? '<br><span style="opacity:.85;">' + esc(T('famHint').tr) + '</span>' : '') + '</div>'
+          + '<label style="' + b + '">' + esc(tl('famF')) + '<input type="file" accept="image/*" style="display:none" onchange="_udocFamPick(' + i + ',this,false)"></label>'
+          + '<label style="' + b + 'border-color:#cbd5e1;color:#475569;font-weight:600;">' + esc(tl('famB')) + '<input type="file" accept="image/*" style="display:none" onchange="_udocFamPick(' + i + ',this,true)"></label>'
+          + '<div id="udocFamMsg' + i + '" style="display:none;"></div>';
+      }
+      // 続柄：よくあるものはボタンで（手入力もそのまま使える）
+      var rel = document.getElementById('f-family' + i + 'Relation');
+      if (rel) {
+        var g = rel.parentNode.querySelector('.udoc-rel');
+        if (!g) { g = document.createElement('div'); g.className = 'udoc-rel'; g.style.cssText = 'display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;'; rel.parentNode.appendChild(g); }
+        var cur = String(rel.value||'').trim(), key = L + '|' + cur;
+        if (g._key !== key) {
+          g._key = key;
+          g.innerHTML = REL_KEYS.map(function(k){
+            var on = cur === T(k).ja;
+            return '<button type="button" onclick="_udocRel(' + i + ',\'' + k + '\')" style="padding:5px 10px;font-size:12px;font-weight:700;border-radius:999px;cursor:pointer;border:1.5px solid ' + (on ? '#2563eb' : '#cbd5e1') + ';background:' + (on ? '#2563eb' : '#fff') + ';color:' + (on ? '#fff' : '#334155') + ';">' + esc(tl(k)) + '</button>';
+          }).join('');
+        }
+      }
+    });
+  }
+  setInterval(function(){ try { famDecorate(); } catch(e){} }, 700);   // 家族を「＋追加」したときにも付ける
 
   // ---- 残りの項目：まだの書類（必須）と確認チェックも数えて、押すと次の項目へ移動 ----
   var _origReqEmpty = _reqEmptyFields;
