@@ -194,7 +194,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20261106.11-test'; // 1月1日の住所：はい／いいえだけ必須、都道府県・市区町村は任意に ／ ver.20261106.10-test: 一本化フォーム（変更・更新）：「2025年1月1日に日本に住んでいましたか？」→はいなら都道府県・市区町村（政令市は区まで）をプルダウンで（「今の住所と同じ」ボタンあり）。送信値 jan1InJapan/jan1Pref/jan1City/jan1Address ／ ver.20261106.09-test: 一本化フォーム：日本語能力（評価区分・分野・試験名・受験地）と技能水準の評価区分の選択肢を「日本語 / 訳」の2つ並びに（言語を選ぶと訳だけになっていた） ／ ver.20261106.08-test: 一本化フォーム：家族ごとに「📷 在留カード（表）／裏」ボタン。撮ると家族の氏名・生年月日・国籍・在留カード番号・住所（本人と同じなら「一緒に住んでいる：はい」）が入る（写真は保存しない）。続柄はボタンでも選べる ／ ver.20261106.07-test: 一本化フォーム：自動で入れた欄はラベル横に小さな「🤖 自動」、説明は②の見出しに1行だけ ／ ver.20261106.05-test: // 2号フォーム：指導対象者を入れたのに、その２号の方の氏名が空なら送る前に止める（Saysay 1-32号で誰の対象者か分からず反映されなかったため） ／ previous: ver.20261106.04-test 一本化フォーム：①書類に「💡見本」（アップロードページと同じ画像・取得方法） ②選択肢が2〜4つの質問はボタンで選ぶ ③下の「残り◯項目」にまだの書類・確認チェックも数え、押すと次の項目へ ④送信後に受け取った書類・まだの書類を一覧で表示 ／ ver.20261106.03-test: // 一本化フォーム：入力の並びを 連絡先→在留歴→家族→一時帰国→転出届 に ／ ver.20261106.02-test: // 一本化フォーム：並び順を整理（①書類の写真 ②確認：基本情報→在留カード（番号・住所）→在留期間→試験（合格証を頼んでいる案件）→確認チェック ③入力：連絡先→一時帰国→在留歴→家族→転出届）。在留カードと一時帰国をそれぞれ1枚にまとめ、連絡先の見出しから「住所」を外した ／ ver.20261106.01-test: // 一本化フォーム：合格証（技能）・（日本語）の写真から、資格の区分・分野・試験名・受験地を読み取って入れる（空いている欄だけ・黄色）。不合格・日本語のレベル不足はその場で知らせる ／ ver.20261105.10-test: // 一本化フォーム：①書類欄・確認・見出しの文言を各言語（英・越・尼・緬・クメール・ネパール・中）に ②違う書類・写りの悪い写真・期限切れをその場で知らせて撮り直してもらう ③在留カード（表）を案シスの在留期限・在留資格と照合し、食い違いはアップロード通知のメモに「⚠️」（申請人には出さない） ④途中保存で選んだ写真も保存 ／ ver.20261105.09-test: // 一本化フォーム：案シスの書類リストが無い案件でも、課税・納税・源泉徴収票・健康診断票・合格証・その他を出す（書類名は案シスと同じ）。英語の書類名を追加 ／ ver.20261105.08-test: // 一本化フォーム（upload=1のときだけ）：並び順を ①書類の写真 → ②写真から入った内容の確認（基本情報・在留カード番号・住所・在留期間）＋確認チェック → ③入力が必要な質問 に ／ ver.20261105.07-test: // 一本化フォーム（upload=1のときだけ）：在留カード「あり／なし」・日本の現住所「あり／なし」（変更・更新は「あり」）と出生地（送信時に国籍と同じ国名）の質問をかくす。現在の在留期間を在留カードの表から読み取って入れ、「アプリで確認しましたか？」を不要に ／ ver.20261105.06-test: // 一本化フォーム：受け取り済みの写真から住所が入ったあとに在留カードの裏を撮り直したら、裏の新しい住所で入れ直す（本人が直した住所は上書きしない） ／ ver.20261105.05-test: // 一本化フォーム：在留カードの住居地（表の印字、裏に書き足しがあれば新しい住所を優先）を読み取って「日本の現住所」に入れる（「あり」も自動で選ぶ） ／ ver.20261105.04-test: // 一本化フォーム：写真から自動で入れるとき、出生地にも国籍と同じ国名を入れる ／ ver.20261105.03-test: // 一本化フォーム：生年月日の入力をやめ、開いたときに受け取り済みの在留カード・パスポートから読み取った内容を自動で欄に入れる（URLの申請人名が案件と一致するときだけ）。確認チェックは必須のまま ／ ver.20261105.02-test: // 一本化フォーム：受け取り済みの在留カード・パスポートから読み取った内容（氏名・生年月日・国籍・パスポート番号/期限・在留カード番号）を、本人が生年月日を入れて合ったときだけ欄に入れる（24時間で5回まちがえると止める）。自動で入れたときは「合っているか確認しました」のチェックが必須 ／ ver.20261105.01-test: // 一本化フォーム（テスト）：URLに upload=1 を付けると、特定技能1号の申請人フォームの最初に「書類の写真」欄が出る。O-Link等で受け取り済みの在留カード表裏・パスポートは「受け取り済み」でスキップ。撮った写真から番号などを自動入力。送信後に人材フォルダへ（フォルダが無いときはプールへ）。本番 ver.20261102.09 と同期 ／  // 技能実習の所属機関フォーム：会社から答えにくい項目を任意に（監理団体の欄は名称以外・届出受理年月日・月額給与）。冒頭に「監理団体の方が代わりに記入しても構いません」
+var FORM_VERSION = 'ver.20261109.01-test'; // 一本化フォーム（変更・更新）：O-Link・案シスにある国籍・今の在留期間・一時帰国を、空いている欄に入れる（緑の「🏢 登録済み」）。写真から読めた値があればそちらが優先 ／ ver.20261106.11-test: 1月1日の住所：はい／いいえだけ必須、都道府県・市区町村は任意に ／ ver.20261106.10-test: 一本化フォーム（変更・更新）：「2025年1月1日に日本に住んでいましたか？」→はいなら都道府県・市区町村（政令市は区まで）をプルダウンで（「今の住所と同じ」ボタンあり）。送信値 jan1InJapan/jan1Pref/jan1City/jan1Address ／ ver.20261106.09-test: 一本化フォーム：日本語能力（評価区分・分野・試験名・受験地）と技能水準の評価区分の選択肢を「日本語 / 訳」の2つ並びに（言語を選ぶと訳だけになっていた） ／ ver.20261106.08-test: 一本化フォーム：家族ごとに「📷 在留カード（表）／裏」ボタン。撮ると家族の氏名・生年月日・国籍・在留カード番号・住所（本人と同じなら「一緒に住んでいる：はい」）が入る（写真は保存しない）。続柄はボタンでも選べる ／ ver.20261106.07-test: 一本化フォーム：自動で入れた欄はラベル横に小さな「🤖 自動」、説明は②の見出しに1行だけ ／ ver.20261106.05-test: // 2号フォーム：指導対象者を入れたのに、その２号の方の氏名が空なら送る前に止める（Saysay 1-32号で誰の対象者か分からず反映されなかったため） ／ previous: ver.20261106.04-test 一本化フォーム：①書類に「💡見本」（アップロードページと同じ画像・取得方法） ②選択肢が2〜4つの質問はボタンで選ぶ ③下の「残り◯項目」にまだの書類・確認チェックも数え、押すと次の項目へ ④送信後に受け取った書類・まだの書類を一覧で表示 ／ ver.20261106.03-test: // 一本化フォーム：入力の並びを 連絡先→在留歴→家族→一時帰国→転出届 に ／ ver.20261106.02-test: // 一本化フォーム：並び順を整理（①書類の写真 ②確認：基本情報→在留カード（番号・住所）→在留期間→試験（合格証を頼んでいる案件）→確認チェック ③入力：連絡先→一時帰国→在留歴→家族→転出届）。在留カードと一時帰国をそれぞれ1枚にまとめ、連絡先の見出しから「住所」を外した ／ ver.20261106.01-test: // 一本化フォーム：合格証（技能）・（日本語）の写真から、資格の区分・分野・試験名・受験地を読み取って入れる（空いている欄だけ・黄色）。不合格・日本語のレベル不足はその場で知らせる ／ ver.20261105.10-test: // 一本化フォーム：①書類欄・確認・見出しの文言を各言語（英・越・尼・緬・クメール・ネパール・中）に ②違う書類・写りの悪い写真・期限切れをその場で知らせて撮り直してもらう ③在留カード（表）を案シスの在留期限・在留資格と照合し、食い違いはアップロード通知のメモに「⚠️」（申請人には出さない） ④途中保存で選んだ写真も保存 ／ ver.20261105.09-test: // 一本化フォーム：案シスの書類リストが無い案件でも、課税・納税・源泉徴収票・健康診断票・合格証・その他を出す（書類名は案シスと同じ）。英語の書類名を追加 ／ ver.20261105.08-test: // 一本化フォーム（upload=1のときだけ）：並び順を ①書類の写真 → ②写真から入った内容の確認（基本情報・在留カード番号・住所・在留期間）＋確認チェック → ③入力が必要な質問 に ／ ver.20261105.07-test: // 一本化フォーム（upload=1のときだけ）：在留カード「あり／なし」・日本の現住所「あり／なし」（変更・更新は「あり」）と出生地（送信時に国籍と同じ国名）の質問をかくす。現在の在留期間を在留カードの表から読み取って入れ、「アプリで確認しましたか？」を不要に ／ ver.20261105.06-test: // 一本化フォーム：受け取り済みの写真から住所が入ったあとに在留カードの裏を撮り直したら、裏の新しい住所で入れ直す（本人が直した住所は上書きしない） ／ ver.20261105.05-test: // 一本化フォーム：在留カードの住居地（表の印字、裏に書き足しがあれば新しい住所を優先）を読み取って「日本の現住所」に入れる（「あり」も自動で選ぶ） ／ ver.20261105.04-test: // 一本化フォーム：写真から自動で入れるとき、出生地にも国籍と同じ国名を入れる ／ ver.20261105.03-test: // 一本化フォーム：生年月日の入力をやめ、開いたときに受け取り済みの在留カード・パスポートから読み取った内容を自動で欄に入れる（URLの申請人名が案件と一致するときだけ）。確認チェックは必須のまま ／ ver.20261105.02-test: // 一本化フォーム：受け取り済みの在留カード・パスポートから読み取った内容（氏名・生年月日・国籍・パスポート番号/期限・在留カード番号）を、本人が生年月日を入れて合ったときだけ欄に入れる（24時間で5回まちがえると止める）。自動で入れたときは「合っているか確認しました」のチェックが必須 ／ ver.20261105.01-test: // 一本化フォーム（テスト）：URLに upload=1 を付けると、特定技能1号の申請人フォームの最初に「書類の写真」欄が出る。O-Link等で受け取り済みの在留カード表裏・パスポートは「受け取り済み」でスキップ。撮った写真から番号などを自動入力。送信後に人材フォルダへ（フォルダが無いときはプールへ）。本番 ver.20261102.09 と同期 ／  // 技能実習の所属機関フォーム：会社から答えにくい項目を任意に（監理団体の欄は名称以外・届出受理年月日・月額給与）。冒頭に「監理団体の方が代わりに記入しても構いません」
 // var FORM_VERSION = 'ver.20261102.08'; // 技能実習の申請人フォームをブラッシュアップ：①質問・案内・選択肢を各言語（英・越・尼・緬・クメール・ネパール・中）に ②入力チェックのメッセージも各言語に ③3号の変更・更新で共通の「一時帰国予定」に「3号のための一時帰国とは別」と補足 ④3号認定で「2号を終えて日本を出た日」を聞く ⑤国籍「その他」の英語表記（Philippines など）でも結核・ミャンマーの判定 ⑥年月の入力欄が使えないブラウザでは「2018-04」の文字入力に
 // var FORM_VERSION = 'ver.20261102.07'; // 技能実習：国籍で出し分け。認定（1号・3号）で入国前結核スクリーニングの対象国（フィリピン・ネパール・ベトナム、インドネシアは2027/1/4以降の申請から）なら結核非発病証明書の案内と取得状況を聞く。3号更新でミャンマー・一時帰国まだなら説明書（参考様式）の案内と理由を聞く
 // var FORM_VERSION = 'ver.20261102.06'; // 技能実習の所属機関（実習実施者）ヒアリングを追加（type=company_jisshu）。特定技能1号の企業フォームの企業基本情報・所在地・代表者を同じ項目名で使い、実習実施者の届出・監理団体（団体監理型のみ）・職種と月額給与を追加。雇用条件書・相談窓口・支援計画などの特定技能の書類用の項目は出さない
@@ -8267,6 +8267,8 @@ function prefillForm(resp) {
     wNotPass:   { ja:'「不合格」と書かれているようです。合格した証明書を撮ってください。', en:'This seems to say "not passed". Please take the certificate you passed.', vi:'Có vẻ ghi là "không đạt". Vui lòng chụp giấy chứng nhận đã đỗ.', id:'Tertulis "tidak lulus". Foto sertifikat yang lulus.', my:'"မအောင်" ဟု ရေးထားပုံရသည်။ အောင်လက်မှတ်ကို ရိုက်ပါ။', km:'ហាក់សរសេរថា "មិនជាប់"។ សូមថតវិញ្ញាបនបត្រដែលជាប់។', ne:'"अनुत्तीर्ण" लेखिएको जस्तो छ। उत्तीर्ण प्रमाणपत्र खिच्नुहोस्।', zh:'似乎写着"不合格"。请拍摄合格的证书。' },
     wJpLevel:   { ja:'特定技能1号には、日本語能力試験N4以上またはJFT-Basic 200点以上が必要です。合っているか確認してください。', en:'SSW (i) needs JLPT N4 or higher, or JFT-Basic 200+. Please check.', vi:'Kỹ năng đặc định số 1 cần JLPT N4 trở lên hoặc JFT-Basic 200 điểm trở lên. Vui lòng kiểm tra.', id:'SSW (i) perlu JLPT N4 ke atas atau JFT-Basic 200+. Periksa kembali.', my:'SSW (i) အတွက် JLPT N4 နှင့်အထက် သို့မဟုတ် JFT-Basic 200 မှတ်အထက် လိုသည်။ စစ်ဆေးပါ။', km:'SSW (i) ត្រូវការ JLPT N4 ឡើង ឬ JFT-Basic 200 ពិន្ទុឡើង។ សូមពិនិត្យ។', ne:'SSW (i) का लागि JLPT N4 वा माथि, वा JFT-Basic 200+ चाहिन्छ। जाँच गर्नुहोस्।', zh:'特定技能1号需要日语能力考试N4以上或JFT-Basic 200分以上。请确认。' },
     autoTag:    { ja:'自動', en:'Auto', vi:'Tự động', id:'Otomatis', my:'အလိုအလျောက်', km:'ស្វ័យប្រវត្តិ', ne:'स्वतः', zh:'自动' },
+    olinkTag:   { ja:'登録済み', en:'On file', vi:'Đã có', id:'Terdaftar', my:'မှတ်ပုံတင်ပြီး', km:'មានរួច', ne:'दर्ता भएको', zh:'已登记' },
+    olinkNote:  { ja:'「🏢 登録済み」の欄は、会社・登録支援機関からもらった情報です。', en:'Fields marked "🏢 On file" come from your company or support organization.', vi:'Ô có "🏢 Đã có" là thông tin từ công ty hoặc tổ chức hỗ trợ.', id:'Kolom "🏢 Terdaftar" berasal dari perusahaan atau lembaga pendukung.', my:'"🏢 မှတ်ပုံတင်ပြီး" ကွက်များသည် ကုမ္ပဏီ သို့မဟုတ် ပံ့ပိုးရေးအဖွဲ့မှ ရရှိသော အချက်အလက်ဖြစ်သည်။', km:'ប្រអប់ "🏢 មានរួច" គឺជាព័ត៌មានពីក្រុមហ៊ុន ឬអង្គការគាំទ្រ។', ne:'"🏢 दर्ता भएको" ठाउँ कम्पनी वा सहयोग संस्थाबाट आएको जानकारी हो।', zh:'标有"🏢 已登记"的栏目是公司或登录支援机构提供的信息。' },
     autoNote:   { ja:'「🤖 自動」の欄は、写真から自動で入力しました。', en:'Fields marked "🤖 Auto" were filled in from your photos.', vi:'Ô có "🤖 Tự động" được điền từ ảnh.', id:'Kolom "🤖 Otomatis" diisi dari foto.', my:'"🤖 အလိုအလျောက်" ကွက်များကို ဓာတ်ပုံမှ ဖြည့်ထားသည်။', km:'ប្រអប់ "🤖 ស្វ័យប្រវត្តិ" បានបំពេញពីរូបថត។', ne:'"🤖 स्वतः" भएका ठाउँ फोटोबाट भरिएका हुन्।', zh:'标有"🤖 自动"的栏目是根据照片自动填写的。' },
     sample:     { ja:'見本', en:'Sample', vi:'Mẫu', id:'Contoh', my:'နမူနာ', km:'គំរូ', ne:'नमूना', zh:'示例' },
     close:      { ja:'閉じる', en:'Close', vi:'Đóng', id:'Tutup', my:'ပိတ်', km:'បិទ', ne:'बन्द', zh:'关闭' },
@@ -8374,27 +8376,38 @@ function prefillForm(resp) {
     var h = document.getElementById('udocHeadCheck');
     if (h) { if (b.parentNode !== h) h.appendChild(b); }
     else if (!b.parentNode) { var f = document.querySelector('.udoc-auto'); var fld = f && f.closest('.field'); if (fld) fld.parentNode.insertBefore(b, fld); }
-    b.innerHTML = autoNoteHtml();
+    var hasA = document.querySelector('.udoc-auto:not([data-kind="olink"])'), hasO = document.querySelector('.udoc-auto[data-kind="olink"]');
+    b.innerHTML = (hasA ? autoNoteHtml() : '') + (hasO ? '<div style="' + (hasA ? 'margin-top:3px;' : '') + 'color:#065f46;">' + TH('olinkNote') + '</div>' : '');
   }
-  function markAuto(el){
+  // kind：'auto'＝写真から（🤖 自動）／'olink'＝O-Link・案シスから（🏢 登録済み）
+  var PILL_CSS = {
+    auto:  'display:inline-block;margin-left:6px;font-size:10.5px;font-weight:700;color:#854d0e;background:#fef9c3;border:1px solid #facc15;border-radius:999px;padding:1px 7px;vertical-align:middle;white-space:nowrap;',
+    olink: 'display:inline-block;margin-left:6px;font-size:10.5px;font-weight:700;color:#065f46;background:#d1fae5;border:1px solid #34d399;border-radius:999px;padding:1px 7px;vertical-align:middle;white-space:nowrap;'
+  };
+  function pillTxt(kind){ return kind === 'olink' ? olinkTagTxt() : autoTagTxt(); }
+  function olinkTagTxt(){ var t = T('olinkTag'); return '🏢 ' + t.ja + (t.tr ? '・' + t.tr : ''); }
+  function markAuto(el, kind){
     if (!el) return;
-    var box = el.closest('.field') || el.parentNode; if (!box || box.querySelector('.udoc-auto')) return;
-    var n = document.createElement('span'); n.className = 'udoc-auto';
-    n.style.cssText = 'display:inline-block;margin-left:6px;font-size:10.5px;font-weight:700;color:#854d0e;background:#fef9c3;border:1px solid #facc15;border-radius:999px;padding:1px 7px;vertical-align:middle;white-space:nowrap;';
-    n.textContent = autoTagTxt();
+    kind = kind || 'auto';
+    var box = el.closest('.field') || el.parentNode; if (!box) return;
+    var old = box.querySelector('.udoc-auto');
+    if (old) { if ((old.getAttribute('data-kind') || 'auto') === kind) return; old.parentNode.removeChild(old); }
+    var n = document.createElement('span'); n.className = 'udoc-auto'; n.setAttribute('data-kind', kind);
+    n.style.cssText = PILL_CSS[kind];
+    n.textContent = pillTxt(kind);
     var lab = box.querySelector('label');
     if (lab) lab.appendChild(n); else box.insertBefore(n, box.firstChild);
     autoBanner();
   }
   function relabelAuto(){
-    Array.prototype.forEach.call(document.querySelectorAll('.udoc-auto'), function(n){ n.textContent = autoTagTxt(); });
+    Array.prototype.forEach.call(document.querySelectorAll('.udoc-auto'), function(n){ n.textContent = pillTxt(n.getAttribute('data-kind') || 'auto'); });
     if (document.querySelector('.udoc-auto')) autoBanner();
   }
-  function setVal(id, v){
+  function setVal(id, v, kind){
     var el = document.getElementById(id); if (!el || !v) return false;
-    if (String(el.value||'').trim()) return false;
+    if (String(el.value||'').trim() && !(el._olink && kind !== 'olink')) return false;   // O-Linkで入れた値は、写真から読めた値で入れ直す
     if (el.tagName === 'SELECT') { var okOpt = Array.prototype.some.call(el.options, function(o){ return o.value === v; }); if (!okOpt) return false; }
-    el.value = v; el.style.background = '#fef9c3'; markAuto(el);
+    el.value = v; el.style.background = kind === 'olink' ? '#ecfdf5' : '#fef9c3'; el._olink = (kind === 'olink'); markAuto(el, kind);
     try { el.dispatchEvent(new Event('input',{bubbles:true})); el.dispatchEvent(new Event('change',{bubbles:true})); } catch(e){}
     return true;
   }
@@ -8413,14 +8426,37 @@ function prefillForm(resp) {
     return true;
   }
   // 現在の在留期間：在留カードの表から読めたら入れて、「アプリで確認しましたか？」は不要にする（はい扱い）
-  function setStay(v){
+  function setStay(v, kind){
     var el = document.getElementById('f-curStayPeriod'); if (!el || !v) return false;
-    if (String(el.value||'').trim()) return false;
+    if (String(el.value||'').trim() && !(el._olink && kind !== 'olink')) return false;
     if (!Array.prototype.some.call(el.options, function(o){ return o.value === v; })) return false;
-    el.value = v; el.style.background = '#fef9c3'; markAuto(el);
+    el.value = v; el.style.background = kind === 'olink' ? '#ecfdf5' : '#fef9c3'; el._olink = (kind === 'olink'); markAuto(el, kind);
+    if (kind === 'olink') { try { _cspOnChange(v); } catch(e){} return true; }   // O-Linkの値は「在留カードで確認しましたか？」をそのまま聞く
     try { _cspOnChange(v); _cspSetApp('はい'); } catch(e){}
     var a = document.getElementById('curStayAppWrap'); if (a) a.style.display = 'none';
     return true;
+  }
+  // ---- ver.20261109.01: O-Link（登録支援機関からの依頼）・案シスにある情報を、空いている欄だけに入れる ----
+  //   国籍・今の在留期間・一時帰国（URLの申請人名が案件と一致したときだけサーバーが返す）。写真から読めた値があればそちらを使う
+  var olinkDone = false;
+  async function olinkPrefill(){
+    if (olinkDone || !(type === 'tokutei_koushin' || type === 'tokutei_henkou')) return;
+    olinkDone = true;
+    try {
+      var r = await callRpc('form_olink_prefill', { p_case_id: caseId, p_name: caseName || '' });
+      var j = r.ok ? await r.json() : null;
+      if (!(j && j.ok && j.data)) return;
+      var d = j.data, n = 0;
+      if (d.nationality && setVal('f-nationality', d.nationality, 'olink')) { n++; setVal('f-birthPlace', d.nationality, 'olink'); }
+      if (setStay(d.stayPeriod, 'olink')) n++;
+      var ts = document.getElementById('f-tempReturnStatus');
+      if (d.tempStatus && ts && !ts.value && Array.prototype.some.call(ts.options, function(o){ return o.value === d.tempStatus; })) {
+        ts.value = d.tempStatus; ts.style.background = '#ecfdf5'; ts._olink = true; markAuto(ts, 'olink'); n++;
+        try { toggleTempReturnDate(d.tempStatus); ts.dispatchEvent(new Event('change',{bubbles:true})); } catch(e){}
+        if (d.tempStatus === '予定あり') { setVal('f-tempReturn', d.tempOut, 'olink'); setVal('f-tempReturnIn', d.tempIn, 'olink'); }
+      }
+      if (n) { try { _formDirty = true; _updateReqRemain(); } catch(e){} autoBanner(); }
+    } catch(e) { console.warn('olink prefill', e); }
   }
   // 一本化フォームでは聞かなくてよい質問をかくす（変更・更新）。既存のフォーム（upload=1 なし）はそのまま
   function hideQuestions(){
@@ -9117,6 +9153,7 @@ function prefillForm(resp) {
       reorder();
       render();
       if (hasExt) setTimeout(autoPrefill, 1500);   // 途中保存の読み込みが終わってから、空いている欄だけに入れる
+      setTimeout(olinkPrefill, 2600);   // 写真から入れたあと、まだ空いている欄にだけ O-Link・案シスの情報を入れる
       if (!hasExt && pi >= 0 && got[pi]) { note('f-passport','受け取り済みのパスポートから読み取るので、分からなければ空欄で大丈夫です / You may leave this blank'); note('f-passExpiry','空欄で大丈夫です / You may leave this blank'); }
       if (!hasExt && fa >= 0 && got[fa]) note('f-residenceCard','受け取り済みの在留カードから読み取るので、分からなければ空欄で大丈夫です / You may leave this blank');
     });
