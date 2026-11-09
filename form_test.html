@@ -194,7 +194,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20261109.01-test'; // 一本化フォーム（変更・更新）：O-Link・案シスにある国籍・今の在留期間・一時帰国を、空いている欄に入れる（緑の「🏢 登録済み」）。写真から読めた値があればそちらが優先 ／ ver.20261106.11-test: 1月1日の住所：はい／いいえだけ必須、都道府県・市区町村は任意に ／ ver.20261106.10-test: 一本化フォーム（変更・更新）：「2025年1月1日に日本に住んでいましたか？」→はいなら都道府県・市区町村（政令市は区まで）をプルダウンで（「今の住所と同じ」ボタンあり）。送信値 jan1InJapan/jan1Pref/jan1City/jan1Address ／ ver.20261106.09-test: 一本化フォーム：日本語能力（評価区分・分野・試験名・受験地）と技能水準の評価区分の選択肢を「日本語 / 訳」の2つ並びに（言語を選ぶと訳だけになっていた） ／ ver.20261106.08-test: 一本化フォーム：家族ごとに「📷 在留カード（表）／裏」ボタン。撮ると家族の氏名・生年月日・国籍・在留カード番号・住所（本人と同じなら「一緒に住んでいる：はい」）が入る（写真は保存しない）。続柄はボタンでも選べる ／ ver.20261106.07-test: 一本化フォーム：自動で入れた欄はラベル横に小さな「🤖 自動」、説明は②の見出しに1行だけ ／ ver.20261106.05-test: // 2号フォーム：指導対象者を入れたのに、その２号の方の氏名が空なら送る前に止める（Saysay 1-32号で誰の対象者か分からず反映されなかったため） ／ previous: ver.20261106.04-test 一本化フォーム：①書類に「💡見本」（アップロードページと同じ画像・取得方法） ②選択肢が2〜4つの質問はボタンで選ぶ ③下の「残り◯項目」にまだの書類・確認チェックも数え、押すと次の項目へ ④送信後に受け取った書類・まだの書類を一覧で表示 ／ ver.20261106.03-test: // 一本化フォーム：入力の並びを 連絡先→在留歴→家族→一時帰国→転出届 に ／ ver.20261106.02-test: // 一本化フォーム：並び順を整理（①書類の写真 ②確認：基本情報→在留カード（番号・住所）→在留期間→試験（合格証を頼んでいる案件）→確認チェック ③入力：連絡先→一時帰国→在留歴→家族→転出届）。在留カードと一時帰国をそれぞれ1枚にまとめ、連絡先の見出しから「住所」を外した ／ ver.20261106.01-test: // 一本化フォーム：合格証（技能）・（日本語）の写真から、資格の区分・分野・試験名・受験地を読み取って入れる（空いている欄だけ・黄色）。不合格・日本語のレベル不足はその場で知らせる ／ ver.20261105.10-test: // 一本化フォーム：①書類欄・確認・見出しの文言を各言語（英・越・尼・緬・クメール・ネパール・中）に ②違う書類・写りの悪い写真・期限切れをその場で知らせて撮り直してもらう ③在留カード（表）を案シスの在留期限・在留資格と照合し、食い違いはアップロード通知のメモに「⚠️」（申請人には出さない） ④途中保存で選んだ写真も保存 ／ ver.20261105.09-test: // 一本化フォーム：案シスの書類リストが無い案件でも、課税・納税・源泉徴収票・健康診断票・合格証・その他を出す（書類名は案シスと同じ）。英語の書類名を追加 ／ ver.20261105.08-test: // 一本化フォーム（upload=1のときだけ）：並び順を ①書類の写真 → ②写真から入った内容の確認（基本情報・在留カード番号・住所・在留期間）＋確認チェック → ③入力が必要な質問 に ／ ver.20261105.07-test: // 一本化フォーム（upload=1のときだけ）：在留カード「あり／なし」・日本の現住所「あり／なし」（変更・更新は「あり」）と出生地（送信時に国籍と同じ国名）の質問をかくす。現在の在留期間を在留カードの表から読み取って入れ、「アプリで確認しましたか？」を不要に ／ ver.20261105.06-test: // 一本化フォーム：受け取り済みの写真から住所が入ったあとに在留カードの裏を撮り直したら、裏の新しい住所で入れ直す（本人が直した住所は上書きしない） ／ ver.20261105.05-test: // 一本化フォーム：在留カードの住居地（表の印字、裏に書き足しがあれば新しい住所を優先）を読み取って「日本の現住所」に入れる（「あり」も自動で選ぶ） ／ ver.20261105.04-test: // 一本化フォーム：写真から自動で入れるとき、出生地にも国籍と同じ国名を入れる ／ ver.20261105.03-test: // 一本化フォーム：生年月日の入力をやめ、開いたときに受け取り済みの在留カード・パスポートから読み取った内容を自動で欄に入れる（URLの申請人名が案件と一致するときだけ）。確認チェックは必須のまま ／ ver.20261105.02-test: // 一本化フォーム：受け取り済みの在留カード・パスポートから読み取った内容（氏名・生年月日・国籍・パスポート番号/期限・在留カード番号）を、本人が生年月日を入れて合ったときだけ欄に入れる（24時間で5回まちがえると止める）。自動で入れたときは「合っているか確認しました」のチェックが必須 ／ ver.20261105.01-test: // 一本化フォーム（テスト）：URLに upload=1 を付けると、特定技能1号の申請人フォームの最初に「書類の写真」欄が出る。O-Link等で受け取り済みの在留カード表裏・パスポートは「受け取り済み」でスキップ。撮った写真から番号などを自動入力。送信後に人材フォルダへ（フォルダが無いときはプールへ）。本番 ver.20261102.09 と同期 ／  // 技能実習の所属機関フォーム：会社から答えにくい項目を任意に（監理団体の欄は名称以外・届出受理年月日・月額給与）。冒頭に「監理団体の方が代わりに記入しても構いません」
+var FORM_VERSION = 'ver.20261109.02-test'; // 一本化フォーム（変更・更新）：入管オンライン申請で使う項目を必須に（パスポート番号・有効期限、在留カード番号、日本の現住所、日本に家族はいますか、特定技能で初めて来日した日）。性別（写真・案シスから自動）・携帯電話番号（「-」自動）・本国の住所を追加（送信値 gender / celPhone / homeCountryAddress） ／ ver.20261109.01-test: 一本化フォーム（変更・更新）：O-Link・案シスにある国籍・今の在留期間・一時帰国を、空いている欄に入れる（緑の「🏢 登録済み」）。写真から読めた値があればそちらが優先 ／ ver.20261106.11-test: 1月1日の住所：はい／いいえだけ必須、都道府県・市区町村は任意に ／ ver.20261106.10-test: 一本化フォーム（変更・更新）：「2025年1月1日に日本に住んでいましたか？」→はいなら都道府県・市区町村（政令市は区まで）をプルダウンで（「今の住所と同じ」ボタンあり）。送信値 jan1InJapan/jan1Pref/jan1City/jan1Address ／ ver.20261106.09-test: 一本化フォーム：日本語能力（評価区分・分野・試験名・受験地）と技能水準の評価区分の選択肢を「日本語 / 訳」の2つ並びに（言語を選ぶと訳だけになっていた） ／ ver.20261106.08-test: 一本化フォーム：家族ごとに「📷 在留カード（表）／裏」ボタン。撮ると家族の氏名・生年月日・国籍・在留カード番号・住所（本人と同じなら「一緒に住んでいる：はい」）が入る（写真は保存しない）。続柄はボタンでも選べる ／ ver.20261106.07-test: 一本化フォーム：自動で入れた欄はラベル横に小さな「🤖 自動」、説明は②の見出しに1行だけ ／ ver.20261106.05-test: // 2号フォーム：指導対象者を入れたのに、その２号の方の氏名が空なら送る前に止める（Saysay 1-32号で誰の対象者か分からず反映されなかったため） ／ previous: ver.20261106.04-test 一本化フォーム：①書類に「💡見本」（アップロードページと同じ画像・取得方法） ②選択肢が2〜4つの質問はボタンで選ぶ ③下の「残り◯項目」にまだの書類・確認チェックも数え、押すと次の項目へ ④送信後に受け取った書類・まだの書類を一覧で表示 ／ ver.20261106.03-test: // 一本化フォーム：入力の並びを 連絡先→在留歴→家族→一時帰国→転出届 に ／ ver.20261106.02-test: // 一本化フォーム：並び順を整理（①書類の写真 ②確認：基本情報→在留カード（番号・住所）→在留期間→試験（合格証を頼んでいる案件）→確認チェック ③入力：連絡先→一時帰国→在留歴→家族→転出届）。在留カードと一時帰国をそれぞれ1枚にまとめ、連絡先の見出しから「住所」を外した ／ ver.20261106.01-test: // 一本化フォーム：合格証（技能）・（日本語）の写真から、資格の区分・分野・試験名・受験地を読み取って入れる（空いている欄だけ・黄色）。不合格・日本語のレベル不足はその場で知らせる ／ ver.20261105.10-test: // 一本化フォーム：①書類欄・確認・見出しの文言を各言語（英・越・尼・緬・クメール・ネパール・中）に ②違う書類・写りの悪い写真・期限切れをその場で知らせて撮り直してもらう ③在留カード（表）を案シスの在留期限・在留資格と照合し、食い違いはアップロード通知のメモに「⚠️」（申請人には出さない） ④途中保存で選んだ写真も保存 ／ ver.20261105.09-test: // 一本化フォーム：案シスの書類リストが無い案件でも、課税・納税・源泉徴収票・健康診断票・合格証・その他を出す（書類名は案シスと同じ）。英語の書類名を追加 ／ ver.20261105.08-test: // 一本化フォーム（upload=1のときだけ）：並び順を ①書類の写真 → ②写真から入った内容の確認（基本情報・在留カード番号・住所・在留期間）＋確認チェック → ③入力が必要な質問 に ／ ver.20261105.07-test: // 一本化フォーム（upload=1のときだけ）：在留カード「あり／なし」・日本の現住所「あり／なし」（変更・更新は「あり」）と出生地（送信時に国籍と同じ国名）の質問をかくす。現在の在留期間を在留カードの表から読み取って入れ、「アプリで確認しましたか？」を不要に ／ ver.20261105.06-test: // 一本化フォーム：受け取り済みの写真から住所が入ったあとに在留カードの裏を撮り直したら、裏の新しい住所で入れ直す（本人が直した住所は上書きしない） ／ ver.20261105.05-test: // 一本化フォーム：在留カードの住居地（表の印字、裏に書き足しがあれば新しい住所を優先）を読み取って「日本の現住所」に入れる（「あり」も自動で選ぶ） ／ ver.20261105.04-test: // 一本化フォーム：写真から自動で入れるとき、出生地にも国籍と同じ国名を入れる ／ ver.20261105.03-test: // 一本化フォーム：生年月日の入力をやめ、開いたときに受け取り済みの在留カード・パスポートから読み取った内容を自動で欄に入れる（URLの申請人名が案件と一致するときだけ）。確認チェックは必須のまま ／ ver.20261105.02-test: // 一本化フォーム：受け取り済みの在留カード・パスポートから読み取った内容（氏名・生年月日・国籍・パスポート番号/期限・在留カード番号）を、本人が生年月日を入れて合ったときだけ欄に入れる（24時間で5回まちがえると止める）。自動で入れたときは「合っているか確認しました」のチェックが必須 ／ ver.20261105.01-test: // 一本化フォーム（テスト）：URLに upload=1 を付けると、特定技能1号の申請人フォームの最初に「書類の写真」欄が出る。O-Link等で受け取り済みの在留カード表裏・パスポートは「受け取り済み」でスキップ。撮った写真から番号などを自動入力。送信後に人材フォルダへ（フォルダが無いときはプールへ）。本番 ver.20261102.09 と同期 ／  // 技能実習の所属機関フォーム：会社から答えにくい項目を任意に（監理団体の欄は名称以外・届出受理年月日・月額給与）。冒頭に「監理団体の方が代わりに記入しても構いません」
 // var FORM_VERSION = 'ver.20261102.08'; // 技能実習の申請人フォームをブラッシュアップ：①質問・案内・選択肢を各言語（英・越・尼・緬・クメール・ネパール・中）に ②入力チェックのメッセージも各言語に ③3号の変更・更新で共通の「一時帰国予定」に「3号のための一時帰国とは別」と補足 ④3号認定で「2号を終えて日本を出た日」を聞く ⑤国籍「その他」の英語表記（Philippines など）でも結核・ミャンマーの判定 ⑥年月の入力欄が使えないブラウザでは「2018-04」の文字入力に
 // var FORM_VERSION = 'ver.20261102.07'; // 技能実習：国籍で出し分け。認定（1号・3号）で入国前結核スクリーニングの対象国（フィリピン・ネパール・ベトナム、インドネシアは2027/1/4以降の申請から）なら結核非発病証明書の案内と取得状況を聞く。3号更新でミャンマー・一時帰国まだなら説明書（参考様式）の案内と理由を聞く
 // var FORM_VERSION = 'ver.20261102.06'; // 技能実習の所属機関（実習実施者）ヒアリングを追加（type=company_jisshu）。特定技能1号の企業フォームの企業基本情報・所在地・代表者を同じ項目名で使い、実習実施者の届出・監理団体（団体監理型のみ）・職種と月額給与を追加。雇用条件書・相談窓口・支援計画などの特定技能の書類用の項目は出さない
@@ -8449,6 +8449,7 @@ function prefillForm(resp) {
       var d = j.data, n = 0;
       if (d.nationality && setVal('f-nationality', d.nationality, 'olink')) { n++; setVal('f-birthPlace', d.nationality, 'olink'); }
       if (setStay(d.stayPeriod, 'olink')) n++;
+      if (setVal('f-xGender', d.gender, 'olink')) n++;
       var ts = document.getElementById('f-tempReturnStatus');
       if (d.tempStatus && ts && !ts.value && Array.prototype.some.call(ts.options, function(o){ return o.value === d.tempStatus; })) {
         ts.value = d.tempStatus; ts.style.background = '#ecfdf5'; ts._olink = true; markAuto(ts, 'olink'); n++;
@@ -8593,6 +8594,7 @@ function prefillForm(resp) {
       if (setVal('f-birth', d.birthdate)) n.push('生年月日');
       if (setVal('f-nationality', d.nationality)) n.push('国籍');
       if (d.nationality) setVal('f-birthPlace', d.nationality);   // 出生地は国籍と同じ国名を入れる
+      if ((k === 'passport' || k === 'zairyu_front') && setVal('f-xGender', d.gender)) n.push('性別');
       if (k === 'passport') { if (setVal('f-passport', d.passport)) n.push('パスポート番号'); if (setVal('f-passExpiry', d.passportExpiry)) n.push('パスポート有効期限'); }
       if (k === 'zairyu_front' && d.residenceCard) {
         var cs = document.getElementById('f-residenceCardStatus');
@@ -8639,6 +8641,7 @@ function prefillForm(resp) {
       if (setVal('f-birth', d.birthdate)) n.push('生年月日');
       if (setVal('f-nationality', d.nationality)) n.push('国籍');
       if (d.nationality) setVal('f-birthPlace', d.nationality);   // 出生地は国籍と同じ国名を入れる
+      if (setVal('f-xGender', d.gender)) n.push('性別');
       if (setVal('f-passport', d.passport)) n.push('パスポート番号');
       if (setVal('f-passExpiry', d.passportExpiry)) n.push('パスポート有効期限');
       if (d.residenceCard) { var cs = document.getElementById('f-residenceCardStatus'); if (cs && !cs.value) { cs.value = 'あり'; cs.style.background = '#fef9c3'; try { toggleResidenceCardInput('あり'); } catch(e){} } if (setVal('f-residenceCard', d.residenceCard)) n.push('在留カード番号'); }
@@ -8718,6 +8721,15 @@ function prefillForm(resp) {
     if (autoFilled && !confirmed) { var em2 = document.getElementById('errorMsg'); em2.innerHTML = '⚠️ ' + TH('needConfirm'); em2.style.display='block'; document.getElementById('udocCard').scrollIntoView({behavior:'smooth',block:'start'}); return; }
     var j1m = j1Missing();
     if (j1m) { var em3 = document.getElementById('errorMsg'); em3.innerHTML = '⚠️ ' + TH('j1Need'); em3.style.display='block'; j1m.scrollIntoView({behavior:'smooth',block:'center'}); return; }
+    var xm = xMissing();
+    if (xm.length) {
+      var seen = {}, names = [];
+      xm.forEach(function(m){ if (!seen[m.id]) { seen[m.id] = 1; names.push(XLBL[m.id] || m.id); } });
+      var em4 = document.getElementById('errorMsg'); em4.innerHTML = '⚠️ ' + TH('xNeed', { ja: names.join('・'), tr: names.join(', ') }); em4.style.display='block';
+      try { var _t0 = xm[0].el; _t0.scrollIntoView({behavior:'smooth',block:'center'}); setTimeout(function(){ try { _t0.focus(); } catch(_){} }, 400); } catch(_){}
+      return;
+    }
+    if (xCelBad()) { var em5 = document.getElementById('errorMsg'); em5.innerHTML = '⚠️ ' + TH('xCelBad'); em5.style.display='block'; document.getElementById('f-xCel').scrollIntoView({behavior:'smooth',block:'center'}); return; }
     var miss = missingRequired();
     if (hasWarnings() && !confirm(TT('warnSend'))) return;
     if (miss.length && !confirm('・' + miss.join('\n・') + '\n\n' + TT('missing'))) return;
@@ -9079,6 +9091,123 @@ function prefillForm(resp) {
   var _j1Lang = '';
   setInterval(function(){ try { j1Card(); if (_j1Lang !== currentLang + '|' + !!(document.getElementById('f-address')||{}).value) { _j1Lang = currentLang + '|' + !!(document.getElementById('f-address')||{}).value; j1Relabel(); } } catch(e){} }, 700);
 
+  // ---- ver.20261109.02: 入管オンライン申請（拡張機能）で使う項目は必須に（変更・更新） ----
+  //   ・パスポート番号／有効期限・在留カード番号・日本の現住所・日本に家族はいますか・特定技能で初めて来日した日 … 「*」を付けて必須に
+  //   ・性別（写真・案シスから入れる）・携帯電話番号・本国の住所 … 新しく聞く（技能実習と同じ名前 gender / celPhone / homeCountryAddress で送る）
+  var xOn = j1On;
+  var XUT = {
+    xCelHint:  { ja:'数字だけ入れれば「-」は自動で入ります', en:'Just type the numbers. Hyphens are added automatically.', vi:'Chỉ cần nhập số, dấu "-" sẽ tự động thêm vào.', id:'Cukup ketik angka, tanda "-" ditambahkan otomatis.', my:'နံပါတ်သာ ရိုက်ပါ။ "-" ကို အလိုအလျောက် ထည့်ပါမည်။', km:'វាយតែលេខប៉ុណ្ណោះ សញ្ញា "-" នឹងបញ្ចូលដោយស្វ័យប្រវត្តិ។', ne:'नम्बर मात्र लेख्नुहोस्, "-" आफैं थपिन्छ।', zh:'只需输入数字，"-"会自动加上。' },
+    xHomeHint: { ja:'国の家の住所（ローマ字でも、自分の国の文字でもOK）', en:'Your home address in your country (Latin letters or your own language is OK)', vi:'Địa chỉ nhà ở nước bạn (viết chữ Latinh hoặc tiếng nước bạn đều được)', id:'Alamat rumah di negara asal (huruf Latin atau bahasa sendiri boleh)', my:'မိခင်နိုင်ငံရှိ အိမ်လိပ်စာ (အင်္ဂလိပ်စာလုံး သို့မဟုတ် မိမိဘာသာ ရေးနိုင်သည်)', km:'អាសយដ្ឋានផ្ទះនៅប្រទេសកំណើត (អក្សរឡាតាំង ឬភាសាខ្លួនឯងក៏បាន)', ne:'आफ्नो देशको घरको ठेगाना (रोमन अक्षर वा आफ्नै भाषामा लेख्न सकिन्छ)', zh:'本国的家庭住址（用拉丁字母或本国文字均可）' },
+    xNeed:     { ja:'まだ入っていない項目があります：{x}', en:'Some required items are not filled in: {x}', vi:'Còn mục bắt buộc chưa nhập: {x}', id:'Ada item wajib yang belum diisi: {x}', my:'မဖြည့်ရသေးသော လိုအပ်ချက်များ ရှိသည်: {x}', km:'មានចំណុចចាំបាច់មិនទាន់បំពេញ៖ {x}', ne:'भर्न बाँकी अनिवार्य विवरण: {x}', zh:'还有必填项目未填写：{x}' },
+    xCelBad:   { ja:'携帯電話番号を正しく入力してください（数字10けた以上）', en:'Please enter a valid mobile phone number (10 digits or more).', vi:'Vui lòng nhập đúng số điện thoại di động (từ 10 chữ số).', id:'Masukkan nomor ponsel yang benar (minimal 10 digit).', my:'မိုဘိုင်းဖုန်းနံပါတ် မှန်ကန်စွာ ထည့်ပါ (ဂဏန်း ၁၀ လုံးနှင့်အထက်)။', km:'សូមបញ្ចូលលេខទូរស័ព្ទដៃឱ្យត្រឹមត្រូវ (១០ខ្ទង់ឡើងទៅ)។', ne:'सही मोबाइल नम्बर लेख्नुहोस् (१० अंक वा बढी)।', zh:'请正确填写手机号码（10位以上数字）。' }
+  };
+  for (var _xk in XUT) UT[_xk] = XUT[_xk];
+  var XLBL = { 'f-passport':'パスポート番号', 'f-passExpiry':'パスポート有効期限', 'f-residenceCard':'在留カード番号', 'f-address':'日本の現住所',
+               'f-hasFamily':'日本に家族はいますか', 'f-firstEntryStatus':'特定技能で初めて日本に来た日', 'f-xGender':'性別', 'f-xCel':'携帯電話番号', 'f-xHome':'本国の住所' };
+  function xStar(id){
+    var el = document.getElementById(id), f = el && el.closest('.field'), lb = f && f.querySelector('label');
+    if (!lb || lb.querySelector('span.req')) return;
+    var s = document.createElement('span'); s.className = 'req'; s.textContent = '*';
+    var tr = lb.querySelector('.trans'); if (tr) lb.insertBefore(s, tr); else lb.appendChild(s);
+  }
+  function xHint(id, k){
+    var el = document.getElementById(id); if (!el || el.parentNode.querySelector('.x-hint')) return;
+    var s = document.createElement('div'); s.className = 'x-hint'; s.setAttribute('data-xk', k); s.style.cssText = 'font-size:11px;color:#6b7280;margin-top:3px;';
+    el.parentNode.appendChild(s);
+  }
+  function xFmtCel(v){
+    var s = String(v || '').replace(/[０-９＋－]/g, function(c){ return String.fromCharCode(c.charCodeAt(0) - 0xFEE0); });
+    var dg = s.replace(/[^\d]/g, '');
+    if (/^0[789]0\d{8}$/.test(dg) && !/^\+/.test(s)) return dg.slice(0,3) + '-' + dg.slice(3,7) + '-' + dg.slice(7);
+    return s.replace(/[^\d+\-\s()]/g, '');
+  }
+  window._xCelIn = function(el){ var v = xFmtCel(el.value); if (v !== el.value) el.value = v; };
+  function xBuild(){
+    if (!xOn) return;
+    // 性別：基本情報（国籍の下）に
+    if (!document.getElementById('f-xGender')) {
+      var nat = document.getElementById('f-nationality'), g = nat && nat.closest('.grid2');
+      if (g) {
+        var d = document.createElement('div');
+        d.innerHTML = '<div class="field"><label>性別（せいべつ）<span class="req">*</span></label><div class="trans" data-key="js_gender"></div>'
+          + '<select id="f-xGender"><option value="">---</option><option value="男">男</option><option value="女">女</option></select></div>';
+        g.parentNode.insertBefore(d.firstChild, g.nextSibling);
+      }
+    }
+    // 携帯電話番号・本国の住所：連絡先（メールの下）に
+    if (!document.getElementById('f-xCel')) {
+      var em = document.getElementById('f-email'), ef = em && em.closest('.field');
+      if (ef) {
+        var w = document.createElement('div');
+        w.innerHTML = '<div class="field"><label>携帯電話番号（けいたいでんわ ばんごう）<span class="req">*</span></label><div class="trans" data-key="js_cel"></div>'
+          + '<input type="tel" id="f-xCel" inputmode="tel" autocomplete="tel" placeholder="例: 080-1234-5678" oninput="_xCelIn(this)"></div>'
+          + '<div class="field"><label>本国の住所（ほんごくの じゅうしょ）<span class="req">*</span></label><div class="trans" data-key="js_homeAddr"></div>'
+          + '<input type="text" id="f-xHome" placeholder="例: 123 Le Loi Street, Hai Ba Trung, Hanoi"></div>';
+        var a = w.children[0], b = w.children[1];
+        ef.parentNode.insertBefore(a, ef.nextSibling); a.parentNode.insertBefore(b, a.nextSibling);
+        xHint('f-xCel', 'xCelHint'); xHint('f-xHome', 'xHomeHint');
+      }
+    }
+    ['f-passport','f-passExpiry','f-residenceCard','f-address','f-hasFamily'].forEach(xStar);
+    // 在留歴の質問は .field の外なので、見出しの文に「*」
+    var fe = document.getElementById('f-firstEntryStatus'), card = fe && fe.closest('.card');
+    if (card && !card.querySelector('.x-fe-req')) {
+      var q = card.querySelector('.trans[data-key="firstEntry"]'), qd = q && q.previousElementSibling;
+      if (qd) { var s = document.createElement('span'); s.className = 'req x-fe-req'; s.textContent = '*'; s.style.cssText = 'color:#dc2626;margin-left:2px;'; qd.appendChild(s); }
+    }
+    xRestore();
+  }
+  var _xLang = null;
+  function xRelabel(){
+    if (_xLang === currentLang && !document.querySelector('.x-hint:empty')) return;
+    _xLang = currentLang;
+    var dict = (typeof TRANS !== 'undefined' && TRANS[currentLang]) || {};
+    ['js_gender','js_cel','js_homeAddr'].forEach(function(k){
+      document.querySelectorAll('#formBody .trans[data-key="' + k + '"]').forEach(function(el){ var t = dict[k] || ''; el.textContent = t; el.classList.toggle('show', !!t); });
+    });
+    var gs = document.getElementById('f-xGender');
+    if (gs) Array.prototype.forEach.call(gs.options, function(o){ if (!o.value) return; var t = (typeof JS_OPTS !== 'undefined' && JS_OPTS[o.value]) || {}; o.textContent = o.value + (currentLang && t[currentLang] ? ' / ' + t[currentLang] : ''); });
+    document.querySelectorAll('.x-hint[data-xk]').forEach(function(el){ var t = T(el.getAttribute('data-xk')); el.textContent = t.ja + (currentLang && t.tr ? ' / ' + t.tr : ''); });
+  }
+  // 入っていない必須項目（送る前の確認用）。 own: 「*」の数え方では拾えないもの
+  function xMissing(){
+    if (!xOn) return [];
+    var out = [], v = function(id){ var e = document.getElementById(id); return e ? String(e.value || '').trim() : null; };
+    ['f-passport','f-passExpiry','f-residenceCard','f-address','f-xGender','f-xCel','f-xHome','f-hasFamily'].forEach(function(id){
+      if (v(id) === '') out.push({ id: id, el: document.getElementById(id) });
+    });
+    var fs = v('f-firstEntryStatus');
+    if (fs === '') out.push({ id: 'f-firstEntryStatus', el: document.getElementById('f-firstEntryStatus'), own: true });
+    else if (fs === 'date') ['f-firstEntryY','f-firstEntryM','f-firstEntryD'].forEach(function(id){ if (v(id) === '') out.push({ id: 'f-firstEntryStatus', el: document.getElementById(id), own: true }); });
+    return out;
+  }
+  function xCelBad(){ var c = (document.getElementById('f-xCel') || {}).value || ''; return xOn && c && c.replace(/[^\d]/g, '').length < 10; }
+  // 送る中身に足す（途中保存も同じ）
+  var _xCollect = collectData;
+  collectData = function(){
+    var d = _xCollect.apply(this, arguments);
+    if (xOn && document.getElementById('f-xCel')) {
+      d.gender = (document.getElementById('f-xGender') || {}).value || '';
+      d.celPhone = (document.getElementById('f-xCel') || {}).value || '';
+      d.homeCountryAddress = (document.getElementById('f-xHome') || {}).value || '';
+    }
+    return d;
+  };
+  var _xPending = null;
+  function xRestore(){
+    var r = _xPending; if (!r || !document.getElementById('f-xCel')) return;
+    _xPending = null;
+    var put = function(id, v){ var e = document.getElementById(id); if (e && v && !String(e.value || '').trim()) { e.value = v; try { e.dispatchEvent(new Event('change',{bubbles:true})); } catch(_){} } };
+    put('f-xGender', r.gender); put('f-xCel', r.celPhone); put('f-xHome', r.homeCountryAddress);
+  }
+  var _xPrefill = prefillForm;
+  prefillForm = function(resp){
+    var r = _xPrefill.apply(this, arguments);
+    try { if (xOn && resp && (resp.gender || resp.celPhone || resp.homeCountryAddress)) { _xPending = resp; xRestore(); } } catch(e){}
+    return r;
+  };
+  if (xOn) setInterval(function(){ try { xBuild(); xRelabel(); } catch(e){} }, 700);
+
   // ---- 残りの項目：まだの書類（必須）と確認チェックも数えて、押すと次の項目へ移動 ----
   var _origReqEmpty = _reqEmptyFields;
   _reqEmptyFields = function(){
@@ -9087,6 +9216,7 @@ function prefillForm(resp) {
     if (dc) docs.forEach(function(d,i){ if (d.r && !got[i] && !(files[i] && files[i].length)) extra.push(dc); });
     if (autoFilled && !confirmed) { var cb = document.getElementById('udocConfirm'); if (cb) extra.push(cb); }
     var j1 = j1Missing(); if (j1) extra.push(j1);
+    xMissing().forEach(function(m){ if (m.own && m.el) extra.push(m.el); });   // 在留歴（「*」の数え方では拾えない）
     return extra.concat(r);
   };
   (function(){
@@ -9154,8 +9284,9 @@ function prefillForm(resp) {
       render();
       if (hasExt) setTimeout(autoPrefill, 1500);   // 途中保存の読み込みが終わってから、空いている欄だけに入れる
       setTimeout(olinkPrefill, 2600);   // 写真から入れたあと、まだ空いている欄にだけ O-Link・案シスの情報を入れる
-      if (!hasExt && pi >= 0 && got[pi]) { note('f-passport','受け取り済みのパスポートから読み取るので、分からなければ空欄で大丈夫です / You may leave this blank'); note('f-passExpiry','空欄で大丈夫です / You may leave this blank'); }
-      if (!hasExt && fa >= 0 && got[fa]) note('f-residenceCard','受け取り済みの在留カードから読み取るので、分からなければ空欄で大丈夫です / You may leave this blank');
+      xBuild();
+      if (false && !hasExt && pi >= 0 && got[pi]) { note('f-passport','受け取り済みのパスポートから読み取るので、分からなければ空欄で大丈夫です / You may leave this blank'); note('f-passExpiry','空欄で大丈夫です / You may leave this blank'); }
+      if (false && !hasExt && fa >= 0 && got[fa]) note('f-residenceCard','受け取り済みの在留カードから読み取るので、分からなければ空欄で大丈夫です / You may leave this blank');
     });
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start); else start();
