@@ -193,7 +193,8 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20261116.01'; // 登録支援機関フォーム（＋自社支援タブ）の支援体制：対応時間 全曜日9:00〜18:00・相談/緊急時 直接面談+電話・定期面談 3ヶ月に1回以上・各支援の実施予定に汎用文言をデフォルト。既存回答から作った候補をプルダウンで選べるように
+var FORM_VERSION = 'ver.20261116.02'; // 支援体制：定期面談の実施方法「対面とオンライン」をデフォルト。定期面談・各支援の実施予定の候補プルダウンをやめ、デフォルト文言＋自由記入に
+// var FORM_VERSION = 'ver.20261116.01'; // 登録支援機関フォーム（＋自社支援タブ）の支援体制：対応時間 全曜日9:00〜18:00・相談/緊急時 直接面談+電話・定期面談 3ヶ月に1回以上・各支援の実施予定に汎用文言をデフォルト。既存回答から作った候補をプルダウンで選べるように
 // var FORM_VERSION = 'ver.20261106.06'; // 自社支援だけのリンク（part=ss）：【自社支援】の2タブだけを出し、自社支援の回答だけを送る（会社情報・雇用条件は送らない）
 // var FORM_VERSION = 'ver.20261106.05'; // 2号フォーム：指導対象者を入れたのに、その２号の方の氏名が空なら送る前に止める（Saysay 1-32号で誰の対象者か分からず反映されなかったため） ／ previous: ver.20261102.09 技能実習の所属機関フォーム：会社から答えにくい項目を任意に（監理団体の欄は名称以外・届出受理年月日・月額給与）。冒頭に「監理団体の方が代わりに記入しても構いません」
 // var FORM_VERSION = 'ver.20261102.08'; // 技能実習の申請人フォームをブラッシュアップ：①質問・案内・選択肢を各言語（英・越・尼・緬・クメール・ネパール・中）に ②入力チェックのメッセージも各言語に ③3号の変更・更新で共通の「一時帰国予定」に「3号のための一時帰国とは別」と補足 ④3号認定で「2号を終えて日本を出た日」を聞く ⑤国籍「その他」の英語表記（Philippines など）でも結核・ミャンマーの判定 ⑥年月の入力欄が使えないブラウザでは「2018-04」の文字入力に
@@ -1821,8 +1822,7 @@ function _soSchedPick(fieldHtml, id, key){
   fieldHtml = fieldHtml.replace('<input type="text" id="'+id+'" ', '<input type="text" id="'+id+'" value="'+esc(opts[0])+'" ');
   var sel = '<select onchange="if(this.value){document.getElementById(\''+id+'\').value=this.value;this.value=\'\';}" style="width:100%;box-sizing:border-box;margin-top:6px;padding:8px;border:1.5px solid #e5e7eb;border-radius:8px;font-size:14px;min-height:40px;color:#374151;"><option value="">候補から選ぶ</option>'
     + opts.map(function(o){ return '<option value="'+esc(o)+'">'+esc(o)+'</option>'; }).join('') + '</select>';
-  var i = fieldHtml.lastIndexOf('</div>');
-  return fieldHtml.slice(0,i) + sel + fieldHtml.slice(i);
+  return fieldHtml; // ver.20261116.02: 候補プルダウンは出さない（デフォルト文言＋自由記入）
 }
 var _soStaffCount = 0;
 function _soFormMethodHtml(pfx){
@@ -2197,7 +2197,7 @@ function buildSupportOrgForm() {
   // B-2 定期面談
   h += '<div style="font-size:13px;font-weight:700;margin:14px 0 4px;">定期面談の実施方法</div>';
   h += '<label style="display:block;font-size:14px;margin-bottom:4px;"><input type="radio" name="f-so_rmMethod" value="face" style="width:18px;height:18px;vertical-align:middle;"> 対面</label>';
-  h += '<label style="display:block;font-size:14px;margin-bottom:4px;"><input type="radio" name="f-so_rmMethod" value="faceOnline" style="width:18px;height:18px;vertical-align:middle;"> 対面とオンラインで実施（同意しない・対面希望の場合は対面）</label>';
+  h += '<label style="display:block;font-size:14px;margin-bottom:4px;"><input type="radio" name="f-so_rmMethod" value="faceOnline" checked style="width:18px;height:18px;vertical-align:middle;"> 対面とオンラインで実施（同意しない・対面希望の場合は対面）</label>';
   h += '<label style="display:block;font-size:14px;margin-bottom:4px;"><input type="radio" name="f-so_rmMethod" value="radio" style="width:18px;height:18px;vertical-align:middle;"> 無線や船舶電話（漁船漁業のみ）</label>';
   h += _soSchedPick(field('f-so_rmSchedule','定期面談の実施時期','text',false,'例：3ヶ月に一回以上実施／1月、4月、7月、10月に実施',''), 'f-so_rmSchedule', 'rm');
   // B-3 実施方法（項目別）
