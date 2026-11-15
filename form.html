@@ -193,7 +193,8 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20261106.06'; // 自社支援だけのリンク（part=ss）：【自社支援】の2タブだけを出し、自社支援の回答だけを送る（会社情報・雇用条件は送らない）
+var FORM_VERSION = 'ver.20261116.01'; // 登録支援機関フォーム（＋自社支援タブ）の支援体制：対応時間 全曜日9:00〜18:00・相談/緊急時 直接面談+電話・定期面談 3ヶ月に1回以上・各支援の実施予定に汎用文言をデフォルト。既存回答から作った候補をプルダウンで選べるように
+// var FORM_VERSION = 'ver.20261106.06'; // 自社支援だけのリンク（part=ss）：【自社支援】の2タブだけを出し、自社支援の回答だけを送る（会社情報・雇用条件は送らない）
 // var FORM_VERSION = 'ver.20261106.05'; // 2号フォーム：指導対象者を入れたのに、その２号の方の氏名が空なら送る前に止める（Saysay 1-32号で誰の対象者か分からず反映されなかったため） ／ previous: ver.20261102.09 技能実習の所属機関フォーム：会社から答えにくい項目を任意に（監理団体の欄は名称以外・届出受理年月日・月額給与）。冒頭に「監理団体の方が代わりに記入しても構いません」
 // var FORM_VERSION = 'ver.20261102.08'; // 技能実習の申請人フォームをブラッシュアップ：①質問・案内・選択肢を各言語（英・越・尼・緬・クメール・ネパール・中）に ②入力チェックのメッセージも各言語に ③3号の変更・更新で共通の「一時帰国予定」に「3号のための一時帰国とは別」と補足 ④3号認定で「2号を終えて日本を出た日」を聞く ⑤国籍「その他」の英語表記（Philippines など）でも結核・ミャンマーの判定 ⑥年月の入力欄が使えないブラウザでは「2018-04」の文字入力に
 // var FORM_VERSION = 'ver.20261102.07'; // 技能実習：国籍で出し分け。認定（1号・3号）で入国前結核スクリーニングの対象国（フィリピン・ネパール・ベトナム、インドネシアは2027/1/4以降の申請から）なら結核非発病証明書の案内と取得状況を聞く。3号更新でミャンマー・一時帰国まだなら説明書（参考様式）の案内と理由を聞く
@@ -1793,16 +1794,46 @@ function buildForm(t) {
 // ===== 登録支援機関フォーム（type=support_org）=====
 var _SO_PREF_LIST = ['','北海道','青森県','岩手県','宮城県','秋田県','山形県','福島県','茨城県','栃木県','群馬県','埼玉県','千葉県','東京都','神奈川県','新潟県','富山県','石川県','福井県','山梨県','長野県','岐阜県','静岡県','愛知県','三重県','滋賀県','京都府','大阪府','兵庫県','奈良県','和歌山県','鳥取県','島根県','岡山県','広島県','山口県','徳島県','香川県','愛媛県','高知県','福岡県','佐賀県','長崎県','熊本県','大分県','宮崎県','鹿児島県','沖縄県'];
 var _SO_DAYS = [['mon','月'],['tue','火'],['wed','水'],['thu','木'],['fri','金'],['sat','土'],['sun','日'],['hol','祝']];
+// ===== ver.20261116.01: 支援体制のデフォルト値と候補（既存の登録支援機関の回答から） =====
+var _SO_HOURS_PRESETS = [['09:00','18:00','9:00〜18:00'],['09:00','20:00','9:00〜20:00'],['08:00','20:00','8:00〜20:00'],['09:00','00:00','9:00〜24:00'],['00:00','23:59','24時間'],['10:00','18:30','10:00〜18:30']];
+function _soHoursPreset(sel){
+  if(!sel.value) return; var p=sel.value.split('|');
+  _SO_DAYS.forEach(function(d){ var n=document.getElementById('f-so_hours_'+d[0]+'_none'); if(n&&n.checked){ n.checked=false; _soHoursNoneToggle(d[0]); }
+    var f=document.getElementById('f-so_hours_'+d[0]+'_from'), t=document.getElementById('f-so_hours_'+d[0]+'_to'); if(f)f.value=p[0]; if(t)t.value=p[1]; });
+  sel.value='';
+}
+// 先頭がデフォルト値
+var _SO_SCHED_OPTIONS = {
+  rm:           ['3ヶ月に1回以上実施','1月、4月、7月、10月に実施','2月、5月、8月、11月に実施','3月、6月、9月、12月に実施'],
+  guidance:     ['雇用契約締結後、在留資格申請前に実施','入国前に実施','入社前に実施','内定後1週間以内に実施','在留資格変更申請前に実施'],
+  escort:       ['入国時・帰国時に実施','入国時は入国予定日、帰国時は契約終了後に実施','入国済みのため実施なし（変更・更新）'],
+  housing:      ['入社後1週間以内に実施','在留資格の許可後、入社前から入社後2週間以内に実施'],
+  orientation:  ['入社後1週間以内に実施','入国時に実施','入社前に実施','入社後10日以内に実施','許可後速やかに実施'],
+  procedures:   ['入社後1週間以内に実施','入国後1週間以内に実施','入社前から入社後2週間以内に実施','配属日に実施'],
+  japanese:     ['適宜実施','内定後に実施'],
+  consultation: ['適宜実施'],
+  exchange:     ['適宜実施'],
+  jobchange:    ['非自発的離職時に実施']
+};
+function _soSchedPick(fieldHtml, id, key){
+  var opts=_SO_SCHED_OPTIONS[key]||[]; if(!opts.length) return fieldHtml;
+  var esc=function(t){ return String(t).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;'); };
+  fieldHtml = fieldHtml.replace('<input type="text" id="'+id+'" ', '<input type="text" id="'+id+'" value="'+esc(opts[0])+'" ');
+  var sel = '<select onchange="if(this.value){document.getElementById(\''+id+'\').value=this.value;this.value=\'\';}" style="width:100%;box-sizing:border-box;margin-top:6px;padding:8px;border:1.5px solid #e5e7eb;border-radius:8px;font-size:14px;min-height:40px;color:#374151;"><option value="">候補から選ぶ</option>'
+    + opts.map(function(o){ return '<option value="'+esc(o)+'">'+esc(o)+'</option>'; }).join('') + '</select>';
+  var i = fieldHtml.lastIndexOf('</div>');
+  return fieldHtml.slice(0,i) + sel + fieldHtml.slice(i);
+}
 var _soStaffCount = 0;
 function _soFormMethodHtml(pfx){
   // ver.20260723: 電話・メールのチェックONで連絡先入力欄を表示（1-17号 IV-6イ 対応）
   var h='<div style="display:flex;flex-wrap:wrap;gap:12px 18px;align-items:center;">'
-    + '<label style="display:flex;align-items:center;gap:6px;font-size:15px;"><input type="checkbox" id="f-so_'+pfx+'_f2f" style="width:20px;height:20px;">直接面談</label>'
-    + '<label style="display:flex;align-items:center;gap:6px;font-size:15px;"><input type="checkbox" id="f-so_'+pfx+'_tel" onchange="_soMethToggle(\''+pfx+'\')" style="width:20px;height:20px;">電話</label>'
+    + '<label style="display:flex;align-items:center;gap:6px;font-size:15px;"><input type="checkbox" id="f-so_'+pfx+'_f2f" checked style="width:20px;height:20px;">直接面談</label>'
+    + '<label style="display:flex;align-items:center;gap:6px;font-size:15px;"><input type="checkbox" id="f-so_'+pfx+'_tel" checked onchange="_soMethToggle(\''+pfx+'\')" style="width:20px;height:20px;">電話</label>'
     + '<label style="display:flex;align-items:center;gap:6px;font-size:15px;"><input type="checkbox" id="f-so_'+pfx+'_mail" onchange="_soMethToggle(\''+pfx+'\')" style="width:20px;height:20px;">メール</label>'
     + '<div style="display:flex;align-items:center;gap:6px;">その他<input type="text" id="f-so_'+pfx+'_other" placeholder="例：LINE" style="padding:8px;border:1.5px solid #e5e7eb;border-radius:8px;font-size:15px;min-height:44px;"></div>'
     + '</div>'
-    + '<div id="f-so_'+pfx+'_telRow" style="display:none;margin-top:8px;"><input type="tel" id="f-so_'+pfx+'_telNo" placeholder="電話番号（例：080-6051-9213）" style="width:100%;box-sizing:border-box;padding:8px;border:1.5px solid #e5e7eb;border-radius:8px;font-size:15px;min-height:44px;"></div>'
+    + '<div id="f-so_'+pfx+'_telRow" style="display:block;margin-top:8px;"><input type="tel" id="f-so_'+pfx+'_telNo" placeholder="電話番号（例：080-6051-9213）" style="width:100%;box-sizing:border-box;padding:8px;border:1.5px solid #e5e7eb;border-radius:8px;font-size:15px;min-height:44px;"></div>'
     + '<div id="f-so_'+pfx+'_mailRow" style="display:none;margin-top:8px;"><input type="email" id="f-so_'+pfx+'_mailAddr" placeholder="メールアドレス" style="width:100%;box-sizing:border-box;padding:8px;border:1.5px solid #e5e7eb;border-radius:8px;font-size:15px;min-height:44px;"></div>';
   if(pfx==='emg'){
     h+='<button type="button" onclick="_soCopyConsultToEmg()" style="margin-top:8px;padding:8px 14px;background:#f0fdf4;color:#15803d;border:1.5px solid #86efac;border-radius:8px;font-weight:700;cursor:pointer;font-size:13px;">📋 相談方法と同じにする</button>';
@@ -2137,10 +2168,13 @@ function buildSupportOrgForm() {
     + '<label style="font-size:15px;"><input type="radio" name="f-so_properness" value="無" style="width:20px;height:20px;vertical-align:middle;"> 無</label></div>';
   h += '</div>';
   h += '<div class="card"><div class="section-title">対応時間（曜日別）</div><div style="display:flex;flex-direction:column;gap:8px;">';
+  // ver.20261116.01: よく使われる時間帯をプルダウンで全曜日に一括反映
+  h += '<select onchange="_soHoursPreset(this)" style="padding:8px;border:1.5px solid #e5e7eb;border-radius:8px;font-size:14px;min-height:44px;margin-bottom:4px;"><option value="">よく使われる時間帯から選ぶ（全曜日に反映）</option>'
+    + _SO_HOURS_PRESETS.map(function(p){ return '<option value="'+p[0]+'|'+p[1]+'">'+p[2]+'</option>'; }).join('') + '</select>';
   _SO_DAYS.forEach(function(d){
     h += '<div style="display:flex;align-items:center;gap:8px;"><span style="width:2.5em;font-weight:700;">'+d[1]+'</span>'
-      + '<input type="time" id="f-so_hours_'+d[0]+'_from" style="flex:1;padding:8px;border:1.5px solid #e5e7eb;border-radius:8px;font-size:15px;min-height:44px;"><span>〜</span>'
-      + '<input type="time" id="f-so_hours_'+d[0]+'_to" style="flex:1;padding:8px;border:1.5px solid #e5e7eb;border-radius:8px;font-size:15px;min-height:44px;">'
+      + '<input type="time" id="f-so_hours_'+d[0]+'_from" value="09:00" style="flex:1;padding:8px;border:1.5px solid #e5e7eb;border-radius:8px;font-size:15px;min-height:44px;"><span>〜</span>'
+      + '<input type="time" id="f-so_hours_'+d[0]+'_to" value="18:00" style="flex:1;padding:8px;border:1.5px solid #e5e7eb;border-radius:8px;font-size:15px;min-height:44px;">'
       + '<label style="display:flex;align-items:center;gap:4px;font-size:13px;white-space:nowrap;color:#6b7280;"><input type="checkbox" id="f-so_hours_'+d[0]+'_none" onchange="_soHoursNoneToggle(\''+d[0]+'\')" style="width:18px;height:18px;">対応なし</label></div>';
   });
   h += '<div style="font-size:12px;color:#9ca3af;margin-top:4px;">※対応していない曜日は「対応なし」にチェックしてください（書類には「-」と記載されます）</div>';
@@ -2165,7 +2199,7 @@ function buildSupportOrgForm() {
   h += '<label style="display:block;font-size:14px;margin-bottom:4px;"><input type="radio" name="f-so_rmMethod" value="face" style="width:18px;height:18px;vertical-align:middle;"> 対面</label>';
   h += '<label style="display:block;font-size:14px;margin-bottom:4px;"><input type="radio" name="f-so_rmMethod" value="faceOnline" style="width:18px;height:18px;vertical-align:middle;"> 対面とオンラインで実施（同意しない・対面希望の場合は対面）</label>';
   h += '<label style="display:block;font-size:14px;margin-bottom:4px;"><input type="radio" name="f-so_rmMethod" value="radio" style="width:18px;height:18px;vertical-align:middle;"> 無線や船舶電話（漁船漁業のみ）</label>';
-  h += field('f-so_rmSchedule','定期面談の実施時期','text',false,'例：3ヶ月に一回以上実施／1月、4月、7月、10月に実施','');
+  h += _soSchedPick(field('f-so_rmSchedule','定期面談の実施時期','text',false,'例：3ヶ月に一回以上実施／1月、4月、7月、10月に実施',''), 'f-so_rmSchedule', 'rm');
   // B-3 実施方法（項目別）
   h += '<div style="font-size:13px;font-weight:700;margin:14px 0 4px;">事前ガイダンスの実施方法</div>';
   h += '<label style="margin-right:14px;font-size:14px;"><input type="checkbox" id="f-so_im_guid_face" style="width:18px;height:18px;vertical-align:middle;"> 対面</label>'
@@ -2188,7 +2222,7 @@ function buildSupportOrgForm() {
   h += '<div class="card"><div class="section-title">📅 各支援の実施予定（標準文言）</div>';
   h += '<div style="font-size:12px;color:#6b7280;margin-bottom:10px;">支援計画書の「実施予定」欄に記載する標準的な文言をご入力ください（例を参考に貴機関の運用どおりに）。</div>';
   var _sched=[['guidance','1. 事前ガイダンス','例：入国時実施'],['escort','2. 出入国時の送迎','例：入国時・帰国時に実施'],['housing','3. 住居確保・生活に必要な契約支援','例：入社後1週間以内'],['orientation','4. 生活オリエンテーション','例：入国時実施'],['procedures','5. 公的手続等への同行','例：入社後1週間以内'],['japanese','6. 日本語学習の機会の提供','例：適宜実施'],['consultation','7. 相談・苦情への対応','例：適宜実施'],['exchange','8. 日本人との交流促進','例：適宜実施'],['jobchange','9. 転職支援（人員整理等の場合）','例：非自発的離職時に実施']];
-  _sched.forEach(function(sc){ h += field('f-so_sched_'+sc[0], sc[1], 'text', false, sc[2], ''); });
+  _sched.forEach(function(sc){ h += _soSchedPick(field('f-so_sched_'+sc[0], sc[1], 'text', false, sc[2], ''), 'f-so_sched_'+sc[0], sc[0]); });
   h += '</div>';
   // B-6 住居方針・B-7 共生施策
   h += '<div class="card"><div class="section-title">🏠 住居確保支援の標準方針</div>';
@@ -2465,7 +2499,7 @@ function _soFormPrefill(resp){
   var map={ name:'f-so_name', nameKana:'f-so_nameKana', nameEn:'f-so_nameEn', corpNo:'f-so_corpNo', empInsNo:'f-so_empInsNo', regNo:'f-so_regNo', regDate:'f-so_regDate', zip:'f-so_zip', pref:'f-so_pref', city:'f-so_city', addressDetail:'f-so_addressDetail', addressEn:'f-so_addressEn', tel:'f-so_tel', repName:'f-so_repName', repNameKana:'f-so_repNameKana', repNameEn:'f-so_repNameEn', languages:'f-so_languages', supportManagerName:'f-so_supportManagerName', supportManagerKana:'f-so_supportManagerKana', supportManagerTitle:'f-so_supportManagerTitle', supportManagerTitleEn:'f-so_supportManagerTitleEn', supporterCount:'f-so_supporterCount', supportStaffCount:'f-so_supportStaffCount', jjName:'f-so_jjName', jjCorpNo:'f-so_jjCorpNo', jjEmpInsNo:'f-so_jjEmpInsNo', jjZip:'f-so_jjZip', jjPref:'f-so_jjPref', jjCity:'f-so_jjCity', jjAddressDetail:'f-so_jjAddressDetail', jjTel:'f-so_jjTel', jjPermitNo:'f-so_jjPermitNo', jjPermitDate:'f-so_jjPermitDate' };
   Object.keys(map).forEach(function(k){ var el=document.getElementById(map[k]); if(el && resp[k]!=null && resp[k]!=='') el.value=resp[k]; });
   if(resp.supportHours && typeof resp.supportHours==='object'){ _SO_DAYS.forEach(function(d){ var hv=resp.supportHours[d[0]]||{}; var f=document.getElementById('f-so_hours_'+d[0]+'_from'),t=document.getElementById('f-so_hours_'+d[0]+'_to'),n=document.getElementById('f-so_hours_'+d[0]+'_none'); if(f&&hv.from)f.value=hv.from; if(t&&hv.to)t.value=hv.to; if(n){n.checked=!!hv.none; if(typeof _soHoursNoneToggle==='function')_soHoursNoneToggle(d[0]);} }); }
-  function setMeth(pfx,mv){ mv=mv||{}; var g=function(id){return document.getElementById(id);}; if(g('f-so_'+pfx+'_f2f'))g('f-so_'+pfx+'_f2f').checked=!!mv.f2f; if(g('f-so_'+pfx+'_tel'))g('f-so_'+pfx+'_tel').checked=!!mv.tel; if(g('f-so_'+pfx+'_mail'))g('f-so_'+pfx+'_mail').checked=!!mv.mail; if(g('f-so_'+pfx+'_other'))g('f-so_'+pfx+'_other').value=mv.other||''; if(g('f-so_'+pfx+'_telNo'))g('f-so_'+pfx+'_telNo').value=mv.telNo||''; if(g('f-so_'+pfx+'_mailAddr'))g('f-so_'+pfx+'_mailAddr').value=mv.mailAddr||''; if(typeof _soMethToggle==='function')_soMethToggle(pfx); }
+  function setMeth(pfx,mv){ mv=mv||{}; if(!(mv.f2f||mv.tel||mv.mail||mv.other||mv.telNo||mv.mailAddr)) return; var g=function(id){return document.getElementById(id);}; if(g('f-so_'+pfx+'_f2f'))g('f-so_'+pfx+'_f2f').checked=!!mv.f2f; if(g('f-so_'+pfx+'_tel'))g('f-so_'+pfx+'_tel').checked=!!mv.tel; if(g('f-so_'+pfx+'_mail'))g('f-so_'+pfx+'_mail').checked=!!mv.mail; if(g('f-so_'+pfx+'_other'))g('f-so_'+pfx+'_other').value=mv.other||''; if(g('f-so_'+pfx+'_telNo'))g('f-so_'+pfx+'_telNo').value=mv.telNo||''; if(g('f-so_'+pfx+'_mailAddr'))g('f-so_'+pfx+'_mailAddr').value=mv.mailAddr||''; if(typeof _soMethToggle==='function')_soMethToggle(pfx); }
   setMeth('consult', resp.consultMethods); setMeth('emg', resp.emergencyContact);
   if(resp.supportProperness){ var _pr=document.querySelector('input[name="f-so_properness"][value="'+resp.supportProperness+'"]'); if(_pr)_pr.checked=true; }
   // ver.20260723: B群復元
