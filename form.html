@@ -193,7 +193,8 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20261116.07'; // 登録支援機関フォーム 入力の手間を減らす：郵便番号→住所、支援担当者数を一覧から自動、支援責任者名簿は空なら支援責任者を自動で入れる、支援担当者の「通訳もする」で通訳者名簿に自動で入れる、「あと○項目」を全タブ分で数えて押すとそのタブへ
+var FORM_VERSION = 'ver.20261116.08'; // 登録支援機関フォーム：Saysayの支援計画書の決まった内容と同じものを最初から入れる（事前ガイダンス＝対面＋テレビ電話、住居 a有・b有・c無、生活オリエンテーション＝適宜実施・対面、口座・携帯等の手続＝適宜実施・情報提供＋同行）
+// var FORM_VERSION = 'ver.20261116.07'; // 登録支援機関フォーム 入力の手間を減らす：郵便番号→住所、支援担当者数を一覧から自動、支援責任者名簿は空なら支援責任者を自動で入れる、支援担当者の「通訳もする」で通訳者名簿に自動で入れる、「あと○項目」を全タブ分で数えて押すとそのタブへ
 // var FORM_VERSION = 'ver.20261116.06'; // 登録支援機関フォーム：開いたとき案シス（O-Linkで直した分を含む）の内容を全項目入れる。送信済みの古い回答より案シスを優先（途中保存の下書きは下書き優先）
 // var FORM_VERSION = 'ver.20261116.05'; // 登録支援機関フォーム：支援の実施言語ごとに通訳者を1名以上必須に（支援担当者が通訳する場合もその方を入力）
 // var FORM_VERSION = 'ver.20261116.04'; // 登録支援機関フォーム：支援体制の必須化（支援責任者・人数・実施言語・支援担当者・実施方法・実施時間、電話/メールにチェックしたら番号/アドレス）。実施時間 3時間・8時間をデフォルト、支援の実施言語を対応可能言語から自動で入れる
@@ -1814,8 +1815,8 @@ var _SO_SCHED_OPTIONS = {
   guidance:     ['雇用契約締結後、在留資格申請前に実施','入国前に実施','入社前に実施','内定後1週間以内に実施','在留資格変更申請前に実施'],
   escort:       ['入国時・帰国時に実施','入国時は入国予定日、帰国時は契約終了後に実施','入国済みのため実施なし（変更・更新）'],
   housing:      ['入社後1週間以内に実施','在留資格の許可後、入社前から入社後2週間以内に実施'],
-  orientation:  ['入社後1週間以内に実施','入国時に実施','入社前に実施','入社後10日以内に実施','許可後速やかに実施'],
-  procedures:   ['入社後1週間以内に実施','入国後1週間以内に実施','入社前から入社後2週間以内に実施','配属日に実施'],
+  orientation:  ['適宜実施','入社後1週間以内に実施','入国時に実施','入社前に実施','入社後10日以内に実施','許可後速やかに実施'],
+  procedures:   ['適宜実施','入社後1週間以内に実施','入国後1週間以内に実施','入社前から入社後2週間以内に実施','配属日に実施'],
   japanese:     ['適宜実施','内定後に実施'],
   consultation: ['適宜実施'],
   exchange:     ['適宜実施'],
@@ -2254,15 +2255,15 @@ function buildSupportOrgForm() {
   h += _soSchedPick(field('f-so_rmSchedule','定期面談の実施時期','text',false,'例：3ヶ月に一回以上実施／1月、4月、7月、10月に実施',''), 'f-so_rmSchedule', 'rm');
   // B-3 実施方法（項目別）
   h += '<div style="font-size:13px;font-weight:700;margin:14px 0 4px;">事前ガイダンスの実施方法</div>';
-  h += '<label style="margin-right:14px;font-size:14px;"><input type="checkbox" id="f-so_im_guid_face" style="width:18px;height:18px;vertical-align:middle;"> 対面</label>'
-     + '<label style="margin-right:14px;font-size:14px;"><input type="checkbox" id="f-so_im_guid_video" style="width:18px;height:18px;vertical-align:middle;"> テレビ電話装置</label>'
+  h += '<label style="margin-right:14px;font-size:14px;"><input type="checkbox" id="f-so_im_guid_face" checked style="width:18px;height:18px;vertical-align:middle;"> 対面</label>'
+     + '<label style="margin-right:14px;font-size:14px;"><input type="checkbox" id="f-so_im_guid_video" checked style="width:18px;height:18px;vertical-align:middle;"> テレビ電話装置</label>'
      + '<label style="font-size:14px;"><input type="checkbox" id="f-so_im_guid_other" style="width:18px;height:18px;vertical-align:middle;"> その他</label>';
   h += '<div style="font-size:13px;font-weight:700;margin:10px 0 4px;">生活オリエンテーションの実施方法</div>';
-  h += '<label style="margin-right:14px;font-size:14px;"><input type="checkbox" id="f-so_im_ori_face" style="width:18px;height:18px;vertical-align:middle;"> 対面</label>'
+  h += '<label style="margin-right:14px;font-size:14px;"><input type="checkbox" id="f-so_im_ori_face" checked style="width:18px;height:18px;vertical-align:middle;"> 対面</label>'
      + '<label style="font-size:14px;"><input type="checkbox" id="f-so_im_ori_video" style="width:18px;height:18px;vertical-align:middle;"> テレビ電話やDVD等の動画視聴等</label>';
   h += '<div style="font-size:13px;font-weight:700;margin:10px 0 4px;">住居確保・生活に必要な契約に係る支援の方法</div>';
-  h += '<label style="margin-right:14px;font-size:14px;"><input type="checkbox" id="f-so_im_life_info" style="width:18px;height:18px;vertical-align:middle;"> 手続に係る情報提供</label>'
-     + '<label style="margin-right:14px;font-size:14px;"><input type="checkbox" id="f-so_im_life_accompany" style="width:18px;height:18px;vertical-align:middle;"> 必要に応じて同行</label>'
+  h += '<label style="margin-right:14px;font-size:14px;"><input type="checkbox" id="f-so_im_life_info" checked style="width:18px;height:18px;vertical-align:middle;"> 手続に係る情報提供</label>'
+     + '<label style="margin-right:14px;font-size:14px;"><input type="checkbox" id="f-so_im_life_accompany" checked style="width:18px;height:18px;vertical-align:middle;"> 必要に応じて同行</label>'
      + '<label style="font-size:14px;"><input type="checkbox" id="f-so_im_life_other" style="width:18px;height:18px;vertical-align:middle;"> その他</label>';
   // B-4 実施時間
   h += '<div style="display:flex;gap:10px;margin-top:12px;flex-wrap:wrap;">'
@@ -2280,10 +2281,10 @@ function buildSupportOrgForm() {
   h += '<div class="card"><div class="section-title">🏠 住居確保支援の標準方針</div>';
   [['a','a. 不動産仲介の情報提供・必要に応じ同行、連帯保証人／緊急連絡先の確保'],['b','b. 自ら賃借人となって住居を提供'],['c','c. 所有する社宅等を提供']].forEach(function(hp){
     h += '<div style="margin-bottom:8px;"><div style="font-size:13px;font-weight:700;margin-bottom:2px;">'+hp[1]+'</div>'
-       + '<label style="margin-right:16px;font-size:14px;"><input type="radio" name="f-so_hp_'+hp[0]+'" value="有"'+(hp[0]==='b'?' checked':'')+' style="width:18px;height:18px;vertical-align:middle;"> 有</label>'
-       + '<label style="font-size:14px;"><input type="radio" name="f-so_hp_'+hp[0]+'" value="無"'+(hp[0]!=='b'?' checked':'')+' style="width:18px;height:18px;vertical-align:middle;"> 無</label></div>';
+       + '<label style="margin-right:16px;font-size:14px;"><input type="radio" name="f-so_hp_'+hp[0]+'" value="有"'+(hp[0]!=='c'?' checked':'')+' style="width:18px;height:18px;vertical-align:middle;"> 有</label>'
+       + '<label style="font-size:14px;"><input type="radio" name="f-so_hp_'+hp[0]+'" value="無"'+(hp[0]==='c'?' checked':'')+' style="width:18px;height:18px;vertical-align:middle;"> 無</label></div>';
   });
-  h += field('f-so_hpNote','補足（実施条件など）','text',false,'例：bで合意しない場合はaで実施','').replace('<input type="text" id="f-so_hpNote" ','<input type="text" id="f-so_hpNote" value="bで合意しない場合はaで実施" ');
+  h += field('f-so_hpNote','補足（実施条件など）','text',false,'例：bで合意しない場合はaで実施','').replace('<input type="text" id="f-so_hpNote" ','<input type="text" id="f-so_hpNote" value="aはbでの入居に合意しなかった場合に実施" ');
   h += '<div style="font-size:13px;font-weight:700;margin:12px 0 4px;">受入企業の自治体の共生施策（相談窓口等）の確認方法</div>';
   h += '<label style="margin-right:14px;font-size:14px;"><input type="checkbox" id="f-so_symb_hp" style="width:18px;height:18px;vertical-align:middle;"> ホームページ</label>'
      + '<span style="font-size:14px;">その他 <input type="text" id="f-so_symb_other" placeholder="例：市役所窓口で確認" style="padding:8px;border:1.5px solid #e5e7eb;border-radius:8px;font-size:14px;min-height:40px;width:200px;"></span>';
