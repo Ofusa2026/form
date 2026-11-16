@@ -193,7 +193,8 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20261116.02'; // 支援体制：定期面談の実施方法「対面とオンライン」をデフォルト。定期面談・各支援の実施予定の候補プルダウンをやめ、デフォルト文言＋自由記入に
+var FORM_VERSION = 'ver.20261116.03'; // 登録支援機関フォーム：基本情報をすべて必須に。支援の適正性「有」、住居確保支援の方針 a無・b有・c無、補足「bで合意しない場合はaで実施」をデフォルトに
+// var FORM_VERSION = 'ver.20261116.02'; // 支援体制：定期面談の実施方法「対面とオンライン」をデフォルト。定期面談・各支援の実施予定の候補プルダウンをやめ、デフォルト文言＋自由記入に
 // var FORM_VERSION = 'ver.20261116.01'; // 登録支援機関フォーム（＋自社支援タブ）の支援体制：対応時間 全曜日9:00〜18:00・相談/緊急時 直接面談+電話・定期面談 3ヶ月に1回以上・各支援の実施予定に汎用文言をデフォルト。既存回答から作った候補をプルダウンで選べるように
 // var FORM_VERSION = 'ver.20261106.06'; // 自社支援だけのリンク（part=ss）：【自社支援】の2タブだけを出し、自社支援の回答だけを送る（会社情報・雇用条件は送らない）
 // var FORM_VERSION = 'ver.20261106.05'; // 2号フォーム：指導対象者を入れたのに、その２号の方の氏名が空なら送る前に止める（Saysay 1-32号で誰の対象者か分からず反映されなかったため） ／ previous: ver.20261102.09 技能実習の所属機関フォーム：会社から答えにくい項目を任意に（監理団体の欄は名称以外・届出受理年月日・月額給与）。冒頭に「監理団体の方が代わりに記入しても構いません」
@@ -2131,26 +2132,26 @@ function buildSupportOrgForm() {
   h += _soPlanUploadHtml();   // ver.20261009.01: 過去の支援計画書のアップロード（こちらでAIが読み取って入力欄に入れる）
   h += '<div class="card"><div class="section-title">基本情報</div>';
   h += field('f-so_name','登録支援機関名','text',true,'例：○○協同組合','');
-  h += field('f-so_nameKana','ふりがな','text',false,'例：まるまるきょうどうくみあい','');
-  h += field('f-so_nameEn','英語名','text',false,'例：XX Cooperative','');
-  h += field('f-so_corpNo','法人番号','text',false,'例：1234567890123','');
-  h += field('f-so_empInsNo','雇用保険適用事業所番号','text',false,'例：01-234567-8','');
-  h += field('f-so_regNo','登録番号','text',false,'例：１９登－000001','');
-  h += field('f-so_regDate','登録年月日','text',false,'例：20190927','');
+  h += field('f-so_nameKana','ふりがな','text',true,'例：まるまるきょうどうくみあい','');
+  h += field('f-so_nameEn','英語名','text',true,'例：XX Cooperative','');
+  h += field('f-so_corpNo','法人番号','text',true,'例：1234567890123','');
+  h += field('f-so_empInsNo','雇用保険適用事業所番号','text',true,'例：01-234567-8','');
+  h += field('f-so_regNo','登録番号','text',true,'例：１９登－000001','');
+  h += field('f-so_regDate','登録年月日','text',true,'例：20190927','');
   h += '</div>';
   h += '<div class="card"><div class="section-title">所在地・連絡先</div>';
-  h += field('f-so_zip','郵便番号','text',false,'例：100-0001','');
-  h += field('f-so_pref','都道府県','select',false,'','',_SO_PREF_LIST);
-  h += field('f-so_city','市区町村','text',false,'例：新宿区','');
-  h += field('f-so_addressDetail','町名丁目番地号等','text',false,'例：西新宿1-1-1','');
-  h += field('f-so_addressEn','英語住所','text',false,'','');
-  h += field('f-so_tel','電話番号','text',false,'例：03-1234-5678','');
+  h += field('f-so_zip','郵便番号','text',true,'例：100-0001','');
+  h += field('f-so_pref','都道府県','select',true,'','',_SO_PREF_LIST);
+  h += field('f-so_city','市区町村','text',true,'例：新宿区','');
+  h += field('f-so_addressDetail','町名丁目番地号等','text',true,'例：西新宿1-1-1','');
+  h += field('f-so_addressEn','英語住所','text',true,'','');
+  h += field('f-so_tel','電話番号','text',true,'例：03-1234-5678','');
   h += '</div>';
   h += '<div class="card"><div class="section-title">代表者・言語</div>';
-  h += field('f-so_repName','代表者氏名','text',false,'例：山田 太郎','');
-  h += field('f-so_repNameKana','代表者氏名（ふりがな）','text',false,'例：やまだ たろう','');
-  h += field('f-so_repNameEn','英語代表者名','text',false,'例：Taro Yamada','');
-  h += field('f-so_languages','対応可能言語','text',false,'例：ベトナム語、英語','');
+  h += field('f-so_repName','代表者氏名','text',true,'例：山田 太郎','');
+  h += field('f-so_repNameKana','代表者氏名（ふりがな）','text',true,'例：やまだ たろう','');
+  h += field('f-so_repNameEn','英語代表者名','text',true,'例：Taro Yamada','');
+  h += field('f-so_languages','対応可能言語','text',true,'例：ベトナム語、英語','');
   h += '</div>';
   h += '</div>';
   // ステップ②支援体制
@@ -2164,7 +2165,7 @@ function buildSupportOrgForm() {
   h += field('f-so_supportStaffCount','支援担当者数','number',false,'例：10','');
   h += '<div style="margin-top:10px;"><div style="font-size:14px;font-weight:700;margin-bottom:4px;">支援の適正性を確保していることの有無</div>'
     + '<div style="font-size:12px;color:#6b7280;margin-bottom:6px;">（支援責任者が所属機関役員の配偶者・2親等以内の親族等でない／過去5年以内に当該機関の役員・職員でなかった／登録拒否事由に該当しない）</div>'
-    + '<label style="margin-right:18px;font-size:15px;"><input type="radio" name="f-so_properness" value="有" style="width:20px;height:20px;vertical-align:middle;"> 有</label>'
+    + '<label style="margin-right:18px;font-size:15px;"><input type="radio" name="f-so_properness" value="有" checked style="width:20px;height:20px;vertical-align:middle;"> 有</label>'
     + '<label style="font-size:15px;"><input type="radio" name="f-so_properness" value="無" style="width:20px;height:20px;vertical-align:middle;"> 無</label></div>';
   h += '</div>';
   h += '<div class="card"><div class="section-title">対応時間（曜日別）</div><div style="display:flex;flex-direction:column;gap:8px;">';
@@ -2228,10 +2229,10 @@ function buildSupportOrgForm() {
   h += '<div class="card"><div class="section-title">🏠 住居確保支援の標準方針</div>';
   [['a','a. 不動産仲介の情報提供・必要に応じ同行、連帯保証人／緊急連絡先の確保'],['b','b. 自ら賃借人となって住居を提供'],['c','c. 所有する社宅等を提供']].forEach(function(hp){
     h += '<div style="margin-bottom:8px;"><div style="font-size:13px;font-weight:700;margin-bottom:2px;">'+hp[1]+'</div>'
-       + '<label style="margin-right:16px;font-size:14px;"><input type="radio" name="f-so_hp_'+hp[0]+'" value="有" style="width:18px;height:18px;vertical-align:middle;"> 有</label>'
-       + '<label style="font-size:14px;"><input type="radio" name="f-so_hp_'+hp[0]+'" value="無" style="width:18px;height:18px;vertical-align:middle;"> 無</label></div>';
+       + '<label style="margin-right:16px;font-size:14px;"><input type="radio" name="f-so_hp_'+hp[0]+'" value="有"'+(hp[0]==='b'?' checked':'')+' style="width:18px;height:18px;vertical-align:middle;"> 有</label>'
+       + '<label style="font-size:14px;"><input type="radio" name="f-so_hp_'+hp[0]+'" value="無"'+(hp[0]!=='b'?' checked':'')+' style="width:18px;height:18px;vertical-align:middle;"> 無</label></div>';
   });
-  h += field('f-so_hpNote','補足（実施条件など）','text',false,'例：bで合意しない場合はaで実施','');
+  h += field('f-so_hpNote','補足（実施条件など）','text',false,'例：bで合意しない場合はaで実施','').replace('<input type="text" id="f-so_hpNote" ','<input type="text" id="f-so_hpNote" value="bで合意しない場合はaで実施" ');
   h += '<div style="font-size:13px;font-weight:700;margin:12px 0 4px;">受入企業の自治体の共生施策（相談窓口等）の確認方法</div>';
   h += '<label style="margin-right:14px;font-size:14px;"><input type="checkbox" id="f-so_symb_hp" style="width:18px;height:18px;vertical-align:middle;"> ホームページ</label>'
      + '<span style="font-size:14px;">その他 <input type="text" id="f-so_symb_other" placeholder="例：市役所窓口で確認" style="padding:8px;border:1.5px solid #e5e7eb;border-radius:8px;font-size:14px;min-height:40px;width:200px;"></span>';
@@ -2492,7 +2493,14 @@ function _soFormCollect(){
     symbiosisCheck:{ hp:(function(id){var e=document.getElementById(id);return !!(e&&e.checked);})('f-so_symb_hp'), other:v('f-so_symb_other') }
   };
 }
-function _soFormValidate(){ if(!val('f-so_name')) return '登録支援機関名は必須です。'; return null; }
+// ver.20261116.03: 基本情報はすべて必須（足りなければ①基本情報タブに戻して知らせる）
+var _SO_BASIC_REQ = [['f-so_name','登録支援機関名'],['f-so_nameKana','ふりがな'],['f-so_nameEn','英語名'],['f-so_corpNo','法人番号'],['f-so_empInsNo','雇用保険適用事業所番号'],['f-so_regNo','登録番号'],['f-so_regDate','登録年月日'],['f-so_zip','郵便番号'],['f-so_pref','都道府県'],['f-so_city','市区町村'],['f-so_addressDetail','町名丁目番地号等'],['f-so_addressEn','英語住所'],['f-so_tel','電話番号'],['f-so_repName','代表者氏名'],['f-so_repNameKana','代表者氏名（ふりがな）'],['f-so_repNameEn','英語代表者名'],['f-so_languages','対応可能言語']];
+function _soFormValidate(){
+  var miss=_SO_BASIC_REQ.filter(function(r){ return document.getElementById(r[0]) && !val(r[0]); });
+  if(!miss.length) return null;
+  try{ if(typeof _soGoStep==='function') _soGoStep(0); var e=document.getElementById(miss[0][0]); if(e) setTimeout(function(){ e.focus(); },300); }catch(_){}
+  return '基本情報の次の項目は必須です：' + miss.map(function(r){return r[1];}).join('、');
+}
 function _soFormPrefill(resp){
   resp = resp || {};
   if(Array.isArray(resp.planFiles) && resp.planFiles.length){ window._soPlanFiles=resp.planFiles.slice(); setTimeout(_soPlanRenderList,0); }
