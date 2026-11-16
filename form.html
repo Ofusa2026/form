@@ -193,7 +193,8 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20261116.03'; // 登録支援機関フォーム：基本情報をすべて必須に。支援の適正性「有」、住居確保支援の方針 a無・b有・c無、補足「bで合意しない場合はaで実施」をデフォルトに
+var FORM_VERSION = 'ver.20261116.04'; // 登録支援機関フォーム：支援体制の必須化（支援責任者・人数・実施言語・支援担当者・実施方法・実施時間、電話/メールにチェックしたら番号/アドレス）。実施時間 3時間・8時間をデフォルト、支援の実施言語を対応可能言語から自動で入れる
+// var FORM_VERSION = 'ver.20261116.03'; // 登録支援機関フォーム：基本情報をすべて必須に。支援の適正性「有」、住居確保支援の方針 a無・b有・c無、補足「bで合意しない場合はaで実施」をデフォルトに
 // var FORM_VERSION = 'ver.20261116.02'; // 支援体制：定期面談の実施方法「対面とオンライン」をデフォルト。定期面談・各支援の実施予定の候補プルダウンをやめ、デフォルト文言＋自由記入に
 // var FORM_VERSION = 'ver.20261116.01'; // 登録支援機関フォーム（＋自社支援タブ）の支援体制：対応時間 全曜日9:00〜18:00・相談/緊急時 直接面談+電話・定期面談 3ヶ月に1回以上・各支援の実施予定に汎用文言をデフォルト。既存回答から作った候補をプルダウンで選べるように
 // var FORM_VERSION = 'ver.20261106.06'; // 自社支援だけのリンク（part=ss）：【自社支援】の2タブだけを出し、自社支援の回答だけを送る（会社情報・雇用条件は送らない）
@@ -1961,6 +1962,7 @@ function _soStepBarHtml(active){
   return h;
 }
 function _soGoStep(n){
+  _soFillSupportLang();
   var steps=document.querySelectorAll('.so-step');
   if(!steps.length) return;
   if(n<0)n=0; if(n>steps.length-1)n=steps.length-1;
@@ -2157,12 +2159,12 @@ function buildSupportOrgForm() {
   // ステップ②支援体制
   h += '<div class="so-step" data-sostep="1" style="display:none;">';
   h += '<div class="card"><div class="section-title">支援体制</div>';
-  h += field('f-so_supportManagerName','支援責任者 氏名','text',false,'例：山田 太郎','');
+  h += field('f-so_supportManagerName','支援責任者 氏名','text',(type==='support_org'),'例：山田 太郎','');
   h += field('f-so_supportManagerKana','支援責任者 氏名（ふりがな）','text',false,'例：やまだ たろう','');
-  h += field('f-so_supportManagerTitle','支援責任者 役職','text',false,'例：代表理事','');
+  h += field('f-so_supportManagerTitle','支援責任者 役職','text',(type==='support_org'),'例：代表理事','');
   h += field('f-so_supportManagerTitleEn','支援責任者 役職（英語）','text',false,'例：Representative Director','');
-  h += field('f-so_supporterCount','支援中の1号特定技能外国人数','number',false,'例：50','');
-  h += field('f-so_supportStaffCount','支援担当者数','number',false,'例：10','');
+  h += field('f-so_supporterCount','支援中の1号特定技能外国人数','number',(type==='support_org'),'例：50','');
+  h += field('f-so_supportStaffCount','支援担当者数','number',(type==='support_org'),'例：10','');
   h += '<div style="margin-top:10px;"><div style="font-size:14px;font-weight:700;margin-bottom:4px;">支援の適正性を確保していることの有無</div>'
     + '<div style="font-size:12px;color:#6b7280;margin-bottom:6px;">（支援責任者が所属機関役員の配偶者・2親等以内の親族等でない／過去5年以内に当該機関の役員・職員でなかった／登録拒否事由に該当しない）</div>'
     + '<label style="margin-right:18px;font-size:15px;"><input type="radio" name="f-so_properness" value="有" checked style="width:20px;height:20px;vertical-align:middle;"> 有</label>'
@@ -2191,7 +2193,7 @@ function buildSupportOrgForm() {
   h += '<div id="so-manager-container">' + _soFormManagerRow(0) + '</div>';
   h += '<button type="button" onclick="_soFormAddManager()" style="margin-top:6px;margin-bottom:10px;padding:8px 14px;background:#eff6ff;color:#2563eb;border:1.5px solid #2563eb;border-radius:8px;font-weight:700;cursor:pointer;font-size:13px;">＋ 支援責任者を追加</button>';
   // B-1 実施言語・通訳者
-  h += field('f-so_supportLanguages','支援の実施言語','text',false,'例：ミャンマー語、ベトナム語','');
+  h += field('f-so_supportLanguages','支援の実施言語','text',(type==='support_org'),'例：ミャンマー語、ベトナム語','');
   h += '<div style="font-size:13px;font-weight:700;margin:10px 0 4px;">通訳者（支援担当者以外の方が通訳を担う場合）</div>';
   h += '<div id="so-interp-container">' + _soFormInterpRow(0) + '</div>';
   h += '<button type="button" onclick="_soFormAddInterp()" style="margin-top:6px;padding:8px 14px;background:#eff6ff;color:#2563eb;border:1.5px solid #2563eb;border-radius:8px;font-weight:700;cursor:pointer;font-size:13px;">＋ 通訳者を追加</button>';
@@ -2215,8 +2217,8 @@ function buildSupportOrgForm() {
      + '<label style="font-size:14px;"><input type="checkbox" id="f-so_im_life_other" style="width:18px;height:18px;vertical-align:middle;"> その他</label>';
   // B-4 実施時間
   h += '<div style="display:flex;gap:10px;margin-top:12px;flex-wrap:wrap;">'
-     + '<div style="flex:1;min-width:150px;"><div style="font-size:13px;font-weight:700;margin-bottom:3px;">事前ガイダンス 合計時間</div><input type="number" id="f-so_implH_guidance" placeholder="例：3" min="0" step="0.5" style="width:100%;box-sizing:border-box;padding:8px;border:1.5px solid #e5e7eb;border-radius:8px;font-size:15px;min-height:44px;"></div>'
-     + '<div style="flex:1;min-width:150px;"><div style="font-size:13px;font-weight:700;margin-bottom:3px;">生活オリエンテーション 合計時間</div><input type="number" id="f-so_implH_orientation" placeholder="例：8（8時間以上が要件）" min="0" step="0.5" style="width:100%;box-sizing:border-box;padding:8px;border:1.5px solid #e5e7eb;border-radius:8px;font-size:15px;min-height:44px;"></div>'
+     + '<div style="flex:1;min-width:150px;"><div style="font-size:13px;font-weight:700;margin-bottom:3px;">事前ガイダンス 合計時間</div><input type="number" id="f-so_implH_guidance" value="3" placeholder="例：3" min="0" step="0.5" style="width:100%;box-sizing:border-box;padding:8px;border:1.5px solid #e5e7eb;border-radius:8px;font-size:15px;min-height:44px;"></div>'
+     + '<div style="flex:1;min-width:150px;"><div style="font-size:13px;font-weight:700;margin-bottom:3px;">生活オリエンテーション 合計時間</div><input type="number" id="f-so_implH_orientation" value="8" placeholder="例：8（8時間以上が要件）" min="0" step="0.5" style="width:100%;box-sizing:border-box;padding:8px;border:1.5px solid #e5e7eb;border-radius:8px;font-size:15px;min-height:44px;"></div>'
      + '</div>';
   h += '</div>';
   // B-5 実施予定の定型文言
@@ -2496,10 +2498,47 @@ function _soFormCollect(){
 // ver.20261116.03: 基本情報はすべて必須（足りなければ①基本情報タブに戻して知らせる）
 var _SO_BASIC_REQ = [['f-so_name','登録支援機関名'],['f-so_nameKana','ふりがな'],['f-so_nameEn','英語名'],['f-so_corpNo','法人番号'],['f-so_empInsNo','雇用保険適用事業所番号'],['f-so_regNo','登録番号'],['f-so_regDate','登録年月日'],['f-so_zip','郵便番号'],['f-so_pref','都道府県'],['f-so_city','市区町村'],['f-so_addressDetail','町名丁目番地号等'],['f-so_addressEn','英語住所'],['f-so_tel','電話番号'],['f-so_repName','代表者氏名'],['f-so_repNameKana','代表者氏名（ふりがな）'],['f-so_repNameEn','英語代表者名'],['f-so_languages','対応可能言語']];
 function _soFormValidate(){
+  _soFillSupportLang();
   var miss=_SO_BASIC_REQ.filter(function(r){ return document.getElementById(r[0]) && !val(r[0]); });
-  if(!miss.length) return null;
-  try{ if(typeof _soGoStep==='function') _soGoStep(0); var e=document.getElementById(miss[0][0]); if(e) setTimeout(function(){ e.focus(); },300); }catch(_){}
-  return '基本情報の次の項目は必須です：' + miss.map(function(r){return r[1];}).join('、');
+  if(miss.length){
+    try{ if(typeof _soGoStep==='function') _soGoStep(0); var e=document.getElementById(miss[0][0]); if(e) setTimeout(function(){ e.focus(); },300); }catch(_){}
+    return '基本情報の次の項目は必須です：' + miss.map(function(r){return r[1];}).join('、');
+  }
+  return _soFormValidate2();
+}
+// ver.20261116.04: 支援体制・担当者（支援計画書に必ず要る欄）の必須チェック。足りない欄のタブに戻してそこへ移る
+function _soFillSupportLang(){
+  var a=document.getElementById('f-so_languages'), b=document.getElementById('f-so_supportLanguages');
+  if(a && b && !String(b.value||'').trim() && String(a.value||'').trim()) b.value=a.value;
+}
+function _soFormValidate2(){
+  var go=function(id, msg){ try{ var e=document.getElementById(id)||document.querySelector('[name="'+id+'"]'); var st=e&&e.closest('.so-step'); if(st&&typeof _soGoStep==='function') _soGoStep(+st.getAttribute('data-sostep')); if(e) setTimeout(function(){ e.focus(); },300); }catch(_){} return msg; };
+  var chk=function(id){ var e=document.getElementById(id); return !!(e&&e.checked); };
+  var req=[['f-so_supportManagerName','支援責任者 氏名'],['f-so_supportManagerTitle','支援責任者 役職'],['f-so_supporterCount','支援中の1号特定技能外国人数'],['f-so_supportStaffCount','支援担当者数'],['f-so_supportLanguages','支援の実施言語']];
+  for(var i=0;i<req.length;i++){ if(document.getElementById(req[i][0]) && !val(req[i][0])) return go(req[i][0],'「'+req[i][1]+'」を入力してください。'); }
+  var ml=[['consult','相談方法'],['emg','緊急時対応']];
+  for(var j=0;j<ml.length;j++){ var px=ml[j][0];
+    if(!document.getElementById('f-so_'+px+'_f2f')) continue;
+    if(!chk('f-so_'+px+'_f2f') && !chk('f-so_'+px+'_tel') && !chk('f-so_'+px+'_mail') && !val('f-so_'+px+'_other')) return go('f-so_'+px+'_f2f','「'+ml[j][1]+'」を1つ以上選んでください。');
+    if(chk('f-so_'+px+'_tel') && !val('f-so_'+px+'_telNo')) return go('f-so_'+px+'_telNo','「'+ml[j][1]+'」の電話番号を入力してください（電話を使わない場合はチェックを外してください）。');
+    if(chk('f-so_'+px+'_mail') && !val('f-so_'+px+'_mailAddr')) return go('f-so_'+px+'_mailAddr','「'+ml[j][1]+'」のメールアドレスを入力してください（メールを使わない場合はチェックを外してください）。');
+  }
+  var grp=[[['f-so_im_guid_face','f-so_im_guid_video','f-so_im_guid_other'],'事前ガイダンスの実施方法'],[['f-so_im_ori_face','f-so_im_ori_video'],'生活オリエンテーションの実施方法'],[['f-so_im_life_info','f-so_im_life_accompany','f-so_im_life_other'],'住居確保・生活に必要な契約に係る支援の方法']];
+  for(var k=0;k<grp.length;k++){ if(document.getElementById(grp[k][0][0]) && !grp[k][0].some(chk)) return go(grp[k][0][0],'「'+grp[k][1]+'」を1つ以上選んでください。'); }
+  if(document.getElementById('f-so_implH_guidance') && !val('f-so_implH_guidance')) return go('f-so_implH_guidance','「事前ガイダンス 合計時間」を入力してください。');
+  if(document.getElementById('f-so_implH_orientation')){
+    if(!val('f-so_implH_orientation')) return go('f-so_implH_orientation','「生活オリエンテーション 合計時間」を入力してください。');
+    if(parseFloat(val('f-so_implH_orientation'))<8) return go('f-so_implH_orientation','生活オリエンテーションは合計8時間以上にしてください（要件です）。');
+  }
+  var rows=document.querySelectorAll('#so-staff-container .so-staff-row'), n=0;
+  for(var r=0;r<rows.length;r++){ var ix=rows[r].getAttribute('data-soidx'); var nm=val('f-so_staff'+ix+'_name'), tel=val('f-so_staff'+ix+'_tel');
+    if(!nm && !tel && !val('f-so_staff'+ix+'_title') && !val('f-so_staff'+ix+'_nameEn')) continue;
+    n++;
+    if(!nm) return go('f-so_staff'+ix+'_name','支援担当者'+n+'人目の氏名を入力してください。');
+    if(!tel) return go('f-so_staff'+ix+'_tel','支援担当者「'+nm+'」の電話番号を入力してください。');
+  }
+  if(rows.length && !n){ var ix0=rows[0].getAttribute('data-soidx'); return go('f-so_staff'+ix0+'_name','支援担当者を1名以上入力してください（支援責任者が兼ねる場合も入力してください）。'); }
+  return null;
 }
 function _soFormPrefill(resp){
   resp = resp || {};
