@@ -193,7 +193,8 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20261116.05'; // 登録支援機関フォーム：支援の実施言語ごとに通訳者を1名以上必須に（支援担当者が通訳する場合もその方を入力）
+var FORM_VERSION = 'ver.20261116.06'; // 登録支援機関フォーム：開いたとき案シス（O-Linkで直した分を含む）の内容を全項目入れる。送信済みの古い回答より案シスを優先（途中保存の下書きは下書き優先）
+// var FORM_VERSION = 'ver.20261116.05'; // 登録支援機関フォーム：支援の実施言語ごとに通訳者を1名以上必須に（支援担当者が通訳する場合もその方を入力）
 // var FORM_VERSION = 'ver.20261116.04'; // 登録支援機関フォーム：支援体制の必須化（支援責任者・人数・実施言語・支援担当者・実施方法・実施時間、電話/メールにチェックしたら番号/アドレス）。実施時間 3時間・8時間をデフォルト、支援の実施言語を対応可能言語から自動で入れる
 // var FORM_VERSION = 'ver.20261116.03'; // 登録支援機関フォーム：基本情報をすべて必須に。支援の適正性「有」、住居確保支援の方針 a無・b有・c無、補足「bで合意しない場合はaで実施」をデフォルトに
 // var FORM_VERSION = 'ver.20261116.02'; // 支援体制：定期面談の実施方法「対面とオンライン」をデフォルト。定期面談・各支援の実施予定の候補プルダウンをやめ、デフォルト文言＋自由記入に
@@ -7902,6 +7903,9 @@ function confirmName(isMatch){
             console.error('prefillForm error (ignored to keep form usable):', prefillErr);
           }
           try { _tkAfterPrefill(resp); } catch (tkErr) { console.error('tk prefill error (ignored):', tkErr); }   // ver.20261009.01
+          // ver.20261116.06: 登録支援機関フォームは、送信済み（取込済み）の回答より案シスの今の内容（O-Linkで直した分を含む）を優先する。
+          //   送信した回答は自動で案シスに取り込まれているので、案シスの方が新しいか同じ。途中保存の下書きは下書きを優先。
+          if (type === 'support_org' && isSubmitted && window._soMaster) { try { _soFormPrefill(window._soMaster); } catch (_sm) { console.error('master re-prefill error (ignored):', _sm); } }
           try { _tkPartInfo(); } catch (_pe) {}   // ver.20261014.04: 確認用リンクの案内に戻す
           // ver.20261005.01: 2号誓約書は「前回の修正」か「新しい申請として入力」を選べる（前回の回答は残す）
           try { if (type === 'tokutei2_pledge' && (isImported || isSubmitted)) _t2OfferNew(resp, row); } catch(_t2e){ console.error('t2 new offer error (ignored):', _t2e); }
@@ -7919,6 +7923,7 @@ function confirmName(isMatch){
         .then(function(r){ return r.ok ? r.json() : null; })
         .then(function(m){
           if (m && typeof m === 'object' && Object.keys(m).length) {
+            window._soMaster = m;   // ver.20261116.06: 送信済みの回答を表示したあと、もう一度これで上書きする
             try { _soFormPrefill(m); } catch(e){ console.error('master prefill error (ignored):', e); }
             var infoEl = document.getElementById('infoBox');
             if (infoEl) {
