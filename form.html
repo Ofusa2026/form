@@ -193,7 +193,8 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20261116.08'; // 登録支援機関フォーム：Saysayの支援計画書の決まった内容と同じものを最初から入れる（事前ガイダンス＝対面＋テレビ電話、住居 a有・b有・c無、生活オリエンテーション＝適宜実施・対面、口座・携帯等の手続＝適宜実施・情報提供＋同行）
+var FORM_VERSION = 'ver.20261116.09'; // 企業フォーム：所定労働の日数・時間がありえない数字（週7日超・年366日超・年の時間が少なすぎる等）なら送る前に止める
+// var FORM_VERSION = 'ver.20261116.08'; // 登録支援機関フォーム：Saysayの支援計画書の決まった内容と同じものを最初から入れる（事前ガイダンス＝対面＋テレビ電話、住居 a有・b有・c無、生活オリエンテーション＝適宜実施・対面、口座・携帯等の手続＝適宜実施・情報提供＋同行）
 // var FORM_VERSION = 'ver.20261116.07'; // 登録支援機関フォーム 入力の手間を減らす：郵便番号→住所、支援担当者数を一覧から自動、支援責任者名簿は空なら支援責任者を自動で入れる、支援担当者の「通訳もする」で通訳者名簿に自動で入れる、「あと○項目」を全タブ分で数えて押すとそのタブへ
 // var FORM_VERSION = 'ver.20261116.06'; // 登録支援機関フォーム：開いたとき案シス（O-Linkで直した分を含む）の内容を全項目入れる。送信済みの古い回答より案シスを優先（途中保存の下書きは下書き優先）
 // var FORM_VERSION = 'ver.20261116.05'; // 登録支援機関フォーム：支援の実施言語ごとに通訳者を1名以上必須に（支援担当者が通訳する場合もその方を入力）
@@ -7094,7 +7095,21 @@ function _gjCompanyValidate() {
 // ver.20261009.01: 特定技能の企業フォーム（company / company_tokutei2）は基本すべて必須。
 //   表示中の「*」付き項目が空なら送信不可。「有」「あり」を選んだときだけ必要になる項目は条件付きで必須。
 //   追完用の項目しぼり込みリンク（fields=）ではこのチェックをしない（従来どおり）。
+// ver.20261116.09: 所定労働の日数・時間の範囲チェック（時間を日数の欄に入れるなどのずれを止める）
+function _tkWorkRangeCheck() {
+  var num = function(id){ var e = document.getElementById(id); if (!e) return null; var v = String(e.value || '').normalize('NFKC').replace(/[^0-9.]/g, ''); return v === '' ? null : parseFloat(v); };
+  var rules = [
+    ['f-weeklyDays', 0, 7, '1週間の所定労働日数', '日'], ['f-monthlyDays', 0, 31, '1か月の所定労働日数', '日'], ['f-yearlyDays', 0, 366, '1年間の所定労働日数', '日'],
+    ['f-weeklyH', 1, 60, '1週間の所定労働時間', '時間'], ['f-monthlyH', 1, 300, '1か月の所定労働時間', '時間'], ['f-yearlyH', 500, 3000, '1年間の所定労働時間', '時間']
+  ];
+  for (var i = 0; i < rules.length; i++) {
+    var r = rules[i], v = num(r[0]); if (v === null) continue;
+    if (v < r[1] || v > r[2]) { try { document.getElementById(r[0]).focus(); } catch(_) {} return '「' + r[3] + '」が ' + v + r[4] + ' になっています。' + r[1] + '〜' + r[2] + r[4] + 'の範囲で入力してください（日数と時間の欄が入れ替わっていないか確認してください）。'; }
+  }
+  return null;
+}
 function _tkCompanyValidate() {
+  var _wr = _tkWorkRangeCheck(); if (_wr) return _wr;
   var root = document.getElementById('formBody') || document;
   var labels = root.querySelectorAll('.field label');
   for (var i = 0; i < labels.length; i++) {
