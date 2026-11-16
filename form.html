@@ -193,7 +193,8 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20261116.06'; // 登録支援機関フォーム：開いたとき案シス（O-Linkで直した分を含む）の内容を全項目入れる。送信済みの古い回答より案シスを優先（途中保存の下書きは下書き優先）
+var FORM_VERSION = 'ver.20261116.07'; // 登録支援機関フォーム 入力の手間を減らす：郵便番号→住所、支援担当者数を一覧から自動、支援責任者名簿は空なら支援責任者を自動で入れる、支援担当者の「通訳もする」で通訳者名簿に自動で入れる、「あと○項目」を全タブ分で数えて押すとそのタブへ
+// var FORM_VERSION = 'ver.20261116.06'; // 登録支援機関フォーム：開いたとき案シス（O-Linkで直した分を含む）の内容を全項目入れる。送信済みの古い回答より案シスを優先（途中保存の下書きは下書き優先）
 // var FORM_VERSION = 'ver.20261116.05'; // 登録支援機関フォーム：支援の実施言語ごとに通訳者を1名以上必須に（支援担当者が通訳する場合もその方を入力）
 // var FORM_VERSION = 'ver.20261116.04'; // 登録支援機関フォーム：支援体制の必須化（支援責任者・人数・実施言語・支援担当者・実施方法・実施時間、電話/メールにチェックしたら番号/アドレス）。実施時間 3時間・8時間をデフォルト、支援の実施言語を対応可能言語から自動で入れる
 // var FORM_VERSION = 'ver.20261116.03'; // 登録支援機関フォーム：基本情報をすべて必須に。支援の適正性「有」、住居確保支援の方針 a無・b有・c無、補足「bで合意しない場合はaで実施」をデフォルトに
@@ -1884,6 +1885,49 @@ function _soLangChecks(i){
   h+='</div>';
   return h;
 }
+// ver.20261116.07: 支援担当者が通訳もする場合は、ここにチェック＋言語で通訳者名簿にも自動で入れる（同じ人を2回書かなくてよい）
+function _soStaffIntHtml(i){
+  var h='<label style="flex:1 1 100%;display:flex;align-items:center;gap:6px;font-size:13px;margin-top:2px;cursor:pointer;"><input type="checkbox" id="f-so_staff'+i+'_int" onchange="var b=document.getElementById(\'f-so_staff'+i+'_intBox\'); if(b) b.style.display=this.checked?\'flex\':\'none\';" style="width:18px;height:18px;">この方が通訳もする（通訳者名簿にも載せます）</label>';
+  h+='<div id="f-so_staff'+i+'_intBox" style="display:none;flex:1 1 100%;flex-wrap:wrap;gap:6px;">';
+  _SO_LANG_MASTER.forEach(function(l){ h+='<label style="display:inline-flex;align-items:center;gap:4px;font-size:13px;background:#f8fafc;border:1px solid #e5e7eb;border-radius:8px;padding:6px 10px;cursor:pointer;"><input type="checkbox" class="so-staff'+i+'-intlang" value="'+l.code+'" style="width:16px;height:16px;">'+l.flag+' '+l.ja+'</label>'; });
+  h+='<input type="text" id="f-so_staff'+i+'_intOther" placeholder="その他の言語（自由入力）" style="flex:1 1 100%;padding:8px;border:1.5px solid #e5e7eb;border-radius:8px;font-size:14px;min-height:40px;"></div>';
+  return h;
+}
+// 通訳もする支援担当者（通訳者名簿と同じ形）
+function _soStaffInterps(){
+  var out=[];
+  document.querySelectorAll('#so-staff-container .so-staff-row').forEach(function(row){
+    var i=row.getAttribute('data-soidx'), cb=document.getElementById('f-so_staff'+i+'_int'); if(!cb||!cb.checked) return;
+    var nm=val('f-so_staff'+i+'_name'); if(!nm) return;
+    var codes=[].map.call(document.querySelectorAll('.so-staff'+i+'-intlang:checked'), function(c){ return c.value; });
+    var o={name:nm, kana:'', language_codes:codes, staff_also:true}; var lo=val('f-so_staff'+i+'_intOther'); if(lo) o.language_other=lo;
+    out.push(o);
+  });
+  return out;
+}
+// 郵便番号 → 都道府県・市区町村、支援担当者数 → 一覧の人数（入っていない／自動で入れた値のときだけ）
+document.addEventListener('input', function(e){
+  var t=e.target; if(!t||!t.id) return;
+  if(t.id==='f-so_zip'){
+    var z=String(t.value||'').replace(/[－ー‐\-\s]/g,'').replace(/[０-９]/g,function(c){return String.fromCharCode(c.charCodeAt(0)-0xFEE0);});
+    if(z.length!==7) return;
+    fetch('https://zipcloud.ibsnet.co.jp/api/search?zipcode='+z).then(function(r){return r.json();}).then(function(d){
+      if(!d||!d.results) return; var r=d.results[0];
+      var pf=document.getElementById('f-so_pref'), ci=document.getElementById('f-so_city');
+      if(pf) pf.value=r.address1; if(ci && (!ci.value || ci.dataset.auto==='1')){ ci.value=r.address2+r.address3; ci.dataset.auto='1'; }
+      try{ _updateReqRemain(); }catch(_){}
+    }).catch(function(){});
+  }
+  if(t.id==='f-so_city') t.dataset.auto='';
+  if(/^f-so_staff\d+_name$/.test(t.id)) _soAutoStaffCount();
+  if(t.id==='f-so_supportStaffCount') t.dataset.auto='';
+});
+function _soAutoStaffCount(){
+  var c=document.getElementById('f-so_supportStaffCount'); if(!c) return;
+  if(String(c.value||'').trim() && c.dataset.auto!=='1') return;
+  var n=0; document.querySelectorAll('#so-staff-container .so-staff-row').forEach(function(row){ if(val('f-so_staff'+row.getAttribute('data-soidx')+'_name')) n++; });
+  c.value = n ? String(n) : ''; c.dataset.auto='1';
+}
 var _soManagerCount = 0;
 function _soFormManagerRow(i){
   return '<div class="so-manager-row" data-somgridx="'+i+'" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;padding:8px;border:1px solid #eef2f7;border-radius:8px;">'
@@ -1918,6 +1962,7 @@ function _soFormStaffRow(i){
     + '<input type="text" id="f-so_staff'+i+'_nameEn" placeholder="氏名（英語）" style="flex:1 1 45%;padding:8px;border:1.5px solid #e5e7eb;border-radius:8px;font-size:15px;min-height:44px;">'
     + '<input type="text" id="f-so_staff'+i+'_titleEn" placeholder="役職（英語）" style="flex:1 1 45%;padding:8px;border:1.5px solid #e5e7eb;border-radius:8px;font-size:15px;min-height:44px;">'
     + '<input type="tel" id="f-so_staff'+i+'_tel" placeholder="📞 電話番号" style="flex:1 1 93%;padding:8px;border:1.5px solid #e5e7eb;border-radius:8px;font-size:15px;min-height:44px;">'
+    + ((typeof type!=='undefined' && type==='support_org') ? _soStaffIntHtml(i) : '')
     + '</div>';
 }
 function _soFormAddStaff(){
@@ -2197,7 +2242,7 @@ function buildSupportOrgForm() {
   // B-1 実施言語・通訳者
   h += field('f-so_supportLanguages','支援の実施言語','text',(type==='support_org'),'例：ミャンマー語、ベトナム語','');
   h += (type==='support_org')
-    ? '<div style="font-size:13px;font-weight:700;margin:10px 0 2px;">通訳者<span class="req">*</span></div><div style="font-size:12px;color:#6b7280;margin-bottom:4px;">「支援の実施言語」の言語ごとに1名以上ご入力ください。支援担当者ご本人が通訳する場合も、その方をここに入力してください（支援計画書の別紙「通訳者名簿」に載ります）。</div>'
+    ? '<div style="font-size:13px;font-weight:700;margin:10px 0 2px;">通訳者<span class="req">*</span></div><div style="font-size:12px;color:#6b7280;margin-bottom:4px;">「支援の実施言語」の言語ごとに1名以上ご入力ください。支援担当者ご本人が通訳する場合は、ここに入力するか、「担当者・その他」タブの支援担当者で「この方が通訳もする」にチェックしてください（どちらでも支援計画書の別紙「通訳者名簿」に載ります）。</div>'
     : '<div style="font-size:13px;font-weight:700;margin:10px 0 4px;">通訳者（支援担当者以外の方が通訳を担う場合）</div>';
   h += '<div id="so-interp-container">' + _soFormInterpRow(0) + '</div>';
   h += '<button type="button" onclick="_soFormAddInterp()" style="margin-top:6px;padding:8px 14px;background:#eff6ff;color:#2563eb;border:1.5px solid #2563eb;border-radius:8px;font-weight:700;cursor:pointer;font-size:13px;">＋ 通訳者を追加</button>';
@@ -2486,6 +2531,12 @@ function _soFormCollect(){
         var nm=v('f-so_staff'+i+'_name'),ti=v('f-so_staff'+i+'_title'),ne=v('f-so_staff'+i+'_nameEn'),te=v('f-so_staff'+i+'_titleEn'),tel=v('f-so_staff'+i+'_tel');
         if(nm||ti||ne||te||tel) stf.push({name:nm,title:ti,name_en:ne,title_en:te,tel:tel});
       });
+      // ver.20261116.07: 通訳もする支援担当者を通訳者名簿へ（同じ名前があれば言語を足す）
+      try{ _soStaffInterps().forEach(function(si){ var ex=interps.filter(function(x){ return x.name===si.name; })[0];
+        if(ex){ si.language_codes.forEach(function(c){ if((ex.language_codes||[]).indexOf(c)<0) (ex.language_codes=ex.language_codes||[]).push(c); }); if(si.language_other && !ex.language_other) ex.language_other=si.language_other; }
+        else interps.push(si); }); }catch(_e){}
+      // 支援責任者名簿が空なら、「支援体制」の支援責任者を1名入れる（2回書かなくてよい）
+      if(!mgrs.length && v('f-so_supportManagerName')) mgrs.push({name:v('f-so_supportManagerName'), title:v('f-so_supportManagerTitle'), name_en:'', title_en:v('f-so_supportManagerTitleEn')});
       return {support_managers:mgrs, interpreters:interps, support_staff:stf};
     })(),
     regularMeeting:{ method:(function(){var r=document.querySelector('input[name="f-so_rmMethod"]:checked');return r?r.value:'';})(), schedule:v('f-so_rmSchedule') },
@@ -2516,6 +2567,7 @@ function _soFillSupportLang(){
   if(a && b && !String(b.value||'').trim() && String(a.value||'').trim()) b.value=a.value;
 }
 function _soFormValidate2(){
+  try{ _soAutoStaffCount(); }catch(_){}
   var go=function(id, msg){ try{ var e=document.getElementById(id)||document.querySelector('[name="'+id+'"]'); var st=e&&e.closest('.so-step'); if(st&&typeof _soGoStep==='function') _soGoStep(+st.getAttribute('data-sostep')); if(e) setTimeout(function(){ e.focus(); },300); }catch(_){} return msg; };
   var chk=function(id){ var e=document.getElementById(id); return !!(e&&e.checked); };
   var req=[['f-so_supportManagerName','支援責任者 氏名'],['f-so_supportManagerTitle','支援責任者 役職'],['f-so_supporterCount','支援中の1号特定技能外国人数'],['f-so_supportStaffCount','支援担当者数'],['f-so_supportLanguages','支援の実施言語']];
@@ -2543,6 +2595,7 @@ function _soFormValidate2(){
     if(!icodes.length && !ilo) return go('f-so_interp'+ii+'_langOther','通訳者「'+inm+'」の対応言語を選んでください。');
     ints.push({codes:icodes, other:ilo});
   }
+  try{ _soStaffInterps().forEach(function(si){ ints.push({codes:si.language_codes, other:si.language_other||''}); }); }catch(_e){}
   if(document.getElementById('so-interp-container')){
     var sl=val('f-so_supportLanguages'), need=[], alias={vi:/ベトナム|vietnam/i,id:/インドネシア|indonesia/i,my:/ミャンマー|ビルマ|myanmar|burm/i,ne:/ネパール|nepal/i,en:/英語|english/i,th:/タイ|thai/i,zh:/中国|chinese|台湾/i,km:/クメール|カンボジア|khmer|cambod/i,ko:/韓国|korean/i};
     _SO_LANG_MASTER.forEach(function(l){ if(alias[l.code]&&alias[l.code].test(sl)) need.push(l); });
@@ -2551,7 +2604,7 @@ function _soFormValidate2(){
       need.push({code:'', ja:t}); });
     for(var w=0;w<need.length;w++){
       var nd=need[w], ok=ints.some(function(it){ return nd.code ? it.codes.indexOf(nd.code)>=0 : (it.other && it.other.indexOf(nd.ja.replace(/語$/,''))>=0); });
-      if(!ok){ var f0=irows.length?irows[irows.length-1].getAttribute('data-sointidx'):'0'; return go('f-so_interp'+f0+'_name','「支援の実施言語」の'+nd.ja+'の通訳者を入力してください（支援担当者が通訳する場合も、その方を通訳者に入力してください）。足りないときは「＋ 通訳者を追加」で増やせます。'); }
+      if(!ok){ var f0=irows.length?irows[irows.length-1].getAttribute('data-sointidx'):'0'; return go('f-so_interp'+f0+'_name','「支援の実施言語」の'+nd.ja+'の通訳者を入力してください。足りないときは「＋ 通訳者を追加」で増やせます（支援担当者が通訳する場合は、「担当者・その他」タブの支援担当者で「この方が通訳もする」にチェックでもOKです）。'); }
     }
   }
   var rows=document.querySelectorAll('#so-staff-container .so-staff-row'), n=0;
@@ -7669,6 +7722,12 @@ function _reqT(key, n){
 }
 // 表示中の「*」付き項目のうち、まだ入っていないもの（タブがあるときは全タブ分）
 function _reqEmptyFields(){
+  if (type === 'support_org' && document.querySelector('.so-step')) {   // ver.20261116.07: 3つのタブ分をまとめて数える
+    var st=document.querySelectorAll('.so-step'), keep=[].map.call(st, function(e){ return e.style.display; }), r;
+    st.forEach(function(e){ e.style.display='block'; });
+    try { r=_reqEmptyFieldsRaw(); } finally { st.forEach(function(e,i){ e.style.display=keep[i]; }); }
+    return r;
+  }
   if (typeof _tkTabsOn !== 'undefined' && _tkTabsOn) { var w = _tkWithAllTabs(_reqEmptyFieldsRaw); _tkUpdateTabCounts(w.r); return w.r; }
   return _reqEmptyFieldsRaw();
 }
@@ -7700,6 +7759,7 @@ function _updateReqRemain(){
 }
 function _reqJumpFirst(){
   var f=_reqEmptyFields()[0]; if(!f) return;
+  try { var _ss=f.closest && f.closest('.so-step'); if (_ss && _ss.style.display==='none' && typeof _soGoStep==='function') _soGoStep(+_ss.getAttribute('data-sostep')); } catch(e) {}
   try { if (typeof _tkTabsOn !== 'undefined' && _tkTabsOn) { var _t=_tkPaneOf(f); if (_t >= 0 && _t !== _tkTabCur) _tkShowTab(_t, false); } } catch(e) {}
   try{ f.scrollIntoView({behavior:'smooth', block:'center'}); setTimeout(function(){ try{ f.focus(); }catch(e){} }, 400); }catch(e){}
 }
