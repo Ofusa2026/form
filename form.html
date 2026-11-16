@@ -193,7 +193,8 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20261116.04'; // 登録支援機関フォーム：支援体制の必須化（支援責任者・人数・実施言語・支援担当者・実施方法・実施時間、電話/メールにチェックしたら番号/アドレス）。実施時間 3時間・8時間をデフォルト、支援の実施言語を対応可能言語から自動で入れる
+var FORM_VERSION = 'ver.20261116.05'; // 登録支援機関フォーム：支援の実施言語ごとに通訳者を1名以上必須に（支援担当者が通訳する場合もその方を入力）
+// var FORM_VERSION = 'ver.20261116.04'; // 登録支援機関フォーム：支援体制の必須化（支援責任者・人数・実施言語・支援担当者・実施方法・実施時間、電話/メールにチェックしたら番号/アドレス）。実施時間 3時間・8時間をデフォルト、支援の実施言語を対応可能言語から自動で入れる
 // var FORM_VERSION = 'ver.20261116.03'; // 登録支援機関フォーム：基本情報をすべて必須に。支援の適正性「有」、住居確保支援の方針 a無・b有・c無、補足「bで合意しない場合はaで実施」をデフォルトに
 // var FORM_VERSION = 'ver.20261116.02'; // 支援体制：定期面談の実施方法「対面とオンライン」をデフォルト。定期面談・各支援の実施予定の候補プルダウンをやめ、デフォルト文言＋自由記入に
 // var FORM_VERSION = 'ver.20261116.01'; // 登録支援機関フォーム（＋自社支援タブ）の支援体制：対応時間 全曜日9:00〜18:00・相談/緊急時 直接面談+電話・定期面談 3ヶ月に1回以上・各支援の実施予定に汎用文言をデフォルト。既存回答から作った候補をプルダウンで選べるように
@@ -2194,7 +2195,9 @@ function buildSupportOrgForm() {
   h += '<button type="button" onclick="_soFormAddManager()" style="margin-top:6px;margin-bottom:10px;padding:8px 14px;background:#eff6ff;color:#2563eb;border:1.5px solid #2563eb;border-radius:8px;font-weight:700;cursor:pointer;font-size:13px;">＋ 支援責任者を追加</button>';
   // B-1 実施言語・通訳者
   h += field('f-so_supportLanguages','支援の実施言語','text',(type==='support_org'),'例：ミャンマー語、ベトナム語','');
-  h += '<div style="font-size:13px;font-weight:700;margin:10px 0 4px;">通訳者（支援担当者以外の方が通訳を担う場合）</div>';
+  h += (type==='support_org')
+    ? '<div style="font-size:13px;font-weight:700;margin:10px 0 2px;">通訳者<span class="req">*</span></div><div style="font-size:12px;color:#6b7280;margin-bottom:4px;">「支援の実施言語」の言語ごとに1名以上ご入力ください。支援担当者ご本人が通訳する場合も、その方をここに入力してください（支援計画書の別紙「通訳者名簿」に載ります）。</div>'
+    : '<div style="font-size:13px;font-weight:700;margin:10px 0 4px;">通訳者（支援担当者以外の方が通訳を担う場合）</div>';
   h += '<div id="so-interp-container">' + _soFormInterpRow(0) + '</div>';
   h += '<button type="button" onclick="_soFormAddInterp()" style="margin-top:6px;padding:8px 14px;background:#eff6ff;color:#2563eb;border:1.5px solid #2563eb;border-radius:8px;font-weight:700;cursor:pointer;font-size:13px;">＋ 通訳者を追加</button>';
   // B-2 定期面談
@@ -2529,6 +2532,26 @@ function _soFormValidate2(){
   if(document.getElementById('f-so_implH_orientation')){
     if(!val('f-so_implH_orientation')) return go('f-so_implH_orientation','「生活オリエンテーション 合計時間」を入力してください。');
     if(parseFloat(val('f-so_implH_orientation'))<8) return go('f-so_implH_orientation','生活オリエンテーションは合計8時間以上にしてください（要件です）。');
+  }
+  // ver.20261116.05: 通訳者は「支援の実施言語」の言語ごとに1名以上
+  var irows=document.querySelectorAll('#so-interp-container .so-interp-row'), ints=[];
+  for(var q=0;q<irows.length;q++){ var ii=irows[q].getAttribute('data-sointidx'), inm=val('f-so_interp'+ii+'_name'), ilo=val('f-so_interp'+ii+'_langOther');
+    var icodes=[].map.call(document.querySelectorAll('.so-interp'+ii+'-lang:checked'), function(c){ return c.value; });
+    if(!inm && !val('f-so_interp'+ii+'_kana') && !ilo && !icodes.length) continue;
+    if(!inm) return go('f-so_interp'+ii+'_name','通訳者の氏名を入力してください。');
+    if(!icodes.length && !ilo) return go('f-so_interp'+ii+'_langOther','通訳者「'+inm+'」の対応言語を選んでください。');
+    ints.push({codes:icodes, other:ilo});
+  }
+  if(document.getElementById('so-interp-container')){
+    var sl=val('f-so_supportLanguages'), need=[], alias={vi:/ベトナム|vietnam/i,id:/インドネシア|indonesia/i,my:/ミャンマー|ビルマ|myanmar|burm/i,ne:/ネパール|nepal/i,en:/英語|english/i,th:/タイ|thai/i,zh:/中国|chinese|台湾/i,km:/クメール|カンボジア|khmer|cambod/i,ko:/韓国|korean/i};
+    _SO_LANG_MASTER.forEach(function(l){ if(alias[l.code]&&alias[l.code].test(sl)) need.push(l); });
+    String(sl).split(/[、,，・\/／\s]+/).forEach(function(t){ t=t.trim(); if(!t || /^日本語?$|japanese/i.test(t)) return;
+      if(_SO_LANG_MASTER.some(function(l){ return alias[l.code]&&alias[l.code].test(t); })) return;
+      need.push({code:'', ja:t}); });
+    for(var w=0;w<need.length;w++){
+      var nd=need[w], ok=ints.some(function(it){ return nd.code ? it.codes.indexOf(nd.code)>=0 : (it.other && it.other.indexOf(nd.ja.replace(/語$/,''))>=0); });
+      if(!ok){ var f0=irows.length?irows[irows.length-1].getAttribute('data-sointidx'):'0'; return go('f-so_interp'+f0+'_name','「支援の実施言語」の'+nd.ja+'の通訳者を入力してください（支援担当者が通訳する場合も、その方を通訳者に入力してください）。足りないときは「＋ 通訳者を追加」で増やせます。'); }
+    }
   }
   var rows=document.querySelectorAll('#so-staff-container .so-staff-row'), n=0;
   for(var r=0;r<rows.length;r++){ var ix=rows[r].getAttribute('data-soidx'); var nm=val('f-so_staff'+ix+'_name'), tel=val('f-so_staff'+ix+'_tel');
