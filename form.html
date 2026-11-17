@@ -193,7 +193,8 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20261117.01'; // 企業フォーム（特定技能1号・2号）：分野が農業のとき①企業情報の役員情報の下に「農業分野の誓約書（11-1号）」を表示。誓約事項３（①ア 会社の雇用経験／①イ 役員が個人事業主として雇用経験／② 労務管理の経験）の時期・氏名・機関名を聞き nogyoExp* で送信。分野はURLの field、なければ form_company_field で案件から取得
+var FORM_VERSION = 'ver.20261117.02'; // 登録支援機関フォーム：共生施策の確認方法「ホームページ」を最初から選択（回答が無いとき）
+// var FORM_VERSION = 'ver.20261117.01'; // 企業フォーム（特定技能1号・2号）：分野が農業のとき①企業情報の役員情報の下に「農業分野の誓約書（11-1号）」を表示。誓約事項３（①ア 会社の雇用経験／①イ 役員が個人事業主として雇用経験／② 労務管理の経験）の時期・氏名・機関名を聞き nogyoExp* で送信。分野はURLの field、なければ form_company_field で案件から取得
 // var FORM_VERSION = 'ver.20261116.10'; // 登録支援機関フォーム：支援責任者のふりがなを必須に（支援計画書の別紙で英語の氏名をふりがなから作るため）
 // var FORM_VERSION = 'ver.20261116.09'; // 企業フォーム：所定労働の日数・時間がありえない数字（週7日超・年366日超・年の時間が少なすぎる等）なら送る前に止める
 // var FORM_VERSION = 'ver.20261116.08'; // 登録支援機関フォーム：Saysayの支援計画書の決まった内容と同じものを最初から入れる（事前ガイダンス＝対面＋テレビ電話、住居 a有・b有・c無、生活オリエンテーション＝適宜実施・対面、口座・携帯等の手続＝適宜実施・情報提供＋同行）
@@ -2289,7 +2290,7 @@ function buildSupportOrgForm() {
   });
   h += field('f-so_hpNote','補足（実施条件など）','text',false,'例：bで合意しない場合はaで実施','').replace('<input type="text" id="f-so_hpNote" ','<input type="text" id="f-so_hpNote" value="aはbでの入居に合意しなかった場合に実施" ');
   h += '<div style="font-size:13px;font-weight:700;margin:12px 0 4px;">受入企業の自治体の共生施策（相談窓口等）の確認方法</div>';
-  h += '<label style="margin-right:14px;font-size:14px;"><input type="checkbox" id="f-so_symb_hp" style="width:18px;height:18px;vertical-align:middle;"> ホームページ</label>'
+  h += '<label style="margin-right:14px;font-size:14px;"><input type="checkbox" id="f-so_symb_hp" checked style="width:18px;height:18px;vertical-align:middle;"> ホームページ</label>'
      + '<span style="font-size:14px;">その他 <input type="text" id="f-so_symb_other" placeholder="例：市役所窓口で確認" style="padding:8px;border:1.5px solid #e5e7eb;border-radius:8px;font-size:14px;min-height:40px;width:200px;"></span>';
   h += '</div>';
   h += '</div>';
@@ -2655,7 +2656,7 @@ function _soFormPrefill(resp){
     ['a','b','c'].forEach(function(k){ if(hp[k]){ var _h=document.querySelector('input[name="f-so_hp_'+k+'"][value="'+hp[k]+'"]'); if(_h)_h.checked=true; } });
     if(g('f-so_hpNote')&&hp.note)g('f-so_hpNote').value=hp.note;
     var sy=resp.symbiosisCheck||{};
-    setC('f-so_symb_hp',sy.hp);
+    if(sy.hp || String(sy.other||'').trim()) setC('f-so_symb_hp',sy.hp);   // ver.20261117.01: 回答が無ければ最初の値（ホームページ）のまま
     if(g('f-so_symb_other')&&sy.other)g('f-so_symb_other').value=sy.other;
   })();
   var _attS = (resp.attachments && Array.isArray(resp.attachments.support_staff)) ? resp.attachments.support_staff : (Array.isArray(resp.supportStaffList) ? resp.supportStaffList : []);
