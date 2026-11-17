@@ -193,7 +193,8 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20261116.10'; // 登録支援機関フォーム：支援責任者のふりがなを必須に（支援計画書の別紙で英語の氏名をふりがなから作るため）
+var FORM_VERSION = 'ver.20261117.01'; // 企業フォーム（特定技能1号・2号）：分野が農業のとき①企業情報の役員情報の下に「農業分野の誓約書（11-1号）」を表示。誓約事項３（①ア 会社の雇用経験／①イ 役員が個人事業主として雇用経験／② 労務管理の経験）の時期・氏名・機関名を聞き nogyoExp* で送信。分野はURLの field、なければ form_company_field で案件から取得
+// var FORM_VERSION = 'ver.20261116.10'; // 登録支援機関フォーム：支援責任者のふりがなを必須に（支援計画書の別紙で英語の氏名をふりがなから作るため）
 // var FORM_VERSION = 'ver.20261116.09'; // 企業フォーム：所定労働の日数・時間がありえない数字（週7日超・年366日超・年の時間が少なすぎる等）なら送る前に止める
 // var FORM_VERSION = 'ver.20261116.08'; // 登録支援機関フォーム：Saysayの支援計画書の決まった内容と同じものを最初から入れる（事前ガイダンス＝対面＋テレビ電話、住居 a有・b有・c無、生活オリエンテーション＝適宜実施・対面、口座・携帯等の手続＝適宜実施・情報提供＋同行）
 // var FORM_VERSION = 'ver.20261116.07'; // 登録支援機関フォーム 入力の手間を減らす：郵便番号→住所、支援担当者数を一覧から自動、支援責任者名簿は空なら支援責任者を自動で入れる、支援担当者の「通訳もする」で通訳者名簿に自動で入れる、「あと○項目」を全タブ分で数えて押すとそのタブへ
@@ -3464,6 +3465,81 @@ function _ssValidate() {
 }
 
 // ===== ver.20261009.01: 特定技能の企業フォーム用の部品 =====
+// ===== ver.20261117.01: 農業分野の誓約書（分野参考様式第11-1号）誓約事項３ =====
+//   「過去５年以内に同一の労働者を６か月以上継続して雇用した経験又はこれに準ずる経験」を企業ヒアリングで聞く。
+//   分野が農業のときだけ表示（URLの field、なければ案シスの案件の分野を form_company_field で取得）。
+//   回答は案シスの取込で companies.nogyo_exp_* に入り、Saysay の 11-1号に自動で入る。
+var _ngField = applicantField;
+function _ngOn() { return /農業/.test(_ngField || ''); }
+function _ngLoadField() {
+  if (_ngOn() || !caseId || !document.getElementById('tkNogyoCard')) { _tkApplyToggles(); return; }
+  callRpc('form_company_field', { p_case_id: caseId })
+    .then(function(r){ return r.ok ? r.json() : ''; })
+    .then(function(v){ if (typeof v === 'string' && v) _ngField = v; _tkApplyToggles(); })
+    .catch(function(){ _tkApplyToggles(); });
+}
+var NG_TYPES = [
+  ['①ア', '①ア 会社で6か月以上雇った経験あり', '会社（法人）として、同じ人を6か月以上続けて雇った経験がある場合'],
+  ['①イ', '①イ 役員が個人事業主のときに雇った', '会社としての雇用経験は6か月未満だが、業務を執行する役員が個人事業主のときに、同じ人を6か月以上続けて雇った経験がある場合'],
+  ['②',   '② 労務管理の経験がある人がいる', '①に当たらないが、これに準ずる経験（労務管理の経験）がある人がいる場合（法人の場合は業務を執行する役員に限る）']
+];
+function _ngCardHtml() {
+  var inp = 'width:100%;padding:13px 14px;border:1.5px solid #e5e7eb;border-radius:10px;font-size:16px;outline:none;background:#fff;box-sizing:border-box;font-family:inherit;';
+  var h = '<div class="card" id="tkNogyoCard" style="display:none;"><div class="section-title">農業分野の誓約書（11-1号）</div>';
+  h += '<div style="font-size:11.5px;color:#166534;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:8px 10px;margin-bottom:10px;line-height:1.6;">🌾 農業分野の誓約書（分野参考様式第11-1号）に書く内容です。<br>誓約書では「<b>過去5年以内</b>に、同じ人を<b>6か月以上続けて</b>雇った経験（またはこれに準ずる経験）」があることを書きます。当てはまるものを1つ選んでください。</div>';
+  h += '<div class="field"><label>当てはまるもの<span class="req">*</span></label><select id="f-nogyoExpType" onchange="_tkApplyToggles()" style="' + inp + '"><option value="">---</option>';
+  NG_TYPES.forEach(function(t){ h += '<option value="' + t[0] + '">' + t[1] + '</option>'; });
+  h += '</select><div id="ngTypeDesc" style="display:none;font-size:11.5px;color:#4b5563;margin-top:6px;line-height:1.6;"></div></div>';
+  h += '<div id="ngNameWrap" style="display:none;"><div class="field"><label><span id="ngNameLbl">氏名</span><span class="req">*</span></label><input type="text" id="f-nogyoExpName" placeholder="例: 山田 太郎" style="' + inp + '"></div></div>';
+  h += '<div id="ngTermWrap" style="display:none;"><div class="grid2">';
+  h += '<div class="field"><label><span id="ngFromLbl">雇用した時期（開始）</span><span class="req">*</span></label><input type="date" id="f-nogyoExpFrom" style="' + inp + '"></div>';
+  h += '<div class="field" id="ngToField"><label><span id="ngToLbl">雇用した時期（終了）</span><span class="req">*</span></label><input type="date" id="f-nogyoExpTo" style="' + inp + '"></div>';
+  h += '</div>';
+  h += '<label style="display:flex;align-items:center;gap:8px;font-size:13px;color:#374151;margin:-4px 0 12px;cursor:pointer;"><input type="checkbox" id="f-nogyoExpNow" onchange="_tkApplyToggles()" style="width:18px;height:18px;"> 今も続いている（終了日なし）</label>';
+  h += '</div>';
+  h += '<div id="ngOrgWrap" style="display:none;"><div class="field"><label>労務管理をした機関名（会社名など）<span class="req">*</span></label><input type="text" id="f-nogyoExpOrg" placeholder="例: 株式会社〇〇農園" style="' + inp + '"></div></div>';
+  h += '<div id="ngTermNote" style="display:none;font-size:11px;color:#6b7280;line-height:1.6;">※ 期間は、過去5年以内で6か月以上続いた期間を書いてください。</div>';
+  h += '</div>';
+  return h;
+}
+function _ngApply(sh) {
+  sh('tkNogyoCard', _ngOn());
+  var t = val('f-nogyoExpType');
+  sh('ngNameWrap', t === '①イ' || t === '②');
+  sh('ngTermWrap', !!t); sh('ngTermNote', !!t);
+  sh('ngOrgWrap', t === '②');
+  var now = !!((document.getElementById('f-nogyoExpNow') || {}).checked);
+  sh('ngToField', !now);
+  var st = function(id, s){ var e = document.getElementById(id); if (e) e.textContent = s; };
+  var _td = NG_TYPES.filter(function(x){ return x[0] === t; })[0]; st('ngTypeDesc', _td ? '→ ' + _td[2] : ''); sh('ngTypeDesc', !!_td);
+  st('ngNameLbl', t === '②' ? '労務管理の経験がある人の氏名' : '業務を執行する役員の氏名');
+  st('ngFromLbl', t === '②' ? '労務管理に従事した時期（開始）' : '雇用した時期（開始）');
+  st('ngToLbl', t === '②' ? '労務管理に従事した時期（終了）' : '雇用した時期（終了）');
+}
+function _ngValidate() {
+  var c = document.getElementById('tkNogyoCard'); if (!c || c.style.display === 'none') return null;
+  var t = val('f-nogyoExpType');
+  if (!t) return '「農業分野の誓約書（11-1号）」の当てはまるものを選んでください。';
+  if ((t === '①イ' || t === '②') && !val('f-nogyoExpName')) return t === '②' ? '「労務管理の経験がある人の氏名」を入力してください。' : '「業務を執行する役員の氏名」を入力してください。';
+  if (!val('f-nogyoExpFrom')) return '農業の誓約書の「開始」の日付を入力してください。';
+  var now = !!((document.getElementById('f-nogyoExpNow') || {}).checked);
+  if (!now && !val('f-nogyoExpTo')) return '農業の誓約書の「終了」の日付を入力するか、「今も続いている」にチェックしてください。';
+  if (!now && val('f-nogyoExpTo') < val('f-nogyoExpFrom')) return '農業の誓約書の「終了」の日付が「開始」より前になっています。';
+  if (t === '②' && !val('f-nogyoExpOrg')) return '「労務管理をした機関名」を入力してください。';
+  return null;
+}
+function _ngCollect(d) {
+  var c = document.getElementById('tkNogyoCard');
+  if (!c || !_ngOn()) return;
+  var t = val('f-nogyoExpType');
+  var now = !!((document.getElementById('f-nogyoExpNow') || {}).checked);
+  d.nogyoExpType = t;
+  d.nogyoExpFrom = val('f-nogyoExpFrom');
+  d.nogyoExpTo = now ? '現在' : val('f-nogyoExpTo');
+  d.nogyoExpName = (t === '①イ' || t === '②') ? val('f-nogyoExpName') : '';
+  d.nogyoExpOrg = (t === '②') ? val('f-nogyoExpOrg') : '';
+}
+
 // 特定技能外国人の受入経験（案シスの案件／会社データから取得。URLの exp=あり|なし でも指定可＝テスト用）
 var _tkAcceptExp = (function(){ var e = new URLSearchParams(location.search).get('exp') || ''; return (e === 'あり' || e === 'なし') ? e : ''; })();
 function _tkLoadAcceptExp() {
@@ -3511,7 +3587,7 @@ function _tkSetDefaults() {
   var _rn = document.getElementById('f-resignNoticeDays'); if (_rn && _rn.value === '') _rn.value = '30';   // ver.20261015.04
 }
 // ===== ver.20261009.03: 特定技能の企業フォームを「① 企業情報」「② 雇用条件」のタブに分ける =====
-var TK_TAB1 = ['企業基本情報','所在地','代表者','役員情報','標準の内容'];   // ver.20261009.04: 標準の内容は企業情報の一番下
+var TK_TAB1 = ['企業基本情報','所在地','代表者','役員情報','農業分野の誓約書（11-1号）','標準の内容'];   // ver.20261117.01: 農業の誓約書は役員情報の下   // ver.20261009.04: 標準の内容は企業情報の一番下
 var TK_TAB2 = ['雇用条件','就業場所（事業所）','労働時間・休日','契約期間','雇用管理相談窓口','相談窓口','①・② 相談窓口（待遇の相違の説明・雇用管理の相談）','① 待遇の相違について説明を求める窓口','② 雇用管理の改善等に関する事項に係る相談窓口','住居（支援計画書用）','比較対象日本人'];
 var _tkTabCur = 0, _tkTabsOn = false;
 function _tkCardTitle(c){ var t = c.querySelector('.section-title'); return t ? t.textContent.trim() : ''; }
@@ -3767,6 +3843,7 @@ function _tkApplyToggles() {
   var _expAri = (_tkAcceptExp === 'あり');
   sh('tkOfficersCard', !_expAri);
   sh('tkJpCompCard', !_expAri);
+  try { _ngApply(sh); } catch(_ng) {}   // ver.20261117.01 農業の誓約書
   // ver.20261019.01: 自社支援（登録支援機関なし＝自社支援。不明なら「支援の方法」を聞く）
   if (document.getElementById('tkSSCard0')) {
     var _ssO = _ssOn();
@@ -4053,6 +4130,7 @@ function buildCompanyForm() {
     '<button type="button" onclick="addOfficer()" style="font-size:11px;padding:5px 14px;background:white;border:1.5px dashed #c7d2fe;border-radius:6px;color:#6366f1;cursor:pointer;font-weight:700;">＋ 役員を追加</button>' +
     '</div>' +
   '</div>' +
+  _ngCardHtml() +   // ver.20261117.01: 農業分野の誓約書（11-1号）誓約事項３（分野が農業のときだけ表示）
 
   '<div class="card"><div class="section-title">雇用条件</div>' +
     '<div class="sub-label">【給与】</div>' +
@@ -6456,6 +6534,7 @@ function collectData() {
       jaimIndustryCode: val('f-jaimIndustryCode'), jaimAgreement: (document.getElementById('f-jaimAgreement') && document.getElementById('f-jaimAgreement').checked) ? '確認済み' : '', jaimProductName: val('f-jaimProductName'), jaimProductPurpose: val('f-jaimProductPurpose'), jaimFinalProductName: val('f-jaimFinalProductName'), jaimFinalProductDesc: val('f-jaimFinalProductDesc'), jaimEquipmentPurpose: val('f-jaimEquipmentPurpose'), jaimEquipmentEffect: val('f-jaimEquipmentEffect'), jaimBranchOfficeFlag: val('f-jaimBranchOfficeFlag'), jaimBranchOfficeName: val('f-jaimBranchOfficeName'), jaimBranchOfficeZip: val('f-jaimBranchOfficeZip'), jaimBranchOfficeAddress: val('f-jaimBranchOfficeAddress'), jaimBranchOfficeContact: val('f-jaimBranchOfficeContact'), jaimBranchOfficeTel: val('f-jaimBranchOfficeTel'), jaimCompanySize: val('f-jaimCompanySize'), jaimMemberOrg: val('f-jaimMemberOrg'), jaimAnnualFee: _jaimFeeValue()
     };
     Object.assign(d, officers);
+    _ngCollect(d);   // ver.20261117.01: 農業の誓約書（11-1号）
     if (document.getElementById('shiftRows')) _shiftCollect(d);   // ver.20261029.01: シフト1〜5（始業・終業・所定）
     // ver.20261009.01: 特定技能の企業フォームの組み替えに合わせて送信データを整える
     if (document.getElementById('f-contractRenewalCondOther')) {
@@ -7288,6 +7367,7 @@ function _validateInner() {
   }
     // ver.20261009.01: 特定技能の企業フォームは基本すべて必須（追完の項目しぼり込みリンクは除く）
   if ((type === 'company' || type === 'company_tokutei2') && !(fieldsFilter && fieldsFilter.length)) {
+    var _ngErr = _ngValidate(); if (_ngErr) return _ngErr;   // ver.20261117.01
     var _tkErr = _tkCompanyValidate(); if (_tkErr) return _tkErr;
     if (formPart3) return null;   // ver.20261015.03: ③だけ（会社名・役員のふりがなは聞いていない）
   }
@@ -7908,7 +7988,7 @@ function confirmName(isMatch){
     document.getElementById('nameConfirmName').innerHTML = _escName;
   }
   document.getElementById('formBody').innerHTML = buildForm(type);
-  try { if (document.getElementById('officersWrap')) { _tkSetDefaults(); _ssInit(); _tkLoadAcceptExp(); _tkLoadSupportMode(); _tkBuildTabs(); _tkApplyToggles(); try { tkSameContact(fieldsFilter ? 'diff' : 'same'); } catch(_se) {} } } catch(e) { console.error('tk init error:', e); }   // ver.20261019.01 ④   // ver.20261009.02 / .03 タブ
+  try { if (document.getElementById('officersWrap')) { _tkSetDefaults(); _ssInit(); _tkLoadAcceptExp(); _tkLoadSupportMode(); _ngLoadField(); _tkBuildTabs(); _tkApplyToggles(); try { tkSameContact(fieldsFilter ? 'diff' : 'same'); } catch(_se) {} } } catch(e) { console.error('tk init error:', e); }   // ver.20261019.01 ④   // ver.20261009.02 / .03 タブ
   if (fieldsFilter && fieldsFilter.length && type === 'company') {
     applyFieldsFilter(fieldsFilter);
   }
@@ -8238,6 +8318,8 @@ function prefillForm(resp) {
       console.error('prefill key=' + k + ' error (ignored):', eachErr);
     }
   });
+  // ver.20261117.01: 農業の誓約書「今も続いている」
+  try { if (resp.nogyoExpTo === '現在') { var _ngNow = document.getElementById('f-nogyoExpNow'); if (_ngNow) { _ngNow.checked = true; } } if (resp.nogyoExpType && typeof _tkApplyToggles === 'function') _tkApplyToggles(); } catch(_ngp) {}
 
   // 入国日「未定」チェックの復元
   try {
