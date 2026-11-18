@@ -117,6 +117,10 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 .type-unknown { text-align: center; padding: 60px 20px; }
 .type-unknown h2 { font-size: 18px; color: #dc2626; margin-bottom: 8px; }
 .type-unknown p { font-size: 13px; color: #6b7280; }
+
+/* ver.20261118.02: 未入力の必須項目を目立たせる */
+.field.req-empty input:not([type=radio]):not([type=checkbox]), .field.req-empty select, .field.req-empty textarea { background:#fffbeb !important; border-color:#f59e0b !important; box-shadow:0 0 0 2px rgba(245,158,11,.18); }
+.field.req-empty > label::after { content:'未入力'; display:inline-block; margin-left:6px; padding:1px 7px; border-radius:9px; background:#f59e0b; color:#fff; font-size:11px; font-weight:700; vertical-align:middle; }
 </style>
 </head>
 <body>
@@ -193,7 +197,8 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20261118.01'; // 登録支援機関フォーム：①基本情報に「O-Link（進捗確認ページ）のパスワード」欄を追加（olinkPass で送信。初回だけO-Linkの閲覧パスワードに反映）
+var FORM_VERSION = 'ver.20261118.02'; // 未入力の必須項目を薄い黄色＋オレンジ枠で目立たせる（入力すると消える）
+// var FORM_VERSION = 'ver.20261118.01'; // 登録支援機関フォーム：①基本情報に「O-Link（進捗確認ページ）のパスワード」欄を追加（olinkPass で送信。初回だけO-Linkの閲覧パスワードに反映）
 // var FORM_VERSION = 'ver.20261117.03'; // 登録支援機関フォーム：共生施策の確認方法の質問をやめる（所属機関側の事柄）
 // var FORM_VERSION = 'ver.20261117.02'; // 登録支援機関フォーム：共生施策の確認方法「ホームページ」を最初から選択（回答が無いとき）
 // var FORM_VERSION = 'ver.20261117.01'; // 企業フォーム（特定技能1号・2号）：分野が農業のとき①企業情報の役員情報の下に「農業分野の誓約書（11-1号）」を表示。誓約事項３（①ア 会社の雇用経験／①イ 役員が個人事業主として雇用経験／② 労務管理の経験）の時期・氏名・機関名を聞き nogyoExp* で送信。分野はURLの field、なければ form_company_field で案件から取得
@@ -7859,7 +7864,14 @@ function _updateReqRemain(){
   _reqTimer=setTimeout(function(){
     var el=document.getElementById('reqRemain'); if(!el) return;
     var wrap=document.getElementById('btnWrap'); if(!wrap || wrap.style.display==='none'){ el.style.display='none'; return; }
-    var n=_reqEmptyFields().length;
+    var _emp=_reqEmptyFields(), n=_emp.length;
+    try {   // ver.20261118.02: 未入力の必須項目に印を付ける（入力済みになったら外す）
+      var _root=document.getElementById('formBody');
+      if (_root) {
+        _root.querySelectorAll('.field.req-empty').forEach(function(f){ f.classList.remove('req-empty'); });
+        _emp.forEach(function(e){ var f=e && e.closest && e.closest('.field'); if (f) f.classList.add('req-empty'); });
+      }
+    } catch(_he) {}
     el.style.display='block';
     if(n>0){ el.style.background='#fff7ed'; el.style.color='#9a3412'; el.style.border='1px solid #fed7aa'; el.innerHTML='📝 '+_reqT('remain', n); }
     else { el.style.background='#eff6ff'; el.style.color='#1d4ed8'; el.style.border='1px solid #bfdbfe'; el.innerHTML='✅ '+_reqT('done', 0); }
