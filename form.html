@@ -193,7 +193,8 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20261117.03'; // 登録支援機関フォーム：共生施策の確認方法の質問をやめる（所属機関側の事柄）
+var FORM_VERSION = 'ver.20261118.01'; // 登録支援機関フォーム：①基本情報に「O-Link（進捗確認ページ）のパスワード」欄を追加（olinkPass で送信。初回だけO-Linkの閲覧パスワードに反映）
+// var FORM_VERSION = 'ver.20261117.03'; // 登録支援機関フォーム：共生施策の確認方法の質問をやめる（所属機関側の事柄）
 // var FORM_VERSION = 'ver.20261117.02'; // 登録支援機関フォーム：共生施策の確認方法「ホームページ」を最初から選択（回答が無いとき）
 // var FORM_VERSION = 'ver.20261117.01'; // 企業フォーム（特定技能1号・2号）：分野が農業のとき①企業情報の役員情報の下に「農業分野の誓約書（11-1号）」を表示。誓約事項３（①ア 会社の雇用経験／①イ 役員が個人事業主として雇用経験／② 労務管理の経験）の時期・氏名・機関名を聞き nogyoExp* で送信。分野はURLの field、なければ form_company_field で案件から取得
 // var FORM_VERSION = 'ver.20261116.10'; // 登録支援機関フォーム：支援責任者のふりがなを必須に（支援計画書の別紙で英語の氏名をふりがなから作るため）
@@ -2208,6 +2209,11 @@ function buildSupportOrgForm() {
   h += field('f-so_repNameEn','英語代表者名','text',true,'例：Taro Yamada','');
   h += field('f-so_languages','対応可能言語','text',true,'例：ベトナム語、英語','');
   h += '</div>';
+  // ver.20261118.01: O-Link（進捗確認ページ）のパスワードを登録支援機関が決める（初回だけ反映。空欄なら案内文の仮パスワードのまま）
+  h += '<div class="card"><div class="section-title">O-Link（進捗確認ページ）のパスワード</div>';
+  h += '<div style="font-size:13px;color:#6b7280;margin-bottom:8px;line-height:1.6;">ご案内したO-Link（進捗確認ページ）を開くときのパスワードを、お好きなものに設定できます。<br>半角の英字・数字で4〜20文字。空欄のままなら、ご案内した仮パスワードをそのままお使いいただけます。</div>';
+  h += field('f-so_olinkPass','O-Linkのパスワード','text',false,'例：abc12345','');
+  h += '</div>';
   h += '</div>';
   // ステップ②支援体制
   h += '<div class="so-step" data-sostep="1" style="display:none;">';
@@ -2505,7 +2511,7 @@ function _soFormCollect(){
     name:v('f-so_name'), nameKana:v('f-so_nameKana'), nameEn:v('f-so_nameEn'),
     corpNo:v('f-so_corpNo'), empInsNo:v('f-so_empInsNo'), regNo:v('f-so_regNo'), regDate:v('f-so_regDate'),
     zip:v('f-so_zip'), pref:v('f-so_pref'), city:v('f-so_city'), addressDetail:v('f-so_addressDetail'), addressEn:v('f-so_addressEn'), tel:v('f-so_tel'),
-    repName:v('f-so_repName'), repNameKana:v('f-so_repNameKana'), repNameEn:v('f-so_repNameEn'), languages:v('f-so_languages'),
+    repName:v('f-so_repName'), repNameKana:v('f-so_repNameKana'), repNameEn:v('f-so_repNameEn'), languages:v('f-so_languages'), olinkPass:v('f-so_olinkPass'),
     supportManagerName:v('f-so_supportManagerName'), supportManagerKana:v('f-so_supportManagerKana'), supportManagerTitle:v('f-so_supportManagerTitle'), supportManagerTitleEn:v('f-so_supportManagerTitleEn'),
     supportProperness:(function(){var r=document.querySelector('input[name="f-so_properness"]:checked');return r?r.value:'';})(),
     supporterCount:v('f-so_supporterCount'), supportStaffCount:v('f-so_supportStaffCount'),
@@ -2577,6 +2583,8 @@ function _soFillSupportLang(){
 function _soFormValidate2(){
   try{ _soAutoStaffCount(); }catch(_){}
   var go=function(id, msg){ try{ var e=document.getElementById(id)||document.querySelector('[name="'+id+'"]'); var st=e&&e.closest('.so-step'); if(st&&typeof _soGoStep==='function') _soGoStep(+st.getAttribute('data-sostep')); if(e) setTimeout(function(){ e.focus(); },300); }catch(_){} return msg; };
+  // ver.20261118.01: O-Linkのパスワード（入力したときだけ：半角英数字4〜20文字）
+  var _olp=document.getElementById('f-so_olinkPass'); if(_olp){ _olp.value=String(_olp.value||'').trim(); if(_olp.value && !/^[A-Za-z0-9]{4,20}$/.test(_olp.value)) return go('f-so_olinkPass','O-Linkのパスワードは半角の英字・数字で4〜20文字にしてください。'); }
   var chk=function(id){ var e=document.getElementById(id); return !!(e&&e.checked); };
   var req=[['f-so_supportManagerName','支援責任者 氏名'],['f-so_supportManagerKana','支援責任者 氏名（ふりがな）'],['f-so_supportManagerTitle','支援責任者 役職'],['f-so_supporterCount','支援中の1号特定技能外国人数'],['f-so_supportStaffCount','支援担当者数'],['f-so_supportLanguages','支援の実施言語']];
   for(var i=0;i<req.length;i++){ if(document.getElementById(req[i][0]) && !val(req[i][0])) return go(req[i][0],'「'+req[i][1]+'」を入力してください。'); }
@@ -2628,7 +2636,7 @@ function _soFormValidate2(){
 function _soFormPrefill(resp){
   resp = resp || {};
   if(Array.isArray(resp.planFiles) && resp.planFiles.length){ window._soPlanFiles=resp.planFiles.slice(); setTimeout(_soPlanRenderList,0); }
-  var map={ name:'f-so_name', nameKana:'f-so_nameKana', nameEn:'f-so_nameEn', corpNo:'f-so_corpNo', empInsNo:'f-so_empInsNo', regNo:'f-so_regNo', regDate:'f-so_regDate', zip:'f-so_zip', pref:'f-so_pref', city:'f-so_city', addressDetail:'f-so_addressDetail', addressEn:'f-so_addressEn', tel:'f-so_tel', repName:'f-so_repName', repNameKana:'f-so_repNameKana', repNameEn:'f-so_repNameEn', languages:'f-so_languages', supportManagerName:'f-so_supportManagerName', supportManagerKana:'f-so_supportManagerKana', supportManagerTitle:'f-so_supportManagerTitle', supportManagerTitleEn:'f-so_supportManagerTitleEn', supporterCount:'f-so_supporterCount', supportStaffCount:'f-so_supportStaffCount', jjName:'f-so_jjName', jjCorpNo:'f-so_jjCorpNo', jjEmpInsNo:'f-so_jjEmpInsNo', jjZip:'f-so_jjZip', jjPref:'f-so_jjPref', jjCity:'f-so_jjCity', jjAddressDetail:'f-so_jjAddressDetail', jjTel:'f-so_jjTel', jjPermitNo:'f-so_jjPermitNo', jjPermitDate:'f-so_jjPermitDate' };
+  var map={ name:'f-so_name', nameKana:'f-so_nameKana', nameEn:'f-so_nameEn', corpNo:'f-so_corpNo', empInsNo:'f-so_empInsNo', regNo:'f-so_regNo', regDate:'f-so_regDate', zip:'f-so_zip', pref:'f-so_pref', city:'f-so_city', addressDetail:'f-so_addressDetail', addressEn:'f-so_addressEn', tel:'f-so_tel', repName:'f-so_repName', repNameKana:'f-so_repNameKana', repNameEn:'f-so_repNameEn', languages:'f-so_languages', olinkPass:'f-so_olinkPass', supportManagerName:'f-so_supportManagerName', supportManagerKana:'f-so_supportManagerKana', supportManagerTitle:'f-so_supportManagerTitle', supportManagerTitleEn:'f-so_supportManagerTitleEn', supporterCount:'f-so_supporterCount', supportStaffCount:'f-so_supportStaffCount', jjName:'f-so_jjName', jjCorpNo:'f-so_jjCorpNo', jjEmpInsNo:'f-so_jjEmpInsNo', jjZip:'f-so_jjZip', jjPref:'f-so_jjPref', jjCity:'f-so_jjCity', jjAddressDetail:'f-so_jjAddressDetail', jjTel:'f-so_jjTel', jjPermitNo:'f-so_jjPermitNo', jjPermitDate:'f-so_jjPermitDate' };
   Object.keys(map).forEach(function(k){ var el=document.getElementById(map[k]); if(el && resp[k]!=null && resp[k]!=='') el.value=resp[k]; });
   if(resp.supportHours && typeof resp.supportHours==='object'){ _SO_DAYS.forEach(function(d){ var hv=resp.supportHours[d[0]]||{}; var f=document.getElementById('f-so_hours_'+d[0]+'_from'),t=document.getElementById('f-so_hours_'+d[0]+'_to'),n=document.getElementById('f-so_hours_'+d[0]+'_none'); if(f&&hv.from)f.value=hv.from; if(t&&hv.to)t.value=hv.to; if(n){n.checked=!!hv.none; if(typeof _soHoursNoneToggle==='function')_soHoursNoneToggle(d[0]);} }); }
   function setMeth(pfx,mv){ mv=mv||{}; if(!(mv.f2f||mv.tel||mv.mail||mv.other||mv.telNo||mv.mailAddr)) return; var g=function(id){return document.getElementById(id);}; if(g('f-so_'+pfx+'_f2f'))g('f-so_'+pfx+'_f2f').checked=!!mv.f2f; if(g('f-so_'+pfx+'_tel'))g('f-so_'+pfx+'_tel').checked=!!mv.tel; if(g('f-so_'+pfx+'_mail'))g('f-so_'+pfx+'_mail').checked=!!mv.mail; if(g('f-so_'+pfx+'_other'))g('f-so_'+pfx+'_other').value=mv.other||''; if(g('f-so_'+pfx+'_telNo'))g('f-so_'+pfx+'_telNo').value=mv.telNo||''; if(g('f-so_'+pfx+'_mailAddr'))g('f-so_'+pfx+'_mailAddr').value=mv.mailAddr||''; if(typeof _soMethToggle==='function')_soMethToggle(pfx); }
