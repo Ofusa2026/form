@@ -197,7 +197,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20261120.04'; // 住居（支援計画書用）に「居室7.5㎡以上・寝室4.5㎡以上を確保している」のチェック（最初からチェック済み・確保する必要がある旨の案内つき、外すと注意）。roomArea75／bedroomArea45 で送る ／ ver.20261120.03: // 住居（支援計画書用）に「予定・概算で大丈夫です」の案内（テンプレートのメッセージも） ／ ver.20261120.02: // 居住費控除「有」で出る住居形態・同居人数の初期値を「借上」「1」に ／ ver.20261120.01: // 住居（支援計画書用）の「実費相当の説明」をテンプレートで作れるように（住居形態・月額・人数・徴収額→文章を自動作成、1人当たり額は自動計算）
+var FORM_VERSION = 'ver.20261120.05'; // 居住費控除を「有」→「無」に戻したとき、初期値で入れた住居形態・同居人数（借上・1）は消す（自分で入れた値は残す） ／ ver.20261120.04: // 住居（支援計画書用）に「居室7.5㎡以上・寝室4.5㎡以上を確保している」のチェック（最初からチェック済み・確保する必要がある旨の案内つき、外すと注意）。roomArea75／bedroomArea45 で送る ／ ver.20261120.03: // 住居（支援計画書用）に「予定・概算で大丈夫です」の案内（テンプレートのメッセージも） ／ ver.20261120.02: // 居住費控除「有」で出る住居形態・同居人数の初期値を「借上」「1」に ／ ver.20261120.01: // 住居（支援計画書用）の「実費相当の説明」をテンプレートで作れるように（住居形態・月額・人数・徴収額→文章を自動作成、1人当たり額は自動計算）
 // var FORM_VERSION = 'ver.20261118.02'; // 未入力の必須項目を薄い黄色＋オレンジ枠で目立たせる（入力すると消える）
 // var FORM_VERSION = 'ver.20261118.01'; // 登録支援機関フォーム：①基本情報に「O-Link（進捗確認ページ）のパスワード」欄を追加（olinkPass で送信。初回だけO-Linkの閲覧パスワードに反映）
 // var FORM_VERSION = 'ver.20261117.03'; // 登録支援機関フォーム：共生施策の確認方法の質問をやめる（所属機関側の事柄）
@@ -3976,11 +3976,15 @@ function _tkApplyToggles() {
   sh('housingWrap', val('f-housingProvided') === '有');
   sh('tkHousingCard', val('f-housingProvided') === '有');
   // ver.20261120.02: 住居（支援計画書用）が出たとき、住居形態・同居人数が空なら「借上」「1」を初期値にする（控除「無」のときは入れない＝取込に余計な値が乗らない）
-  if (val('f-housingProvided') === '有') {
+  (function(){   // ver.20261120.05: 初期値（借上・1）は「有」のときだけ。「無」に戻したら、自分で入れたものでなければ消す（取込に余計な値が乗らないように）
     var _hoEl = document.getElementById('f-housingOwnership'), _coEl = document.getElementById('f-cohabitants');
-    if (_hoEl && !_hoEl.value) _hoEl.value = '借上';
-    if (_coEl && !String(_coEl.value||'').trim()) _coEl.value = '1';
-  }
+    var _on = val('f-housingProvided') === '有';
+    [[_hoEl,'借上'],[_coEl,'1']].forEach(function(x){ var el=x[0]; if(!el) return;
+      if(!el._hcDefBound){ el._hcDefBound=true; ['input','change'].forEach(function(ev){ el.addEventListener(ev,function(e){ if(e.isTrusted) el.removeAttribute('data-hcdef'); }); }); }
+      if(_on && !String(el.value||'').trim()){ el.value=x[1]; el.setAttribute('data-hcdef','1'); }
+      else if(!_on && el.getAttribute('data-hcdef')==='1'){ if(String(el.value||'').trim()===x[1]) el.value=''; el.removeAttribute('data-hcdef'); }
+    });
+  })();
   try { _hcAreaSync(false); } catch(_ha) {}   // ver.20261120.04: 広さの基準のチェックと送る値をそろえる
   sh('foodWrap', val('f-foodProvided') === '有');
   sh('utilityWrap', val('f-utilityProvided') === '有');
