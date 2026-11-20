@@ -197,7 +197,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20261120.06'; // 住居（支援計画書用）：居住費の内訳（借上＝月額家賃／自己所有＝建築・購入費用と耐用年数）を必須にし、実費相当の説明はそこから自動で作る（手で書かない） ／ ver.20261120.05: // 居住費控除を「有」→「無」に戻したとき、初期値で入れた住居形態・同居人数（借上・1）は消す（自分で入れた値は残す） ／ ver.20261120.04: // 住居（支援計画書用）に「居室7.5㎡以上・寝室4.5㎡以上を確保している」のチェック（最初からチェック済み・確保する必要がある旨の案内つき、外すと注意）。roomArea75／bedroomArea45 で送る ／ ver.20261120.03: // 住居（支援計画書用）に「予定・概算で大丈夫です」の案内（テンプレートのメッセージも） ／ ver.20261120.02: // 居住費控除「有」で出る住居形態・同居人数の初期値を「借上」「1」に ／ ver.20261120.01: // 住居（支援計画書用）の「実費相当の説明」をテンプレートで作れるように（住居形態・月額・人数・徴収額→文章を自動作成、1人当たり額は自動計算）
+var FORM_VERSION = 'ver.20261120.07'; // 2号の企業フォームでは「住居（支援計画書用）」を出さない（支援計画書が無いため。住居形態・同居人数・内訳・広さの基準は聞かない） ／ ver.20261120.06: // 住居（支援計画書用）：居住費の内訳（借上＝月額家賃／自己所有＝建築・購入費用と耐用年数）を必須にし、実費相当の説明はそこから自動で作る（手で書かない） ／ ver.20261120.05: // 居住費控除を「有」→「無」に戻したとき、初期値で入れた住居形態・同居人数（借上・1）は消す（自分で入れた値は残す） ／ ver.20261120.04: // 住居（支援計画書用）に「居室7.5㎡以上・寝室4.5㎡以上を確保している」のチェック（最初からチェック済み・確保する必要がある旨の案内つき、外すと注意）。roomArea75／bedroomArea45 で送る ／ ver.20261120.03: // 住居（支援計画書用）に「予定・概算で大丈夫です」の案内（テンプレートのメッセージも） ／ ver.20261120.02: // 居住費控除「有」で出る住居形態・同居人数の初期値を「借上」「1」に ／ ver.20261120.01: // 住居（支援計画書用）の「実費相当の説明」をテンプレートで作れるように（住居形態・月額・人数・徴収額→文章を自動作成、1人当たり額は自動計算）
 // var FORM_VERSION = 'ver.20261118.02'; // 未入力の必須項目を薄い黄色＋オレンジ枠で目立たせる（入力すると消える）
 // var FORM_VERSION = 'ver.20261118.01'; // 登録支援機関フォーム：①基本情報に「O-Link（進捗確認ページ）のパスワード」欄を追加（olinkPass で送信。初回だけO-Linkの閲覧パスワードに反映）
 // var FORM_VERSION = 'ver.20261117.03'; // 登録支援機関フォーム：共生施策の確認方法の質問をやめる（所属機関側の事柄）
@@ -2808,6 +2808,8 @@ function _hcApply(key){
   if(c.after) try{ c.after(r); }catch(e){}
 }
 // （ここまで）
+// ver.20261120.07: 2号の企業フォームか（支援計画書が無いので住居（支援計画書用）は聞かない）
+function _hcIs2go(){ return (typeof type!=='undefined') && /tokutei2/.test(String(type||'')); }
 // ver.20261120.06: 実費相当の説明（フォーム用）。月額（借上）／建築・購入費用と耐用年数（自己所有）を必須で聞き、
 //   住居形態・同居人数・居住費控除 月額は上の回答を使って、説明文を自動で作る（説明文は手で書かない＝1-17号で各言語の決まった訳になる）
 var _HCF_MAIN = ['f-housingOwnership','f-cohabitants','f-deductHousing','f-housingProvided'];
@@ -2854,7 +2856,7 @@ function _hcfUpd(fromInit){
 ['input','change'].forEach(function(ev){ document.addEventListener(ev, function(e){ var t=e.target; if(t && _HCF_MAIN.indexOf(t.id)>=0) setTimeout(_hcfUpd,0); }); });
 // ver.20261120.04: 広さの基準。送る値は hidden（f-roomArea75／f-bedroomArea45）に「確保」「未確保」。控除「無」で住居の欄が出ていないときは空（送らない）
 function _hcAreaSync(fromCb){
-  var on = (typeof val==='function') && val('f-housingProvided') === '有';
+  var on = (typeof val==='function') && val('f-housingProvided') === '有' && !_hcIs2go();
   [['hcRoom75cb','f-roomArea75'],['hcBed45cb','f-bedroomArea45']].forEach(function(x){
     var cb=document.getElementById(x[0]), h=document.getElementById(x[1]); if(!cb||!h) return;
     if(!on){ h.value=''; return; }
@@ -4018,11 +4020,11 @@ document.addEventListener('input', function(e){ try { if (e.target && e.target.i
 function _tkApplyToggles() {
   var sh = function(id, on){ var e = document.getElementById(id); if (e) e.style.display = on ? '' : 'none'; };
   sh('housingWrap', val('f-housingProvided') === '有');
-  sh('tkHousingCard', val('f-housingProvided') === '有');
+  sh('tkHousingCard', val('f-housingProvided') === '有' && !_hcIs2go());   // ver.20261120.07: 2号は支援計画書（1-17号）が無いので出さない
   // ver.20261120.02: 住居（支援計画書用）が出たとき、住居形態・同居人数が空なら「借上」「1」を初期値にする（控除「無」のときは入れない＝取込に余計な値が乗らない）
   (function(){   // ver.20261120.05: 初期値（借上・1）は「有」のときだけ。「無」に戻したら、自分で入れたものでなければ消す（取込に余計な値が乗らないように）
     var _hoEl = document.getElementById('f-housingOwnership'), _coEl = document.getElementById('f-cohabitants');
-    var _on = val('f-housingProvided') === '有';
+    var _on = val('f-housingProvided') === '有' && !_hcIs2go();
     [[_hoEl,'借上'],[_coEl,'1']].forEach(function(x){ var el=x[0]; if(!el) return;
       if(!el._hcDefBound){ el._hcDefBound=true; ['input','change'].forEach(function(ev){ el.addEventListener(ev,function(e){ if(e.isTrusted) el.removeAttribute('data-hcdef'); }); }); }
       if(_on && !String(el.value||'').trim()){ el.value=x[1]; el.setAttribute('data-hcdef','1'); }
@@ -4030,7 +4032,7 @@ function _tkApplyToggles() {
     });
   })();
   try { _hcAreaSync(false); } catch(_ha) {}   // ver.20261120.04: 広さの基準のチェックと送る値をそろえる
-  try { if (val('f-housingProvided') === '有') _hcfInit(); } catch(_hf) {}   // ver.20261120.06
+  try { if (val('f-housingProvided') === '有' && !_hcIs2go()) _hcfInit(); } catch(_hf) {}   // ver.20261120.06
   sh('foodWrap', val('f-foodProvided') === '有');
   sh('utilityWrap', val('f-utilityProvided') === '有');
   var _expAri = (_tkAcceptExp === 'あり');
