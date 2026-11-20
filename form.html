@@ -197,7 +197,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20261120.05'; // 居住費控除を「有」→「無」に戻したとき、初期値で入れた住居形態・同居人数（借上・1）は消す（自分で入れた値は残す） ／ ver.20261120.04: // 住居（支援計画書用）に「居室7.5㎡以上・寝室4.5㎡以上を確保している」のチェック（最初からチェック済み・確保する必要がある旨の案内つき、外すと注意）。roomArea75／bedroomArea45 で送る ／ ver.20261120.03: // 住居（支援計画書用）に「予定・概算で大丈夫です」の案内（テンプレートのメッセージも） ／ ver.20261120.02: // 居住費控除「有」で出る住居形態・同居人数の初期値を「借上」「1」に ／ ver.20261120.01: // 住居（支援計画書用）の「実費相当の説明」をテンプレートで作れるように（住居形態・月額・人数・徴収額→文章を自動作成、1人当たり額は自動計算）
+var FORM_VERSION = 'ver.20261120.06'; // 住居（支援計画書用）：居住費の内訳（借上＝月額家賃／自己所有＝建築・購入費用と耐用年数）を必須にし、実費相当の説明はそこから自動で作る（手で書かない） ／ ver.20261120.05: // 居住費控除を「有」→「無」に戻したとき、初期値で入れた住居形態・同居人数（借上・1）は消す（自分で入れた値は残す） ／ ver.20261120.04: // 住居（支援計画書用）に「居室7.5㎡以上・寝室4.5㎡以上を確保している」のチェック（最初からチェック済み・確保する必要がある旨の案内つき、外すと注意）。roomArea75／bedroomArea45 で送る ／ ver.20261120.03: // 住居（支援計画書用）に「予定・概算で大丈夫です」の案内（テンプレートのメッセージも） ／ ver.20261120.02: // 居住費控除「有」で出る住居形態・同居人数の初期値を「借上」「1」に ／ ver.20261120.01: // 住居（支援計画書用）の「実費相当の説明」をテンプレートで作れるように（住居形態・月額・人数・徴収額→文章を自動作成、1人当たり額は自動計算）
 // var FORM_VERSION = 'ver.20261118.02'; // 未入力の必須項目を薄い黄色＋オレンジ枠で目立たせる（入力すると消える）
 // var FORM_VERSION = 'ver.20261118.01'; // 登録支援機関フォーム：①基本情報に「O-Link（進捗確認ページ）のパスワード」欄を追加（olinkPass で送信。初回だけO-Linkの閲覧パスワードに反映）
 // var FORM_VERSION = 'ver.20261117.03'; // 登録支援機関フォーム：共生施策の確認方法の質問をやめる（所属機関側の事柄）
@@ -2808,6 +2808,50 @@ function _hcApply(key){
   if(c.after) try{ c.after(r); }catch(e){}
 }
 // （ここまで）
+// ver.20261120.06: 実費相当の説明（フォーム用）。月額（借上）／建築・購入費用と耐用年数（自己所有）を必須で聞き、
+//   住居形態・同居人数・居住費控除 月額は上の回答を使って、説明文を自動で作る（説明文は手で書かない＝1-17号で各言語の決まった訳になる）
+var _HCF_MAIN = ['f-housingOwnership','f-cohabitants','f-deductHousing','f-housingProvided'];
+function _hcfHtml(){
+  var rq='<span class="req">*</span>';
+  return '<div id="hcf" style="margin:4px 0 12px;border:1px dashed #93c5fd;border-radius:10px;background:#eff6ff;padding:12px 14px;">' +
+    '<div style="font-size:14px;font-weight:700;color:#1d4ed8;">🧩 居住費の内訳（ここから実費相当の説明を自動で作ります）</div>' +
+    '<div style="font-size:12px;color:#4b5563;margin:4px 0 10px;"><b>予定・概算で大丈夫です。</b>住居形態・同居人数・居住費控除の月額は、上の回答を使います。</div>' +
+    '<div class="field" id="hcf_rentW"><label>月額家賃（円）' + rq + '</label><input type="number" id="hcf_rent" min="0" placeholder="例: 92000（管理費・共益費を含む）" oninput="_hcfUpd()"></div>' +
+    '<div class="field" id="hcf_costW" style="display:none;"><label>建築・購入費用（円）' + rq + '</label><input type="number" id="hcf_cost" min="0" placeholder="例: 15000000" oninput="_hcfUpd()"></div>' +
+    '<div class="field" id="hcf_yrsW" style="display:none;"><label>耐用年数（年）' + rq + '</label>' +
+      '<select id="hcf_struct" onchange="if(this.value)document.getElementById(\'hcf_years\').value=this.value;_hcfUpd()"><option value="">構造から選ぶ（法定耐用年数）</option><option value="22">木造（22年）</option><option value="19">軽量鉄骨・骨格材3mm以下（19年）</option><option value="27">軽量鉄骨・骨格材3mm超4mm以下（27年）</option><option value="34">鉄骨造・骨格材4mm超（34年）</option><option value="47">鉄筋コンクリート造（47年）</option></select>' +
+      '<input type="number" id="hcf_years" min="1" placeholder="例: 22（中古は残りの年数）" oninput="_hcfUpd()" style="margin-top:6px;"></div>' +
+    '<div class="field"><label>補足（任意・説明文の最後に付きます）</label><input type="text" id="hcf_note" placeholder="例: 光熱費は別途実費。" oninput="_hcfUpd()"></div>' +
+    '<div id="hcf_pv" style="font-size:13px;line-height:1.6;color:#374151;"></div>' +
+  '</div>';
+}
+function _hcfV(id){ var e=document.getElementById(id); return e ? String(e.value||'').trim() : ''; }
+function _hcfSet(id,v){ var e=document.getElementById(id); if(e && !String(e.value||'').trim() && v) e.value=v; }
+/* 前の回答・途中保存から戻したとき：テンプレートで作った説明文なら、金額を読み戻す */
+function _hcfInit(){
+  if(typeof _hcParse!=='function' || !document.getElementById('hcf')) return;
+  var q=_hcParse(_hcfV('f-actualCostDesc'));
+  if(q){ if(q.kind==='rent') _hcfSet('hcf_rent',q.rent); if(q.cost) _hcfSet('hcf_cost',q.cost); if(q.years) _hcfSet('hcf_years',q.years); if(q.note) _hcfSet('hcf_note',q.note); }
+  _hcfUpd(true);
+}
+function _hcfUpd(fromInit){
+  if(typeof _hcBuild!=='function' || !document.getElementById('hcf')) return;
+  var own=/自己所有/.test(_hcfV('f-housingOwnership'));
+  [['hcf_rentW',!own],['hcf_costW',own],['hcf_yrsW',own]].forEach(function(x){ var e=document.getElementById(x[0]); if(e) e.style.display=x[1]?'':'none'; });
+  var r=_hcBuild({type:own?'自己所有':'借上', rent:_hcfV('hcf_rent'), cost:_hcfV('hcf_cost'), years:_hcfV('hcf_years'), n:_hcfV('f-cohabitants'), fee:_hcfV('f-deductHousing'), note:_hcfV('hcf_note')});
+  var pv=document.getElementById('hcf_pv');
+  if(pv){
+    var head=(own && r.rent ? '<b>月額費用：'+_hcYenJa(r.rent)+'</b>（費用÷耐用年数÷12か月）　' : '') + (r.per!=null ? '<b>1人当たり：'+_hcYenJa(r.per)+'</b>' : '');
+    var empty = own ? !(_hcfV('hcf_cost')||_hcfV('hcf_years')) : !_hcfV('hcf_rent');
+    pv.innerHTML = r.err ? (empty ? '' : head+(head?'<br>':'')+'<span style="color:#b45309;">⚠ '+r.err+'</span>') : head+'<br><span style="color:#15803d;">✅ 下の「実費相当の説明」に入りました</span>';
+  }
+  var d=document.getElementById('f-actualCostDesc'); if(!d) return;
+  d.readOnly=true; d.style.background='#f9fafb';
+  var nv = r.err ? '' : r.text, cur=String(d.value||'').trim();
+  if(r.err && (fromInit===true || (cur && !_hcParse(cur)))) return;   // 前に手で書いた文は、金額を入れ直すまでそのまま
+  if(cur!==nv){ d.value=nv; try{ d.style.height='auto'; d.style.height=(d.scrollHeight+4)+'px'; }catch(e){} d.dispatchEvent(new Event('input',{bubbles:true})); }
+}
+['input','change'].forEach(function(ev){ document.addEventListener(ev, function(e){ var t=e.target; if(t && _HCF_MAIN.indexOf(t.id)>=0) setTimeout(_hcfUpd,0); }); });
 // ver.20261120.04: 広さの基準。送る値は hidden（f-roomArea75／f-bedroomArea45）に「確保」「未確保」。控除「無」で住居の欄が出ていないときは空（送らない）
 function _hcAreaSync(fromCb){
   var on = (typeof val==='function') && val('f-housingProvided') === '有';
@@ -3986,6 +4030,7 @@ function _tkApplyToggles() {
     });
   })();
   try { _hcAreaSync(false); } catch(_ha) {}   // ver.20261120.04: 広さの基準のチェックと送る値をそろえる
+  try { if (val('f-housingProvided') === '有') _hcfInit(); } catch(_hf) {}   // ver.20261120.06
   sh('foodWrap', val('f-foodProvided') === '有');
   sh('utilityWrap', val('f-utilityProvided') === '有');
   var _expAri = (_tkAcceptExp === 'あり');
@@ -4450,8 +4495,8 @@ function buildCompanyForm() {
       '<div id="hcAreaWarn" style="display:none;font-size:12px;color:#b45309;background:#fffbeb;border:1px solid #fcd34d;border-radius:6px;padding:6px 8px;margin-top:6px;">⚠ 基準の広さを確保する必要があります。確保できる住居を用意できるか、ご検討ください（このまま送信もできます。担当者から確認のご連絡をします）。</div>' +
       '<input type="hidden" id="f-roomArea75"><input type="hidden" id="f-bedroomArea45">' +
     '</div>' +
-    field('f-actualCostDesc','実費相当の説明','textarea',true,'例: 月額13万円で借上の物件。居住人数10名のため1人当たり1万3千円は適正。（予定・概算で大丈夫です。下のテンプレートでも作れます）') +
-    _hcBuilderHtml('f',{desc:'f-actualCostDesc',type:'f-housingOwnership',n:'f-cohabitants',fee:'f-deductHousing'}) +   // ver.20261120.01
+    _hcfHtml() +   // ver.20261120.06: 実費相当の説明は入力（必須）から自動で作る
+    field('f-actualCostDesc','実費相当の説明（上の入力から自動でできます）','textarea',true,'上の金額を入れると、ここに自動で文章が入ります') +
   '</div>' +
 
   '<div class="card" id="tkJpCompCard"><div class="section-title">比較対象日本人</div>' +
@@ -8485,6 +8530,7 @@ function prefillForm(resp) {
     }
   });
   try { _hcAreaSync(false); } catch (_has) {}   // ver.20261120.04: 戻した「確保／未確保」をチェックに反映
+  try { _hcfInit(); } catch (_hfi) {}   // ver.20261120.06: 戻した説明文から金額を読み戻す
   // ver.20261117.01: 農業の誓約書「今も続いている」
   try { if (resp.nogyoExpTo === '現在') { var _ngNow = document.getElementById('f-nogyoExpNow'); if (_ngNow) { _ngNow.checked = true; } } if (resp.nogyoExpType && typeof _tkApplyToggles === 'function') _tkApplyToggles(); } catch(_ngp) {}
 
