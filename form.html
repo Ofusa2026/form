@@ -197,7 +197,7 @@ body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20261120.07'; // 2号の企業フォームでは「住居（支援計画書用）」を出さない（支援計画書が無いため。住居形態・同居人数・内訳・広さの基準は聞かない） ／ ver.20261120.06: // 住居（支援計画書用）：居住費の内訳（借上＝月額家賃／自己所有＝建築・購入費用と耐用年数）を必須にし、実費相当の説明はそこから自動で作る（手で書かない） ／ ver.20261120.05: // 居住費控除を「有」→「無」に戻したとき、初期値で入れた住居形態・同居人数（借上・1）は消す（自分で入れた値は残す） ／ ver.20261120.04: // 住居（支援計画書用）に「居室7.5㎡以上・寝室4.5㎡以上を確保している」のチェック（最初からチェック済み・確保する必要がある旨の案内つき、外すと注意）。roomArea75／bedroomArea45 で送る ／ ver.20261120.03: // 住居（支援計画書用）に「予定・概算で大丈夫です」の案内（テンプレートのメッセージも） ／ ver.20261120.02: // 居住費控除「有」で出る住居形態・同居人数の初期値を「借上」「1」に ／ ver.20261120.01: // 住居（支援計画書用）の「実費相当の説明」をテンプレートで作れるように（住居形態・月額・人数・徴収額→文章を自動作成、1人当たり額は自動計算）
+var FORM_VERSION = 'ver.20261121.01'; // 企業フォーム（特定技能1号・2号・技人国など雇用条件のあるもの）：雇用条件を入力すると、その場で雇用条件書の形で見られる（パソコンは右に常に表示・スマホは「📄 雇用条件書で見る」で下から開く）。「送信する」を押すと、まず雇用条件書を出して確認してから送信（スマホは下まで見て送信）。分野・業務区分など大房で入れる欄は出さない ／ ver.20261120.07: // 2号の企業フォームでは「住居（支援計画書用）」を出さない（支援計画書が無いため。住居形態・同居人数・内訳・広さの基準は聞かない） ／ ver.20261120.06: // 住居（支援計画書用）：居住費の内訳（借上＝月額家賃／自己所有＝建築・購入費用と耐用年数）を必須にし、実費相当の説明はそこから自動で作る（手で書かない） ／ ver.20261120.05: // 居住費控除を「有」→「無」に戻したとき、初期値で入れた住居形態・同居人数（借上・1）は消す（自分で入れた値は残す） ／ ver.20261120.04: // 住居（支援計画書用）に「居室7.5㎡以上・寝室4.5㎡以上を確保している」のチェック（最初からチェック済み・確保する必要がある旨の案内つき、外すと注意）。roomArea75／bedroomArea45 で送る ／ ver.20261120.03: // 住居（支援計画書用）に「予定・概算で大丈夫です」の案内（テンプレートのメッセージも） ／ ver.20261120.02: // 居住費控除「有」で出る住居形態・同居人数の初期値を「借上」「1」に ／ ver.20261120.01: // 住居（支援計画書用）の「実費相当の説明」をテンプレートで作れるように（住居形態・月額・人数・徴収額→文章を自動作成、1人当たり額は自動計算）
 // var FORM_VERSION = 'ver.20261118.02'; // 未入力の必須項目を薄い黄色＋オレンジ枠で目立たせる（入力すると消える）
 // var FORM_VERSION = 'ver.20261118.01'; // 登録支援機関フォーム：①基本情報に「O-Link（進捗確認ページ）のパスワード」欄を追加（olinkPass で送信。初回だけO-Linkの閲覧パスワードに反映）
 // var FORM_VERSION = 'ver.20261117.03'; // 登録支援機関フォーム：共生施策の確認方法の質問をやめる（所属機関側の事柄）
@@ -8689,6 +8689,262 @@ function prefillForm(resp) {
     }
   } catch(e) { console.error('t2 pledge prefill error (ignored):', e); }
 }
+</script>
+<script>
+// ver.20261121.01: 雇用条件を入力すると、その場で雇用条件書の形で見せる（パソコンは右に常に表示／スマホは「雇用条件書で見る」で下から開く）。送信する前にも雇用条件書を出して確認してもらう
+(function(){
+  if (typeof _isCompanyForm === 'undefined' || !_isCompanyForm) return;
+  if ((typeof formPart !== 'undefined' && formPart) || (typeof formPart3 !== 'undefined' && formPart3)) return;   // 企業情報だけ・③だけのリンクでは出さない
+  window._p16Active = function(){ return !!document.getElementById('f-salaryMonthly'); };
+  var $ = function(id){ return document.getElementById(id); };
+  var v = function(id){ var e = $(id); return e ? String(e.value || '').trim() : ''; };
+  var esc = function(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); };
+  var yen = function(n){ n = Number(String(n).replace(/[^\d.-]/g, '')); return isFinite(n) && String(n) !== '0' ? n.toLocaleString('ja-JP') + '円' : ''; };
+  var num = function(id){ var n = Number(v(id).replace(/[^\d.-]/g, '')); return isFinite(n) ? n : 0; };
+  // 値があれば値、なければ「未入力」（押すとその入力欄へ）
+  var F = function(id, txt){
+    if (!$(id)) return '<span style="color:#94a3b8;">―</span>';   // このフォームにない項目
+    var t = (txt === undefined) ? v(id) : txt;
+    if (t) return '<span class="p16v" data-go="' + id + '">' + esc(t) + '</span>';
+    return '<span class="p16e" data-go="' + id + '">未入力</span>';
+  };
+  var css = ''
+    + '#p16Panel{position:fixed;top:0;right:0;bottom:0;width:min(46vw,680px);background:#e9edf2;border-left:1px solid #cbd5e1;z-index:900;display:flex;flex-direction:column;font-family:inherit;}'
+    + '#p16Panel .hd{flex:none;display:flex;align-items:center;gap:10px;padding:12px 16px;background:#0f2040;color:#fff;}'
+    + '#p16Panel .hd b{font-size:15px;} #p16Panel .hd .cnt{margin-left:auto;font-size:12px;background:#fff;color:#0f2040;border-radius:99px;padding:3px 10px;font-weight:800;}'
+    + '#p16Panel .hd .x{display:none;background:none;border:none;color:#fff;font-size:22px;cursor:pointer;}'
+    + '#p16Panel .sc{flex:1;overflow:auto;padding:18px;}'
+    + '.p16doc{background:#fff;box-shadow:0 2px 12px rgba(0,0,0,.12);padding:28px 30px;font-family:"Hiragino Mincho ProN","Yu Mincho","Noto Serif JP",serif;color:#111;font-size:13px;line-height:1.75;}'
+    + '.p16doc .sm{font-size:10.5px;color:#444;} .p16doc h2{text-align:center;font-size:19px;letter-spacing:.3em;margin:4px 0 16px;}'
+    + '.p16doc table{width:100%;border-collapse:collapse;margin-bottom:10px;} .p16doc td{border:1px solid #333;padding:6px 8px;vertical-align:top;}'
+    + '.p16doc td.k{width:23%;background:#f4f4f4;font-weight:700;font-size:12.5px;}'
+    + '.p16doc .ln{margin:1px 0;}'
+    + '.p16v{background:#eef6ff;border-bottom:1.5px solid #93c5fd;padding:0 2px;cursor:pointer;transition:background .3s;}'
+    + '.p16v.flash{background:#fde68a;}'
+    + '.p16e{display:inline-block;background:#fef3c7;color:#b45309;border:1px dashed #f59e0b;border-radius:4px;padding:0 6px;font-family:sans-serif;font-size:11.5px;font-weight:700;cursor:pointer;}'
+    + '.p16hl{outline:3px solid #f59e0b !important;outline-offset:2px;transition:outline .3s;}'
+        + '@media (min-width:1200px){ body.p16on{padding-right:min(46vw,680px) !important;} body.p16on .btn-wrap{right:min(46vw,680px) !important;} }'
+    + '@media (max-width:1199px){'
+    + ' #p16Panel{display:flex;top:auto;left:0;right:0;width:100%;height:92vh;border-left:none;border-radius:18px 18px 0 0;box-shadow:0 -10px 30px rgba(0,0,0,.25);transform:translateY(100%);transition:transform .28s ease;z-index:1000;}'
+    + ' #p16Panel.open{transform:translateY(0);}'
+    + ' #p16Panel .hd{border-radius:18px 18px 0 0;padding:16px 16px 12px;flex-wrap:wrap;position:relative;}'
+    + ' #p16Panel .hd:before{content:"";position:absolute;top:6px;left:50%;width:44px;height:5px;margin-left:-22px;border-radius:9px;background:rgba(255,255,255,.45);}'
+    + ' #p16Panel .hd b{font-size:15px;} #p16Panel .hd .x{display:block;}'
+    + ' #p16Panel .sc{padding:10px 10px 12px;} .p16doc{padding:16px 12px;font-size:12.5px;} .p16doc td.k{width:28%;font-size:11.5px;}'
+    + ' #p16Panel.open .ft, body #p16Panel .ft{display:flex;}'
+    + ' body #p16Dim{display:block;}'
+    + '}'
+    + '#p16Panel .ft{display:none;flex:none;gap:8px;padding:10px 12px calc(10px + env(safe-area-inset-bottom,0px));background:#fff;border-top:1px solid #e2e8f0;}'
+    + '#p16Panel .ft button{flex:1;min-height:52px;border-radius:12px;font-size:15px;font-weight:800;font-family:inherit;cursor:pointer;}'
+    + '#p16Panel .ft .back{background:#fff;color:#0f2040;border:2px solid #0f2040;} #p16Panel .ft .next{background:#f59e0b;color:#fff;border:none;}'
+    + '#p16Dim{display:none;position:fixed;inset:0;background:rgba(15,23,42,.45);z-index:999;opacity:0;pointer-events:none;transition:opacity .25s;} #p16Dim.on{opacity:1;pointer-events:auto;}'
+    + '.p16row{display:flex;gap:8px;align-items:stretch;} .p16row > button{flex:1 1 0;min-width:0;margin-top:0 !important;margin-bottom:8px !important;}'
+    + '.p16open{display:none;width:100%;min-height:46px;margin:0 0 8px;border-radius:12px;border:2px solid #0f2040;background:#fff;color:#0f2040;font-size:15px;font-weight:800;font-family:inherit;cursor:pointer;}'
+    + '.p16open .n{display:inline-block;margin-left:6px;background:#fef3c7;color:#b45309;border-radius:99px;padding:1px 9px;font-size:12px;}'
+    + '@media (max-width:1199px){ body.p16tab .btn-wrap .p16open{display:block;} }'
+    + '.p16intro{display:none;align-items:center;gap:12px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:12px 14px;margin:0 0 12px;font-size:13px;color:#334155;line-height:1.6;}'
+    + '.p16intro button{flex:none;min-height:44px;padding:0 14px;border-radius:10px;border:none;background:#0f2040;color:#fff;font-weight:800;font-size:14px;font-family:inherit;}'
+    + '@media (max-width:1199px){ .tk-pane .p16intro{display:flex;} }'
+  var st = document.createElement('style'); st.textContent = css; document.head.appendChild(st);
+
+  var panel = document.createElement('div'); panel.id = 'p16Panel';
+  panel.innerHTML = '<div class="hd"><b>📄 雇用条件書（入力した内容）</b><span class="cnt" id="p16Cnt"></span><button class="x" onclick="p16Close()" aria-label="閉じる">×</button></div>'
+    + '<div class="sc"><div class="sm" style="font-size:11.5px;color:#475569;margin-bottom:10px;line-height:1.6;">入力した内容が、そのまま雇用条件書の形で出ます。<span class="p16e" style="pointer-events:none;">未入力</span> を押すと、その入力欄へ移動します。</div><div class="p16doc" id="p16Doc"></div></div>'
+    + '<div class="ft"><button type="button" class="back" onclick="p16Close()">✏️ 入力にもどる</button><button type="button" class="next" id="p16Next" onclick="p16NextEmpty()">次の未入力へ →</button></div>';
+  document.body.appendChild(panel);
+  var dim = document.createElement('div'); dim.id = 'p16Dim'; dim.onclick = function(){ p16Close(); }; document.body.appendChild(dim);
+  window.p16Open = function(){ render(); panel.classList.add('open'); dim.classList.add('on'); document.body.style.overflow = 'hidden'; };
+  window.p16Close = function(){ panel.classList.remove('open'); dim.classList.remove('on'); document.body.style.overflow = ''; };
+  window.p16NextEmpty = function(){ var e = document.querySelector('#p16Doc .p16e'); if (e) e.click(); else p16Close(); };
+  // スマホ：下の「送信する」の上に「雇用条件書で見る」（②雇用条件のタブを開いているときだけ）
+  var fab = document.createElement('button'); fab.type = 'button'; fab.className = 'p16open'; fab.onclick = function(){ p16Open(); };
+
+  // ②雇用条件のタブのいちばん上に案内（スマホ）
+  var intro = document.createElement('div'); intro.className = 'p16intro';
+  intro.innerHTML = '<div>入力した内容を、<b>雇用条件書の形</b>で確認できます。</div><button type="button" onclick="p16Open()">📄 雇用条件書で見る</button>';
+  function place(){
+    var bw = document.querySelector('.btn-wrap');
+    if (bw && !fab.parentNode) {
+      var save = [].filter.call(bw.querySelectorAll('button'), function(b){ return /途中保存/.test(b.textContent); })[0];
+      if (save) { var row = document.createElement('div'); row.className = 'p16row'; save.parentNode.insertBefore(row, save); row.appendChild(save); row.appendChild(fab); }
+      else bw.insertBefore(fab, bw.firstChild);
+    }
+    var pane1 = document.querySelector('.tk-pane[data-tab="1"]');
+    if (pane1) { if (intro.parentNode !== pane1) pane1.insertBefore(intro, pane1.firstChild); }
+    else if (!intro.parentNode) { var sal = $('f-salaryMonthly'), card = sal && sal.closest('.card'); if (card && card.parentNode) card.parentNode.insertBefore(intro, card); }
+  }
+
+  function allowances(){
+    var out = [];
+    for (var i = 1; i <= 10; i++) {
+      var nm = v('f-allowance' + i + 'Name'), am = v('f-allowance' + i + 'Amount');
+      if (!$('f-allowance' + i + 'Name')) break;
+      if (nm || am) out.push({ i: i, nm: nm, am: am, cond: v('f-allowance' + i + 'Cond') });
+    }
+    return out;
+  }
+  function holidays(){
+    var t = v('f-holidayType'), h = [];
+    if (/定例日/.test(t) && t !== '非定例日') {
+      var d = [['Mon','月'],['Tue','火'],['Wed','水'],['Thu','木'],['Fri','金'],['Sat','土'],['Sun','日'],['Hol','祝日']];
+      var off = d.filter(function(x){ return v('f-fixedHoliday' + x[0]) === '休み'; }).map(function(x){ return x[1]; });
+      h.push('<div class="ln">・定例日：' + F('f-fixedHolidayMon', off.length ? '毎週 ' + off.join('・') + (off.indexOf('祝日') >= 0 ? '' : '') : '') + '</div>');
+    }
+    if (/非定例日/.test(t)) h.push('<div class="ln">・非定例日：週・月当たり ' + F('f-nonRegWeeklyDays', v('f-nonRegWeeklyDays') ? '週' + v('f-nonRegWeeklyDays') + '日' : '') + '／' + F('f-nonRegMonthlyDays', v('f-nonRegMonthlyDays') ? '月' + v('f-nonRegMonthlyDays') + '日' : '') + '</div>');
+    if (!t) h.push('<div class="ln">・' + F('f-holidayType') + '</div>');
+    if (v('f-otherHoliday')) h.push('<div class="ln">・その他：' + F('f-otherHoliday') + '</div>');
+    h.push('<div class="ln">（年間合計休日日数 ' + F('f-annualHolidays', v('f-annualHolidays') ? v('f-annualHolidays') + '日' : '') + '）</div>');
+    return h.join('');
+  }
+  function render(){
+    var on = _p16Active();
+    document.body.classList.toggle('p16on', on); panel.style.display = on ? '' : 'none';
+    if (!on) return;
+    try{ place(); }catch(_){}
+    var doc = $('p16Doc'); if (!doc) return;
+    var al = allowances();
+    var base = num('f-salaryMonthly'), alSum = al.reduce(function(s, a){ return s + (Number(String(a.am).replace(/[^\d]/g, '')) || 0); }, 0);
+    var fot = num('f-fixedOTAmount');
+    var ded = [['居住費','f-housingProvided','f-deductHousing'],['食費','f-foodProvided','f-deductFood'],['水道光熱費','f-utilityProvided','f-deductUtility']];
+    var dedHtml = ded.map(function(d){
+      var p = v(d[1]);
+      if (p === '有') return '<div class="ln">・' + d[0] + '：' + F(d[2], yen(v(d[2]))) + '</div>';
+      if (p === '無') return '<div class="ln">・' + d[0] + '：なし</div>';
+      return '<div class="ln">・' + d[0] + '：' + F(d[1]) + '</div>';
+    }).join('');
+    if (v('f-deductOther1Name')) dedHtml += '<div class="ln">・' + F('f-deductOther1Name') + '：' + F('f-deductOther1Amount', yen(v('f-deductOther1Amount'))) + '</div>';
+    var dedSum = ded.reduce(function(s, d){ return s + (v(d[1]) === '有' ? num(d[2]) : 0); }, 0) + (v('f-deductOther1Name') ? num('f-deductOther1Amount') : 0);
+    var total = base + alSum + fot;
+    var shift = v('f-shiftFlg');
+    var flex = v('f-flexFlg');
+    var renew = v('f-contractRenewal');
+    var conds = [].map.call(document.querySelectorAll('input[type=checkbox][name="contractRenewalCond"], #f-contractRenewalCond'), function(x){ return x.type === 'checkbox' ? (x.checked ? x.value : '') : x.value; }).filter(Boolean).join('、');
+    var h = '';
+    h += ((type === 'company' || type === 'company_tokutei2') ? '<div class="sm">参考様式第1-6号</div>' : '') + '<h2>雇用条件書</h2>';
+    h += '<div class="sm" style="text-align:right;margin-bottom:8px;">' + F('f-coName', v('f-coName') || v('f-companyName')) + '</div>';
+    h += '<table>';
+    h += '<tr><td class="k">Ⅰ．雇用契約期間</td><td><div class="ln">契約の更新：' + F('f-contractRenewal') + '</div>' + (renew && renew !== '無' && renew !== '更新しない' ? '<div class="ln">更新の判断基準：' + F('f-contractRenewalCond', conds) + '</div>' : '') + '</td></tr>';
+    h += '<tr><td class="k">Ⅱ．就業の場所</td><td><div class="ln">事業所名：' + F('f-officeName') + '</div><div class="ln">所在地：' + F('f-officeAddress') + '</div><div class="ln">連絡先：' + F('f-officeTel') + '</div></td></tr>';
+    // Ⅲ．従事すべき業務の内容（分野・業務区分）は大房行政書士法人で入れるので出さない
+    h += '<tr><td class="k">Ⅳ．労働時間等</td><td>'
+      + '<div class="ln">1．始業・終業の時刻：' + F('f-startTime', v('f-startTime') && v('f-endTime') ? v('f-startTime') + ' 〜 ' + v('f-endTime') : '') + '</div>'
+      + '<div class="ln">　（1日の所定労働時間 ' + F('f-dailyHours', v('f-dailyHours') ? v('f-dailyHours') + '時間' : '') + '）</div>'
+      + '<div class="ln">2．休憩時間：' + F('f-breakTime', v('f-breakTime') ? v('f-breakTime') + '分' : '') + '</div>'
+      + '<div class="ln">3．所定労働時間：週 ' + F('f-weeklyH', v('f-weeklyH') ? v('f-weeklyH') + '時間' : '') + '／月 ' + F('f-monthlyH', v('f-monthlyH') ? v('f-monthlyH') + '時間' : '') + '／年 ' + F('f-yearlyH', v('f-yearlyH') ? v('f-yearlyH') + '時間' : '') + '</div>'
+      + '<div class="ln">4．所定労働日数：週 ' + F('f-weeklyDays', v('f-weeklyDays') ? v('f-weeklyDays') + '日' : '') + '／月 ' + F('f-monthlyDays', v('f-monthlyDays') ? v('f-monthlyDays') + '日' : '') + '／年 ' + F('f-yearlyDays', v('f-yearlyDays') ? v('f-yearlyDays') + '日' : '') + '</div>'
+      + '<div class="ln">5．交代制：' + F('f-shiftFlg') + '</div>'
+      + '<div class="ln">6．変形労働時間制：' + F('f-flexFlg') + (flex === '適用あり' ? '（' + F('f-flexType') + '）' : '') + '</div>'
+      + '<div class="ln">7．所定時間外労働：' + F('f-overtimeFlg') + '</div></td></tr>';
+    h += '<tr><td class="k">Ⅴ．休日</td><td>' + holidays() + '</td></tr>';
+    h += '<tr><td class="k">Ⅵ．休暇</td><td><div class="ln">1．年次有給休暇：6か月継続勤務した場合 ' + F('f-paidLeaveCount', v('f-paidLeaveCount') ? v('f-paidLeaveCount') + '日' : '10日') + '</div><div class="ln">2．一時帰国のための休暇：本人の希望により取得可</div></td></tr>';
+    h += '<tr><td class="k">Ⅶ．賃金</td><td>'
+      + '<div class="ln">1．基本賃金：' + F('f-salaryType') + '　' + F('f-salaryMonthly', yen(v('f-salaryMonthly'))) + '</div>'
+      + '<div class="ln">2．諸手当：' + (al.length ? '' : 'なし') + '</div>'
+      + al.map(function(a){ return '<div class="ln">　・' + F('f-allowance' + a.i + 'Name', a.nm) + '　' + F('f-allowance' + a.i + 'Amount', yen(a.am)) + (a.cond ? '（' + F('f-allowance' + a.i + 'Cond') + '）' : '') + '</div>'; }).join('')
+      + (v('f-fixedOTName') || fot ? '<div class="ln">3．固定残業代：' + F('f-fixedOTName') + '　' + F('f-fixedOTAmount', yen(v('f-fixedOTAmount'))) + '（' + F('f-fixedOTHours', v('f-fixedOTHours') ? v('f-fixedOTHours') + '時間分' : '') + '）</div>' : '')
+      + '<div class="ln">4．賃金締切日：' + F('f-payCutoffDay', v('f-payCutoffMonth') && v('f-payCutoffDay') ? v('f-payCutoffMonth') + ' ' + v('f-payCutoffDay') : '') + '　賃金支払日：' + F('f-payDayDay', v('f-payDayMonth') && v('f-payDayDay') ? v('f-payDayMonth') + ' ' + v('f-payDayDay') : '') + '</div>'
+      + '<div class="ln">5．支払方法：' + F('f-payMethod') + '</div>'
+      + '<div class="ln">6．労使協定に基づく賃金支払時の控除：</div>' + dedHtml
+      + '<div class="ln">7．昇給：' + F('f-salaryRaise') + (v('f-salaryRaise') === '有' ? '（' + F('f-salaryRaiseCond') + '）' : '') + '</div>'
+      + '<div class="ln">8．賞与：' + F('f-bonus') + (v('f-bonus') === '有' ? '（' + F('f-bonusCond') + '）' : '') + '</div>'
+      + '<div class="ln">9．退職金：' + F('f-retirement') + (v('f-retirement') === '有' ? '（' + F('f-retirementDetail') + '）' : '') + '</div></td></tr>';
+    h += '<tr><td class="k">Ⅷ．退職に関する事項</td><td><div class="ln">自己都合退職の手続：退職する ' + F('f-resignNoticeDays', v('f-resignNoticeDays') ? v('f-resignNoticeDays') + '日' : '') + ' 以上前に届け出ること</div></td></tr>';
+    h += '<tr><td class="k">Ⅸ．その他</td><td><div class="ln">定期健康診断：' + F('f-healthCheckM1', v('f-healthCheckM1') ? '毎年 ' + v('f-healthCheckM1') + (v('f-healthCheckM2nd') ? '・' + v('f-healthCheckM2nd') : '') : '') + '</div>'
+      + '<div class="ln">雇用管理の相談窓口：' + F('f-consultDept') + '　' + F('f-consultName') + '　' + F('f-consultTel') + '</div></td></tr>';
+    h += '</table>';
+    h += '<div style="font-weight:700;margin:14px 0 4px;">（別紙）賃金の支払</div><table>'
+      + '<tr><td class="k">基本賃金</td><td style="text-align:right;">' + F('f-salaryMonthly', yen(v('f-salaryMonthly'))) + '</td></tr>'
+      + al.map(function(a){ return '<tr><td class="k">' + esc(a.nm || '手当') + '</td><td style="text-align:right;">' + F('f-allowance' + a.i + 'Amount', yen(a.am)) + '</td></tr>'; }).join('')
+      + (fot ? '<tr><td class="k">' + esc(v('f-fixedOTName') || '固定残業代') + '</td><td style="text-align:right;">' + F('f-fixedOTAmount', yen(v('f-fixedOTAmount'))) + '</td></tr>' : '')
+      + '<tr><td class="k">支給額の合計</td><td style="text-align:right;font-weight:700;">' + (total ? total.toLocaleString('ja-JP') + '円' : '―') + '</td></tr>'
+      + '<tr><td class="k">控除（居住費等）</td><td style="text-align:right;">' + (dedSum ? '－' + dedSum.toLocaleString('ja-JP') + '円' : '0円') + '</td></tr>'
+      + '<tr><td class="k">控除後の額<br><span style="font-weight:400;font-size:10.5px;">（税・社会保険料は別）</span></td><td style="text-align:right;font-weight:700;">' + (total ? (total - dedSum).toLocaleString('ja-JP') + '円' : '―') + '</td></tr>'
+      + '</table>';
+    doc.innerHTML = h;
+    var nEmpty = doc.querySelectorAll('.p16e').length;
+    var c = $('p16Cnt'); if (c) c.textContent = nEmpty ? '未入力 ' + nEmpty + 'か所' : '✓ すべて入力済み';
+    fab.innerHTML = '📄 雇用条件書で見る' + (nEmpty ? '<span class="n">' + nEmpty + '</span>' : ' ✓');
+    var nx = $('p16Next'); if (nx) nx.style.display = nEmpty ? '' : 'none';
+    var p1 = document.querySelector('.tk-pane[data-tab="1"]'); document.body.classList.toggle('p16tab', p1 ? getComputedStyle(p1).display !== 'none' : true);
+  }
+  // 未入力・値を押すと、その入力欄へ（②雇用条件のタブを開いてから）
+  panel.addEventListener('click', function(e){
+    var t = e.target.closest('[data-go]'); if (!t) return;
+    var el = $(t.getAttribute('data-go')); if (!el) return;
+    var pane = el.closest('.tk-pane');
+    if (pane && typeof _tkShowTab === 'function' && getComputedStyle(pane).display === 'none') _tkShowTab(+pane.getAttribute('data-tab'), false);
+    if (window.innerWidth < 1200) p16Close();
+    var box = el.closest('.field') || el;
+    setTimeout(function(){ box.scrollIntoView({ behavior:'smooth', block:'center' }); box.classList.add('p16hl'); setTimeout(function(){ box.classList.remove('p16hl'); }, 1600); try{ el.focus({ preventScroll:true }); }catch(_){ } }, 50);
+  });
+  // 入力したらすぐ反映し、変わった所を一瞬光らせる
+  var last = {};
+  function onEdit(e){
+    render();
+    var id = e && e.target && e.target.id;
+    if (id) { var s = document.querySelectorAll('#p16Doc [data-go="' + id + '"]'); s.forEach(function(x){ x.classList.add('flash'); setTimeout(function(){ x.classList.remove('flash'); }, 700); }); }
+  }
+  document.addEventListener('input', onEdit, true);
+  document.addEventListener('change', onEdit, true);
+  document.addEventListener('click', function(){ setTimeout(render, 60); }, true);   // タブの切り替えなど
+  setInterval(render, 2000);   // 自動計算など、プログラムで入った値も拾う
+  render();
+})();
+
+// ===== ver.20261121.01: 送信する前に、雇用条件書を出して確認してもらう（パソコン・スマホとも。スマホは下まで見てから送信） =====
+(function(){
+  if (typeof window._p16Active !== 'function') return;
+  var css = ''
+    + '#p16Cf{position:fixed;inset:0;z-index:2000;display:none;align-items:center;justify-content:center;background:rgba(15,23,42,.55);}'
+    + '#p16Cf.on{display:flex;}'
+    + '#p16Cf .bx{background:#e9edf2;width:min(860px,94vw);height:min(92vh,1100px);border-radius:16px;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 20px 50px rgba(0,0,0,.35);}'
+    + '#p16Cf .hd{flex:none;background:#0f2040;color:#fff;padding:16px 20px;}'
+    + '#p16Cf .hd b{font-size:17px;display:block;} #p16Cf .hd span{font-size:13px;opacity:.85;}'
+    + '#p16Cf .sc{flex:1;overflow:auto;padding:16px;}'
+    + '#p16Cf .warn{background:#fef3c7;border:1px solid #f59e0b;color:#92400e;border-radius:10px;padding:10px 12px;font-size:13.5px;font-weight:700;margin-bottom:12px;}'
+    + '#p16Cf .ft{flex:none;display:flex;gap:10px;padding:12px 16px calc(12px + env(safe-area-inset-bottom,0px));background:#fff;border-top:1px solid #e2e8f0;}'
+    + '#p16Cf .ft button{flex:1;min-height:54px;border-radius:12px;font-size:16px;font-weight:800;font-family:inherit;cursor:pointer;}'
+    + '#p16Cf .ft .back{background:#fff;color:#0f2040;border:2px solid #0f2040;} #p16Cf .ft .go{background:#2563eb;color:#fff;border:none;}'
+    + '#p16Cf .end{display:none;flex-direction:column;gap:10px;margin:16px 0 8px;}'
+    + '#p16Cf .end button{min-height:52px;border-radius:12px;font-size:16px;font-weight:800;font-family:inherit;cursor:pointer;}'
+    + '#p16Cf .end .go{background:#2563eb;color:#fff;border:none;} #p16Cf .end .back{background:#fff;color:#0f2040;border:2px solid #0f2040;}'
+    + '#p16Cf .hint{display:none;position:absolute;left:0;right:0;bottom:0;padding:28px 0 calc(12px + env(safe-area-inset-bottom,0px));text-align:center;font-size:13.5px;font-weight:800;color:#0f2040;background:linear-gradient(rgba(233,237,242,0),#e9edf2 55%);pointer-events:none;transition:opacity .2s;}'
+    + '@media (max-width:700px){ #p16Cf{align-items:flex-end;} #p16Cf .bx{position:relative;width:100%;height:94vh;border-radius:18px 18px 0 0;} #p16Cf .ft{display:none;} #p16Cf .end{display:flex;} #p16Cf .hint{display:block;} #p16Cf .hint.gone{opacity:0;} #p16Cf .sc{padding:10px 10px 60px;} }';
+  var st = document.createElement('style'); st.textContent = css; document.head.appendChild(st);
+  var cf = document.createElement('div'); cf.id = 'p16Cf';
+  cf.innerHTML = '<div class="bx"><div class="hd"><b>📄 送信する前に、雇用条件書をご確認ください</b><span>入力した内容が、この形で雇用条件書になります。</span></div>'
+    + '<div class="sc" id="p16CfSc"><div class="warn" id="p16CfWarn" style="display:none;"></div><div class="p16doc" id="p16CfDoc"></div>'
+    + '<div class="end"><button type="button" class="go p16go">✅ この内容で送信する</button><button type="button" class="back p16back">✏️ 入力にもどって直す</button></div></div>'
+    + '<div class="hint" id="p16CfHint">↓ 下までご確認のうえ、いちばん下で送信できます</div>'
+    + '<div class="ft"><button type="button" class="back" id="p16CfBack">✏️ 入力にもどって直す</button><button type="button" class="go" id="p16CfGo">✅ この内容で送信する</button></div></div>';
+  document.body.appendChild(cf);
+  var target = null, ok = false;
+  function close(){ cf.classList.remove('on'); document.body.style.overflow = ''; }
+  var send = function(){ close(); ok = true; try{ target && target.click(); } finally { setTimeout(function(){ ok = false; }, 300); } };
+  document.getElementById('p16CfBack').onclick = close; document.getElementById('p16CfGo').onclick = send;
+  cf.querySelector('.p16back').onclick = close; cf.querySelector('.p16go').onclick = send;
+  // スマホ：いちばん下まで来たら「↓ 下までご確認…」を消す
+  var sc = document.getElementById('p16CfSc'), hint = document.getElementById('p16CfHint');
+  var chk = function(){ hint.classList.toggle('gone', sc.scrollTop + sc.clientHeight >= sc.scrollHeight - 40); };
+  sc.addEventListener('scroll', chk);
+  cf.addEventListener('click', function(e){
+    var t = e.target.closest('[data-go]'); if (!t) return;
+    close(); var src = document.querySelector('#p16Doc [data-go="' + t.getAttribute('data-go') + '"]'); if (src) src.click();
+  });
+  // 「送信する」を押したら、まず確認画面（雇用条件書）を出す
+  document.addEventListener('click', function(e){
+    var b = e.target.closest('.btn-wrap button'); if (!b || ok) return;
+    if (!/送信する/.test(b.textContent) || /途中保存/.test(b.textContent)) return;
+    if (typeof window._p16Active !== 'function' || !window._p16Active()) return;   // 雇用条件のないフォームでは出さない
+    e.preventDefault(); e.stopImmediatePropagation();
+    target = b;
+    var src = document.getElementById('p16Doc'); document.getElementById('p16CfDoc').innerHTML = src ? src.innerHTML : '';
+    var n = document.querySelectorAll('#p16CfDoc .p16e').length, w = document.getElementById('p16CfWarn');
+    w.style.display = n ? '' : 'none'; w.textContent = '⚠ まだ入っていない所が ' + n + 'か所あります（黄色の「未入力」を押すと、その入力欄へ移動します）';
+    cf.classList.add('on'); document.body.style.overflow = 'hidden'; sc.scrollTop = 0; setTimeout(chk, 50);
+  }, true);
+})();
+
 </script>
 </body>
 </html>
