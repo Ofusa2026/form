@@ -143,7 +143,7 @@ html { scroll-padding-top: 70px; scroll-padding-bottom: 200px; }
 @keyframes feShake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-5px)} 75%{transform:translateX(5px)} }
 /* ver.20261125.02: 生年月日は「年・月・日」を選ぶ形に */
 .ymd-wrap { position: relative; display: flex; gap: 6px; }
-.ymd-wrap select { flex: 1 1 0; min-width: 0; }
+.ymd-wrap select { flex: 1 1 0; min-width: 0; padding-left: 8px !important; padding-right: 22px !important; background-position: right 7px center !important; font-size: 15px !important; }
 .ymd-wrap select.ymd-y { flex: 1.4 1 0; }
 .ymd-wrap > input.ymd-src { position: absolute !important; left: 0; top: 0; width: 1px !important; height: 1px !important; min-height: 0 !important; padding: 0 !important; border: 0 !important; opacity: 0; pointer-events: none; }
 </style>
@@ -222,7 +222,8 @@ html { scroll-padding-top: 70px; scroll-padding-bottom: 200px; }
 </div>
 
 <script>
-var FORM_VERSION = 'ver.20261125.02'; // 生年月日（本人・家族・扶養者・名簿の行）をカレンダーではなく「年・月・日」を選ぶ形に。保存される値の形（YYYY-MM-DD）は同じ
+var FORM_VERSION = 'ver.20261125.03'; // 下の「あと○項目」の案内を1行に短く（スマホで入力する場所を広く。長い説明は長押し/マウスを乗せると出る）
+// var FORM_VERSION = 'ver.20261125.02'; // 生年月日（本人・家族・扶養者・名簿の行）をカレンダーではなく「年・月・日」を選ぶ形に。保存される値の形（YYYY-MM-DD）は同じ
 // var FORM_VERSION = 'ver.20261125.01'; // 全フォーム共通：スマホで入力しやすく（言語ボタンを1行に・送信/途中保存を横並び・欄に合ったキーボード・「次へ」で次の欄）＋送信で止まったら、その欄の下に赤字でエラー（母国語つき）を出してそこへ移動
 // var FORM_VERSION = 'ver.20261121.01'; // 企業フォーム（特定技能1号・2号・技人国など雇用条件のあるもの）：雇用条件を入力すると、その場で雇用条件書の形で見られる（パソコンは右に常に表示・スマホは「📄 雇用条件書で見る」で下から開く）。「送信する」を押すと、まず雇用条件書を出して確認してから送信（スマホは下まで見て送信）。分野・業務区分など大房で入れる欄は出さない ／ ver.20261120.07: // 2号の企業フォームでは「住居（支援計画書用）」を出さない（支援計画書が無いため。住居形態・同居人数・内訳・広さの基準は聞かない） ／ ver.20261120.06: // 住居（支援計画書用）：居住費の内訳（借上＝月額家賃／自己所有＝建築・購入費用と耐用年数）を必須にし、実費相当の説明はそこから自動で作る（手で書かない） ／ ver.20261120.05: // 居住費控除を「有」→「無」に戻したとき、初期値で入れた住居形態・同居人数（借上・1）は消す（自分で入れた値は残す） ／ ver.20261120.04: // 住居（支援計画書用）に「居室7.5㎡以上・寝室4.5㎡以上を確保している」のチェック（最初からチェック済み・確保する必要がある旨の案内つき、外すと注意）。roomArea75／bedroomArea45 で送る ／ ver.20261120.03: // 住居（支援計画書用）に「予定・概算で大丈夫です」の案内（テンプレートのメッセージも） ／ ver.20261120.02: // 居住費控除「有」で出る住居形態・同居人数の初期値を「借上」「1」に ／ ver.20261120.01: // 住居（支援計画書用）の「実費相当の説明」をテンプレートで作れるように（住居形態・月額・人数・徴収額→文章を自動作成、1人当たり額は自動計算）
 // var FORM_VERSION = 'ver.20261118.02'; // 未入力の必須項目を薄い黄色＋オレンジ枠で目立たせる（入力すると消える）
@@ -8043,6 +8044,17 @@ var REQ_I18N = {
   done:{ja:'必須項目はすべて入力しました。最後に「送信する」を押してください。',fr:'ひっす こうもくは すべて にゅうりょく しました。さいごに「送信する」を おして ください。',en:'All required items are filled. Please press “送信する (Submit)” at the end.',vi:'Đã nhập đủ các mục bắt buộc. Cuối cùng hãy nhấn “送信する (Gửi)”.',id:'Semua isian wajib sudah diisi. Terakhir, tekan “送信する (Kirim)”.',my:'မဖြစ်မနေဖြည့်ရမည့်အချက်များ အားလုံးဖြည့်ပြီးပါပြီ။ နောက်ဆုံးတွင် “送信する (ပေးပို့ရန်)” ကိုနှိပ်ပါ။',km:'បានបំពេញចំណុចចាំបាច់ទាំងអស់ហើយ។ ចុងក្រោយសូមចុច “送信する (ផ្ញើ)”។',ne:'सबै अनिवार्य विवरण भरिसकियो। अन्त्यमा “送信する (पठाउनुहोस्)” थिच्नुहोस्।',zh:'必填项已全部填写。最后请点击“送信する（提交）”。'},
   notSent:{ja:'※まだ送信されていません。入力が終わったら、最後に「送信する」を押してください。',fr:'※まだ そうしん されて いません。にゅうりょくが おわったら、さいごに「送信する」を おして ください。',en:'※Not submitted yet. When you finish, please press “送信する (Submit)” at the end.',vi:'※Chưa được gửi. Khi nhập xong, hãy nhấn “送信する (Gửi)” ở cuối.',id:'※Belum terkirim. Setelah selesai, tekan “送信する (Kirim)” di bagian akhir.',my:'※မပေးပို့ရသေးပါ။ ဖြည့်ပြီးပါက နောက်ဆုံးတွင် “送信する (ပေးပို့ရန်)” ကိုနှိပ်ပါ။',km:'※មិនទាន់បានផ្ញើទេ។ ពេលបំពេញរួច សូមចុច “送信する (ផ្ញើ)” នៅចុងក្រោយ។',ne:'※अझै पठाइएको छैन। भरिसकेपछि अन्त्यमा “送信する (पठाउनुहोस्)” थिच्नुहोस्।',zh:'※尚未提交。填写完成后，请在最后点击“送信する（提交）”。'}
 };
+// ver.20261125.03: 下の案内（残り○項目）を1行で出す短い文
+var REQ_SHORT = {
+  remain:{ja:'あと {n} 項目（こうもく） ▶ 押すと移動',en:'{n} left — tap to go',vi:'Còn {n} mục — nhấn để đến',id:'Sisa {n} — ketuk untuk ke sana',my:'ကျန် {n} ခု — နှိပ်ပါ',km:'នៅសល់ {n} — ចុចដើម្បីទៅ',ne:'बाँकी {n} — थिच्नुहोस्',zh:'还剩 {n} 项 — 点击前往'},
+  done:{ja:'入力完了！「送信する」を押してください',en:'All done! Press 送信する',vi:'Xong! Nhấn 送信する',id:'Selesai! Tekan 送信する',my:'ပြီးပါပြီ! 送信する ကိုနှိပ်ပါ',km:'រួចរាល់! ចុច 送信する',ne:'सकियो! 送信する थिच्नुहोस्',zh:'已填完！请按「送信する」'}
+};
+function _reqShort(key, n){
+  var m=REQ_SHORT[key]||{}; var L=currentLang||'';
+  var ja=String(m.ja||'').replace('{n}', n);
+  if(L && L!=='ja' && m[L]) return '<b>'+String(m[L]).replace('{n}', n)+'</b><span style="font-weight:400;opacity:.75;"> ／ '+ja+'</span>';
+  return '<b>'+ja+'</b>';
+}
 function _reqT(key, n){
   var m=REQ_I18N[key]||{}; var L=currentLang||'';
   var main=(L&&m[L])?m[L]:m.ja; var out=String(main||'').replace('{n}', n);
@@ -8090,8 +8102,10 @@ function _updateReqRemain(){
       }
     } catch(_he) {}
     el.style.display='block';
-    if(n>0){ el.style.background='#fff7ed'; el.style.color='#9a3412'; el.style.border='1px solid #fed7aa'; el.innerHTML='📝 '+_reqT('remain', n); }
-    else { el.style.background='#eff6ff'; el.style.color='#1d4ed8'; el.style.border='1px solid #bfdbfe'; el.innerHTML='✅ '+_reqT('done', 0); }
+    // ver.20261125.03: 1行に短く（スマホで入力する場所を広く）
+    el.style.whiteSpace='nowrap'; el.style.overflow='hidden'; el.style.textOverflow='ellipsis'; el.style.padding='6px 10px';
+    if(n>0){ el.style.background='#fff7ed'; el.style.color='#9a3412'; el.style.border='1px solid #fed7aa'; el.innerHTML='📝 '+_reqShort('remain', n); el.title=_reqT('remain', n).replace(/<[^>]+>/g,' '); }
+    else { el.style.background='#eff6ff'; el.style.color='#1d4ed8'; el.style.border='1px solid #bfdbfe'; el.innerHTML='✅ '+_reqShort('done', 0); el.title=''; }
   }, 300);
 }
 function _reqJumpFirst(){
@@ -9072,7 +9086,7 @@ function prefillForm(resp) {
 // ===== ver.20261125.02: 生年月日は「年・月・日」を選ぶ形に（カレンダーで昔の年まで戻らなくてよい） =====
 (function(){
   var LBL = {y:{ja:'年',en:'Year',vi:'Năm',id:'Tahun',my:'နှစ်',km:'ឆ្នាំ',ne:'वर्ष',zh:'年'}, m:{ja:'月',en:'Month',vi:'Tháng',id:'Bulan',my:'လ',km:'ខែ',ne:'महिना',zh:'月'}, d:{ja:'日',en:'Day',vi:'Ngày',id:'Tanggal',my:'ရက်',km:'ថ្ងៃ',ne:'दिन',zh:'日'}};
-  function _ph(k){ var L = (typeof currentLang !== 'undefined' && currentLang) || ''; return LBL[k].ja + (L && L !== 'ja' && LBL[k][L] ? ' / ' + LBL[k][L] : ''); }
+  function _ph(k){ var L = (typeof currentLang !== 'undefined' && currentLang) || ''; return LBL[k].ja + (L && L !== 'ja' && LBL[k][L] ? '/' + LBL[k][L] : ''); }
   function _pad(n){ return (n < 10 ? '0' : '') + n; }
   function _isBirth(el){ return el && el.type === 'date' && !el.dataset.ymd && (/birth$/i.test(el.id || '') || el.getAttribute('data-k') === 'birth'); }
   function _opts(sel, from, to, step, ph){
